@@ -1,9 +1,9 @@
 {
   "info": {
-    "name": "Example Plugin",
+    "name": "Example Plugin 2",
     "authors": ["Jiiks"],
     "version": 1.0,
-    "description": "Example Plugin Description"
+    "description": "Example Plugin 2 Description"
   },
   "main": "index.js",
   "defaultConfig": {

@@ -9,7 +9,7 @@
 */
 
 const { Module } = require('./modulebase');
-const { FileUtils } = require('./utils');
+const { FileUtils, Logger } = require('./utils');
 const { Global } = require('./global');
 const path = window.require('path');
 
@@ -57,8 +57,64 @@ class PluginManager extends Module {
         return this.state.plugins;
     }
 
-    pluginsPath() {
+    get pluginsPath() {
         return Global.getObject('paths').find(path => path.id === 'plugins').path;
+    }
+
+    async loadAllPlugins() {
+        try {
+            const directories = await FileUtils.readDir(this.pluginsPath);
+
+            for (let dir of directories) {
+                try {
+                    await this.loadPlugin(dir);
+                } catch (err) {
+                    //We don't want every plugin to fail loading when one does
+                    Logger.err('PluginManager', err);
+                }
+            }
+
+            return this.plugins;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async refreshPlugins() {
+        if (this.plugins.length <= 0) return this.loadAllPlugins();
+        try {
+            const directories = await FileUtils.readDir(this.pluginsPath);
+            for (let dir of directories) {
+                //If a plugin is already loaded this should resolve.
+                if (this.getPluginByDirName(dir)) continue;
+
+                try {
+                    //Load the plugin if not
+                    await this.loadPlugin(dir);
+                } catch (err) {
+                    //We don't want every plugin to fail loading when one does
+                    Logger.err('PluginManager', err);
+                }
+            }
+
+            for (let plugin of this.plugins) {
+                if (directories.includes(plugin.dirName)) continue;
+                //Plugin was deleted manually, stop it and remove any reference
+                try {
+                    if (plugin.enabled) plugin.stop();
+                    const { pluginPath } = plugin;
+                    const index = this.getPluginIndex(plugin);
+
+                    delete window.require.cache[window.require.resolve(pluginPath)];
+                    this.plugins.splice(index, 1);
+                } catch (err) {
+                    //This might fail but we don't have any other option at this point
+                    Logger.err('PluginManager', err);
+                }
+            }
+        } catch (err) {
+            throw err;
+        }
     }
 
     async loadPlugin(pluginPath) {
@@ -66,8 +122,7 @@ class PluginManager extends Module {
         const dirName = pluginPath;
 
         try {
-            const pluginsPath = this.pluginsPath();
-            pluginPath = path.join(pluginsPath, pluginPath);
+            pluginPath = path.join(this.pluginsPath, pluginPath);
 
             const loaded = plugins.find(plugin => plugin.pluginPath === pluginPath);
             if (loaded) {
@@ -136,13 +191,21 @@ class PluginManager extends Module {
 
     stopPlugin(name) {
         const plugin = this.getPluginByName(name);
-        if (plugin && plugin.instance) return plugin.instance.stop();
+        try {
+            if (plugin && plugin.instance) return plugin.instance.stop();
+        } catch (err) {
+            Logger.err('PluginManager', err);
+        }
         return true; //Return true anyways since plugin doesn't exist
     }
 
     startPlugin(name) {
         const plugin = this.getPluginByName(name);
-        if (plugin && plugin.instance) return plugin.instance.start();
+        try {
+            if (plugin && plugin.instance) return plugin.instance.start();
+        } catch (err) {
+            Logger.err('PluginManager', err);
+        }
         return true; //Return true anyways since plugin doesn't exist
     }
 

@@ -3,6 +3,7 @@
         <div class="bd-flex">
             <div class="bd-flex-grow bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Local</h3>
+                <div @click="refreshLocalPlugins()">Refresh</div>
             </div>
             <div class="bd-flex-grow bd-button" :class="{'bd-active': !local}" @click="showOnline">
                 <h3>Online</h3>

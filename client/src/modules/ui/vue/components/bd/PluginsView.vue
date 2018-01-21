@@ -1,17 +1,23 @@
 <template src="./templates/PluginsView.html"></template>
 <script>
+    const { PluginManager } = require('../../../../'); //#1 require of 2018~ :3
+
     /*Imports*/
     import { SettingsWrapper } from './';
     import PluginCard from './PluginCard.vue';
     const components = { SettingsWrapper, PluginCard };
 
     /*Variables*/
-    let dummyPlugins = [
-        { "id": 0, "name": "Dummy Plugin 1", "authors": ["Jiiks"], "version": "1.0", "description": "Dummy Plugin 1 Description" },
-        { "id": 1, "name": "Dummy Plugin 2", "authors": ["Jiiks", "SomeoneElse"], "version": "1.0", "description": "Dummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 DescriptionDummy Plugin 2 Description" }
-    ];
 
-    /*Methods*/
+     /*Methods*/
+    async function refreshLocalPlugins() {
+        try {
+            await PluginManager.refreshPlugins();
+        } catch (err) {
+            
+        }
+        this.localPlugins = PluginManager.plugins;
+    }
 
     function showLocal() {
         this.local = true;
@@ -21,16 +27,19 @@
         this.local = false;
     }
 
-    const methods = { showLocal, showOnline };
+    const methods = { showLocal, showOnline, refreshLocalPlugins };
 
     export default {
         components,
         data() {
             return {
-                localPlugins: dummyPlugins,
+                localPlugins: [],
                 local: true
             }
         },
-        methods
+        methods,
+        created: function () {
+            this.refreshLocalPlugins();
+        }
     }
 </script>

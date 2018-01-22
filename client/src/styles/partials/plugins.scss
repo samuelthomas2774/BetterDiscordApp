@@ -26,10 +26,7 @@
             user-select: none;
             display: block;
             font-size: 1.17em;
-            margin-top: 1em;
-            margin-bottom: 1em;
-            margin-left: 0;
-            margin-right: 0;
+            margin: 10px 10px 10px 40px;
             font-weight: bold;
             flex-grow: 1;
         }
@@ -39,6 +36,10 @@
             color: #fff;
             background: transparent;
             border-bottom: 2px solid #3e82e5;
+        }
+
+        &.bd-active {
+            cursor: default;
         }
 
         .material-design-icon {
@@ -57,6 +58,7 @@
     justify-content: center;
     width: 30px;
     height: 30px;
+    cursor: pointer;
 
     > span {
         display: flex;

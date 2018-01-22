@@ -7,3 +7,4 @@ export { WebpackModules } from './core/webpackmodules';
 export { Events } from './core/events';
 export { SocketProxy } from './core/discordsocket';
 export { CssEditor } from './core/csseditor';
+export { Settings } from './core/settings';

@@ -1,0 +1,55 @@
+[
+    {
+        "id": "core",
+        "text": "Core",
+        "settings": [
+            {
+                "id": "test-setting",
+                "text": "Test Setting",
+                "hint": "Test Setting",
+                "enabled": false,
+                "disabled": false
+            },
+            {
+                "id": "test-setting2",
+                "text": "Test Setting 2",
+                "hint": "Test Setting 2",
+                "enabled": true,
+                "disabled": false
+            },
+            {
+                "id": "voice-disconnect",
+                "text": "Voice Disconnect",
+                "hint": "Disconnect from voice server when Discord closes",
+                "enabled": false,
+                "disabled": true
+            },
+            {
+                "id": "developer-mode",
+                "text": "Developer Mode",
+                "hint": "BetterDiscord developer mode",
+                "enabled": false,
+                "disabled": true
+            }
+        ]
+    },
+    {
+        "id": "ui",
+        "text":  "UI", 
+        "settings": [
+
+        ]
+    },
+    {
+        "id": "emotes",
+        "text": "Emotes",
+        "settings": []
+    },
+    {
+        "id": "security",
+        "text": "Security",
+        "settings": [
+
+        ] 
+    }
+]

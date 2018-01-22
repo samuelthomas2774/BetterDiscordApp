@@ -1,11 +1,13 @@
 <template src="./templates/BdSettings.html"></template>
 
 <script>
-    const { CssEditor } = require('../../../');
+
+    const { Settings } = require('../../../');
+
     /*Imports*/
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { CoreSettings, UISettings, EmoteSettings, PluginsView } from './bd';
-    const components = { SidebarView, Sidebar, SidebarItem, ContentColumn, CoreSettings, UISettings, EmoteSettings, PluginsView };
+    import { CoreSettings, UISettings, EmoteSettings, PluginsView, CssEditorView } from './bd';
+    const components = { SidebarView, Sidebar, SidebarItem, ContentColumn, CoreSettings, UISettings, EmoteSettings, PluginsView, CssEditorView };
 
     /*Constants*/
     const sidebarItems = [
@@ -21,10 +23,6 @@
 
     /*Methods*/
     function itemOnClick(id) {
-        if (id === 3) {
-            CssEditor.show();
-            return;
-        }
         if (this.animating || id === this.activeIndex) return;
         if (this.activeIndex >= 0) this.sidebarItems.find(item => item.id === this.activeIndex).active = false;
         this.sidebarItems.find(item => item.id === id).active = true;
@@ -54,7 +52,21 @@
         return item.id === this.activeIndex;
     }
 
-    const methods = { itemOnClick, animatingContent, activeContent };
+    function enableSetting(cat, id) {
+        switch (cat) {
+            case 'core':
+                return this.coreSettings.find(setting => setting.id === id).enabled = true;
+        }
+    }
+
+    function disableSetting(cat, id) {
+        switch (cat) {
+            case 'core':
+                return this.coreSettings.find(setting => setting.id === id).enabled = false;
+        }
+    }
+
+    const methods = { itemOnClick, animatingContent, activeContent, enableSetting, disableSetting };
 
     export default {
         components,
@@ -66,7 +78,13 @@
                 activeIndex: -1,
                 lastActiveIndex: -1,
                 animating: false,
-                first: true
+                first: true,
+                settings: Settings.getSettings
+            }
+        },
+        computed: {
+            coreSettings: function () {
+                return this.settings.find(settingset => settingset.id === 'core').settings;
             }
         },
         updated: function () {

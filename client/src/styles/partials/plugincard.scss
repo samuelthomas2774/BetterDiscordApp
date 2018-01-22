@@ -2,9 +2,9 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    background: rgba(32, 34, 37, 0.6);
+    background: #2f3136;
     border: 1px solid #202225;
-    padding: 5px 10px;
+    padding: 10px 5px;
     min-height: 150px;
     color: #b9bbbe;
     border-radius: 8px;
@@ -15,7 +15,6 @@
         display: flex;
         flex-grow: 0;
         font-weight: 700;
-        box-shadow: 0 1px 0px darken(#2f3136, 8%);
     }
 
     .bd-plugin-body {
@@ -31,7 +30,7 @@
             color: #8a8c90;
             font-size: 12px;
             font-weight: 600;
-            background: rgba(32, 34, 37, 0.6);
+            background: rgba(0,0,0,.05);
             padding: 5px;
             border-radius: 8px;
             margin-top: 5px;

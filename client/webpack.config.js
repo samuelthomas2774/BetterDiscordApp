@@ -13,7 +13,6 @@ const jsLoader = {
 
 const vueLoader = {
     test: /\.(vue)$/,
-    exclude: /node_modules/,
     loader: 'vue-loader'
 }
 

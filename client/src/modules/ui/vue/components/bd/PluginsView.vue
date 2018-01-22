@@ -5,7 +5,8 @@
     /*Imports*/
     import { SettingsWrapper } from './';
     import PluginCard from './PluginCard.vue';
-    const components = { SettingsWrapper, PluginCard };
+    import Refresh from 'vue-material-design-icons/Refresh.vue';
+    const components = { SettingsWrapper, PluginCard, Refresh };
 
     /*Variables*/
 
@@ -43,3 +44,55 @@
         }
     }
 </script>
+
+<style>
+    .bd-spinner-container {
+        display: flex;
+        flex-grow: 1;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+    }
+
+    .bd-spinner-container .bd-spinner-2 {
+        width: 200px;
+        height: 200px;
+     }
+
+    .bd-pluginsView .bd-button {
+        display: flex;
+    }
+
+    .bd-pluginsView .bd-button h3 {
+        flex-grow: 1;
+    } 
+    
+    .bd-pluginsView .bd-button .material-design-icon {
+        display: flex;
+        align-items: center;
+        fill: #FFF;
+    }
+
+    .bd-material-button {
+        border-radius: 3px;
+        display: flex;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+    }
+
+    .bd-pluginsView .bd-button {
+        border-bottom: 2px solid #2b2d31;
+        align-items: center;
+    }
+
+    .bd-material-button > span {
+        display: flex;
+    }
+
+    .bd-material-button:hover {
+        background: #2d2f34;
+    }
+</style>

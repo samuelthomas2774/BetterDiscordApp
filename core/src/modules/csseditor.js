@@ -5,7 +5,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 const path = require('path');
@@ -16,7 +16,9 @@ const { Module } = require('./modulebase');
 class CSSEditor extends Module {
 
     openEditor(o) {
-        if (this.editor && this.editor.open) {
+        if (this.editor) {
+            if (this.editor.isFocused()) return;
+
             this.editor.focus();
             this.editor.flashFrame(true);
             o.reply(true);
@@ -26,9 +28,10 @@ class CSSEditor extends Module {
         this.editor = new BrowserWindow(this.options);
         this.editor.loadURL(`file://${this.editorPath}/index.html`);
         this.editor.open = true;
+        this.editor.setSheetOffset(33);
 
         this.editor.webContents.on('close', () => {
-            this.editor.open = false;
+            this.editor = null;
         });
 
         this.editor.webContents.on('did-finish-load', () => {
@@ -55,6 +58,7 @@ class CSSEditor extends Module {
 
     //TODO Currently uses a development path
     get editorPath() {
+        return path.resolve(__dirname, '..', '..', '..', 'csseditor', 'dist');
         return path.resolve(__dirname, '..', '..', '..', 'tests', 'csseditor');
     }
 

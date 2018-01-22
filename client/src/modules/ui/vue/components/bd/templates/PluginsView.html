@@ -3,14 +3,22 @@
         <div class="bd-flex">
             <div class="bd-flex-grow bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Local</h3>
-                <div @click="refreshLocalPlugins()">Refresh</div>
+                <div class="bd-material-button" @click="refreshLocalPlugins">
+                    <refresh />
+                </div>
             </div>
             <div class="bd-flex-grow bd-button" :class="{'bd-active': !local}" @click="showOnline">
                 <h3>Online</h3>
+                <div class="bd-material-button">
+                    <refresh/>
+                </div>
             </div>
         </div>
         <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
             <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id"/>
+        </div>
+        <div v-if="!local" class="bd-spinner-container">
+            <div class="bd-spinner-2"></div>
         </div>
     </div>
 </SettingsWrapper>

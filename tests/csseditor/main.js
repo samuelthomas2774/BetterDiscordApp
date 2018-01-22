@@ -29,14 +29,14 @@ $closeeditor.on('click', e => window.close());
 
 $btnSave.on('click', () => sendToDiscord("save-css", codeMirror.getValue()));
 $btnUpdate.on('click', () => sendToDiscord("update-css", codeMirror.getValue()));
-$chkboxLiveUpdate.on('click', () => options.liveUpdate = $chkboxLiveUpdate[0].checked);
+$chkboxLiveUpdate.on('change', () => options.liveUpdate = $chkboxLiveUpdate[0].checked);
 
 BDIpc.on("set-css", (_, data) => {
     if (data.error) {
         alert(data.error);
         return;
     }
-    
+
     setCss(data.css);
     $spinner.hide();
 });
@@ -46,14 +46,6 @@ function setCss(css) {
 }
 
 function alert(message) {}
-
-
-
-
-
-
-
-
 
 const codeMirror = CodeMirror($editor[0], {
     lineNumbers: true,
@@ -66,7 +58,7 @@ const codeMirror = CodeMirror($editor[0], {
 });
 
 codeMirror.on('change', () => {
-    if (options.liveUpdate) 
+    if (options.liveUpdate)
         sendToDiscord("update-css", codeMirror.getValue());
 });
 
@@ -75,7 +67,6 @@ codeMirror.on('keyup', function (editor, event) {
     if (ExcludedIntelliSenseTriggerKeys[event.keyCode]) return;
     CodeMirror.commands.autocomplete(editor, null, { completeSingle: false });
 });
-
 
 const ExcludedIntelliSenseTriggerKeys = {
     '8': 'backspace',
@@ -127,4 +118,6 @@ const ExcludedIntelliSenseTriggerKeys = {
     '192': 'graveaccent',
     '220': 'backslash',
     '222': 'quote'
-}
+};
+
+BDIpc.send('bd-get-css');

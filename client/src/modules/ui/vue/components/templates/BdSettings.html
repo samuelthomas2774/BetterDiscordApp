@@ -9,10 +9,13 @@
         </Sidebar>
         <ContentColumn slot="content">
             <div :class="{active: activeContent('core'), animating: animatingContent('core')}">
-                <CoreSettings />
+                <CoreSettings :settings="coreSettings" :enableSetting="enableSetting" :disableSetting="disableSetting"/>
             </div>
             <div :class="{active: activeContent('ui'), animating: animatingContent('ui')}">
                 <UISettings />
+            </div>
+            <div :class="{active: activeContent('css'), animating: animatingContent('css')}">
+                <CssEditorView />
             </div>
             <div :class="{active: activeContent('emotes'), animating: animatingContent('emotes')}">
                 <EmoteSettings />

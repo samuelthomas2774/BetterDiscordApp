@@ -72,10 +72,11 @@
                     &:hover,
                     &.active {
                         background: $colbdblue;
+                        color: #FFF;
                     }
 
                     &.active {
-                        color: #FFF;
+                        cursor: default;
                     }
                 }
             }

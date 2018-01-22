@@ -1,0 +1,51 @@
+<html>
+<head>
+    <title>CSS Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/theme/material.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/scroll/simplescrollbars.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/addon/dialog/dialog.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/hint/show-hint.min.css" />
+    <link rel="stylesheet" href="./main.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="titlebar">
+            <div class="draggable"></div>
+            <div class="icon">
+                <div class="inner"></div>
+            </div>
+            <div class="title">CSS Editor</div>
+            <div class="flex-spacer"></div>
+            <div class="controls">
+                <button title="Toggle always on top" id="toggleaot">P</button>
+                <button title="Close CSS Editor" id="closeeditor">X</button>
+            </div>
+        </div>
+        <div id="spinner"><div class="valign">Loading Please Wait...</div></div>
+        <div class="editor" id="editor">
+        </div>
+        <div class="tools">
+            <div class="flex-row">
+                <button id="btnSave">Save</button>
+                <button id="btnUpdate">Update</button>
+                <div id="chkboxLiveUpdate"><input type="checkbox"><span>Live Update</span></div>
+            </div>
+            <div class="flex-row">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/scroll/simplescrollbars.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/search/search.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/search/searchcursor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/search/jump-to-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/dialog/dialog.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/hint/css-hint.min.js"></script>
+    <script src="./main.js"></script>
+</body>
+</html>

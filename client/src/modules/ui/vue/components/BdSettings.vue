@@ -1,6 +1,7 @@
 <template src="./templates/BdSettings.html"></template>
 
 <script>
+    const { CssEditor } = require('../../../');
     /*Imports*/
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { CoreSettings, UISettings, EmoteSettings, PluginsView } from './bd';
@@ -20,6 +21,10 @@
 
     /*Methods*/
     function itemOnClick(id) {
+        if (id === 3) {
+            CssEditor.show();
+            return;
+        }
         if (this.animating || id === this.activeIndex) return;
         if (this.activeIndex >= 0) this.sidebarItems.find(item => item.id === this.activeIndex).active = false;
         this.sidebarItems.find(item => item.id === id).active = true;

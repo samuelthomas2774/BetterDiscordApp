@@ -9,7 +9,6 @@
 */
 
 const { Module } = require('./modulebase');
-const moment = require('moment');
 const fs = window.require('fs');
 const path = window.require('path');
 
@@ -30,7 +29,7 @@ class Logger {
         }
         level = this.parseLevel(level);
         console[level]('[%cBetter%cDiscord:%s] %s', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, message);
-        logs.push(`[${moment().format('DD/MM/YY hh:mm:ss')}|${module}|${level}] ${message}`);
+        logs.push(`[${BetterDiscord.vendor.moment().format('DD/MM/YY hh:mm:ss')}|${module}|${level}] ${message}`);
         window.bdlogs = logs;
     }
 
@@ -183,5 +182,43 @@ class FileUtils {
     }
 }
 
+class Filters {
+    static byProperties(props, selector = m => m) {
+        return module => {
+            const component = selector(module);
+            if (!component) return false;
+            return props.every(property => component[property] !== undefined);
+        };
+    }
 
-module.exports = { Logger, Utils, FileUtils }
+    static byPrototypeFields(fields, selector = m => m) {
+        return module => {
+            const component = selector(module);
+            if (!component) return false;
+            if (!component.prototype) return false;
+            return fields.every(field => component.prototype[field] !== undefined);
+        };
+    }
+
+    static byCode(search, selector = m => m) {
+        return module => {
+            const method = selector(module);
+            if (!method) return false;
+            return method.toString().search(search) !== -1;
+        };
+    }
+
+    static byDisplayName(name) { 
+        return module => {
+            return module && module.displayName === name;
+        };
+    }
+
+    static combine(...filters) { 
+        return module => {
+            return filters.every(filter => filter(module));
+        };
+    }
+};
+
+module.exports = { Logger, Utils, FileUtils, Filters }

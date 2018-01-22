@@ -11,6 +11,9 @@
 const { ipcRenderer } = require('electron');
 
 class BDIpc {
+    static on(channel, cb) {
+        ipcRenderer.on(channel, (event, message) => cb(event, message));
+    }
 
     static async send(channel, message) {
         channel = channel.startsWith('bd-') ? channel : `bd-${channel}`;

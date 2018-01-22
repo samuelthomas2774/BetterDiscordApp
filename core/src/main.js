@@ -23,7 +23,7 @@ const __DEV = {
 const __pluginPath = path.resolve(__dirname, '..', '..', 'tests', 'plugins');
 const __themePath = path.resolve(__dirname, '..', '..', 'tests', 'themes');
 
-const { Utils, FileUtils, BDIpc, Config, WindowUtils } = require('./modules');
+const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor } = require('./modules');
 const { BrowserWindow } = require('electron');
 
 const Common = {};
@@ -50,6 +50,9 @@ class Comms {
         BDIpc.on('bd-getConfig', o => {
             o.reply(Common.Config.config);
         });
+
+        BDIpc.on('bd-openCssEditor', o => CSSEditor.openEditor(o));
+        BDIpc.on('bd-setCss', o => CSSEditor.setCSS(o.args));
 
         BDIpc.on('bd-readFile', this.readFile);
         BDIpc.on('bd-readJson', o => this.readFile(o, true));
@@ -102,6 +105,7 @@ class BetterDiscord {
             this.windowUtils.send('did-navigate-in-page', { event, url, isMainFrame });
         });
 
+        BDIpc.on('bd-sendToDiscord', event => this.windowUtils.send(event.args.channel, event.args.message))
 
         setTimeout(() => {
             if (__DEV) { this.injectScripts(); }

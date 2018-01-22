@@ -1,0 +1,45 @@
+{
+  "name": "betterdiscord",
+  "description": "BetterDiscord",
+  "author": "Jiiks",
+  "version": "0.4.0",
+  "homepage": "https://betterdiscord.net",
+  "license": "MIT",
+  "main": "./core/index.js",
+  "contributors": [
+    "Jiiks",
+    "Pohky"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jiiks/BetterDiscordApp.git"
+  },
+  "private": false,
+  "devDependencies": {
+    "webpack": "^3.10.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "babel-loader": "^7.1.2",
+    "jquery": "^3.2.1",
+    "vue": "^2.5.13",
+    "vue-loader": "^13.7.0",
+    "vue-template-compiler": "^2.5.13",
+    "css-loader": "^0.28.9",
+    "sass-loader": "^6.0.6",
+    "node-sass": "^4.7.2",
+    "electron": "^1.7.10",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "pump": "^2.0.0",
+    "gulp-plumber": "^1.2.0",
+    "gulp-watch": "^5.0.0"
+  },
+  "scripts": {
+    "build": "cd ./client && npm run build && cd ../core && npm run build",
+    "watch_client": "cd ./client && npm run watch",
+    "watch_core": "cd ./core && npm run watch",
+    "test":  "npm run build" 
+  }
+}

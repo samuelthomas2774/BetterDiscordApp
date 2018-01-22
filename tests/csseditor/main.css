@@ -1,0 +1,254 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    max-height: 100%;
+    height: 100%;
+    background: #2c383e;
+    min-width: 700px;
+    min-height: 400px;
+}
+
+* {
+    outline: none;
+}
+
+.flex-spacer {
+    flex-grow: 1;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.valign {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.container {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    height: 100%;
+}
+
+.titlebar {
+    display: flex;
+    height: 40px;
+    background: #292b2f;
+    border-bottom: 1px solid hsla(218,5%,47%,.3);
+}
+
+.titlebar .icon {
+    width: 45px;
+    height: 40px;
+}
+
+.titlebar .icon .inner {
+    width: 40px;
+    height: 40px;
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FscXVlXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjAwMCAyMDAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyMDAwIDIwMDAiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnPjxwYXRoIGZpbGw9IiMzRTgyRTUiIGQ9Ik0xNDAyLjIsNjMxLjdjLTkuNy0zNTMuNC0yODYuMi00OTYtNjQyLjYtNDk2SDY4LjR2NzE0LjFsNDQyLDM5OFY0OTAuN2gyNTdjMjc0LjUsMCwyNzQuNSwzNDQuOSwwLDM0NC45SDU5Ny42djMyOS41aDE2OS44YzI3NC41LDAsMjc0LjUsMzQ0LjgsMCwzNDQuOGgtNjk5djM1NC45aDY5MS4yYzM1Ni4zLDAsNjMyLjgtMTQyLjYsNjQyLjYtNDk2YzAtMTYyLjYtNDQuNS0yODQuMS0xMjIuOS0zNjguNkMxMzU3LjcsOTE1LjgsMTQwMi4yLDc5NC4zLDE0MDIuMiw2MzEuN3oiLz48cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTI2Mi41LDEzNS4yTDEyNjIuNSwxMzUuMmwtNzYuOCwwYzI2LjYsMTMuMyw1MS43LDI4LjEsNzUsNDQuM2M3MC43LDQ5LjEsMTI2LjEsMTExLjUsMTY0LjYsMTg1LjNjMzkuOSw3Ni42LDYxLjUsMTY1LjYsNjQuMywyNjQuNmwwLDEuMnYxLjJjMCwxNDEuMSwwLDU5Ni4xLDAsNzM3LjF2MS4ybDAsMS4yYy0yLjcsOTktMjQuMywxODgtNjQuMywyNjQuNmMtMzguNSw3My44LTkzLjgsMTM2LjItMTY0LjYsMTg1LjNjLTIyLjYsMTUuNy00Ni45LDMwLjEtNzIuNiw0My4xaDcyLjVjMzQ2LjIsMS45LDY3MS0xNzEuMiw2NzEtNTY3LjlWNzE2LjdDMTkzMy41LDMxMi4yLDE2MDguNywxMzUuMiwxMjYyLjUsMTM1LjJ6Ii8+PC9nPjwvc3ZnPg==);
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.titlebar .title {
+    color: #bac9d2;
+    font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+    line-height: 41px;
+}
+
+.titlebar .controls {
+    margin: 4px 4px 0 0;
+}
+
+.titlebar .controls button {
+    -webkit-app-region: no-drag;
+    border-radius: 3px;
+    width: 25px;
+    font-size: 12px;
+    font-weight: 600;
+    /*background: #263238;*/
+    background: #36393f;
+    color: #bac9d2;
+    font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+    transition: background-color .2s ease;
+    cursor: pointer;
+    border: 0;
+    height: 25px;
+    z-index: 900062;
+    padding: 0;
+    margin: 0;
+}
+
+.titlebar .controls button:hover {
+    background: #44474e;
+    color: #FFF;
+}
+
+.titlebar .controls button.active {
+    background: #3a71c1;
+}
+
+.titlebar .draggable {
+    top: 4px;
+    left: 4px;
+    right: 62px;
+    position: absolute;
+    height: 36px;
+    -webkit-app-region: drag;
+}
+
+#spinner {
+    background: rgba(51, 48, 48, 0.41);
+    position: absolute;
+    top: 41px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: #bac9d2;
+    font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+    font-weight: 600;
+    font-size: 2em;
+    z-index: 90000;
+}
+
+.editor {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.editor .CodeMirror {
+    flex-grow: 1;
+}
+
+.tools {
+    height: 60px;
+    background: #292b2f;
+    border-top: 1px solid hsla(218,5%,47%,.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.tools .flex-row {
+    flex-grow: 1;
+    padding: 3px 0;
+}
+
+.tools button {
+    border-radius: 3px;
+    width: 100px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #36393f;
+    color: #bac9d2;
+    font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+    transition: background-color .2s ease;
+    cursor: pointer;
+    border: 0;
+    margin-left: 5px;
+}
+
+.tools button:hover {
+    background: #44474e;
+    color: #FFF;
+}
+
+.tools #chkboxLiveUpdate span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #bac9d2;
+    font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+
+
+/*CodeMirror styling*/
+.CodeMirror-overlayscroll .CodeMirror-scrollbar-filler {
+    background: #38444a;
+}
+
+.CodeMirror-overlayscroll-horizontal div,
+.CodeMirror-overlayscroll-vertical div {
+    background: rgb(41, 43, 47);
+}
+
+.CodeMirror-overlayscroll-horizontal ,
+.CodeMirror-overlayscroll-horizontal div {
+    height: 10px;
+}
+
+.CodeMirror-overlayscroll-vertical ,
+.CodeMirror-overlayscroll-vertical div {
+    width: 10px;
+}
+
+.CodeMirror-scrollbar-filler {
+    width: 10px;
+    height: 10px;
+    background: rgb(41, 43, 47);
+}
+
+.cm-s-material.CodeMirror {
+    background: #36393f;
+}
+
+.cm-s-material .CodeMirror-gutters {
+    background: #292b2f;
+}
+
+.CodeMirror-hints {
+    /*background: #1e262a;*/
+    background: #292b2f;
+    box-shadow: 2px 3px 5px rgba(4, 4, 4, 0.22);
+    border: 1px solid #262f33;
+}
+
+.CodeMirror-hints::-webkit-scrollbar {
+    background: transparent;
+}
+
+.CodeMirror-hints::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,.4);
+    border-color: transparent;
+}
+
+.CodeMirror-hints::-webkit-scrollbar-thumb,
+.CodeMirror-hints::-webkit-scrollbar-track {
+    background-clip: padding-box;
+    border-width: 3px;
+    border-style: solid;
+    border-radius: 7px;
+}
+
+.CodeMirror-hints::-webkit-scrollbar-track {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.cm-s-material .CodeMirror-linenumber {
+    color: #f6f6f7;
+}
+
+.CodeMirror-hint {
+    color: #bac9d2;
+}
+
+li.CodeMirror-hint-active {
+    color: #bac9d2;
+    /*background: #3b4950;*/
+    background: #36393f;
+}
+
+.CodeMirror-dialog-top {
+    bottom: 0;
+    top: auto;
+    border: none;
+    background: #1e262a;
+}

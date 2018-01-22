@@ -2,6 +2,10 @@ const { ipcRenderer } = require('electron');
 
 class BDIpc {
 
+    static on(channel, cb) {
+        ipcRenderer.on(channel, (event, args) => cb(event, args));
+    }
+
     static async send(channel, message) {
         const __eid = Date.now().toString();
         ipcRenderer.send(
@@ -18,3 +22,5 @@ class BDIpc {
     }
 
 }
+
+module.exports = { BDIpc };

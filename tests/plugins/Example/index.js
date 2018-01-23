@@ -12,6 +12,7 @@ module.exports = (Plugin, Api, Vendor) => {
 
         onStart() {
             console.log('On Start!');
+            return true;
         }
     }
 

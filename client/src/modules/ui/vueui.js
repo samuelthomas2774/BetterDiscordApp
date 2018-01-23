@@ -11,7 +11,7 @@
 const $ = require('jquery');
 const Vue = require('vue');
 
-const BdSettingsWrapper = (require('./vue/components/BdSettingsWrapper.vue')).default;
+const BdSettingsWrapper = (require('./components/BdSettingsWrapper.vue')).default;
 class UI {
 
     constructor() {

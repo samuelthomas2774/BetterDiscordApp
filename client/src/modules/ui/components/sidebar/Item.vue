@@ -1,17 +1,11 @@
-<template>
-    <SidebarButton v-if="item.t == 'button'" :item="item" :onClick="onClick" />
-    <SidebarHeader v-else-if="item.t == 'header'" :item="item" />
-</template>
+<template src="./templates/Item.html"></template>
 <script>
+    /*Imports*/
+    import { SidebarHeader, SidebarButton } from './';
+    const components = { SidebarHeader, SidebarButton };
 
-import { SidebarHeader, SidebarButton } from './';
-
-export default {
-	components: {
-        SidebarHeader,
-        SidebarButton
-	},
-    props: ['item', 'onClick']
-}
-
+    export default {
+        components,
+        props: ['item', 'onClick']
+    }
 </script>

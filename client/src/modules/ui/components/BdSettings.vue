@@ -1,8 +1,8 @@
 <template src="./templates/BdSettings.html"></template>
 
 <script>
-
-    const { Settings } = require('../../../');
+    const { Settings } = require('../../');
+    const electron = require('electron');
 
     /*Imports*/
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
@@ -66,7 +66,11 @@
         }
     }
 
-    const methods = { itemOnClick, animatingContent, activeContent, enableSetting, disableSetting };
+    function openLink(e) {
+        electron.shell.openExternal(e.target.href);
+    }
+
+    const methods = { itemOnClick, animatingContent, activeContent, enableSetting, disableSetting, openLink };
 
     export default {
         components,

@@ -56,13 +56,28 @@
 }
 
 .bd-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    color: #b9bbbe;
-    background: #202225;
+    color: #FFF;
     text-align: center;
-    -webkit-user-select: none;
     user-select: none;
     font-weight: 500;
+    background: $colbdblue;
+
+    &:not(.bd-disabled):hover {
+        background: darken($colbdblue, 5%);
+    }
+
+    &.bd-disabled {
+        filter: grayscale(90%);
+        cursor: not-allowed;
+    }
+
+    .bd-spinner-7 {
+        opacity: .3;
+    }
 }
 
 .bd-form-item h5 {
@@ -103,26 +118,20 @@
     background: #C42929;
 
     &:hover {
-        background: lighten(#C42929, 2%);
+        background: darken(#C42929, 2%);
     }
 }
 
 .bd-form-button {
-    background: #3e82e5;
     width: 100px;
     height: 30px;
     line-height: 30px;
     text-align: center;
-    color: #FFF;
     border-radius: 4px;
     margin-top: 10px;
     cursor: pointer;
     font-weight: 500;
     user-select: none;
-
-    &:hover {
-        background: lighten(#3e82e5, 5%);
-    }
 }
 
 @import './switches.scss';

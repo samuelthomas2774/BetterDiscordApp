@@ -2,9 +2,9 @@
     <div class="bd-plugin-header">
         <span>{{plugin.name}}</span>
         <div class="bd-flex-spacer"/>
-        <label class="bd-switch-wrapper">
+        <label class="bd-switch-wrapper" @click="togglePlugin(plugin)">
             <input type="checkbox" class="bd-switch-checkbox" />
-            <div class="bd-switch"/>
+            <div class="bd-switch" :class="{'bd-checked': plugin.enabled}" />
         </label>
     </div>
     <div class="bd-plugin-body">

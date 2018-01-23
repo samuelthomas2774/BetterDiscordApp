@@ -1,6 +1,6 @@
 <template src="./templates/PluginsView.html"></template>
 <script>
-    const { PluginManager } = require('../../../../'); //#1 require of 2018~ :3
+    const { PluginManager } = require('../../../'); //#1 require of 2018~ :3
 
     /*Imports*/
     import { SettingsWrapper } from './';
@@ -17,7 +17,6 @@
         } catch (err) {
 
         }
-        this.localPlugins = PluginManager.plugins;
     }
 
     function showLocal() {
@@ -28,14 +27,27 @@
         this.local = false;
     }
 
-    const methods = { showLocal, showOnline, refreshLocalPlugins };
+    function togglePlugin(plugin) {
+       if (plugin.enabled) {
+            this.pluginManager.stopPlugin(plugin.name);
+        } else {
+            this.pluginManager.startPlugin(plugin.name);
+        }
+    }
+
+    const methods = { showLocal, showOnline, refreshLocalPlugins, togglePlugin };
 
     export default {
         components,
         data() {
             return {
-                localPlugins: [],
-                local: true
+                local: true,
+                pluginManager: PluginManager
+            }
+        },
+        computed: {
+            localPlugins: function () {
+                return this.pluginManager.plugins;
             }
         },
         methods,

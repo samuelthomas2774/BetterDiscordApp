@@ -6,6 +6,9 @@
                 <span>ESC</span>
             </div>
             <SidebarItem v-for="item in sidebarItems" :item="item" :key="item.id" :onClick="itemOnClick" />
+            <div class="bd-info">
+                <span>v2.0.0a by Jiiks/JsSucks</span>
+            </div>
         </Sidebar>
         <ContentColumn slot="content">
             <div :class="{active: activeContent('core'), animating: animatingContent('core')}">

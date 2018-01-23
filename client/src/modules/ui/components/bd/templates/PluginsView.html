@@ -15,7 +15,7 @@
             </div>
         </div>
         <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
-            <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id"/>
+            <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="togglePlugin"/>
         </div>
         <div v-if="!local" class="bd-spinner-container">
             <div class="bd-spinner-2"></div>

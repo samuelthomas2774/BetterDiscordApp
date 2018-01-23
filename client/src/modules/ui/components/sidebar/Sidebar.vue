@@ -1,11 +1,2 @@
-<template>
-    <div class='bd-sidebar'>
-        <slot />
-    </div>
-</template>
-
-<script>
-export default {
-
-}
-</script>
+<template src="./templates/Sidebar.html"></template>
+<script> export default { }</script>

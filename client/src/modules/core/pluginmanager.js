@@ -17,6 +17,9 @@ class Plugin {
 
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;
+        this.userConfig.enabled = this.userConfig.enabled || false;
+        this.start = this.start.bind(this);
+        this.stop = this.stop.bind(this);
     }
 
     get configs() { return this.__pluginInternals.configs }
@@ -33,12 +36,26 @@ class Plugin {
     get enabled() { return this.userConfig.enabled }
 
     start() {
-        if (this.onStart) return this.onStart();
-        return true; //Assume plugin started since it doesn't have onStart
+        if (this.onStart) {
+            const started = this.onStart();
+            if (started) {
+                return this.userConfig.enabled = true;
+            }
+            return false;
+        }
+        return this.userConfig.enabled = true; //Assume plugin started since it doesn't have onStart
     }
 
     stop() {
-        if (this.onStop) return this.onStop();
+        if (this.onStop) {
+            const stopped = this.onStop();
+            if (stopped) {
+                this.userConfig.enabled = false;
+                return true;
+            }
+            return false;
+        }
+        this.userConfig.enabled = false;
         return true; //Assume plugin stopped since it doesn't have onStop
     }
 
@@ -192,7 +209,7 @@ class PluginManager extends Module {
     stopPlugin(name) {
         const plugin = this.getPluginByName(name);
         try {
-            if (plugin && plugin.instance) return plugin.instance.stop();
+            if (plugin) return plugin.stop();
         } catch (err) {
             Logger.err('PluginManager', err);
         }
@@ -202,7 +219,7 @@ class PluginManager extends Module {
     startPlugin(name) {
         const plugin = this.getPluginByName(name);
         try {
-            if (plugin && plugin.instance) return plugin.instance.start();
+            if (plugin) return plugin.start();
         } catch (err) {
             Logger.err('PluginManager', err);
         }

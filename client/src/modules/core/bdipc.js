@@ -5,14 +5,18 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 const { ipcRenderer } = require('electron');
 
 class BDIpc {
     static on(channel, cb) {
-        ipcRenderer.on(channel, (event, message) => cb(event, message));
+        ipcRenderer.on(channel, cb.__ipc_binding = (event, message) => cb(event, message));
+    }
+
+    static off(channel, cb) {
+        ipcRenderer.removeListener(channel, cb.__ipc_binding);
     }
 
     static async send(channel, message) {

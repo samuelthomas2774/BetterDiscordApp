@@ -5,7 +5,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 /*
@@ -16,7 +16,7 @@ class Module {
 
     constructor(args) {
         this.__ = {
-            state: args,
+            state: args || {},
             args
         }
         this.init();
@@ -25,6 +25,12 @@ class Module {
     init() {
         if (this.bindings) this.bindings();
         if (this.setInitialState) this.setInitialState(this.state);
+    }
+
+    setState(newState) {
+        const oldState = this.state;
+        Object.assign(this.__.state, newState);
+        if (this.stateChanged) this.stateChanged(oldState, newState);
     }
 
     set args(t) {}

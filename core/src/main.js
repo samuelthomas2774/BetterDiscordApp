@@ -5,7 +5,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 const path = require('path');
@@ -23,7 +23,7 @@ const __DEV = {
 const __pluginPath = path.resolve(__dirname, '..', '..', 'tests', 'plugins');
 const __themePath = path.resolve(__dirname, '..', '..', 'tests', 'themes');
 
-const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor } = require('./modules');
+const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor, AppMenu } = require('./modules');
 const { BrowserWindow } = require('electron');
 
 const Common = {};
@@ -38,7 +38,6 @@ const dummyArgs = {
 };
 
 console.log(dummyArgs);
-
 
 class Comms {
 
@@ -105,7 +104,9 @@ class BetterDiscord {
             this.windowUtils.send('did-navigate-in-page', { event, url, isMainFrame });
         });
 
-        BDIpc.on('bd-sendToDiscord', event => this.windowUtils.send(event.args.channel, event.args.message))
+        BDIpc.on('bd-sendToDiscord', event => this.windowUtils.send(event.args.channel, event.args.message));
+
+        AppMenu.setState({ windowUtils: this.windowUtils });
 
         setTimeout(() => {
             if (__DEV) { this.injectScripts(); }
@@ -155,6 +156,4 @@ class BetterDiscord {
 
 }
 
-module.exports = {
-    BetterDiscord
-}
+module.exports = { BetterDiscord };

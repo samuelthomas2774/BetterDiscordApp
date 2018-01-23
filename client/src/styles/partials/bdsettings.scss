@@ -50,6 +50,10 @@
         top: 26px;
         padding-bottom: 2px;
     }
+
+    .platform-linux & {
+        top: 0;
+    }
 }
 
 .bd-settings {
@@ -107,6 +111,10 @@
         .platform-darwin & {
             top: 44px;
         }
+
+        .platform-linux & {
+            top: 0;
+        }
     }
 
     .platform-darwin & {
@@ -116,5 +124,9 @@
         .bd-sidebar-view .bd-content-region {
             padding-top: 22px;
         }
+    }
+
+    .platform-linux & {
+        top: 0;
     }
 }

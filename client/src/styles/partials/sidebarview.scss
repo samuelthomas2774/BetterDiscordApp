@@ -72,10 +72,11 @@
                     &:hover,
                     &.active {
                         background: $colbdblue;
+                        color: #FFF;
                     }
 
                     &.active {
-                        color: #FFF;
+                        cursor: default;
                     }
                 }
             }
@@ -114,9 +115,9 @@
                     color: $colbdblue;
                     text-transform: uppercase;
                     font-weight: 600;
-                    margin-top: 10px;
-                    margin-bottom: 20px;
-                    font-size: 100%;
+                    margin-top: 26px;
+                    margin-bottom: 17px;
+                    font-size: 17px;
                     outline: 0;
                     padding: 0;
                     vertical-align: baseline;
@@ -141,11 +142,9 @@
         }
 
         .bd-settingsWrap {
-            padding: 20px 15px 15px 15px;
+            padding: 20px 30px 15px;
         }
     }
-
-
 
     &.active {
         .bd-content-region {

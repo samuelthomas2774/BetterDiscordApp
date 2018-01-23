@@ -7,7 +7,7 @@
             </div>
             <SidebarItem v-for="item in sidebarItems" :item="item" :key="item.id" :onClick="itemOnClick" />
             <div class="bd-info">
-                <a href="https://github.com/JsSucks/BetterDiscordApp">v2.0.0a by Jiiks/JsSucks</a>
+                <a href="https://github.com/JsSucks/BetterDiscordApp" @click="openLink">v2.0.0a by Jiiks/JsSucks</a>
             </div>
         </Sidebar>
 

@@ -126,3 +126,21 @@
         }
     }
 }
+
+.bd-info {
+    display: flex;
+    flex-grow: 1;
+    align-items: flex-end;
+    overflow: hidden;
+
+    a {
+        color: #414245;
+        font-weight: 700;
+        font-size: 12px;
+        transition: color .25s ease;
+
+        &:hover {
+            color: lighten(#414245, 25%);
+        }
+    }
+}

@@ -1,8 +1,7 @@
 <template src="./templates/BdSettings.html"></template>
 
 <script>
-
-    const { Settings } = require('../../');
+    const { BDIpc, Settings } = require('../../');
 
     /*Imports*/
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
@@ -52,6 +51,12 @@
         return item.id === this.activeIndex;
     }
 
+    function activateContent(s) {
+        const item = this.sidebarItems.find(item => item.contentid === s);
+        if (item.active) return;
+        this.itemOnClick(item.id);
+    }
+
     function enableSetting(cat, id) {
         switch (cat) {
             case 'core':
@@ -66,7 +71,10 @@
         }
     }
 
-    const methods = { itemOnClick, animatingContent, activeContent, enableSetting, disableSetting };
+    const methods = { itemOnClick, animatingContent, activeContent, activateContent, enableSetting, disableSetting };
+
+    let menuListener;
+    let ipcEventListener;
 
     export default {
         components,
@@ -91,6 +99,13 @@
             if (this.active) return;
             this.activeIndex = this.lastActiveIndex = -1;
             this.sidebarItems.forEach(item => item.active = false);
+        },
+        created: function () {
+            BDIpc.on('bd-show-menu', ipcEventListener = (e, content) => this.activateContent(content));
+        },
+        destroyed: function () {
+            if (menuListener) window.removeEventListener('bd-show-plugins', menuListener);
+            if (ipcEventListener) BDIpc.off('bd-show-menu', ipcEventListener);
         }
     }
 </script>

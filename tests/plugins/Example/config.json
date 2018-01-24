@@ -6,7 +6,20 @@
     "description": "Example Plugin Description"
   },
   "main": "index.js",
-  "defaultConfig": {
-    "foo": "bar"
-  }
+    "defaultConfig": [
+        {
+            "id": "test-setting-1",
+            "type": "bool",
+            "value": false,
+            "text": "Bool Test Setting",
+            "hint": "Bool Test Setting Hint"
+        },
+        {
+            "id": "test-setting-2",
+            "type": "text",
+            "value": "defaultValue",
+            "text": "Text Test Setting",
+            "hint": "Text Test Setting Hint"
+        }
+    ]
 }

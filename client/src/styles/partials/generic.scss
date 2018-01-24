@@ -1,3 +1,5 @@
+@import './buttons.scss';
+
 .bd-scroller-wrap {
     display: flex;
     width: 100%;
@@ -55,30 +57,6 @@
     backface-visibility: hidden;
 }
 
-.bd-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #FFF;
-    text-align: center;
-    user-select: none;
-    font-weight: 500;
-    background: $colbdblue;
-
-    &:not(.bd-disabled):hover {
-        background: darken($colbdblue, 5%);
-    }
-
-    &.bd-disabled {
-        filter: grayscale(90%);
-        cursor: not-allowed;
-    }
-
-    .bd-spinner-7 {
-        opacity: .3;
-    }
-}
 
 .bd-form-item h5 {
     color: #b9bbbe;
@@ -242,3 +220,6 @@
         background: #888888;
     }
 }
+
+
+

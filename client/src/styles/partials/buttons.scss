@@ -1,0 +1,88 @@
+.bd-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #FFF;
+    text-align: center;
+    user-select: none;
+    font-weight: 500;
+    background: $colbdblue;
+
+    &:not(.bd-disabled):hover {
+        background: darken($colbdblue, 5%);
+    }
+
+    &.bd-disabled {
+        filter: grayscale(90%);
+        cursor: not-allowed;
+    }
+
+    .bd-spinner-7 {
+        opacity: .3;
+    }
+}
+
+.bd-button-group {
+    display: flex;
+
+    .bd-button,
+    .bd-material-button {
+        &:first-of-type {
+            border-radius: 6px 0 0 6px;
+        }
+
+        &:last-of-type {
+            border-radius: 0 6px 6px 0;
+        }
+
+        &:not(:last-of-type) {
+            border-right: 1px solid rgba(114, 118, 126, 0.3);
+        }
+
+        &:not(:first-of-type) {
+            border-left: 1px solid rgba(114, 118, 126, 0.1);
+        }
+    }
+}
+
+.bd-tabheader {
+    .bd-button {
+        background: transparent;
+        border-bottom: 2px solid #2b2d31;
+
+        h3 {
+            flex-grow: 1;
+        }
+
+        .bd-material-button {
+            width: 30px;
+            height: 30px;
+
+            .material-design-icon,
+            .bd-material-design-icon {
+                display: flex;
+                align-items: center;
+                fill: #FFF;
+            }
+
+            &:hover {
+                background: #2d2f34;
+            }
+        }
+
+        &:hover,
+        &.bd-active {
+            background: transparent;
+            border-bottom: 2px solid $colbdblue;
+        }
+    }
+}
+
+.bd-material-button {
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+}

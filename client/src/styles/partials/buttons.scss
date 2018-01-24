@@ -21,14 +21,26 @@
 
     &.bd-err {
         background: $colerr;
+
+        &:hover {
+            background: darken($colerr, 5%);
+        }
     }
 
     &.bd-warn {
         background: $colwarn;
+
+        &:hover {
+            background: darken($colwarn, 5%);
+        }
     }
 
     &.bd-ok {
         background: $colok;
+
+        &:hover {
+            background: darken($colok, 5%);
+        }
     }
 
     .bd-spinner-7 {

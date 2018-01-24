@@ -5,7 +5,7 @@
     /*Imports*/
     import { SettingsWrapper } from './';
     import PluginCard from './PluginCard.vue';
-    import Refresh from 'vue-material-design-icons/Refresh.vue';
+    import Refresh from 'vue-material-design-icons/refresh.vue';
     const components = { SettingsWrapper, PluginCard, Refresh };
 
     /*Variables*/

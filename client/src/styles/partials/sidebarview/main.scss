@@ -1,0 +1,47 @@
+.bd-sidebar-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    box-sizing: border-box;
+
+    .bd-sidebar-region {
+        background: #202225;
+        -webkit-box-flex: 1;
+        -webkit-box-pack: end;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        justify-content: flex-end;
+        flex: 1 0 30%;
+        z-index: 5;
+        max-width: 310px;
+        min-width: 310px;
+
+        .bd-settingsWrap {
+            display: flex;
+            height: 100%;
+            -webkit-box-flex: 1;
+            flex: 1;
+            min-height: 1px;
+            box-sizing: border-box;
+            padding: 80px 15px 15px 15px;
+        }
+    }
+
+    .bd-content-region {
+        flex-grow: 1;
+        transform: translateX(-100%);
+        background: #36393e;
+        box-shadow: 0 0 4px #202225;
+        backface-visibility: hidden;
+    }
+
+    &.active {
+        .bd-content-region {
+            animation: bd-slidein .6s forwards;
+        }
+    }
+}

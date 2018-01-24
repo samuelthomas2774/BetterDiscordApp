@@ -35,7 +35,11 @@
         }
     }
 
-    const methods = { showLocal, showOnline, refreshLocalPlugins, togglePlugin };
+    function reloadPlugin(plugin) {
+        this.pluginManager.reloadPlugin(plugin.name);
+    }
+
+    const methods = { showLocal, showOnline, refreshLocalPlugins, togglePlugin, reloadPlugin };
 
     export default {
         components,

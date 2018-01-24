@@ -10,7 +10,7 @@
     const components = { MiSettings, Button, ButtonGroup, MiReload, MiEdit, MiDelete };
 
     export default {
-        props: ['plugin', 'togglePlugin'],
+        props: ['plugin', 'togglePlugin', 'reloadPlugin'],
         components,
         name: "PluginCard"
     }

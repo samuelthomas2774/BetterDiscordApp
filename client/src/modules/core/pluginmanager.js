@@ -134,16 +134,18 @@ class PluginManager extends Module {
         }
     }
 
-    async loadPlugin(pluginPath) {
+    async loadPlugin(pluginPath, reload = false, index) {
         const { plugins } = this.state;
         const dirName = pluginPath;
 
         try {
             pluginPath = path.join(this.pluginsPath, pluginPath);
 
-            const loaded = plugins.find(plugin => plugin.pluginPath === pluginPath);
-            if (loaded) {
-                throw { 'message': 'Attempted to load an already loaded plugin' };
+            if (!reload) {
+                const loaded = plugins.find(plugin => plugin.pluginPath === pluginPath);
+                if (loaded) {
+                    throw { 'message': 'Attempted to load an already loaded plugin' };
+                }
             }
 
             const readConfig = await this.readConfig(pluginPath);
@@ -165,8 +167,8 @@ class PluginManager extends Module {
             const instance = new plugin({configs, info: readConfig.info, main: readConfig.main, paths: { pluginPath, dirName }});
 
             if (instance.enabled) instance.start();
-
-            plugins.push(instance);
+            if (reload) plugins[index] = instance;
+            else plugins.push(instance);
 
             this.setState(plugins);
 
@@ -184,9 +186,9 @@ class PluginManager extends Module {
         const { pluginPath, dirName } = _plugin;
         delete window.require.cache[window.require.resolve(pluginPath)];
 
-        this.plugins.splice(index, 1);
+       // this.plugins.splice(index, 1);
 
-        return this.loadPlugin(dirName);
+        return this.loadPlugin(dirName, true, index);
     }
 
     //TODO make this nicer

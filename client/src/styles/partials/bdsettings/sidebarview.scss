@@ -15,10 +15,20 @@
         opacity: 1;
     }
 
+    .bd-sidebar-view::after {
+        content: "";
+        height: 100%;
+        width: 310px;
+        background-color: #202225;
+        top: 100%;
+        display: block;
+        position: absolute;
+    }
+
     .bd-settings-x {
         position: absolute;
-        top: 15px;
-        left: 250px;
+        top: 17px;
+        left: 255px;
         border: 2px solid #6e6e6e;
         border-radius: 50%;
         width: 25px;
@@ -39,6 +49,10 @@
         &:hover {
             background-color: hsla(218,5%,47%,.3);
         }
+
+        .platform-darwin & {
+            top: 43px;
+        }
     }
 
     .bd-info {
@@ -47,10 +61,15 @@
         align-items: flex-end;
         overflow: hidden;
 
-        span {
+        a {
             color: #414245;
             font-weight: 700;
             font-size: 12px;
+            transition: color .25s ease;
+
+            &:hover {
+                color: lighten(#414245, 25%);
+            }
         }
     }
 

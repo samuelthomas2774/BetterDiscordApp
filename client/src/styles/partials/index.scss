@@ -1,11 +1,9 @@
-@import './images.scss';
-@import './colours.scss';
+@import './variables/index.scss';
 @import './animations.scss';
-@import './spinners.scss';
 @import './layouts.scss';
-@import './bdsettings.scss';
-@import './sidebarview.scss';
-@import './generic.scss';
-@import './plugins.scss';
+
+@import './sidebarview/index.scss';
+@import './bdsettings/index.scss';
+@import './generic/index.scss';
 
 @import './discordoverrides.scss';

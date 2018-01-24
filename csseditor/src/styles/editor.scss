@@ -1,0 +1,17 @@
+.editor {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+
+    .vue-codemirror {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow: hidden;
+
+        &, & .CodeMirror {
+            flex-grow: 1;
+        }
+    }
+}

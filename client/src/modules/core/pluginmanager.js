@@ -5,7 +5,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 const { Module } = require('./modulebase');
@@ -63,7 +63,7 @@ class Plugin {
 }
 
 class PluginManager extends Module {
-    
+
     setInitialState() {
         window.pm = this;
         this.setState({
@@ -141,6 +141,9 @@ class PluginManager extends Module {
 
         try {
             pluginPath = path.join(this.pluginsPath, pluginPath);
+
+            // Make sure this is a directory
+            await FileUtils.directoryExists(pluginPath);
 
             if (!reload) {
                 const loaded = plugins.find(plugin => plugin.pluginPath === pluginPath);
@@ -269,4 +272,4 @@ async function pluginManager(pluginName) {
 if (window.bdTests) window.bdTests.pluginManager = pluginManager;
 else window.bdTests = { pluginManager };
 
-module.exports = { PluginManager: _instance, Plugin }
+module.exports = { PluginManager: _instance, Plugin };

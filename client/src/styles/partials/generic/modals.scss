@@ -42,13 +42,13 @@
     display: -ms-flexbox;
     display: flex;
     flex-grow: 1;
-    padding: 15px;
     border-radius: 8px;
 }
 
 .bd-modal {
     .bd-modal-header {
         display: flex;
+        padding: 15px;
 
         span {
             color: #FFF;
@@ -73,5 +73,12 @@
                 background: #2d2f34;
             }
         }
+    }
+
+    .bd-modal-body {
+        padding: 0 15px;
+    }
+
+    .bd-modal-footer {
     }
 }

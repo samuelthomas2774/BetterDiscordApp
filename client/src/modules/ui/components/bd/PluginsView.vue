@@ -1,13 +1,13 @@
 <template src="./templates/PluginsView.html"></template>
 <script>
-    const { PluginManager, Plugin } = require('../../../'); //#1 require of 2018~ :3
+    const { PluginManager, Plugin } = require('../../../'); 
 
     /*Imports*/
     import { SettingsWrapper } from './';
-    import { Modal } from '../generic';
+    import PluginSettingsModal from './PluginSettingsModal.vue';
     import PluginCard from './PluginCard.vue';
     import Refresh from 'vue-material-design-icons/refresh.vue';
-    const components = { SettingsWrapper, PluginCard, Refresh, Modal };
+    const components = { SettingsWrapper, PluginCard, Refresh, PluginSettingsModal };
 
     /*Variables*/
 

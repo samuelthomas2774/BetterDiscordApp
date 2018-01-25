@@ -29,6 +29,7 @@
         this.local = false;
     }
 
+    //TODO Display error if plugin fails to start/stop
     function togglePlugin(plugin) {
        if (plugin.enabled) {
             this.pluginManager.stopPlugin(plugin);

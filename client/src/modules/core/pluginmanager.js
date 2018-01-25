@@ -17,6 +17,7 @@ class Plugin {
 
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;
+        this.hasSettings = this.pluginConfig && this.pluginConfig.length > 0;
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
     }

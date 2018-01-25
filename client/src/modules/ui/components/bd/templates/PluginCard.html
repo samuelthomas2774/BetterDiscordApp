@@ -14,7 +14,7 @@
             <div class="bd-plugin-extra">v{{plugin.version}} by {{plugin.authors.join(', ').replace(/,(?!.*,)/gmi, ' and')}}</div>
             <div class="bd-controls">
                 <ButtonGroup>
-                    <Button :onClick="() => showSettings(plugin)">
+                    <Button v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
                         <MiSettings/>
                     </Button>
                     <Button :onClick="() => reloadPlugin(plugin)">

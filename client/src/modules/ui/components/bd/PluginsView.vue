@@ -1,12 +1,13 @@
 <template src="./templates/PluginsView.html"></template>
 <script>
-    const { PluginManager } = require('../../../'); //#1 require of 2018~ :3
+    const { PluginManager, Plugin } = require('../../../'); 
 
     /*Imports*/
     import { SettingsWrapper } from './';
+    import PluginSettingsModal from './PluginSettingsModal.vue';
     import PluginCard from './PluginCard.vue';
     import Refresh from 'vue-material-design-icons/refresh.vue';
-    const components = { SettingsWrapper, PluginCard, Refresh };
+    const components = { SettingsWrapper, PluginCard, Refresh, PluginSettingsModal };
 
     /*Variables*/
 
@@ -14,8 +15,9 @@
     async function refreshLocalPlugins() {
         try {
             await PluginManager.refreshPlugins();
+            this.$forceUpdate();
         } catch (err) {
-
+            
         }
     }
 
@@ -27,22 +29,33 @@
         this.local = false;
     }
 
+    //TODO Display error if plugin fails to start/stop
     function togglePlugin(plugin) {
        if (plugin.enabled) {
-            this.pluginManager.stopPlugin(plugin.name);
+            this.pluginManager.stopPlugin(plugin);
         } else {
-            this.pluginManager.startPlugin(plugin.name);
-        }
+            this.pluginManager.startPlugin(plugin);
+       }
     }
 
-    const methods = { showLocal, showOnline, refreshLocalPlugins, togglePlugin };
+    async function reloadPlugin(plugin) {
+        await this.pluginManager.reloadPlugin(plugin.name);
+        this.$forceUpdate();
+    }
+
+    function showSettings(plugin) {
+        this.settingsOpen = plugin;
+    }
+
+    const methods = { showLocal, showOnline, refreshLocalPlugins, togglePlugin, reloadPlugin, showSettings };
 
     export default {
         components,
         data() {
             return {
                 local: true,
-                pluginManager: PluginManager
+                pluginManager: PluginManager,
+                settingsOpen: null
             }
         },
         computed: {
@@ -50,9 +63,6 @@
                 return this.pluginManager.plugins;
             }
         },
-        methods,
-        created: function () {
-            this.refreshLocalPlugins();
-        }
+        methods
     }
 </script>

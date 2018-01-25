@@ -4,7 +4,7 @@
             <h3>{{setting.title || setting.text}}</h3>
             <label class="bd-switch-wrapper" @click="!disabled ? onClick(setting) : null">
                 <input type="checkbox" class="bd-switch-checkbox" />
-                <div class="bd-switch" :class="{'bd-checked': (setting.checked || setting.enabled)}" />
+                <div class="bd-switch" :class="{'bd-checked': (setting.checked || setting.enabled || setting.value)}" />
             </label>
         </div>
         <div class="bd-hint">{{setting.hint}}</div>

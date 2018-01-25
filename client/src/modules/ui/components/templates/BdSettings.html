@@ -12,19 +12,19 @@
         </Sidebar>
 
         <ContentColumn slot="content">
-            <div :class="{active: activeContent('core'), animating: animatingContent('core')}">
+            <div v-if="activeContent('core') || animatingContent('core')" :class="{active: activeContent('core'), animating: animatingContent('core')}">
                 <CoreSettings :settings="coreSettings" :enableSetting="enableSetting" :disableSetting="disableSetting"/>
             </div>
-            <div :class="{active: activeContent('ui'), animating: animatingContent('ui')}">
+            <div v-if="activeContent('ui') || animatingContent('ui')" :class="{active: activeContent('ui'), animating: animatingContent('ui')}">
                 <UISettings />
             </div>
-            <div :class="{active: activeContent('css'), animating: animatingContent('css')}">
+            <div v-if="activeContent('css') || animatingContent('css')" :class="{active: activeContent('css'), animating: animatingContent('css')}">
                 <CssEditorView />
             </div>
-            <div :class="{active: activeContent('emotes'), animating: animatingContent('emotes')}">
+            <div v-if="activeContent('emotes') || animatingContent('emotes')" :class="{active: activeContent('emotes'), animating: animatingContent('emotes')}">
                 <EmoteSettings />
             </div>
-            <div :class="{active: activeContent('plugins'), animating: animatingContent('plugins')}">
+            <div v-if="activeContent('plugins') || animatingContent('plugins')" :class="{active: activeContent('plugins'), animating: animatingContent('plugins')}">
                 <PluginsView />
             </div>
         </ContentColumn>

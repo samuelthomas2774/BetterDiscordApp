@@ -1,0 +1,36 @@
+bdtooltips {
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 9000;
+}
+
+.bd-tooltip {
+    background-color: #000;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+    color: #dcddde;
+    contain: layout;
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 190px;
+    padding: 8px 12px;
+    position: absolute;
+    word-wrap: break-word;
+    z-index: 9001;
+    margin-bottom: 10px;
+}
+
+.bd-tooltip:after {
+    border: 5px solid transparent;
+    content: " ";
+    height: 0;
+    pointer-events: none;
+    width: 0;
+    border-top-color: #000;
+    left: 50%;
+    margin-left: -5px;
+    position: absolute;
+    top: 100%;
+}

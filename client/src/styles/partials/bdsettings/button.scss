@@ -22,9 +22,13 @@
         opacity: 0.5;
         transition: all 0.4s ease-in-out;
 
-        &:hover {
+        &:not(.bd-loading):hover {
             filter: none;
             opacity: 1;
+        }
+
+        &.bd-loading {
+            animation: bd-settings-button-pulse 1.5s infinite;
         }
     }
 
@@ -49,5 +53,18 @@
     .platform-darwin & {
         top: 26px;
         padding-bottom: 2px;
+    }
+}
+
+@keyframes bd-settings-button-pulse {
+    0% {
+        filter: grayscale(100%);
+    }
+    50% {
+        filter: grayscale(0%);
+        opacity: 1;
+    }
+    100% {
+        filter: grayscale(100%);
     }
 }

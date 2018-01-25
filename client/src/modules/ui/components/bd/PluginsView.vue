@@ -15,6 +15,7 @@
     async function refreshLocalPlugins() {
         try {
             await PluginManager.refreshPlugins();
+            this.$forceUpdate();
         } catch (err) {
             
         }
@@ -36,8 +37,9 @@
        }
     }
 
-    function reloadPlugin(plugin) {
-        this.pluginManager.reloadPlugin(plugin.name);
+    async function reloadPlugin(plugin) {
+        await this.pluginManager.reloadPlugin(plugin.name);
+        this.$forceUpdate();
     }
 
     function showSettings(plugin) {

@@ -42,7 +42,7 @@
                     <div v-else-if="setting.type === 'text'" class="bd-form-textinput">
                         <div class="bd-title">
                             <h3>{{setting.text}}</h3>
-                            <input type="text" value="setting.value" />
+                            <input type="text" v-model="setting.value" @keyup.stop/>
                         </div>
                         <div class="bd-hint">{{setting.hint}}</div>
                     </div>

@@ -1,10 +1,11 @@
 <SettingsWrapper headertext="Plugins">
+    
     <div class="bd-flex bd-flex-col bd-pluginsView">
         <div class="bd-flex bd-tabheader">
             <div class="bd-flex-grow bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Local</h3>
                 <div class="bd-material-button" @click="refreshLocalPlugins">
-                    <refresh />
+                    <refresh/>
                 </div>
             </div>
             <div class="bd-flex-grow bd-button" :class="{'bd-active': !local}" @click="showOnline">
@@ -15,10 +16,33 @@
             </div>
         </div>
         <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
-            <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="togglePlugin" :reloadPlugin="reloadPlugin"/>
+            <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="togglePlugin" :reloadPlugin="reloadPlugin" :showSettings="showSettings"/>
         </div>
         <div v-if="!local" class="bd-spinner-container">
             <div class="bd-spinner-2"></div>
+        </div>
+    </div>
+    <div v-if="settingsOpen !== null" class="bd-backdrop" @click="settingsOpen = null"></div>
+    <div v-if="settingsOpen !== null" class="bd-modal">
+        <span>{{settingsOpen.name}} Settings</span>
+        <div v-for="setting in settingsOpen.pluginConfig" class="bd-plugin-settings-body">
+            <div class="bd-form-item" v-if="setting.type === 'bool'">
+                <div class="bd-setting-switch">
+                    <div class="bd-title">
+                        <h3>{{setting.text}}</h3>
+                        <label class="bd-switch-wrapper">
+                            <input type="checkbox" class="bd-switch-checkbox"/>
+                            <div class="bd-switch" :class="{'bd-checked': setting.value}"/>
+                        </label>
+                    </div>
+                    <div class="bd-hint">{{setting.hint}}</div>
+                </div>
+                <div class="bd-form-divider"></div>
+            </div>
+
+            <div v-else-if="setting.type === 'text'">
+
+            </div>
         </div>
     </div>
 </SettingsWrapper>

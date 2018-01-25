@@ -17,7 +17,6 @@ class Plugin {
 
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;
-        this.userConfig.enabled = this.userConfig.enabled || false;
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
     }
@@ -34,6 +33,7 @@ class Plugin {
     get pluginPath() { return this.paths.pluginPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
+    get pluginConfig() { return this.userConfig.pluginConfig }
 
     start() {
         if (this.onStart) {
@@ -152,10 +152,17 @@ class PluginManager extends Module {
             const mainPath = path.join(pluginPath, readConfig.main);
             const userConfigPath = path.join(pluginPath, 'user.config.json');
 
-            let userConfig = readConfig.defaultConfig;
+            const userConfig = {
+                enabled: false,
+                pluginConfig: readConfig.defaultConfig
+            };
             try {
                 const readUserConfig = await FileUtils.readJsonFromFile(userConfigPath);
-                userConfig = Object.assign({}, userConfig, readUserConfig);
+                //userConfig = Object.assign({}, userConfig, readUserConfig);
+                userConfig.pluginConfig = readConfig.defaultConfig.map(config => {
+                    const userSet = readUserConfig.pluginConfig.find(c => c.id === config.id);
+                    return userSet || config;
+                });
             } catch (err) {/*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/}
 
             const configs = {
@@ -179,7 +186,7 @@ class PluginManager extends Module {
     }
 
     async reloadPlugin(plugin) {
-        const _plugin = this.findPlugin(plugin);
+        const _plugin = plugin instanceof Plugin ? plugin : this.findPlugin(plugin);
         if (!_plugin) throw { 'message': 'Attempted to reload a plugin that is not loaded?' };
         if (!_plugin.stop()) throw { 'message': 'Plugin failed to stop!' };
         const index = this.getPluginIndex(_plugin);
@@ -209,7 +216,7 @@ class PluginManager extends Module {
     getPluginByDirName(dirName) { return this.plugins.find(p => p.dirName === dirName) }
 
     stopPlugin(name) {
-        const plugin = this.getPluginByName(name);
+        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
         try {
             if (plugin) return plugin.stop();
         } catch (err) {
@@ -219,7 +226,7 @@ class PluginManager extends Module {
     }
 
     startPlugin(name) {
-        const plugin = this.getPluginByName(name);
+        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
         try {
             if (plugin) return plugin.start();
         } catch (err) {
@@ -261,4 +268,4 @@ async function pluginManager(pluginName) {
 if (window.bdTests) window.bdTests.pluginManager = pluginManager;
 else window.bdTests = { pluginManager };
 
-module.exports = { PluginManager: _instance }
+module.exports = { PluginManager: _instance, Plugin }

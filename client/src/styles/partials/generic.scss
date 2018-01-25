@@ -220,3 +220,34 @@
         background: #888888;
     }
 }
+
+.bd-backdrop {
+    position: absolute;
+    right: 0px;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    background: #000;
+    opacity: .85;
+    padding: 20px;
+}
+
+.bd-modal {
+    background: #36393e;
+    position: absolute;
+    top: 80px;
+    left: 40px;
+    right: 40px;
+    bottom: 80px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+}
+
+.bd-modal span {
+    color: #FFF;
+    font-weight: 700;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+}

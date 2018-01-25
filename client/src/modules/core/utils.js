@@ -5,7 +5,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 const { Module } = require('./modulebase');
@@ -78,7 +78,7 @@ class Utils {
             });
         }
     }
-    
+
 }
 
 class FileUtils {
@@ -102,7 +102,7 @@ class FileUtils {
     }
 
     static async directoryExists(path) {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if (err) return reject({
                     'message': `Directory does not exist: ${path}`,
@@ -126,7 +126,7 @@ class FileUtils {
             throw (err);
         }
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf-8', (err, data) => {
                 if (err) reject({
                     'message': `Could not read file: ${path}`,
@@ -208,17 +208,17 @@ class Filters {
         };
     }
 
-    static byDisplayName(name) { 
+    static byDisplayName(name) {
         return module => {
             return module && module.displayName === name;
         };
     }
 
-    static combine(...filters) { 
+    static combine(...filters) {
         return module => {
             return filters.every(filter => filter(module));
         };
     }
 };
 
-module.exports = { Logger, Utils, FileUtils, Filters }
+module.exports = { Logger, Utils, FileUtils, Filters };

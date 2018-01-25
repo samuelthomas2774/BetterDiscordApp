@@ -99,15 +99,15 @@
                 transition: all .15s ease;
                 box-shadow: 0 3px 1px 0 rgba(0,0,0,.05), 0 2px 2px 0 rgba(0,0,0,.1), 0 3px 3px 0 rgba(0,0,0,.05);
             }
-        }
-    }
-}
 
-.bd-plugin-settings-header {
-    span {
-        color: #b9bbbe;
-        font-weight: 700;
-        padding: 0 20px;
+            &.bd-checked {
+                background: $colbdblue;
+
+                &::before {
+                    transform: translateX(20px);
+                }
+            }
+        }
     }
 }
 
@@ -154,6 +154,14 @@
                     border-radius: 10px;
                     transition: all .15s ease;
                     box-shadow: 0 3px 1px 0 rgba(0,0,0,.05), 0 2px 2px 0 rgba(0,0,0,.1), 0 3px 3px 0 rgba(0,0,0,.05);
+                }
+
+                &.bd-checked {
+                    background: $colbdblue;
+
+                    &::before {
+                        transform: translateX(20px);
+                    }
                 }
             }
         }

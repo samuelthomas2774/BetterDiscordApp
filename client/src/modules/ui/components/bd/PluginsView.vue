@@ -4,9 +4,10 @@
 
     /*Imports*/
     import { SettingsWrapper } from './';
+    import { Modal } from '../generic';
     import PluginCard from './PluginCard.vue';
     import Refresh from 'vue-material-design-icons/refresh.vue';
-    const components = { SettingsWrapper, PluginCard, Refresh };
+    const components = { SettingsWrapper, PluginCard, Refresh, Modal };
 
     /*Variables*/
 

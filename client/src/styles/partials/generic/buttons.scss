@@ -1,126 +1,48 @@
-.bd-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #FFF;
-    background: #44474c;
-    text-align: center;
-    user-select: none;
-    font-weight: 500;
-    background: $colbdblue;
+.bd-settings-button {
+    position: absolute;
+    z-index: 1;
+    top: 22px;
+    width: 70px;
+    height: 48px;
+    left: 0;
+    background: #202225;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 2px 0 rgba(0, 0, 0, 0.06);
+    opacity: 1;
 
-
-    &:not(.bd-disabled):hover {
-        background: darken($colbdblue, 5%);
-    }
-
-    &.bd-disabled {
-        filter: grayscale(90%);
-        cursor: not-allowed;
-    }
-
-    &.bd-err {
-        background: $colerr;
-
-        &:hover {
-            background: darken($colerr, 5%);
-        }
-    }
-
-    &.bd-warn {
-        background: $colwarn;
+    .bd-settings-button-btn {
+        background-image: $logoSmallBw;
+        background-size: 50% 50%;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 100%;
+        height: 100%;
+        z-index: 3000;
+        cursor: pointer;
+        filter: grayscale(100%);
+        opacity: 0.5;
+        transition: all 0.4s ease-in-out;
 
         &:hover {
-            background: darken($colwarn, 5%);
+            filter: none;
+            opacity: 1;
         }
     }
 
-    &.bd-ok {
-        background: $colok;
-
-        &:hover {
-            background: darken($colok, 5%);
-        }
-    }
-
-    .bd-spinner-7 {
-        opacity: .3;
-    }
-
-    .material-design-icon svg {
-        width: 18px;
-        height: 18px;
-    }
-}
-
-.bd-button-group {
-    display: flex;
-
-    .bd-button,
-    .bd-material-button {
-
-        &:first-of-type {
-            border-radius: 6px 0 0 6px;
-        }
-
-        &:last-of-type {
-            border-radius: 0 6px 6px 0;
-        }
-
-        &:not(:last-of-type) {
-            border-right: 1px solid rgba(114, 118, 126, 0.3);
-        }
-
-        &:not(:first-of-type) {
-            border-left: 1px solid rgba(114, 118, 126, 0.1);
-        }
-    }
-}
-
-.bd-tabheader {
-    .bd-button {
+    &.active {
         background: transparent;
-        border-bottom: 2px solid rgba(114, 118, 126, 0.3);
+        opacity: 1;
+        box-shadow: none;
+        z-index: 90000;
 
-        h3 {
-            -webkit-user-select: none;
-            user-select: none;
-            display: block;
-            font-size: 1.17em;
-            margin-top: 1em;
-            margin-bottom: 1em;
-            margin-left: 0;
-            margin-right: 0;
-            font-weight: bold;
-            flex-grow: 1;
-        }
-
-        .bd-material-button {
-            width: 30px;
-            height: 30px;
-
-            .material-design-icon,
-            .bd-material-design-icon {
-                display: flex;
-                align-items: center;
-                fill: #FFF;
-
-                svg {
-                    width: 24px;
-                    height: 24px;
-                }
-            }
-
-            &:hover {
-                background: #2d2f34;
-            }
-        }
-
-        &:hover,
-        &.bd-active {
-            background: transparent;
-            border-bottom: 2px solid $colbdblue;
+        .bd-settings-button-btn {
+            background-image: $logoBigBw;
+            filter: none;
+            opacity: 1;
+            width: 130px;
+            height: 80px;
+            background-size: 100% 100%;
+            margin-left: 20px;
+            cursor: default;
         }
     }
 }

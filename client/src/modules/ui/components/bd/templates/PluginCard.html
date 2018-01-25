@@ -1,6 +1,6 @@
 <div class="bd-plugin-card">
     <div class="bd-plugin-header">
-        <span>{{plugin.name}}</span>
+        <span v-tooltip="'wat'">{{plugin.name}}</span>
         <div class="bd-flex-spacer"/>
         <label class="bd-switch-wrapper" @click="togglePlugin(plugin)">
             <input type="checkbox" class="bd-switch-checkbox" />
@@ -14,16 +14,16 @@
             <div class="bd-plugin-extra">v{{plugin.version}} by {{plugin.authors.join(', ').replace(/,(?!.*,)/gmi, ' and')}}</div>
             <div class="bd-controls">
                 <ButtonGroup>
-                    <Button v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
+                    <Button v-tooltip="'Settings'" v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
                         <MiSettings/>
                     </Button>
-                    <Button :onClick="() => reloadPlugin(plugin)">
+                    <Button v-tooltip="'Reload'" :onClick="() => reloadPlugin(plugin)">
                         <MiReload/>
                     </Button>
-                    <Button :onClick="editPlugin">
+                    <Button v-tooltip="'Edit'" :onClick="editPlugin">
                         <MiEdit/>
                     </Button>
-                    <Button type="err">
+                    <Button v-tooltip="'Uninstall'" type="err">
                         <MiDelete/>
                     </Button>
                 </ButtonGroup>

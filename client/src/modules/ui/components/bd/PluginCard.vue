@@ -13,7 +13,15 @@
     function showSettings() {
         this.settingsOpen = true;
     }
-    const methods = {  };
+    function editPlugin() {
+        try {
+            window.require('electron').shell.openItem(this.plugin.pluginPath);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const methods = { editPlugin  };
 
     export default {
         props: ['plugin', 'togglePlugin', 'reloadPlugin', 'showSettings'],

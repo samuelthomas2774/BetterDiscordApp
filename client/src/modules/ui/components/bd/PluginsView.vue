@@ -63,7 +63,3 @@
         methods
     }
 </script>
-
-<style>
-    
-</style>

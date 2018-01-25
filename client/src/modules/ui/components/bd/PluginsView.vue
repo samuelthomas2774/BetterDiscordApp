@@ -15,6 +15,7 @@
     async function refreshLocalPlugins() {
         try {
             await PluginManager.refreshPlugins();
+            this.$forceUpdate();
         } catch (err) {
             
         }
@@ -28,6 +29,7 @@
         this.local = false;
     }
 
+    //TODO Display error if plugin fails to start/stop
     function togglePlugin(plugin) {
        if (plugin.enabled) {
             this.pluginManager.stopPlugin(plugin);
@@ -36,8 +38,9 @@
        }
     }
 
-    function reloadPlugin(plugin) {
-        this.pluginManager.reloadPlugin(plugin.name);
+    async function reloadPlugin(plugin) {
+        await this.pluginManager.reloadPlugin(plugin.name);
+        this.$forceUpdate();
     }
 
     function showSettings(plugin) {

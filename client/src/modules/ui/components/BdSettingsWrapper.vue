@@ -32,9 +32,7 @@
         created: function () {
 
             Events.on('ready', e => {
-                setTimeout(() => { //Dummy timeout to test loading
-                    this.loaded = true;
-                }, 5000);
+                this.loaded = true;
             });
 
             window.addEventListener('keyup', globalKeyListener = e => {

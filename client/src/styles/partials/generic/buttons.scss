@@ -1,0 +1,24 @@
+.bd-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #FFF;
+    text-align: center;
+    user-select: none;
+    font-weight: 500;
+    background: $colbdblue;
+
+    &:not(.bd-disabled):hover {
+        background: darken($colbdblue, 5%);
+    }
+
+    &.bd-disabled {
+        filter: grayscale(90%);
+        cursor: not-allowed;
+    }
+
+    .bd-spinner-7 {
+        opacity: .3;
+    }
+}

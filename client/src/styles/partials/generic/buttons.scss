@@ -1,24 +1,48 @@
-.bd-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #FFF;
-    text-align: center;
-    user-select: none;
-    font-weight: 500;
-    background: $colbdblue;
+.bd-settings-button {
+    position: absolute;
+    z-index: 1;
+    top: 22px;
+    width: 70px;
+    height: 48px;
+    left: 0;
+    background: #202225;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 2px 0 rgba(0, 0, 0, 0.06);
+    opacity: 1;
 
-    &:not(.bd-disabled):hover {
-        background: darken($colbdblue, 5%);
+    .bd-settings-button-btn {
+        background-image: $logoSmallBw;
+        background-size: 50% 50%;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 100%;
+        height: 100%;
+        z-index: 3000;
+        cursor: pointer;
+        filter: grayscale(100%);
+        opacity: 0.5;
+        transition: all 0.4s ease-in-out;
+
+        &:hover {
+            filter: none;
+            opacity: 1;
+        }
     }
 
-    &.bd-disabled {
-        filter: grayscale(90%);
-        cursor: not-allowed;
-    }
+    &.active {
+        background: transparent;
+        opacity: 1;
+        box-shadow: none;
+        z-index: 90000;
 
-    .bd-spinner-7 {
-        opacity: .3;
+        .bd-settings-button-btn {
+            background-image: $logoBigBw;
+            filter: none;
+            opacity: 1;
+            width: 130px;
+            height: 80px;
+            background-size: 100% 100%;
+            margin-left: 20px;
+            cursor: default;
+        }
     }
 }

@@ -7,11 +7,28 @@
             <div class="bd-switch" :class="{'bd-checked': plugin.enabled}" />
         </label>
     </div>
+
     <div class="bd-plugin-body">
         <div class="bd-plugin-description">{{plugin.description}}</div>
         <div class="bd-plugin-footer">
             <div class="bd-plugin-extra">v{{plugin.version}} by {{plugin.authors.join(', ').replace(/,(?!.*,)/gmi, ' and')}}</div>
-            <div class="bd-controls"></div>
+            <div class="bd-controls">
+                <ButtonGroup>
+                    <Button :onClick="() => showSettings(plugin)">
+                        <MiSettings/>
+                    </Button>
+                    <Button :onClick="() => reloadPlugin(plugin)">
+                        <MiReload/>
+                    </Button>
+                    <Button>
+                        <MiEdit/>
+                    </Button>
+                    <Button type="err">
+                        <MiDelete/>
+                    </Button>
+                </ButtonGroup>
+            </div>
         </div>
     </div>
+
 </div>

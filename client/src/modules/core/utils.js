@@ -103,7 +103,7 @@ class FileUtils {
     }
 
     static async directoryExists(path) {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if (err) return reject({
                     'message': `Directory does not exist: ${path}`,
@@ -127,7 +127,7 @@ class FileUtils {
             throw (err);
         }
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf-8', (err, data) => {
                 if (err) reject({
                     'message': `Could not read file: ${path}`,
@@ -220,6 +220,6 @@ class Filters {
             return filters.every(filter => filter(module));
         };
     }
-};
+}
 
 module.exports = { Logger, Utils, FileUtils, Filters }

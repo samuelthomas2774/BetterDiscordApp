@@ -42,9 +42,9 @@
 
   },
   "scripts": {
-    "build": "cd ./client && npm run build && cd ../core && npm run build && cd ../csseditor && npm run build",
-    "watch_client": "cd ./client && npm run watch",
-    "watch_core": "cd ./core && npm run watch",
+    "build": "npm run build --prefix client && npm run build --prefix core && npm run build --prefix csseditor",
+    "watch_client": "npm run watch --prefix client",
+    "watch_core": "npm run watch --prefix core",
     "test": "npm run build"
   }
 }

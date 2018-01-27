@@ -10,8 +10,8 @@ window.cmCommands = VueCodemirror.CodeMirror.commands;
 
 new Vue({
     el: '#root',
-    template: '<Editor/>',
-    components: { Editor }
+    components: { Editor },
+    template: '<Editor/>'
 });
 
 const style = document.createElement('style');

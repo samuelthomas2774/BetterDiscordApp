@@ -5,7 +5,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 const $ = require('jquery');
@@ -32,8 +32,8 @@ class UI {
 
          this.vueInstance = new Vue({
              el: '#bd-settings',
-             template: '<BdSettingsWrapper/>',
-             components: { BdSettingsWrapper }
+             components: { BdSettingsWrapper },
+             template: '<BdSettingsWrapper/>'
          });
     }
 

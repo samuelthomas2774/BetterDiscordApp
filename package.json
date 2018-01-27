@@ -16,35 +16,37 @@
   },
   "private": false,
   "devDependencies": {
-    "webpack": "^3.10.0",
     "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
-    "babel-preset-env": "^1.6.1",
-    "babel-loader": "^7.1.2",
-    "jquery": "^3.2.1",
-    "vue": "^2.5.13",
-    "vue-loader": "^13.7.0",
-    "vue-template-compiler": "^2.5.13",
+    "codemirror": "^5.23.0",
     "css-loader": "^0.28.9",
-    "sass-loader": "^6.0.6",
-    "node-sass": "^4.7.2",
     "electron": "^1.7.10",
+    "eslint": "^4.16.0",
+    "eslint-plugin-vue": "^4.2.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.0",
-    "pump": "^2.0.0",
     "gulp-plumber": "^1.2.0",
     "gulp-watch": "^5.0.0",
-    "codemirror": "^5.23.0",
+    "jquery": "^3.2.1",
+    "node-sass": "^4.7.2",
+    "pump": "^2.0.0",
+    "sass-loader": "^6.0.6",
+    "v-tooltip": "^2.0.0-rc.30",
+    "vue": "^2.5.13",
     "vue-codemirror": "^4.0.3",
+    "vue-loader": "^13.7.0",
     "vue-material-design-icons": "^1.0.0",
-    "v-tooltip": "^2.0.0-rc.30"
-
+    "vue-template-compiler": "^2.5.13",
+    "webpack": "^3.10.0"
   },
   "scripts": {
     "build": "npm run build --prefix client && npm run build --prefix core && npm run build --prefix csseditor",
     "watch_client": "npm run watch --prefix client",
     "watch_core": "npm run watch --prefix core",
-    "test": "npm run build"
+    "lint": "eslint -f unix client/src core/src csseditor/src",
+    "test": "npm run build && npm run lint"
   }
 }

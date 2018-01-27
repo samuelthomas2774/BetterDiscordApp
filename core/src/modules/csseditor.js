@@ -59,7 +59,7 @@ class CSSEditor extends Module {
     //TODO Currently uses a development path
     get editorPath() {
         return path.resolve(__dirname, '..', '..', '..', 'csseditor', 'dist');
-        return path.resolve(__dirname, '..', '..', '..', 'tests', 'csseditor');
+        // return path.resolve(__dirname, '..', '..', '..', 'tests', 'csseditor');
     }
 
 }

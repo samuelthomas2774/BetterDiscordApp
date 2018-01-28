@@ -109,18 +109,3 @@
         }
     }
 </script>
-
-<style>
-    .bd-info {
-        display: flex;
-        flex-grow: 1;
-        align-items: flex-end;
-        overflow: hidden;
-    }
-
-    .bd-info span {
-        color: #414245;
-        font-weight: 700;
-        font-size: 12px;
-    }
-</style>

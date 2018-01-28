@@ -1,0 +1,105 @@
+.CodeMirror-scroll {
+    cursor: text;
+}
+
+.CodeMirror-overlayscroll .CodeMirror-scrollbar-filler {
+    background: #38444a;
+}
+
+.CodeMirror-overlayscroll-horizontal div,
+.CodeMirror-overlayscroll-vertical div {
+    background: rgb(41, 43, 47);
+}
+
+.CodeMirror-overlayscroll-horizontal,
+.CodeMirror-overlayscroll-horizontal div {
+    height: 10px;
+}
+
+.CodeMirror-overlayscroll-vertical,
+.CodeMirror-overlayscroll-vertical div {
+    width: 10px;
+}
+
+.CodeMirror-scrollbar-filler {
+    width: 10px;
+    height: 10px;
+    background: rgb(41, 43, 47);
+}
+
+.cm-s-material.CodeMirror {
+    background: #36393f;
+}
+
+.CodeMirror-scroll {
+    cursor: text;
+}
+
+.cm-s-material .CodeMirror-gutters {
+    background: #292b2f;
+}
+
+.CodeMirror-gutter {
+    min-width: 34px;
+    border-right: 1px solid hsla(218,5%,47%,.3);
+    cursor: default;
+}
+
+.CodeMirror-hints {
+    /*background: #1e262a;*/
+    background: #292b2f;
+    box-shadow: 2px 3px 5px rgba(4, 4, 4, 0.22);
+    border: 1px solid #262f33;
+
+    &::-webkit-scrollbar {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,.4);
+        border-color: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb,
+    &::-webkit-scrollbar-track {
+        background-clip: padding-box;
+        border-width: 3px;
+        border-style: solid;
+        border-radius: 7px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+        border-color: transparent;
+    }
+}
+
+.CodeMirror-linenumber,
+.CodeMirror-line {
+    padding: 0 5px !important;
+}
+
+.CodeMirror-linenumber {
+    cursor: text;
+}
+
+.cm-s-material .CodeMirror-linenumber {
+    color: #f6f6f7;
+}
+
+.CodeMirror-hint {
+    color: #bac9d2;
+}
+
+li.CodeMirror-hint-active {
+    color: #bac9d2;
+    /*background: #3b4950;*/
+    background: #36393f;
+}
+
+.CodeMirror-dialog-top {
+    bottom: 0;
+    top: auto;
+    border: none;
+    background: #1e262a;
+}

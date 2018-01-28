@@ -1,0 +1,17 @@
+.bd-material-button {
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+
+    > span {
+        display: flex;
+    }
+
+    &:hover {
+        background: #2d2f34;
+    }
+}

@@ -1,0 +1,65 @@
+.bd-settings {
+    position: absolute;
+    top: 22px;
+    left: 0;
+    bottom: 0;
+    z-index: 3000;
+    width: 310px;
+    transform: translateX(-100%) translateY(-100%);
+    opacity: 0;
+    transition: all .4s ease-in-out;
+
+    &.active {
+        width: 900px;
+        transform: none;
+        opacity: 1;
+    }
+
+    .bd-settings-x {
+        position: absolute;
+        top: 15px;
+        left: 250px;
+        border: 2px solid #6e6e6e;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        span {
+            color: #72767d;
+            position: absolute;
+            top: 32px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        &:hover {
+            background-color: hsla(218,5%,47%,.3);
+        }
+    }
+
+    .bd-info {
+        display: flex;
+        flex-grow: 1;
+        align-items: flex-end;
+        overflow: hidden;
+
+        span {
+            color: #414245;
+            font-weight: 700;
+            font-size: 12px;
+        }
+    }
+
+    .platform-darwin & {
+        top: 0px;
+
+        .bd-sidebar-view .bd-sidebar-region,
+        .bd-sidebar-view .bd-content-region {
+            padding-top: 22px;
+        }
+    }
+}

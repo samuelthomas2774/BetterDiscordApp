@@ -5,13 +5,13 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 'use strict';
 
 const styles = require('./styles/index.scss');
-const { Global, Logger, Utils, PluginManager, BDIpc, WebpackModules, SocketProxy, Events } = require('./modules');
+const { Global, Logger, Utils, PluginManager, BDIpc, WebpackModules, SocketProxy, Events, Vendor } = require('./modules');
 //const { UI } = require('./modules/ui/index.jsx');
 
 class BetterDiscord {
@@ -50,11 +50,5 @@ if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
     let bdInstance = new BetterDiscord();
-    window.BetterDiscord = {
-        'vendor': {
-            jQuery: require('jquery'),
-            $: require('jquery'),
-            moment: WebpackModules.getModuleByName('Moment')
-        }
-    };
+    window.BetterDiscord = {'vendor': Vendor};
 }

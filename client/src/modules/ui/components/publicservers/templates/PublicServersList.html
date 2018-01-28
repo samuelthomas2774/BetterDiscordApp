@@ -1,0 +1,47 @@
+<div class="bd-public-servers form deprecated join-server" :class="[{'bd-loading': !this.loaded}]">
+    <div class="bd-modal-header">
+        <h5>Public Servers</h5>
+        <form action="javascript:" @submit="$parent.search">
+            <input name="search" type="text" placeholder="Search" ref="search_query" />
+            <select name="category" ref="category" @change="$parent.search">
+                <option value="">All</option>
+
+                <optgroup :label="category_group" v-for="category_group in Object.keys(categories)">
+                    <option :value="category" v-for="category in Object.keys(categories[category_group])">{{ categories[category_group][category] }}</option>
+                </optgroup>
+            </select>
+        </form>
+    </div>
+    <ScrollerWrap>
+        <div class="bd-scroller">
+            <div class="bd-modal-inner">
+
+                <p v-if="message" v-text="message"></p>
+
+                <p class="bd-public-servers-info" v-if="info">Showing {{ info.from + 1 }} - {{ info.from + info.size }} of {{ info.total }} results.</p>
+
+                <div class="bd-public-servers-list bd-public-servers-list-pinned" v-if="!category && !query">
+                    <Server v-for="server in pinned_servers" :server="server" />
+                </div>
+
+                <div class="bd-public-servers-list">
+                    <Server v-for="server in servers" :server="server" />
+                </div>
+
+                <div class="bd-public-servers-load-more-button" v-if="info.more_available">
+                    <button class="bd-button bd-button-primary" type="button" @click="$parent.more()">Load more...</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="bd-spinner-container" v-if="!loaded">
+            <div class="bd-spinner-2"></div>
+        </div>
+    </ScrollerWrap>
+    <div class="bd-modal-footer">
+        <button type="button" class="bd-button bd-button-default bd-public-back" @click="$parent.back()">Back</button>
+        <div class="bd-discordservers-link">
+            <a class="bd-button bd-button-link" href="https://discordservers.com" @click="$parent.openLink">Server list provided by discordservers.com</a>
+        </div>
+    </div>
+</div>

@@ -5,7 +5,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 const { Filters } = require('./utils');
 
@@ -25,6 +25,7 @@ const KnownModules = {
     GuildEmojiStore: Filters.byProperties(['getEmojis']),
     GuildActions: Filters.byProperties(['markGuildAsRead']),
     GuildPermissions: Filters.byProperties(['getGuildPermissions']),
+    AddGuild: Filters.byProperties(['open', 'close', 'createGuild']),
 
     /* Channel Store & Actions */
     ChannelStore: Filters.byProperties(['getChannels', 'getDMFromUserId']),

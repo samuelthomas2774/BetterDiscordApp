@@ -1,0 +1,90 @@
+.bd-public-server {
+    margin-bottom: 20px;
+
+    .bd-public-server-wrap {
+        display: flex;
+    }
+
+    .bd-public-server-image-wrap {
+        width: 100px;
+        flex: 0 0 auto;
+
+        .bd-public-server-image {
+            width: 85px;
+        }
+    }
+
+    .bd-public-server-info {
+        .bd-public-server-name {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+
+            .bd-public-server-label {
+                background-color: #eee;
+                font-weight: 500;
+                font-size: 13px;
+                display: inline-block;
+                padding: 2px 5px;
+                margin-left: 2px;
+                border-radius: 2px;
+                color: #444;
+            }
+        }
+
+        .bd-public-server-description {
+            color: #555;
+            font-size: 16px;
+            text-align: left;
+            margin: 8px 0;
+            padding: 0;
+        }
+
+        .bd-public-server-tags {
+            // text-align: center;
+            display: flex;
+            color: #999;
+            margin: 8px 0;
+
+            > * {
+                flex: 1 1 auto;
+                margin-right: 10px;
+                // width: 100%;
+            }
+        }
+
+        .bd-button-group {
+            margin-top: 10px;
+
+            .bd-public-server-join-button {
+                width: 120px;
+                border-radius: 6px;
+            }
+        }
+    }
+
+    .bd-public-server-details {
+        margin-top: 20px;
+
+        > * {
+            color: #555;
+            font-size: 16px;
+            margin: 6px 0;
+            padding: 0;
+
+            strong {
+                color: #000;
+            }
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .bd-public-servers-list-pinned &,
+    &:not(:last-child) {
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+}

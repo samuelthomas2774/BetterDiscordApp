@@ -34,6 +34,10 @@ class CSSEditor extends Module {
             this.editor = null;
         });
 
+        this.editor.once('ready-to-show', () => {
+            this.editor.show()
+        });
+
         this.editor.webContents.on('did-finish-load', () => {
             o.reply(true);
         });
@@ -52,6 +56,7 @@ class CSSEditor extends Module {
         return {
             width: 800,
             height: 600,
+            show: false,
             frame: false
         };
     }
@@ -59,7 +64,7 @@ class CSSEditor extends Module {
     //TODO Currently uses a development path
     get editorPath() {
         return path.resolve(__dirname, '..', '..', '..', 'csseditor', 'dist');
-        return path.resolve(__dirname, '..', '..', '..', 'tests', 'csseditor');
+        // return path.resolve(__dirname, '..', '..', '..', 'tests', 'csseditor');
     }
 
 }

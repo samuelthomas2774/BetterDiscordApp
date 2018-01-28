@@ -1,0 +1,36 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    max-height: 100%;
+    height: 100%;
+    background: #2c383e;
+    min-width: 700px;
+    min-height: 400px;
+}
+
+* {
+    outline: none;
+}
+
+.flex-spacer {
+    flex-grow: 1;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.valign {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.container {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    height: 100%;
+}

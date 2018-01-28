@@ -1,0 +1,51 @@
+.tools {
+    height: 36px;
+    background: #292b2f;
+    border-top: 1px solid hsla(218,5%,47%,.3);
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+
+    .flex-row {
+        flex-grow: 1;
+        padding: 4px 5px;
+    }
+
+    button {
+        border-radius: 3px;
+        width: 100px;
+        padding: 3px 10px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #36393f;
+        color: #bac9d2;
+        font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+        transition: background-color .2s ease;
+        cursor: pointer;
+        border: 0;
+        margin-right: 4px;
+
+        &:hover {
+            background: #44474e;
+            color: #FFF;
+        }
+    }
+
+    #chkboxLiveUpdate {
+        padding: 3px 10px;
+        line-height: 22px;
+
+        input[type="checkbox"] {
+            margin: 0 6px 0 0;
+            cursor: pointer;
+        }
+
+        span {
+            font-size: 12px;
+            font-weight: 500;
+            color: #bac9d2;
+            font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+            cursor: default;
+        }
+    }
+}

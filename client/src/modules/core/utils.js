@@ -5,10 +5,11 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 const { Module } = require('./modulebase');
+const { Vendor } = require('./vendor');
 const fs = window.require('fs');
 const path = window.require('path');
 
@@ -29,7 +30,7 @@ class Logger {
         }
         level = this.parseLevel(level);
         console[level]('[%cBetter%cDiscord:%s] %s', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, message);
-        logs.push(`[${BetterDiscord.vendor.moment().format('DD/MM/YY hh:mm:ss')}|${module}|${level}] ${message}`);
+        logs.push(`[${Vendor.moment().format('DD/MM/YY hh:mm:ss')}|${module}|${level}] ${message}`);
         window.bdlogs = logs;
     }
 
@@ -78,7 +79,7 @@ class Utils {
             });
         }
     }
-    
+
 }
 
 class FileUtils {
@@ -102,7 +103,7 @@ class FileUtils {
     }
 
     static async directoryExists(path) {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if (err) return reject({
                     'message': `Directory does not exist: ${path}`,
@@ -126,7 +127,7 @@ class FileUtils {
             throw (err);
         }
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf-8', (err, data) => {
                 if (err) reject({
                     'message': `Could not read file: ${path}`,
@@ -208,17 +209,17 @@ class Filters {
         };
     }
 
-    static byDisplayName(name) { 
+    static byDisplayName(name) {
         return module => {
             return module && module.displayName === name;
         };
     }
 
-    static combine(...filters) { 
+    static combine(...filters) {
         return module => {
             return filters.every(filter => filter(module));
         };
     }
-};
+}
 
-module.exports = { Logger, Utils, FileUtils, Filters }
+module.exports = { Logger, Utils, FileUtils, Filters };

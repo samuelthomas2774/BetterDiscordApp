@@ -22,6 +22,7 @@ class BetterDiscord {
         Events.on('global-ready', e => {
             const { UI } = require('./modules/ui/vueui.js');
             this.ui = new UI();
+            this.init();
         });
 
         //Inject styles to head for now
@@ -30,6 +31,17 @@ class BetterDiscord {
         style.type = 'text/css';
         style.appendChild(document.createTextNode(styles));
         document.head.appendChild(style);
+
+        this.init();
+    }
+
+    async init() {
+        try {
+            await PluginManager.loadAllPlugins();
+        } catch (err) {
+        }
+
+        Events.emit('ready');
     }
 
 }

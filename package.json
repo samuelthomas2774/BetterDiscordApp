@@ -37,7 +37,8 @@
     "gulp-watch": "^5.0.0",
     "codemirror": "^5.23.0",
     "vue-codemirror": "^4.0.3",
-    "vue-material-design-icons": "^1.0.0"
+    "vue-material-design-icons": "^1.0.0",
+    "v-tooltip": "^2.0.0-rc.30"
 
   },
   "scripts": {

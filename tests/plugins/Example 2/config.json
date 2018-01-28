@@ -6,7 +6,5 @@
     "description": "Example Plugin 2 Description"
   },
   "main": "index.js",
-  "defaultConfig": {
-    "foo": "bar"
-  }
+    "defaultConfig": []
 }

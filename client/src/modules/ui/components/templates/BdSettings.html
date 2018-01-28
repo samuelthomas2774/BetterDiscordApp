@@ -6,6 +6,7 @@
                 <span>ESC</span>
             </div>
             <SidebarItem v-for="item in sidebarItems" :item="item" :key="item.id" :onClick="itemOnClick" />
+            <div class="bd-sidebar-info">Looking for the public server list? It's in the <a @click="showCreateJoinServerModal">normal create/join server menu</a>.</div>
             <div class="bd-info">
                 <span>v2.0.0a by Jiiks/JsSucks</span>
             </div>

@@ -15,7 +15,6 @@ const InjectorKit = require('injectorkit');
 
 const { WebpackModules } = require('./webpackmodules');
 const InviteActions = WebpackModules.getModuleByName('InviteActions');
-const AddGuild = WebpackModules.getModuleByName('AddGuild');
 
 const { PublicServersAPI } = require('./publicserversapi');
 
@@ -165,7 +164,7 @@ class PublicServers {
 
     joinServer(server) {
         InviteActions.acceptInviteAndTransitionToInviteChannel(server.invite_code);
-        AddGuild.close();
+        WebpackModules.getModuleByProps(['open', 'close', 'createGuild']).close();
     }
 
     unfocusServers() {

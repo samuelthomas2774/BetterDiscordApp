@@ -1,8 +1,7 @@
 <template src="./templates/BdSettings.html"></template>
 
 <script>
-
-    const { Settings } = require('../../');
+    const { Settings, WebpackModules } = require('../../');
 
     /*Imports*/
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
@@ -66,7 +65,12 @@
         }
     }
 
-    const methods = { itemOnClick, animatingContent, activeContent, enableSetting, disableSetting };
+    function showCreateJoinServerModal() {
+        this.close();
+        WebpackModules.getModuleByProps(['open', 'close', 'createGuild']).open();
+    }
+
+    const methods = { itemOnClick, animatingContent, activeContent, enableSetting, disableSetting, showCreateJoinServerModal };
 
     export default {
         components,

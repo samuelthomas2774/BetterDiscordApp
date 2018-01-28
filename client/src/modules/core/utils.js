@@ -222,4 +222,4 @@ class Filters {
     }
 }
 
-module.exports = { Logger, Utils, FileUtils, Filters }
+module.exports = { Logger, Utils, FileUtils, Filters };

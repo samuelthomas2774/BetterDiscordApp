@@ -48,4 +48,18 @@
             cursor: default;
         }
     }
+
+    .bd-sidebar-info {
+         margin: 10px 0;
+         padding: 0 10px;
+         color: #777;
+
+         a {
+             color: #888;
+
+             &:hover {
+                 color: #999;
+             }
+         }
+    }
 }

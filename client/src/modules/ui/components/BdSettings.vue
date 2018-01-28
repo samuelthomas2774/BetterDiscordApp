@@ -1,7 +1,7 @@
 <template src="./templates/BdSettings.html"></template>
 
 <script>
-    const { BDIpc, Settings } = require('../../');
+    const { BDIpc, Settings, WebpackModules } = require('../../');
     const electron = require('electron');
 
     /*Imports*/
@@ -76,7 +76,12 @@
         electron.shell.openExternal(e.target.href);
     }
 
-    const methods = { itemOnClick, animatingContent, activeContent, activateContent, enableSetting, disableSetting, openLink };
+    function showCreateJoinServerModal() {
+        this.close();
+        WebpackModules.getModuleByProps(['open', 'close', 'createGuild']).open();
+    }
+
+    const methods = { itemOnClick, animatingContent, activeContent, activateContent, enableSetting, disableSetting, openLink, showCreateJoinServerModal };
 
     let menuListener;
     let ipcEventListener;

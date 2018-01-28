@@ -1,0 +1,34 @@
+<div class="bd-public-server" :class="[{'bd-public-server-nsfw': server.nsfw}]">
+    <div class="bd-public-server-wrap">
+        <div class="bd-public-server-image-wrap">
+            <img class="bd-public-server-image" :src="server.icon" />
+        </div>
+        <div class="bd-public-server-info">
+            <h6 class="bd-public-server-name">{{ server.name }}
+                <span class="bd-public-server-label bd-public-server-nsfw-label" v-if="server.nsfw">NSFW</span></h6>
+            <p class="bd-public-server-description">{{ server.description }}</p>
+
+            <div class="bd-public-server-tags" v-if="server.members || server.region">
+                <div class="bd-public-server-members" v-if="server.members">{{ server.members }} members</div>
+                <div class="bd-public-server-members-online" v-if="server.online">{{ server.online }} online members</div>
+                <div class="bd-public-server-region" v-if="server.region">Voice region {{ server.region }}</div>
+            </div>
+
+            <div class="bd-button-group">
+                <button type="button" class="bd-button bd-button-primary bd-public-server-join-button" @click="$parent.$parent.$parent.join(server)">Join</button>
+                <button type="button" class="bd-button bd-button-link bd-public-server-toggle-details-button" onclick="$(this).parent().parent().parent().next().slideToggle()">Details</button>
+                <span class="bd-button bd-button-text" v-if="server.invite_code">Invite code: {{ server.invite_code }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bd-public-server-details-wrap" style="display: none;">
+        <div class="bd-public-server-details">
+            <div class="bd-public-server-id"><strong>ID</strong> {{ server.identifier }}</div>
+            <div class="bd-public-server-created"><strong>Created</strong> {{ server.insert_date }}</div>
+            <div class="bd-public-server-updated"><strong>Updated</strong> {{ server.modified_date }}</div>
+            <div class="bd-public-server-categories" v-if="server.categories.length >= 1"><strong>Categories</strong> {{ server.categories.join(', ') }}</div>
+            <div class="bd-public-server-keywords" v-if="server.keywords.length >= 1"><strong>Keywords</strong> {{ server.keywords.join(', ') }}</div>
+        </div>
+    </div>
+</div>

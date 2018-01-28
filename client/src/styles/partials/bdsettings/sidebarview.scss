@@ -57,9 +57,10 @@
 
     .bd-info {
         display: flex;
-        flex-grow: 1;
+        flex: 1 0 auto;
         align-items: flex-end;
         overflow: hidden;
+        margin-top: 10px;
 
         a {
             color: #414245;

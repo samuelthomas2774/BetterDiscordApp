@@ -38,8 +38,8 @@
     "codemirror": "^5.23.0",
     "vue-codemirror": "^4.0.3",
     "vue-material-design-icons": "^1.0.0",
-    "v-tooltip": "^2.0.0-rc.30"
-
+    "v-tooltip": "^2.0.0-rc.30",
+    "injectorkit": "^1.0.1"
   },
   "scripts": {
     "build": "cd ./client && npm run build && cd ../core && npm run build && cd ../csseditor && npm run build",

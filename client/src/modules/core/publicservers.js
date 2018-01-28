@@ -35,7 +35,7 @@ var pinned_servers = [];
 class PublicServers {
 
     constructor() {
-        this.pinned_servers = [this.bd_server, this.test_server];
+        this.pinned_servers = [this.bd_server, this.bd_server_2, this.test_server];
 
         this.$createjoin_panel = $(createjoin_panel).attr('id', 'publicservertest-panel');
         this.$createjoin_or = $('<div></div>').attr('id', 'publicservertest-or').addClass('bd-public-or or').text('or');
@@ -220,6 +220,36 @@ class PublicServers {
             ],
             keywords: [],
             invite_code: '0Tmfo5ZbORCRqbAd',
+            subscription: ''
+        };
+    }
+
+    get bd_server_2() {
+        return {
+            identifier: 3,
+            name: 'BetterDiscord 2',
+            score: 1,
+            boost: 1,
+            events: 1,
+            members: null,
+            online: null,
+            enabled: true,
+            nsfw: false,
+            listed: true,
+            has_bot: false,
+            owner: 1,
+            description: 'Secondary BetterDiscord server for support.',
+            region: null,
+            icon: 'https://cdn.discordapp.com/icons/86004744966914048/c8d49dc02248e1f55caeb897c3e1a26e.png',
+            insert_date: '2018-01-27',
+            modified_date: '2018-01-27',
+            categories: [
+                'community',
+                'programming',
+                'support'
+            ],
+            keywords: [],
+            invite_code: '2HScm8j',
             subscription: ''
         };
     }

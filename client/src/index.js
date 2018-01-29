@@ -19,7 +19,7 @@ class BetterDiscord {
     }
 
     globalReady() {
-        BdUI.injectUi();
+        this.vueInstance = BdUI.injectUi();
     }
 }
 

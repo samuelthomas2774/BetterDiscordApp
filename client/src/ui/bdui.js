@@ -10,10 +10,18 @@
 
 import Dom from './dom';
 import Vue from 'vue';
+import VTooltip from 'v-tooltip';
 import { BdSettingsWrapper } from './components';
 
 export default class {
     static injectUi() {
+        Vue.use(VTooltip, {
+            defaultContainer: 'bdtooltips',
+            defaultClass: 'bd-tooltip',
+            defaultTargetClass: 'bd-has-tooltip',
+            defaultInnerSelector: '.bd-tooltip-inner',
+            defaultTemplate: '<div class="bd-tooltip"><span class="bd-tooltip-inner"></span></div>'
+        });
 
         Dom.createElement('div', null, 'bd-settings').appendTo(Dom.bdBody);
 
@@ -22,5 +30,7 @@ export default class {
             components: { BdSettingsWrapper },
             template: '<BdSettingsWrapper/>'
         });
+
+        return vueInstance;
     }
 }

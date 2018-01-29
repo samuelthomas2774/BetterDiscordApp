@@ -13,7 +13,6 @@ import BdCss from './styles/index.scss';
 
 class BetterDiscord {
     constructor() {
-        window.DOM = DOM;
         DOM.injectStyle(BdCss, 'bdmain');
     }
 }

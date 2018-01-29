@@ -1,0 +1,1 @@
+export { default as BdSettingsWrapper } from './BdSettingsWrapper.vue';

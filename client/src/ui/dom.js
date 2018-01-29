@@ -9,9 +9,10 @@
 */
 
 class BdNode {
-    constructor(tag, className) {
+    constructor(tag, className, id) {
         this.element = document.createElement(tag);
         if (className) this.element.className = className;
+        if (id) this.element.id = id;
     }
 
     appendTo(e) {
@@ -54,8 +55,8 @@ class DOM {
         return document.querySelector(e);
     }
 
-    static createElement(tag = 'div', className = null) {
-        return new BdNode(tag, className);
+    static createElement(tag = 'div', className = null, id = null) {
+        return new BdNode(tag, className, id);
     }
 
     static deleteStyle(id) {

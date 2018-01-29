@@ -8,12 +8,18 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM } from './ui';
+import { DOM, BdUI } from './ui';
 import BdCss from './styles/index.scss';
+import { Events } from './modules';
 
 class BetterDiscord {
     constructor() {
         DOM.injectStyle(BdCss, 'bdmain');
+        Events.on('global-ready', this.globalReady.bind(this));
+    }
+
+    globalReady() {
+        BdUI.injectUi();
     }
 }
 

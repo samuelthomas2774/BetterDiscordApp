@@ -48,7 +48,7 @@ class ProfileBadges {
         // If any normal profile badges are loaded later, move things around so it works properly
         this.injectorkit.get('profilebadges-usermodal-defaultprofilebadges').callback((injection, $profilebadges) => {
             const $badgeswrap = $profilebadges.parent().find('.bd-profile-badges-wrap');
-            if (!$badgeswrap) return;
+            if (!$badgeswrap.length) return;
 
             const $badges = $badgeswrap.find('.bd-profile-badges').detach();
             $badgeswrap.remove();
@@ -98,7 +98,7 @@ class ProfileBadges {
 
             const $header = $modal.find('[class*="headerInfo-"]');
             var $profilebadges = $header.find('[class*="profileBadges-"]');
-            if ($profilebadges) {
+            if ($profilebadges.length) {
                 // This user doesn't have any badges - or the profile badges container
                 // Add it
                 $profilebadges = $('<div></div>').addClass('bd-profile-badges-wrap').appendTo($header);

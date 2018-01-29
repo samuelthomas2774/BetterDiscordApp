@@ -10,6 +10,7 @@
 
 const { shell } = require('electron');
 
+const $ = require('jquery');
 const InjectorKit = require('injectorkit');
 const { WebpackModules } = require('./webpackmodules');
 

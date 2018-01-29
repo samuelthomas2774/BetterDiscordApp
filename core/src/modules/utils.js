@@ -5,10 +5,10 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
-const 
+const
     path = require('path'),
     fs = require('fs');
 
@@ -54,7 +54,7 @@ class FileUtils {
     }
 
     static async directoryExists(path) {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if(err) return reject({
                     'message': `Directory does not exist: ${path}`,
@@ -78,7 +78,7 @@ class FileUtils {
             throw(err);
         }
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf-8', (err, data) => {
                 if(err) reject({
                     'message': `Could not read file: ${path}`,
@@ -145,7 +145,7 @@ class WindowUtils extends Module {
         channel = channel.startsWith('bd-') ? channel : `bd-${channel}`;
         this.webContents.send(channel, message);
     }
-    
+
 }
 
 module.exports = {

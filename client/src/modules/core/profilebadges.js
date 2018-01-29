@@ -46,9 +46,7 @@ class ProfileBadges {
 
         // If any normal profile badges are loaded later, move things around so it works properly
         this.injectorkit.get('profilebadges-usermodal-defaultprofilebadges').callback((injection, $profilebadges) => {
-            const $header = $profilebadges.parent();
-
-            const $badgeswrap = $header.find('.bd-profile-badges-wrap');
+            const $badgeswrap = $profilebadges.parent().find('.bd-profile-badges-wrap');
             if (!$badgeswrap) return;
 
             const $badges = $badgeswrap.find('.bd-profile-badges').detach();
@@ -76,16 +74,17 @@ class ProfileBadges {
         const that = this;
 
         this.injectorkit.get('modal').once((injection, $modal) => {
+            // Cleanup incase a previous modal was open
+            $modal.find('.bd-profile-badges-wrap, .bd-profile-badges').remove();
+
             const user_badges = this.getUserBadges(user_id);
             if (user_badges.length < 1) return;
-
-            console.log($modal);
 
             const $badges = $('<div></div>').addClass('bd-profile-badges');
             $.each(user_badges, (key, badge_type) => $('<div></div>').addClass('bd-profile-badge bd-profile-badge-' + badge_type).on('click', this.badge_actions[badge_type]).on('mouseover', function() {
                 const $bdtooltips = $('bdtooltips');
                 const $tooltip = $('<div class="bd-tooltip"></div>');
-                const $tooltipinner = $('<span class="bd-tooltip-inner"></span>').text(that.badge_tooltips[badge_type]).appendTo($tooltip);
+                $('<span class="bd-tooltip-inner"></span>').text(that.badge_tooltips[badge_type]).appendTo($tooltip);
 
                 $(this).data('bd-tooltip', $tooltip.appendTo($bdtooltips));
                 $tooltip.css({

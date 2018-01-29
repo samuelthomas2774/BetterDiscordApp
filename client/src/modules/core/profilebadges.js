@@ -98,7 +98,7 @@ class ProfileBadges {
 
             const $header = $modal.find('[class*="headerInfo-"]');
             var $profilebadges = $header.find('[class*="profileBadges-"]');
-            if ($profilebadges.length) {
+            if (!$profilebadges.length) {
                 // This user doesn't have any badges - or the profile badges container
                 // Add it
                 $profilebadges = $('<div></div>').addClass('bd-profile-badges-wrap').appendTo($header);

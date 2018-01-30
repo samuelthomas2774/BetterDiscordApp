@@ -9,6 +9,7 @@
 */
 
 import Globals from './globals';
+import { FileUtils, ClientLogger as Logger } from 'common';
 
 const localPlugins = [];
 
@@ -19,11 +20,27 @@ export default class {
     }
 
     static get pluginsPath() {
+        Logger.log('PluginManager', 'hi!');
         return Globals.getObject('paths').find(path => path.id === 'plugins').path;
     }
 
     static async loadAllPlugins() {
-        
+        try {
+            const directories = await FileUtils.readDir(this.pluginsPath);
+
+            for (let dir of directories) {
+                try {
+                    await this.loadPlugin(dir);
+                } catch (err) {
+                    //We don't want every plugin to fail loading when one does
+                    Logger.err('PluginManager', err);
+                }
+            }
+
+            return this.plugins;
+        } catch (err) {
+            throw err;
+        }
     }
 
 }

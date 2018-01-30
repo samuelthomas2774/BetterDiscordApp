@@ -14,6 +14,7 @@ import { Events, CssEditor, Globals, PluginManager } from 'modules';
 
 class BetterDiscord {
     constructor() {
+        window.pm = PluginManager;
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }

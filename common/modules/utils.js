@@ -12,6 +12,8 @@ const
     path = require('path'),
     fs = require('fs');
 
+import  { Vendor } from 'modules';
+
 export class Utils {
     static overload(fn, cb) {
         const orig = fn;
@@ -133,6 +135,8 @@ export class FileUtils {
     }
 }
 
+const logs = [];
+
 export class ClientLogger {
     static err(module, message) { this.log(module, message, 'err'); }
     static warn(module, message) { this.log(module, message, 'warn'); }
@@ -147,7 +151,7 @@ export class ClientLogger {
         }
         level = this.parseLevel(level);
         console[level]('[%cBetter%cDiscord:%s] %s', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, message);
-        logs.push(`[${Vendor.moment().format('DD/MM/YY hh:mm:ss')}|${module}|${level}] ${message}`);
+        logs.push(`${level.toUpperCase()} : [${Vendor.moment().format('DD/MM/YY hh:mm:ss')}|${module}] ${message}`);
         window.bdlogs = logs;
     }
 

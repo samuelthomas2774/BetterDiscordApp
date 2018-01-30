@@ -50,7 +50,7 @@ export default new class extends Module {
         Events.emit('socket-created');
     }
 
-    getObject() {
+    getObject(name) {
         return this.state[name];
     }
 

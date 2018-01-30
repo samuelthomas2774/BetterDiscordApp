@@ -63,8 +63,12 @@
             }
         },
         methods: {
-            showLocal() { },
-            showOnline() { },
+            showLocal() {
+                this.local = true;
+            },
+            showOnline() {
+                this.local = false;
+            },
             refreshLocal() { },
             togglePlugin() { },
             reloadPlugin() { },

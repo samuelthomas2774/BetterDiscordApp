@@ -25,17 +25,38 @@ export default class extends ContentManager {
         return 'plugins';
     }
 
-    static get loadAllPlugins() {
-        return this.loadAllContent;
-    }
+    static get loadAllPlugins() { return this.loadAllContent }
+    static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
     static async loadPlugin(paths, configs, info, main) {
         const plugin = window.require(paths.mainPath)(Plugin, {}, {});
-        const instance = new plugin({ configs, info, main, paths: { pluginPath: paths.contentPath, dirName: paths.dirName } });
+        const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName } });
 
         if (instance.enabled) instance.start();
         return instance;
     }
+
+    static get unloadContent() { return this.unloadPlugin }
+    static async unloadPlugin(plugin) {
+        try {
+            if (plugin.enabled) plugin.stop();
+            const { pluginPath } = plugin;
+            const index = this.getPluginIndex(plugin);
+
+            delete window.require.cache[window.require.resolve(pluginPath)];
+            this.localPlugins.splice(index, 1);
+        } catch (err) {
+            //This might fail but we don't have any other option at this point
+            Logger.err('PluginManager', err);
+        }
+    }
+
+    static get findPlugin() { return this.findContent }
+    static get getPluginIndex() { return this.getContentIndex }
+    static get getPluginByName() { return this.getContentByName }
+    static get getPluginById() { return this.getContentById }
+    static get getPluginByPath() { return this.getContentByPath }
+    static get getPluginByDirName() { return this.getContentByDirName }
 
 }

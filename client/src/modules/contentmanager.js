@@ -24,7 +24,6 @@ export default class {
 
     static async loadAllContent() {
         try {
-
             await FileUtils.ensureDirectory(this.contentPath);
             const directories = await FileUtils.listDirectory(this.contentPath);
 
@@ -38,6 +37,39 @@ export default class {
             }
 
             return this.localContent;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    static async refreshContent() {
+        if (!this.localContent.length) return this.loadAllContent();
+
+        try {
+            await FileUtils.ensureDirectory(this.contentPath);
+            const directories = await FileUtils.listDirectory(this.contentPath);
+
+            for (let dir of directories) {
+                // If content is already loaded this should resolve.
+                if (this.getContentByDirName(dir)) continue;
+
+                try {
+                    // Load if not
+                    await this.preloadContent(dir);
+                } catch (err) {
+                    //We don't want every plugin/theme to fail loading when one does
+                    Logger.err(this.moduleName, err);
+                }
+            }
+
+            for (let content of this.localContent) {
+                if (directories.includes(content.dirName)) continue;
+                //Plugin/theme was deleted manually, stop it and remove any reference
+                this.unloadContent(content);
+            }
+
+            return this.localContent;
+
         } catch (err) {
             throw err;
         }
@@ -101,5 +133,22 @@ export default class {
         configPath = path.resolve(configPath, 'user.config.json');
         return FileUtils.readJsonFromFile(configPath);
     }
+
+    //TODO make this nicer
+    static findContent(wild) {
+        let content = this.getContentByName(wild);
+        if (content) return content;
+        content = this.getContentById(wild);
+        if (content) return content;
+        content = this.getContentByPath(wild);
+        if (content) return content;
+        return this.getContentByDirName(wild);
+    }
+
+    static getContentIndex(content) { return this.localContent.findIndex(c => c === content) }
+    static getContentByName(name) { return this.localContent.find(c => c.name === name) }
+    static getContentById(id) { return this.localContent.find(c => c.id === id) }
+    static getContentByPath(path) { return this.localContent.find(c => c.contentPath === path) }
+    static getContentByDirName(dirName) { return this.localContent.find(c => c.dirName === dirName) }
 
 }

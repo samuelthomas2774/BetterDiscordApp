@@ -26,10 +26,10 @@ export default class {
     get name() { return this.info.name }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
-    get pluginPath() { return this.paths.pluginPath }
+    get pluginPath() { return this.paths.contentPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
-    get pluginConfig() { return this.userConfig.pluginConfig }
+    get pluginConfig() { return this.userConfig.config }
 
     start() {
         if (this.onStart) {

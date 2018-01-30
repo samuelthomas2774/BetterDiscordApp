@@ -43,7 +43,9 @@
 </template>
 <script>
     // Imports
+    import { Settings } from '../../modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
+    import { CoreSettings } from './bd';
     import { SvgX } from './common';
 
     // Constants
@@ -65,22 +67,48 @@
                 activeIndex: -1,
                 lastActiveIndex: -1,
                 animating: false,
-                first: true
+                first: true,
+                settings: Settings.getSettings
             }
         },
         props: ['active', 'close'],
+        computed: {
+            coreSettings() {
+                return this.settings.find(settingset => settingset.id === 'core').settings;
+            }
+        },
         components: {
-            SidebarView, Sidebar, SidebarItem, ContentColumn, SvgX
+            SidebarView, Sidebar, SidebarItem, ContentColumn,
+            CoreSettings,
+            SvgX
         },
         methods: {
-            itemOnClick() {
+            itemOnClick(id) {
+                if (this.animating || id === this.activeIndex) return;
+                if (this.activeIndex >= 0) this.sidebarItems.find(item => item.id === this.activeIndex).active = false;
+                this.sidebarItems.find(item => item.id === id).active = true;
+                this.animating = true;
+                this.lastActiveIndex = this.activeIndex;
+                this.activeIndex = id;
 
+                if (this.first) {
+                    this.first = false;
+                }
+
+                setTimeout(() => {
+                    this.animating = false;
+                    this.lastActiveIndex = -1;
+                }, 400);
             },
-            activeContent() {
-                return false;
+            activeContent(s) {
+                const item = this.sidebarItems.find(item => item.contentid === s);
+                if (!item) return false;
+                return item.id === this.activeIndex;
             },
-            animatingContent() {
-                return false;
+            animatingContent(s) {
+                const item = this.sidebarItems.find(item => item.contentid === s);
+                if (!item) return false;
+                return item.id === this.lastActiveIndex;
             }
         }
     }

@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Button Group Component
+ * BetterDiscord Settings Wrapper Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -9,11 +9,21 @@
 */
 
 <template>
-    <div class="bd-button-group">
-        <slot />
+    <div class="bd-settingsWrap">
+        <div class="bd-settingsWrap-header">{{headertext}}</div>
+        <ScrollerWrap>
+            <slot />
+        </ScrollerWrap>
     </div>
 </template>
 <script>
+    // Imports
+    import { ScrollerWrap } from '../common';
+
     export default {
+        props: ['headertext'],
+        components: {
+            ScrollerWrap
+        }
     }
 </script>

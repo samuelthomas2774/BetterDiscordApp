@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Button Group Component
+ * BetterDiscord Settings Module
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -8,12 +8,10 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-<template>
-    <div class="bd-button-group">
-        <slot />
-    </div>
-</template>
-<script>
-    export default {
+import defaultSettings from '../data/user.settings.default';
+
+export default class {
+    static get getSettings() {
+        return defaultSettings;
     }
-</script>
+}

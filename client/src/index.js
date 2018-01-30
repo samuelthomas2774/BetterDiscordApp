@@ -28,5 +28,5 @@ if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
     let bdInstance = new BetterDiscord();
-    window.BetterDiscord = { 'vendor': Vendor };
+   // window.BetterDiscord = { 'vendor': Vendor };
 }

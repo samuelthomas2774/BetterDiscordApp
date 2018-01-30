@@ -19,13 +19,14 @@
 <script>
     // Imports
     import { Events } from '../../modules';
-    import { BdSettings } from './';
+    import BdSettings from './BdSettings.vue';
 
     export default {
         data() {
             return {
                 loaded: false,
-                active: false
+                active: false,
+                platform: global.process.platform
             }
         },
         components: {
@@ -47,7 +48,8 @@
         },
         created() {
             Events.on('ready', e => this.loaded = true);
-            window.addEvenetListener('keyup', this.keyupListener);
+            this.loaded = true;
+            window.addEventListener('keyup', this.keyupListener);
         },
         destroyed() {
             window.removeEventListener('keyup', this.keyupListener);

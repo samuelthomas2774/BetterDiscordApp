@@ -45,7 +45,7 @@
     // Imports
     import { Settings } from '../../modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { CoreSettings, UISettings, EmoteSettings } from './bd';
+    import { CoreSettings, UISettings, EmoteSettings, CssEditorView } from './bd';
     import { SvgX } from './common';
 
     // Constants
@@ -79,7 +79,7 @@
         },
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            CoreSettings, UISettings, EmoteSettings,
+            CoreSettings, UISettings, EmoteSettings, CssEditorView,
             SvgX
         },
         methods: {

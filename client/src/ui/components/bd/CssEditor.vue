@@ -46,7 +46,7 @@
 
 <script>
     // Imports
-    import CssEditor from '../../';
+    import { CssEditor } from '../../../modules';
     import { SettingsWrapper } from './';
     import { SettingSwitch, FormButton } from '../common';
 
@@ -57,7 +57,7 @@
         },
         methods: {
             openInternalEditor() {
-
+                CssEditor.show();
             },
             settingClicked() {
             }

@@ -15,7 +15,7 @@ export default class {
 
     static async show() {
         const t = await ClientIPC.send('openCssEditor', {});
-        if (t === 1) ClientIPC.send('setCss', { css: DOM.getStyleCss('bd-customcss') });
+        ClientIPC.send('setCss', { css: DOM.getStyleCss('bd-customcss') });
 
         ClientIPC.on('bd-update-css', this.updateCss);
     }

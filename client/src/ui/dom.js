@@ -71,7 +71,7 @@ class DOM {
 
     static getStyleCss(id) {
         const exists = this.getElement(`bd-styles > #${id}`);
-        return exists.textContent || '';
+        return exists ? exists.textContent : '';
     }
 
     static deleteTheme(id) {

@@ -8,9 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI } from './ui';
+import { DOM, BdUI } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor } from './modules';
+import { Events, CssEditor, Globals } from 'modules';
 
 class BetterDiscord {
     constructor() {

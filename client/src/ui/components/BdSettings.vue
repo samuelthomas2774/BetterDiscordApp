@@ -43,7 +43,7 @@
 </template>
 <script>
     // Imports
-    import { Settings } from '../../modules';
+    import { Settings } from 'modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { CoreSettings, UISettings, EmoteSettings, CssEditorView } from './bd';
     import { SvgX } from './common';

@@ -18,7 +18,7 @@
 </template>
 <script>
     // Imports
-    import { Events } from '../../modules';
+    import { Events } from 'modules';
     import BdSettings from './BdSettings.vue';
 
     export default {

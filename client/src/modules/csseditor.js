@@ -8,8 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { ClientIPC } from '../../../common/modules';
-import { DOM } from '../ui';
+import { ClientIPC } from 'common';
+import { DOM } from 'ui';
 
 export default class {
 

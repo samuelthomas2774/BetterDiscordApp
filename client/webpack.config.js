@@ -37,7 +37,13 @@ module.exports = {
     resolve: {
         alias: {
             vue$: path.resolve('..', 'node_modules', 'vue', 'dist', 'vue.esm.js')
-        }
+        },
+        modules: [
+            path.resolve('..', 'node_modules'),
+            path.resolve('..', 'common', 'modules'),
+            path.resolve('src', 'modules'),
+            path.resolve('src', 'ui')
+        ]
     }
    /* resolve: {
         alias: {

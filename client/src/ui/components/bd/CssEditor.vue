@@ -46,7 +46,7 @@
 
 <script>
     // Imports
-    import { CssEditor } from '../../../modules';
+    import { CssEditor } from 'modules';
     import { SettingsWrapper } from './';
     import { SettingSwitch, FormButton } from '../common';
 

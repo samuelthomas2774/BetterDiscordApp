@@ -8,28 +8,60 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-<template src="./templates/CssEditor.html">
+<template>
+    <SettingsWrapper headertext="CSS Editor">
+        <div class="bd-css-editor">
+            <div class="bd-form-item">
+                <h5>Custom Editor</h5>
+                <div class="bd-form-warning">
+                    <div class="bd-text">Custom Editor is not installed!</div>
+                    <FormButton>
+                        Install
+                    </FormButton>
+                </div>
+                <span style="color: #FFF; font-size: 12px; font-weight: 700;">*This is displayed if editor is not installed</span>
+                <FormButton :onClick="openInternalEditor">
+                    Open
+                </FormButton>
+            </div>
+            <div class="bd-form-divider"></div>
+            <SettingSwitch :setting="dummySetting" :onClick="settingClicked" />
+            <div class="bd-form-item">
+                <h5>System Editor</h5>
+                <FormButton>
+                    Open
+                </FormButton>
+            </div>
+            <div class="bd-form-divider"></div>
+            <FormButton :onClick="settingClicked">
+                Enabled
+            </FormButton>
+            <FormButton :disabled="true">
+                <span>Disabled</span>
+            </FormButton>
+            <FormButton :loading="true" />
+        </div>
+    </SettingsWrapper>
 </template>
 
 <script>
-    const { CssEditor } = require('../../../');
-
-    /*Imports*/
+    // Imports
+    import CssEditor from '../../';
     import { SettingsWrapper } from './';
-    import { SettingSwitch, FormButton } from '../generic';
-    const components = { SettingsWrapper, SettingSwitch, FormButton };
-
-    function openInternalEditor() {
-        CssEditor.show();
-    }
-
-    function settingClicked() {
-        this.dummySetting.checked = !this.dummySetting.checked;
-    }
+    import { SettingSwitch, FormButton } from '../common';
 
     export default {
-        components,
-        methods: { openInternalEditor, settingClicked },
+        components: {
+            SettingsWrapper,
+            SettingSwitch, FormButton
+        },
+        methods: {
+            openInternalEditor() {
+
+            },
+            settingClicked() {
+            }
+        },
         data() {
             return {
                 dummySetting: {

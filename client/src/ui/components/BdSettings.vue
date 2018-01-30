@@ -45,7 +45,7 @@
     // Imports
     import { Settings } from '../../modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { CoreSettings } from './bd';
+    import { CoreSettings, UISettings, EmoteSettings } from './bd';
     import { SvgX } from './common';
 
     // Constants
@@ -79,7 +79,7 @@
         },
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            CoreSettings,
+            CoreSettings, UISettings, EmoteSettings,
             SvgX
         },
         methods: {
@@ -109,6 +109,18 @@
                 const item = this.sidebarItems.find(item => item.contentid === s);
                 if (!item) return false;
                 return item.id === this.lastActiveIndex;
+            },
+            enableSetting(cat, id) {
+                switch (cat) {
+                    case 'core':
+                        return this.coreSettings.find(setting => setting.id === id).enabled = true;
+                }
+            },
+            disableSetting(cat, id) {
+                switch (cat) {
+                    case 'core':
+                        return this.coreSettings.find(setting => setting.id === id).enabled = false;
+                }
             }
         }
     }

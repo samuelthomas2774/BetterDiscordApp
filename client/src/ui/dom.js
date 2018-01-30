@@ -69,6 +69,11 @@ class DOM {
         this.bdStyles.append(this.createStyle(css, id));
     }
 
+    static getStyleCss(id) {
+        const exists = this.getElement(`bd-styles > #${id}`);
+        return exists.textContent || '';
+    }
+
     static deleteTheme(id) {
         const exists = this.getElement(`bd-themes > #${id}`);
         if (exists) exists.remove();

@@ -10,10 +10,12 @@
 
 import { DOM, BdUI } from './ui';
 import BdCss from './styles/index.scss';
-import { Events } from './modules';
+import { Events, CssEditor } from './modules';
 
 class BetterDiscord {
     constructor() {
+        window.DOM = DOM;
+        window.cssEditorTest = CssEditor;
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
         Events.emit('global-ready'); // Emit for now

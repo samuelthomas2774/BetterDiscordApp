@@ -10,17 +10,25 @@
 
 import { DOM, BdUI } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, PluginManager } from 'modules';
+import { Events, CssEditor, Globals, PluginManager, ThemeManager } from 'modules';
 
 class BetterDiscord {
     constructor() {
-        window.pm = PluginManager;
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }
 
+    async init() {
+        await PluginManager.loadAllPlugins();
+        await ThemeManager.loadAllThemes();
+        Events.emit('ready');
+    }
+
     globalReady() {
         this.vueInstance = BdUI.injectUi();
+        (async () => {
+            this.init();
+        })();
     }
 }
 
@@ -28,5 +36,4 @@ if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
     let bdInstance = new BetterDiscord();
-   // window.BetterDiscord = { 'vendor': Vendor };
 }

@@ -8,39 +8,34 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import Globals from './globals';
-import { FileUtils, ClientLogger as Logger } from 'common';
+import ContentManager from './contentmanager';
+import Plugin from './plugin';
 
-const localPlugins = [];
-
-export default class {
+export default class extends ContentManager {
 
     static get localPlugins() {
-        return localPlugins;
+        return this.localContent;
     }
 
-    static get pluginsPath() {
-        Logger.log('PluginManager', 'hi!');
-        return Globals.getObject('paths').find(path => path.id === 'plugins').path;
+    static get moduleName() {
+        return 'PluginManager';
     }
 
-    static async loadAllPlugins() {
-        try {
-            const directories = await FileUtils.readDir(this.pluginsPath);
+    static get pathId() {
+        return 'plugins';
+    }
 
-            for (let dir of directories) {
-                try {
-                    await this.loadPlugin(dir);
-                } catch (err) {
-                    //We don't want every plugin to fail loading when one does
-                    Logger.err('PluginManager', err);
-                }
-            }
+    static get loadAllPlugins() {
+        return this.loadAllContent;
+    }
 
-            return this.plugins;
-        } catch (err) {
-            throw err;
-        }
+    static get loadContent() { return this.loadPlugin }
+    static async loadPlugin(paths, configs, info, main) {
+        const plugin = window.require(paths.mainPath)(Plugin, {}, {});
+        const instance = new plugin({ configs, info, main, paths: { pluginPath: paths.contentPath, dirName: paths.dirName } });
+
+        if (instance.enabled) instance.start();
+        return instance;
     }
 
 }

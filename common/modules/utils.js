@@ -72,6 +72,32 @@ export class FileUtils {
         });
     }
 
+    static async createDirectory(path) {
+        return new Promise((resolve, reject) => {
+            fs.mkdir(path, err => {
+                if (err) {
+                    if (err.code === 'EEXIST') return resolve();
+                    else return reject(err);
+                }
+                resolve();
+            });
+        });
+    }
+
+    static async ensureDirectory(path) {
+        try {
+            await this.directoryExists(path);
+            return true;
+        } catch (err) {
+            try {
+                await this.createDirectory(path);
+                return true;
+            } catch (err) {
+                throw err;
+            }
+        }
+    }
+
     static async readFile(path) {
         try {
             await this.fileExists(path);
@@ -120,7 +146,7 @@ export class FileUtils {
         return this.writeFile(path, JSON.stringify(json));
     }
 
-    static async readDir(path) {
+    static async listDirectory(path) {
         try {
             await this.directoryExists(path);
             return new Promise((resolve, reject) => {
@@ -132,6 +158,10 @@ export class FileUtils {
         } catch (err) {
             throw err;
         }
+    }
+
+    static async readDir(path) {
+        return this.listDirectory(path);
     }
 }
 

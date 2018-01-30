@@ -30,6 +30,13 @@ export default new class extends Module {
             const config = await ClientIPC.send('getConfig');
             this.setState(config);
 
+            // This is for Discord to stop error reporting :3
+            window.BetterDiscord = {
+                'version': config.version,
+                'v': config.version
+            };
+            window.jQuery = {};
+
             Events.emit('global-ready');
         })();
 
@@ -40,7 +47,6 @@ export default new class extends Module {
             }
             Events.emit('socket-created', this.state.wsHook);
         }
-
     }
 
     setWS(wSocket) {

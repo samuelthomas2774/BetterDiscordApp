@@ -48,7 +48,6 @@
         },
         created() {
             Events.on('ready', e => this.loaded = true);
-            this.loaded = true;
             window.addEventListener('keyup', this.keyupListener);
         },
         destroyed() {

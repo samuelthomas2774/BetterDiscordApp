@@ -18,4 +18,8 @@ export default class {
         return localPlugins;
     }
 
+    static get pluginsPath() {
+        return Globals.getObject('paths').find(path => path.id === 'plugins').path;
+    }
+
 }

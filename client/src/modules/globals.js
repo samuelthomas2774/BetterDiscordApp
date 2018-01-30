@@ -21,10 +21,37 @@ export default new class extends Module {
 
     bindings() {
         this.first = this.first.bind(this);
+        this.setWS = this.setWS.bind(this);
+        this.getObject = this.getObject.bind(this);
     }
 
     first() {
-        
+        (async() => {
+            const config = await ClientIPC.send('getConfig');
+            this.setState(config);
+
+            Events.emit('global-ready');
+        })();
+
+        if (window.__bd) {
+            this.setState(window.__bd);
+            window.__bd = {
+                setWS: this.setWS
+            }
+            Events.emit('socket-created', this.state.wsHook);
+        }
+
+    }
+
+    setWS(wSocket) {
+        const state = this.state;
+        state.wsHook = wSocket;
+        this.setState(state);
+        Events.emit('socket-created');
+    }
+
+    getObject() {
+        return this.state[name];
     }
 
 }

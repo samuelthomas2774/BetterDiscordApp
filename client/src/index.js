@@ -18,7 +18,6 @@ class BetterDiscord {
         window.cssEditorTest = CssEditor;
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
-        Events.emit('global-ready'); // Emit for now
     }
 
     globalReady() {

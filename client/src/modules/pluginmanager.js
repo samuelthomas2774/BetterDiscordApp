@@ -22,4 +22,8 @@ export default class {
         return Globals.getObject('paths').find(path => path.id === 'plugins').path;
     }
 
+    static async loadAllPlugins() {
+        
+    }
+
 }

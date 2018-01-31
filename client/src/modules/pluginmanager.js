@@ -10,6 +10,7 @@
 
 import ContentManager from './contentmanager';
 import Plugin from './plugin';
+import { ClientLogger as Logger } from 'common';
 
 export default class extends ContentManager {
 

@@ -11,6 +11,7 @@
 import { DOM, BdUI } from 'ui';
 import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, PluginManager, ThemeManager } from 'modules';
+import { ClientLogger as Logger } from 'common';
 
 class BetterDiscord {
     constructor() {

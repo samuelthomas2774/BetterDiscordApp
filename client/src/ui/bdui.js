@@ -9,19 +9,35 @@
 */
 
 import Dom from './dom';
-import Vue from 'vue';
+import Vue from './vue';
 import VTooltip from 'v-tooltip';
 import { BdSettingsWrapper } from './components';
+import { Events, WebpackModules } from 'modules';
+import { Utils } from 'common';
 
 export default class {
+
+    static initUiEvents() {
+        //this.profilePopupModule.open
+        const defer = setInterval(() => {
+            if (!this.profilePopupModule) return;
+            clearInterval(defer);
+            this.profilePopupModule.open = Utils.overload(this.profilePopupModule.open, userid => {
+                Events.emit('ui-event', {
+                    event: 'profile-popup-open',
+                    data: { userid }
+                });
+            });
+        }, 100);
+        
+    }
+
+    static get profilePopupModule() {
+        return WebpackModules.getModuleByProps(['fetchMutualFriends', 'setSection']);
+    }
+
     static injectUi() {
-        Vue.use(VTooltip, {
-            defaultContainer: 'bdtooltips',
-            defaultClass: 'bd-tooltip',
-            defaultTargetClass: 'bd-has-tooltip',
-            defaultInnerSelector: '.bd-tooltip-inner',
-            defaultTemplate: '<div class="bd-tooltip"><span class="bd-tooltip-inner"></span></div>'
-        });
+        Dom.createElement('bdtooltips').appendTo(Dom.bdBody);
 
         Dom.createElement('div', null, 'bd-settings').appendTo(Dom.bdBody);
 

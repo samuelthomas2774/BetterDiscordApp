@@ -12,7 +12,11 @@ const { ipcRenderer, ipcMain } = require('electron');
 
 export class ClientIPC {
     static on(channel, cb) {
-        ipcRenderer.on(channel, (event, message) => cb(event, message));
+        ipcRenderer.on(channel, cb.__bdipc_binding = (event, message) => cb(event, message));
+    }
+
+    static off(channel, cb) {
+        ipcRenderer.on(channel, cb.__bdipc_binding);
     }
 
     static async send(channel, message) {

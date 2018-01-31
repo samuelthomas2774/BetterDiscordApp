@@ -48,6 +48,7 @@
     import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView } from './bd';
     import { SvgX } from './common';
     import { shell } from 'electron';
+    import { ClientIPC } from 'common';
 
     // Constants
     const sidebarItems = [
@@ -101,6 +102,14 @@
                     this.lastActiveIndex = -1;
                 }, 400);
             },
+            activateContent(s) {
+                const item = this.sidebarItems.find(item => item.contentid === s);
+                if (item.active) return;
+                this.itemOnClick(item.id);
+            },
+            ipcShowMenu(e, content) {
+                this.activateContent(content);
+            },
             activeContent(s) {
                 const item = this.sidebarItems.find(item => item.contentid === s);
                 if (!item) return false;
@@ -126,6 +135,12 @@
             openLink(e) {
                 shell.openExternal(e.target.href);
             }
+        },
+        created() {
+            ClientIPC.on('bd-show-menu', this.ipcShowMenu);
+        },
+        destroyed() {
+            ClientIPC.off('bd-show-menu', this.ipcShowMenu);
         }
     }
 </script>

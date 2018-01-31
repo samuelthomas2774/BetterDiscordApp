@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div :class="{'bd-profile-badges-wrap': !hasBadges}">
+    <div :class="{'bd-profile-badges-wrap': hasBadges == 'false'}">
         <div class="bd-profile-badges">
             <div v-if="developer == 'true'" v-tooltip="'BetterDiscord Developer'" class="bd-profile-badge bd-profile-badge-developer" @click="onClick"></div>
             <div v-else-if="webdev == 'true'" v-tooltip="'BetterDiscord Web Developer'" class="bd-profile-badge bd-profile-badge-developer" @click="onClick"></div>

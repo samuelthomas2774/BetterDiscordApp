@@ -40,12 +40,15 @@ class DOMObserver {
     }
 
     observerCallback(mutations) {
-        this.subscriptions.forEach(sub => {
+        for (let sub of this.subscriptions) {
             try {
                 const f = mutations.find(sub.filter);
-                if (f) sub.callback(f);
-            } catch (err) { }
-        });
+                if (f) {
+                    sub.callback(f);
+                    continue;
+                }
+            } catch(err) {}
+        }
     }
 
     observe() {

@@ -26,7 +26,7 @@
         methods: {
             onClick() {
                 if (this.developer) return shell.openExternal('https://github.com/JsSucks/BetterDiscordApp');
-                if (this.webdev) return shell.openExternal('http://betterdiscord.net');
+                if (this.webdev) return shell.openExternal('https://betterdiscord.net');
                 if (this.contributor) return shell.openExternal('https://github.com/JsSucks/BetterDiscordApp/graphs/contributors');
             }
         }

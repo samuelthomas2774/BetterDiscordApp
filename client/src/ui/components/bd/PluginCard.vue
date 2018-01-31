@@ -13,7 +13,7 @@
         <div class="bd-plugin-header">
             <span v-tooltip="'wat'">{{plugin.name}}</span>
             <div class="bd-flex-spacer" />
-            <label class="bd-switch-wrapper" @click="togglePlugin(plugin)">
+            <label class="bd-switch-wrapper" @click="() => { togglePlugin(plugin); this.$forceUpdate(); }">
                 <input type="checkbox" class="bd-switch-checkbox" />
                 <div class="bd-switch" :class="{'bd-checked': plugin.enabled}" />
             </label>

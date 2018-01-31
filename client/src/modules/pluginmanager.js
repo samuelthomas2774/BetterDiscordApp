@@ -64,6 +64,26 @@ export default class extends ContentManager {
         return this.preloadContent(dirName, true, index);
     }
 
+    static stopPlugin(name) {
+        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
+        try {
+            if (plugin) return plugin.stop();
+        } catch (err) {
+           // Logger.err('PluginManager', err);
+        }
+        return true; //Return true anyways since plugin doesn't exist
+    }
+
+    static startPlugin(name) {
+        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
+        try {
+            if (plugin) return plugin.start();
+        } catch (err) {
+           // Logger.err('PluginManager', err);
+        }
+        return true; //Return true anyways since plugin doesn't exist
+    }
+
     static get findPlugin() { return this.findContent }
     static get getPluginIndex() { return this.getContentIndex }
     static get getPluginByName() { return this.getContentByName }

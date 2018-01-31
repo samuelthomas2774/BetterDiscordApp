@@ -50,17 +50,12 @@
         data() {
             return {
                 local: true,
-                pluginManager: PluginManager,
-                settingsOpen: null
+                settingsOpen: null,
+                localPlugins: PluginManager.localPlugins
             }
         },
         components: {
             SettingsWrapper, PluginCard, Refresh
-        },
-        computed: {
-            localPlugins() {
-                return this.pluginManager.localPlugins;
-            }
         },
         methods: {
             showLocal() {
@@ -70,11 +65,22 @@
                 this.local = false;
             },
             refreshLocal() { },
-            togglePlugin() { },
+            togglePlugin(plugin) {
+                // TODO Display error if plugin fails to start/stop
+                try {
+                    if (plugin.enabled) {
+                        PluginManager.stopPlugin(plugin);
+                    } else {
+                        PluginManager.startPlugin(plugin);
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            },
             reloadPlugin(plugin) {
                 (async () => {
                     try {
-                        await this.pluginManager.reloadPlugin(plugin);
+                        await PluginManager.reloadPlugin(plugin);
                         this.$forceUpdate();
                     } catch (err) {
                         console.log(err);

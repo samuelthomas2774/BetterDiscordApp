@@ -29,8 +29,8 @@ export default class {
     }
 
     static inject(userid) {
-        const contributor = this.contributors.find(c => c.id == userid);
-        if (!contributor) return;
+        const c = this.contributors.find(c => c.id === userid);
+        if (!c) return;
 
         setTimeout(() => {
             let hasBadges = false;
@@ -41,13 +41,15 @@ export default class {
                 root = document.querySelector('[class*="headerInfo"]');
             }
 
+            const { developer, contributor, webdev } = c;
+
             VueInjector.inject(
                 root,
                 DOM.createElement('div', null, 'bdprofilebadges'),
                 { BdBadge },
-                `<BdBadge developer="${contributor.developer}" contributor="${contributor.contributor}" webdev="${contributor.webdev}" hasBadges="${hasBadges}" />`
+                `<BdBadge hasBadges="${hasBadges}" developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`
             );
-        }, 200);
+        }, 400);
     }
 
     static filter(mutation) {
@@ -56,15 +58,15 @@ export default class {
 
     static get contributors() {
         return [
-            { 'id': 81388395867156480, 'webdev': true, 'developer': true, 'contributor': true }, // Jiiks
-            { 'id': 98003542823944192, 'webdev': false, 'developer': true, 'contributor': true }, // Pohky
-            { 'id': 138850472541814784, 'webdev': true, 'developer': false, 'contributor': true }, // Hammock
-            { 'id': 249746236008169473, 'webdev': false, 'developer': true, 'contributor': true }, // Zerebos
-            { 'id': 125367412370440192, 'webdev': false, 'developer': true, 'contributor': true }, // Pierce
-            { 'id': 284056145272766465, 'webdev': false, 'developer': false, 'contributor': true }, // Samuel Elliott
-            { 'id': 184021060562321419, 'webdev': false, 'developer': false, 'contributor': true }, // Lilian Tedone
-            { 'id': 76052829285916672, 'webdev': false, 'developer': false, 'contributor': true }, // samfun123
-            { 'id': 171005991272316937, 'webdev': false, 'developer': false, 'contributor': true }, // samogot
+            { 'id': '81388395867156480', 'webdev': true, 'developer': true, 'contributor': true }, // Jiiks
+            { 'id': '98003542823944192', 'webdev': false, 'developer': true, 'contributor': true }, // Pohky
+            { 'id': '138850472541814784', 'webdev': true, 'developer': false, 'contributor': true }, // Hammock
+            { 'id': '249746236008169473', 'webdev': false, 'developer': true, 'contributor': true }, // Zerebos
+            { 'id': '125367412370440192', 'webdev': false, 'developer': true, 'contributor': true }, // Pierce
+            { 'id': '284056145272766465', 'webdev': false, 'developer': false, 'contributor': true }, // Samuel Elliott
+            { 'id': '184021060562321419', 'webdev': false, 'developer': false, 'contributor': true }, // Lilian Tedone
+            { 'id': '76052829285916672', 'webdev': false, 'developer': false, 'contributor': true }, // samfun123
+            { 'id': '171005991272316937', 'webdev': false, 'developer': false, 'contributor': true }, // samogot
         ];
     }
 

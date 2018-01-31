@@ -44,6 +44,7 @@
     import { PluginManager } from 'modules';
     import { SettingsWrapper } from './';
     import PluginCard from './PluginCard.vue';
+    import PluginSettingsModal from './PluginSettingsModal.vue';
     import Refresh from 'vue-material-design-icons/refresh.vue';
 
     export default {
@@ -55,7 +56,7 @@
             }
         },
         components: {
-            SettingsWrapper, PluginCard, Refresh
+            SettingsWrapper, PluginCard, PluginSettingsModal, Refresh
         },
         methods: {
             showLocal() {
@@ -91,7 +92,9 @@
                     }
                 })();
             },
-            showSettings() { }
+            showSettings(plugin) {
+                this.settingsOpen = plugin;
+            }
         }
     }
 

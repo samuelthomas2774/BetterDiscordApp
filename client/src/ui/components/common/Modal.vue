@@ -29,7 +29,7 @@
 
 <script>
     // Imports
-    import { SvgX } from './';
+    import SvgX from './SvgX.vue';
 
     export default {
         props: ['headerText', 'close'],

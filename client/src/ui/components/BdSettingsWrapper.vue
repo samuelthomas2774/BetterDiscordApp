@@ -20,6 +20,7 @@
     // Imports
     import { Events } from 'modules';
     import BdSettings from './BdSettings.vue';
+    import { ClientIPC } from 'common';
 
     export default {
         data() {
@@ -49,9 +50,15 @@
         created() {
             Events.on('ready', e => this.loaded = true);
             window.addEventListener('keyup', this.keyupListener);
+            ClientIPC.on('bd-toggle-menu', this.toggleSettings);
+            ClientIPC.on('bd-show-menu', this.showSettings);
+            ClientIPC.on('bd-hide-menu', this.hideSettings);
         },
         destroyed() {
             window.removeEventListener('keyup', this.keyupListener);
+            ClientIPC.off('bd-toggle-menu', this.toggleSettings);
+            ClientIPC.off('bd-show-menu', this.showSettings);
+            ClientIPC.off('bd-hide-menu', this.hideSettings);
         }
     }
 </script>

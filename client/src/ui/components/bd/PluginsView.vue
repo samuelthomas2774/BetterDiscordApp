@@ -71,7 +71,16 @@
             },
             refreshLocal() { },
             togglePlugin() { },
-            reloadPlugin() { },
+            reloadPlugin(plugin) {
+                (async () => {
+                    try {
+                        await this.pluginManager.reloadPlugin(plugin);
+                        this.$forceUpdate();
+                    } catch (err) {
+                        console.log(err);
+                    }
+                })();
+            },
             showSettings() { }
         }
     }

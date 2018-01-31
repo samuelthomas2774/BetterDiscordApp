@@ -116,14 +116,15 @@ export default class {
             }
 
             const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main);
-            this.localContent.push(content);
+            if (reload) this.localContent[index] = content;
+            else this.localContent.push(content);
             return content;
 
         } catch (err) {
             throw err;
         }
     }
-
+    
     static async readConfig(configPath) {
         configPath = path.resolve(configPath, 'config.json');
         return FileUtils.readJsonFromFile(configPath);

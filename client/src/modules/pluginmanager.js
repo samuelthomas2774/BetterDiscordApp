@@ -52,6 +52,18 @@ export default class extends ContentManager {
         }
     }
 
+    static async reloadPlugin(plugin) {
+        const _plugin = plugin instanceof Plugin ? plugin : this.findPlugin(plugin);
+        if (!_plugin) throw { 'message': 'Attempted to reload a plugin that is not loaded?' };
+        if (!_plugin.stop()) throw { 'message': 'Plugin failed to stop!' };
+        const index = this.getPluginIndex(_plugin);
+        const { pluginPath, dirName } = _plugin;
+
+        delete window.require.cache[window.require.resolve(pluginPath)];
+
+        return this.preloadContent(dirName, true, index);
+    }
+
     static get findPlugin() { return this.findContent }
     static get getPluginIndex() { return this.getContentIndex }
     static get getPluginByName() { return this.getContentByName }

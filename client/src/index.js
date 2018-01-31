@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI } from 'ui';
+import { DOM, BdUI, ProfileBadges } from 'ui';
 import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, PluginManager, ThemeManager } from 'modules';
 import { ClientLogger as Logger } from 'common';
@@ -16,6 +16,7 @@ import { ClientLogger as Logger } from 'common';
 class BetterDiscord {
 
     constructor() {
+        ProfileBadges.init(); // Not final way to do it
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }
@@ -27,6 +28,7 @@ class BetterDiscord {
     }
 
     globalReady() {
+        BdUI.initUiEvents();
         this.vueInstance = BdUI.injectUi();
         (async () => {
             this.init();

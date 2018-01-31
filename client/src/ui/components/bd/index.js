@@ -4,3 +4,4 @@ export { default as UISettings } from './UISettings.vue';
 export { default as EmoteSettings } from './EmoteSettings.vue';
 export { default as CssEditorView } from './CssEditor.vue';
 export { default as PluginsView } from './PluginsView.vue';
+export { default as BdBadge } from './BdBadge.vue';

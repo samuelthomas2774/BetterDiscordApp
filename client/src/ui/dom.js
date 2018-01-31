@@ -30,7 +30,65 @@ class BdNode {
     }
 }
 
+class DOMObserver {
+
+    constructor() {
+        this.observe = this.observe.bind(this);
+        this.subscribe = this.subscribe.bind(this);
+        this.observerCallback = this.observerCallback.bind(this);
+        this.observer = new MutationObserver(this.observerCallback);
+    }
+
+    observerCallback(mutations) {
+        for (let sub of this.subscriptions) {
+            try {
+                const f = mutations.find(sub.filter);
+                if (f) {
+                    sub.callback(f);
+                    continue;
+                }
+            } catch(err) {}
+        }
+    }
+
+    observe() {
+        this.observer.observe(this.root, this.options);
+    }
+
+    get root() {
+        return document.getElementById('app-mount');
+    }
+
+    get options() {
+        return { attributes: true, childList: true, subtree: true };
+    }
+
+    get subscriptions() {
+        return this._subscriptions || (this._subscriptions = []);
+    }
+
+    subscribe(id, filter, callback) {
+        if (this.subscriptions.find(sub => sub.id === id)) return;
+        this.subscriptions.push({
+            id,
+            filter,
+            callback
+        });
+    }
+
+    unsubscribe(id) {
+        const index = this.subscriptions.find(sub => sub.id === id);
+        if (index < 0) return;
+        this.subscriptions.splice(index, 1);
+    }
+
+}
+
 class DOM {
+
+    static get observer() {
+        return this._observer || (this._observer = new DOMObserver());
+    }
 
     static get bdHead() {
         return this.getElement('bd-head') || this.createElement('bd-head').appendTo('head');

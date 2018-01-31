@@ -64,7 +64,11 @@
             showOnline() {
                 this.local = false;
             },
-            refreshLocal() { },
+            refreshLocal() {
+                (async () => {
+                    await PluginManager.refreshPlugins();
+                })();
+            },
             togglePlugin(plugin) {
                 // TODO Display error if plugin fails to start/stop
                 try {

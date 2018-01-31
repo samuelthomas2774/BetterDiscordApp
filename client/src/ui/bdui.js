@@ -8,9 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import Dom from './dom';
+import DOM from './dom';
 import Vue from './vue';
-import VTooltip from 'v-tooltip';
 import { BdSettingsWrapper } from './components';
 import { Events, WebpackModules } from 'modules';
 import { Utils } from 'common';
@@ -37,10 +36,8 @@ export default class {
     }
 
     static injectUi() {
-        Dom.createElement('bdtooltips').appendTo(Dom.bdBody);
-
-        Dom.createElement('div', null, 'bd-settings').appendTo(Dom.bdBody);
-
+        DOM.createElement('bdtooltips').appendTo(DOM.bdBody);
+        DOM.createElement('div', null, 'bd-settings').appendTo(DOM.bdBody);
         const vueInstance = new Vue({
             el: '#bd-settings',
             components: { BdSettingsWrapper },

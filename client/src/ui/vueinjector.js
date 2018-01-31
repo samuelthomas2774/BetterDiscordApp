@@ -8,7 +8,6 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import Dom from './dom';
 import Vue from './vue';
 
 export default class {

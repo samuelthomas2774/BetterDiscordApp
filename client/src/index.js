@@ -13,8 +13,6 @@ import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, PluginManager, ThemeManager } from 'modules';
 import { ClientLogger as Logger } from 'common';
 
-import { default as WebpackModules } from './modules/webpackmodules';
-
 class BetterDiscord {
 
     constructor() {

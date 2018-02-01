@@ -8,18 +8,24 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { EventListener } from 'modules';
 import DOM from './dom';
 import { BdBadge } from './components/bd';
 import VueInjector from './vueinjector';
-import { Events } from 'modules';
 
-export default class {
+export default class extends EventListener {
 
-    static init() {
-        Events.on('ui-event', this.uiEvent.bind(this));
+    bindings() {
+        this.uiEvent = this.uiEvent.bind(this);
     }
 
-    static uiEvent(e) {
+    get eventBindings() {
+        return [
+            { id: 'ui-event', callback:  this.uiEvent }
+        ];
+    }
+
+    uiEvent(e) {
         const { event, data } = e;
         if (event !== 'profile-popup-open') return;
         const { userid } = data;
@@ -28,7 +34,7 @@ export default class {
         this.inject(userid);
     }
 
-    static inject(userid) {
+    inject(userid) {
         const c = this.contributors.find(c => c.id === userid);
         if (!c) return;
 
@@ -52,11 +58,7 @@ export default class {
         }, 400);
     }
 
-    static filter(mutation) {
-        return mutation.target.firstChild && mutation.target.className.includes('modal');
-    }
-
-    static get contributors() {
+    get contributors() {
         return [
             { 'id': '81388395867156480', 'webdev': true, 'developer': true, 'contributor': true }, // Jiiks
             { 'id': '98003542823944192', 'webdev': false, 'developer': true, 'contributor': true }, // Pohky

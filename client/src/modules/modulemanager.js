@@ -16,9 +16,9 @@ import { ProfileBadges } from 'ui';
 export default class {
 
     static get modules() {
-        return [
-            ProfileBadges
-        ];
+        return this._modules ? this._modules : (this._modules = [
+            new ProfileBadges()
+        ]);
     }
 
     static initModules() {

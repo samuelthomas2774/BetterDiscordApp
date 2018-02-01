@@ -8,12 +8,13 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import Module from './module';
 import Events from './events';
 
-export default class {
+export default class extends Module {
 
-    constructor() {
-        for (let event of this.events) {
+    events() {
+        for (let event of this.eventBindings) {
             Events.on(event.id, event.callback);
         }
     }

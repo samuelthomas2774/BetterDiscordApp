@@ -37,16 +37,16 @@ export default new class extends Module {
             };
             window.jQuery = {};
 
-            Events.emit('global-ready');
-        })();
-
-        if (window.__bd) {
-            this.setState(window.__bd);
-            window.__bd = {
-                setWS: this.setWS
+            if (window.__bd) {
+                this.setState(window.__bd);
+                window.__bd = {
+                    setWS: this.setWS
+                }
             }
+
+            Events.emit('global-ready');
             Events.emit('socket-created', this.state.wsHook);
-        }
+        })();
     }
 
     setWS(wSocket) {

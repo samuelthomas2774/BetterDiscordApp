@@ -10,18 +10,20 @@
 
 /*Module Manager initializes all modules when everything is ready*/
 
-import { Events } from 'modules';
+import { Events, SocketProxy, EventHook } from 'modules';
 import { ProfileBadges } from 'ui';
 
 export default class {
 
     static get modules() {
         return this._modules ? this._modules : (this._modules = [
-            new ProfileBadges()
+            new ProfileBadges(),
+            new SocketProxy(),
+            new EventHook()
         ]);
     }
 
-    static initModules() {
+    static async initModules() {
         for (let module of this.modules) {
             try {
                 if (module.init && module.init instanceof Function) module.init();
@@ -29,6 +31,7 @@ export default class {
                 console.log(`Failed to initialize module: ${err}`);
             }
         }
+        return true;
     }
 
 }

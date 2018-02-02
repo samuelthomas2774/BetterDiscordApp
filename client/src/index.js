@@ -10,21 +10,24 @@
 
 import { DOM, BdUI } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, PluginManager, ThemeManager, ModuleManager } from 'modules';
+import { Events, CssEditor, Globals, PluginManager, ThemeManager, ModuleManager, WebpackModules } from 'modules';
 import { ClientLogger as Logger } from 'common';
 
 class BetterDiscord {
 
     constructor() {
+        window.events = Events;
+        window.wpm = WebpackModules;
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }
 
     async init() {
+        await ModuleManager.initModules();
         await PluginManager.loadAllPlugins();
         await ThemeManager.loadAllThemes();
-        ModuleManager.initModules();
         Events.emit('ready');
+        Events.emit('discord-ready');
     }
 
     globalReady() {

@@ -9,6 +9,7 @@
     "defaultConfig": [
         {
             "id": "test-setting-1",
+            "category":  "test category", 
             "type": "bool",
             "value": false,
             "text": "Bool Test Setting",
@@ -16,6 +17,7 @@
         },
         {
             "id": "test-setting-2",
+            "category":  "test category 2", 
             "type": "text",
             "value": "defaultValue",
             "text": "Text Test Setting",
@@ -37,6 +39,7 @@
         },
         {
             "id": "test-setting-5",
+            "category":  "test category", 
             "type": "bool",
             "value": false,
             "text": "Bool Test Setting 4",

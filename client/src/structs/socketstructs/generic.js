@@ -8,7 +8,6 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-
 import DiscordEvent from './discordevent';
 
 export class TYPING_START extends DiscordEvent {

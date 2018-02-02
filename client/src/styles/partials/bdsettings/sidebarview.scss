@@ -107,4 +107,8 @@
             padding-top: 22px;
         }
     }
+
+    .platform-linux & {
+        top: 0;
+    }
 }

@@ -11,56 +11,60 @@
 <template>
     <Modal :headerText="plugin.name + ' Settings'" :close="() => {  }">
         <div slot="body" class="bd-plugin-settings-body">
-            <div v-for="setting in plugin.pluginConfig" class="bd-form-item">
-                <div v-if="setting.type === 'bool'" class="bd-setting-switch">
-                    <div class="bd-title">
-                        <h3>{{setting.text}}</h3>
-                        <label class="bd-switch-wrapper">
-                            <input type="checkbox" class="bd-switch-checkbox" />
-                            <div class="bd-switch" :class="{'bd-checked': setting.value}" />
-                        </label>
-                    </div>
-                    <div class="bd-hint">{{setting.hint}}</div>
-                </div>
-
-                <div v-else-if="setting.type === 'text'" class="bd-form-textinput">
-                    <div class="bd-title">
-                        <h3>{{setting.text}}</h3>
-                        <div class="bd-textinput-wrapper">
-                            <input type="text" v-model="setting.value" @keyup.stop @keydown="textInputKd" />
-                        </div>
-                    </div>
-                    <div class="bd-hint">{{setting.hint}}</div>
-                </div>
-
-                <div class="bd-form-divider"></div>
-            </div>
+            <PluginSetting v-for="setting in configCache" :key="setting.id" :setting="setting" :change="settingChange"/>
         </div>
         <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed}">
             <div class="bd-footer-alert-text">Unsaved changes</div>
-            <div class="bd-button bd-reset-button bd-tp">Reset</div>
-            <div class="bd-button bd-ok">Save Changes</div>
+            <div class="bd-button bd-reset-button bd-tp" @click="resetSettings">Reset</div>
+            <div class="bd-button bd-ok" @click="saveSettings">Save Changes</div>
         </div>
     </Modal>
 </template>
 <script>
     // Imports
     import { Modal } from '../common';
+    import PluginSetting from './pluginsetting/PluginSetting.vue';
 
     export default {
         props: ['plugin'],
         data() {
             return {
-                'changed': false
+                changed: false,
+                configCache: []
             }
         },
         components: {
-            Modal
+            Modal,
+            PluginSetting
         },
         methods: {
-            textInputKd(e) {
-                this.changed = true;
+            checkForChanges() {
+                for (let cachedSetting of this.configCache) {
+                    if (this.plugin.pluginConfig.find(s => s.id === cachedSetting.id && s.value !== cachedSetting.value)) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            textInputKd(settingId) {
+            },
+            settingChange(settingId, newValue) {
+                this.configCache.find(s => s.id === settingId).value = newValue;
+                this.changed = this.checkForChanges();
+            },
+            saveSettings() {
+                this.plugin.saveSettings(this.configCache);
+                this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+                this.changed = false;
+            },
+            resetSettings() {
+                this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+                this.changed = false;
             }
+        },
+        beforeMount() {
+            this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+            this.changed = this.checkForChanges();
         }
     }
 </script>

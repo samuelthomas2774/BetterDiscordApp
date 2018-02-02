@@ -25,16 +25,16 @@
                 <div class="bd-controls">
                     <ButtonGroup>
                         <Button v-tooltip="'Settings'" v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
-                            <MiSettings />
+                            <MaterialIcon name="settings" size="18"/>
                         </Button>
                         <Button v-tooltip="'Reload'" :onClick="() => reloadPlugin(plugin)">
-                            <MiReload />
+                            <MaterialIcon name="refresh" size="18" />
                         </Button>
                         <Button v-tooltip="'Edit'" :onClick="editPlugin">
-                            <MiEdit />
+                            <MaterialIcon name="pencil" size="18" />
                         </Button>
                         <Button v-tooltip="'Uninstall'" type="err">
-                            <MiDelete />
+                            <MaterialIcon name="delete" size="18" />
                         </Button>
                     </ButtonGroup>
                 </div>
@@ -45,11 +45,7 @@
 <script>
     // Imports
     import { shell } from 'electron';
-    import { Button, ButtonGroup, SettingSwitch } from '../common';
-    import MiSettings from 'vue-material-design-icons/settings.vue';
-    import MiReload from 'vue-material-design-icons/refresh.vue';
-    import MiEdit from 'vue-material-design-icons/pencil.vue';
-    import MiDelete from 'vue-material-design-icons/delete.vue';
+    import { Button, ButtonGroup, SettingSwitch, MaterialIcon } from '../common';
 
     export default {
         data() {
@@ -59,8 +55,7 @@
         },
         props: ['plugin', 'togglePlugin', 'reloadPlugin', 'showSettings'],
         components: {
-            Button, ButtonGroup, SettingSwitch,
-            MiSettings, MiReload, MiEdit, MiDelete
+            Button, ButtonGroup, SettingSwitch, MaterialIcon
         },
         methods: {
             editPlugin() {

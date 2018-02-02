@@ -64,20 +64,14 @@
             cursor: pointer;
 
             &:hover {
-                .material-design-icon {
+                .bd-material-design-icon {
                     fill: #FFF;
                 }
             }
         }
 
-        .material-design-icon {
+        .bd-material-design-icon {
             fill: #414245;
-
-            svg {
-                width: 16px;
-                height: 16px;
-            }
-
             &:hover {
                 fill: #FFF;
             }

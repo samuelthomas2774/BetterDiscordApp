@@ -41,7 +41,7 @@
             hideSettings() { this.active = false },
             toggleSettings() { this.active = !this.active },
             keyupListener(e) {
-                if (this.active || e.which !== 27) return;
+                if (!this.active || e.which !== 27) return;
                 this.hideSettings();
                 e.stopImmediatePropagation();
             }

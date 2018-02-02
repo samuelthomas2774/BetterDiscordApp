@@ -61,14 +61,39 @@
         align-items: flex-end;
         overflow: hidden;
 
-        a {
+        .bd-vtext {
             color: #414245;
             font-weight: 700;
             font-size: 12px;
-            transition: color .25s ease;
+        }
+
+        .bd-vtext {
+            flex-grow: 1;
+            height: 20px;
+            cursor: default;
+            user-select: none;
+        }
+
+        .bd-material-button {
+            cursor: pointer;
 
             &:hover {
-                color: lighten(#414245, 25%);
+                .material-design-icon {
+                    fill: #FFF;
+                }
+            }
+        }
+
+        .material-design-icon {
+            fill: #414245;
+
+            svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            &:hover {
+                fill: #FFF;
             }
         }
     }

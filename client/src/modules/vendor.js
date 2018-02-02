@@ -10,6 +10,7 @@
 
 import WebpackModules from './webpackmodules';
 import jQuery from 'jquery';
+import lodash from 'lodash';
 
 export default class {
 
@@ -19,6 +20,14 @@ export default class {
 
     static get $() {
         return this.jQuery;
+    }
+
+    static get lodash() {
+        return lodash;
+    }
+
+    static get _() {
+        return this.lodash;
     }
 
     static get moment() {

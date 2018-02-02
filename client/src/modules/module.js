@@ -20,10 +20,10 @@ export default class Module {
             args
         }
         this.setState = this.setState.bind(this);
-        this.init();
+        this.initialize();
     }
 
-    init() {
+    initialize() {
         if (this.bindings) this.bindings();
         if (this.setInitialState) this.setInitialState(this.state);
         if (this.events) this.events();

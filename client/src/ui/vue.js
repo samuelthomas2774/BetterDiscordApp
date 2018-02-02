@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import DOM from 'dom';
 import Vue from 'vue';
 import VTooltip from 'v-tooltip';
 
@@ -16,7 +17,8 @@ Vue.use(VTooltip, {
     defaultClass: 'bd-tooltip',
     defaultTargetClass: 'bd-has-tooltip',
     defaultInnerSelector: '.bd-tooltip-inner',
-    defaultTemplate: '<div class="bd-tooltip"><span class="bd-tooltip-inner"></span></div>'
+    defaultTemplate: '<div class="bd-tooltip"><span class="bd-tooltip-inner"></span></div>',
+    defaultBoundariesElement: DOM.getElement('#app-mount')
 });
 
 export default Vue;

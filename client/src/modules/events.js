@@ -23,4 +23,5 @@ export default class {
     static emit(...args) {
         emitter.emit(...args);
     }
+
 }

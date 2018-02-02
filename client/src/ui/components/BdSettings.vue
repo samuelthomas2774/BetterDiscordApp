@@ -18,7 +18,13 @@
                 </div>
                 <SidebarItem v-for="item in sidebarItems" :item="item" :key="item.id" :onClick="itemOnClick" />
                 <div class="bd-info">
-                    <a href="https://github.com/JsSucks/BetterDiscordApp" @click="openLink">v2.0.0a by Jiiks/JsSucks</a>
+                    <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
+                    <div @click="openGithub" v-tooltip="'Github'" class="bd-material-button">
+                        <MiGithub/>
+                    </div>
+                    <div @click="openWebsite" v-tooltip="'BetterDiscord'" class="bd-material-button">
+                        <MiWeb/>
+                     </div>
                 </div>
             </Sidebar>
             <ContentColumn slot="content">
@@ -43,12 +49,14 @@
 </template>
 <script>
     // Imports
+    import { shell } from 'electron';
     import { Settings } from 'modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView } from './bd';
     import { SvgX } from './common';
-    import { shell } from 'electron';
     import { ClientIPC } from 'common';
+    import MiGithub from 'vue-material-design-icons/github-circle.vue';
+    import MiWeb from 'vue-material-design-icons/web.vue';
 
     // Constants
     const sidebarItems = [
@@ -82,7 +90,8 @@
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
             CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView,
-            SvgX
+            SvgX,
+            MiGithub, MiWeb
         },
         methods: {
             itemOnClick(id) {
@@ -132,8 +141,12 @@
                         return this.coreSettings.find(setting => setting.id === id).enabled = false;
                 }
             },
-            openLink(e) {
-                shell.openExternal(e.target.href);
+            openGithub() {
+                console.log('open github?');
+                shell.openExternal('https://github.com/JsSucks/BetterDiscordApp');
+            },
+            openWebsite() {
+                shell.openExternal('https://betterdiscord.net');
             }
         },
         created() {

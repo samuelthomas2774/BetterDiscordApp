@@ -10,7 +10,6 @@
 
 import DiscordEvent from './discordevent';
 
-export class MESSAGE_UPDATE extends MESSAGE_CREATE {}
 export class MESSAGE_CREATE extends DiscordEvent {
     get author() { return this.args.author }
     get channelId() { return this.args.channelId }
@@ -28,6 +27,7 @@ export class MESSAGE_CREATE extends DiscordEvent {
     get tts() { return this.args.tts }
     get type() { return this.args.type }
 }
+export class MESSAGE_UPDATE extends MESSAGE_CREATE { }
 
 export class MESSAGE_DELETE extends DiscordEvent {
     get channelId() { return this.args.channelId }
@@ -42,10 +42,10 @@ export class MESSAGE_ACK extends DiscordEvent {
     get messageId() { return this.args.messageId }
 }
 
-export class MESSAGE_REACTION_REMOVE extends MESSAGE_REACTION_ADD {}
 export class MESSAGE_REACTION_ADD extends DiscordEvent {
     get channelId() { return this.args.channelId }
     get messageId() { return this.args.messageId }
     get userId() { return this.args.userId }
     get emoji() { return this.args.emoji }
 }
+export class MESSAGE_REACTION_REMOVE extends MESSAGE_REACTION_ADD { }

@@ -9,16 +9,19 @@
 */
 
 <template>
-    <Modal :headerText="plugin.name + ' Settings'" :close="close">
-        <div slot="body" class="bd-plugin-settings-body">
-            <PluginSetting v-for="setting in configCache" :key="setting.id" :setting="setting" :change="settingChange"/>
-        </div>
-        <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed}">
-            <div class="bd-footer-alert-text">Unsaved changes</div>
-            <div class="bd-button bd-reset-button bd-tp" @click="resetSettings">Reset</div>
-            <div class="bd-button bd-ok" @click="saveSettings">Save Changes</div>
-        </div>
-    </Modal>
+    <div>
+        <div class="bd-backdrop" @click="attemptToClose"></div>
+        <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose">
+            <div slot="body" class="bd-plugin-settings-body">
+                <PluginSetting v-for="setting in configCache" :key="setting.id" :setting="setting" :change="settingChange"/>
+            </div>
+            <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed, 'bd-warn': warnclose}">
+                <div class="bd-footer-alert-text">Unsaved changes</div>
+                <div class="bd-button bd-reset-button bd-tp" @click="resetSettings">Reset</div>
+                <div class="bd-button bd-ok" @click="saveSettings">Save Changes</div>
+            </div>
+        </Modal>
+    </div>
 </template>
 <script>
     // Imports
@@ -26,13 +29,11 @@
     import PluginSetting from './pluginsetting/PluginSetting.vue';
 
     export default {
-        props: [
-            'plugin',
-            'close'
-        ],
+        props: ['plugin','close'],
         data() {
             return {
                 changed: false,
+                warnclose: false,
                 configCache: []
             }
         },
@@ -63,6 +64,13 @@
             resetSettings() {
                 this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
                 this.changed = false;
+            },
+            attemptToClose() {
+                if (!this.changed) return this.close();
+                this.warnclose = true;
+                setTimeout(() => {
+                    this.warnclose = false;
+                }, 400);
             }
         },
         beforeMount() {

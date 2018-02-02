@@ -41,9 +41,8 @@
             hideSettings() { this.active = false },
             toggleSettings() { this.active = !this.active },
             keyupListener(e) {
-                if (this.active && e.which === 27) return this.hideSettings();
-                if (!e.metaKey && !e.ctrlKey || e.key !== 'b') return;
-                this.toggleSettings();
+                if (this.active || e.which !== 27) return;
+                this.hideSettings();
                 e.stopImmediatePropagation();
             }
         },

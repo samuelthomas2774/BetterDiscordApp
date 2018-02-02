@@ -47,7 +47,7 @@ class AppMenu extends Module {
         if (this._appMenu) return this._appMenu;
 
         const appMenu = new MenuItem({
-            label: app.getName(),
+            label: 'Discord',
             submenu: [
                 {role: 'about', label: 'About Discord'},
                 {type: 'separator'},
@@ -78,7 +78,7 @@ class AppMenu extends Module {
         if (this._fileMenu) return this._fileMenu;
 
         const fileMenu = new MenuItem({
-            label: app.getName(),
+            label: 'Discord',
             submenu: [
                 {
                     label: 'Options',
@@ -152,7 +152,7 @@ class AppMenu extends Module {
             submenu: [
                 {
                     label: 'Toggle BetterDiscord',
-                    click: () => { this.webContents.focus(); this.webContents.send('bd-toggle-menu'); },
+                    click: () => this.focusAndSend('bd-toggle-menu'),
                     accelerator: process.platform === 'darwin' ? 'Cmd+B' : 'Ctrl+B'
                 },
                 {
@@ -162,29 +162,29 @@ class AppMenu extends Module {
                 {type: 'separator'},
                 {
                     label: 'Show Core Settings',
-                    click: () => { this.webContents.focus(); this.webContents.send('bd-show-menu', 'core'); }
+                    click: () => this.focusAndSend('bd-show-menu', 'core')
                 },
                 {
                     label: 'Show UI Settings',
-                    click: () => { this.webContents.focus(); this.webContents.send('bd-show-menu', 'ui'); }
+                    click: () => this.focusAndSend('bd-show-menu', 'ui')
                 },
                 {
                     label: 'Show Emote Settings',
-                    click: () => { this.webContents.focus(); this.webContents.send('bd-show-menu', 'emotes'); }
+                    click: () => this.focusAndSend('bd-show-menu', 'emotes')
                 },
                 {
                     label: 'Show CSS Editor',
-                    click: () => { this.webContents.focus(); this.webContents.send('bd-show-menu', 'css'); },
+                    click: () => this.focusAndSend('bd-show-menu', 'css'),
                     accelerator: process.platform === 'darwin' ? 'Cmd+S' : 'Ctrl+S'
                 },
                 {type: 'separator'},
                 {
                     label: 'Show Plugins',
-                    click: () => { this.webContents.focus(); this.webContents.send('bd-show-menu', 'plugins'); }
+                    click: () => this.focusAndSend('bd-show-menu', 'plugins')
                 },
                 {
                     label: 'Show Themes',
-                    click: () => { this.webContents.focus(); this.webContents.send('bd-show-menu', 'themes'); }
+                    click: () => this.focusAndSend('bd-show-menu', 'themes')
                 }
             ]
         });
@@ -258,6 +258,11 @@ class AppMenu extends Module {
 
     getMenu() {
         return this.menu;
+    }
+
+    focusAndSend(event, data) {
+        this.webContents.focus();
+        this.webContents.send(event, data);
     }
 
     get windowUtils() {

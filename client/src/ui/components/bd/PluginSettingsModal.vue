@@ -13,7 +13,17 @@
         <div class="bd-backdrop" @click="attemptToClose"></div>
         <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose">
             <div slot="body" class="bd-plugin-settings-body">
-                <PluginSetting v-for="setting in configCache" :key="setting.id" :setting="setting" :change="settingChange"/>
+
+                <template v-for="category in categories">
+                    <template v-if="category === 'default'">
+                        <PluginSetting v-for="setting in configCache" v-if="!setting.category || setting.category === 'default'" :key="setting.id" :setting="setting" :change="settingChange" />
+                    </template>
+                    <div v-else class="bd-category-container">
+                        <span>{{category}}</span>
+                        <PluginSetting v-for="setting in configCache" v-if="setting.category === category" :key="setting.id" :setting="setting" :change="settingChange" />
+                    </div>
+                </template>
+
             </div>
             <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed, 'bd-warn': warnclose}">
                 <div class="bd-footer-alert-text">Unsaved changes</div>
@@ -34,7 +44,8 @@
             return {
                 changed: false,
                 warnclose: false,
-                configCache: []
+                configCache: [],
+                categories: ['default']
             }
         },
         components: {
@@ -75,6 +86,11 @@
         },
         beforeMount() {
             this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+            this.configCache.forEach(s => {
+                if (!s.category || s.category === 'default') return;
+                if (this.categories.includes(s.category)) return;
+                this.categories.push(s.category);
+            });
             this.changed = this.checkForChanges();
         }
     }

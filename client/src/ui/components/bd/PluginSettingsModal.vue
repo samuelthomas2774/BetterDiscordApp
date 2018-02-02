@@ -9,7 +9,7 @@
 */
 
 <template>
-    <Modal :headerText="plugin.name + ' Settings'" :close="() => {  }">
+    <Modal :headerText="plugin.name + ' Settings'" :close="close">
         <div slot="body" class="bd-plugin-settings-body">
             <PluginSetting v-for="setting in configCache" :key="setting.id" :setting="setting" :change="settingChange"/>
         </div>
@@ -26,7 +26,10 @@
     import PluginSetting from './pluginsetting/PluginSetting.vue';
 
     export default {
-        props: ['plugin'],
+        props: [
+            'plugin',
+            'close'
+        ],
         data() {
             return {
                 changed: false,

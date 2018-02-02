@@ -100,6 +100,11 @@
             opacity: 0;
             transition: all .2s ease-in-out;
 
+            &.bd-warn {
+                background-color: $colerr;
+                animation: bd-warn-shake 0.4s;
+            }
+
             &.bd-active {
                 opacity: 1;
                 transform: none;

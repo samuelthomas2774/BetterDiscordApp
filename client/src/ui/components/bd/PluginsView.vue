@@ -32,7 +32,6 @@
                 <div class="bd-spinner-2"></div>
             </div>
         </div>
-        <div v-if="settingsOpen !== null" class="bd-backdrop" @click="settingsOpen = null"></div>
         <PluginSettingsModal v-if="settingsOpen !== null" :plugin="settingsOpen" :close="closeSettings" />
     </SettingsWrapper>
 </template>

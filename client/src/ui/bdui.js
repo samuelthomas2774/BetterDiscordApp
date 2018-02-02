@@ -17,7 +17,6 @@ import { Utils } from 'common';
 export default class {
 
     static initUiEvents() {
-        //this.profilePopupModule.open
         const defer = setInterval(() => {
             if (!this.profilePopupModule) return;
             clearInterval(defer);

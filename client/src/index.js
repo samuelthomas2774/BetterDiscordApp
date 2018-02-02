@@ -28,13 +28,6 @@ class BetterDiscord {
         await ThemeManager.loadAllThemes();
         Events.emit('ready');
         Events.emit('discord-ready');
-       /* var count = 0;
-        const waitForDiscord = setInterval(() => {
-            if (!window.__require) return;
-            clearInterval(waitForDiscord);
-            console.log(`waited ${count * 100}ms`);
-            Events.emit('discord-ready');
-        }, 100);*/
     }
 
     globalReady() {

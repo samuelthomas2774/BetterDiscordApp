@@ -35,14 +35,11 @@
 
                 <div class="bd-form-divider"></div>
             </div>
-
-            <div slot="footer">
-                <div class="footer-alert" :class="{'bd-active': changed}">
-                    <div class="footer-alert-text">Unsaved changes</div>
-                    <div class="bd-reset-button">Reset</div>
-                    <div class="bd-button bd-ok">Save Changes</div>
-                </div>
-            </div>
+        </div>
+        <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed}">
+            <div class="bd-footer-alert-text">Unsaved changes</div>
+            <div class="bd-button bd-reset-button bd-tp">Reset</div>
+            <div class="bd-button bd-ok">Save Changes</div>
         </div>
     </Modal>
 </template>

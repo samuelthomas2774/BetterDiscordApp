@@ -18,7 +18,11 @@
                 </div>
             </div>
             <div class="bd-modal-body">
-                <slot name="body"></slot>
+                <div class="bd-scroller-wrap">
+                    <div class="bd-scroller">
+                        <slot name="body"></slot>
+                     </div>
+                </div>
             </div>
             <div class="bd-modal-footer">
                 <slot name="footer"></slot>

@@ -12,6 +12,7 @@ export default class {
 
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;
+        this.saveSettings = this.saveSettings.bind(this);
         this.hasSettings = this.pluginConfig && this.pluginConfig.length > 0;
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
@@ -30,6 +31,22 @@ export default class {
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
     get pluginConfig() { return this.userConfig.config }
+
+    getSetting(settingId) {
+        return this.userConfig.config.find(setting => setting.id === settingId);
+    }
+
+    saveSettings(newSettings) {
+        let changed = false;
+        for (let newSetting of newSettings) {
+            const setting = this.pluginConfig.find(s => s.id === newSetting.id && s.value !== newSetting.value);
+            if (!setting) continue;
+            setting.value = newSetting.value;
+            if (this.settingSaved) this.settingSaved(setting);
+            changed = true;
+        }
+        if (changed && this.settingsSaved) this.settingsSaved(this.pluginConfig);
+    }
 
     start() {
         if (this.onStart) {

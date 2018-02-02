@@ -42,7 +42,12 @@
     display: -ms-flexbox;
     display: flex;
     flex-grow: 1;
-    border-radius: 8px;
+    border-radius: 4px;
+    max-height: 100%;
+}
+
+.bd-modal .bd-modal-body {
+    display: flex;
 }
 
 .bd-modal {
@@ -80,5 +85,47 @@
     }
 
     .bd-modal-footer {
+        .bd-footer-alert {
+            position: absolute;
+            bottom: 80px;
+            left: 70px;
+            right: 70px;
+            display: flex;
+            background-color: rgba(32, 34, 37, 0.9);
+            box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+            padding: 10px 10px 10px 16px;
+            overflow: hidden;
+            border-radius: 5px;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all .2s ease-in-out;
+
+            &.bd-active {
+                opacity: 1;
+                transform: none;
+            }
+
+            .bd-footer-alert-text {
+                flex: 1 1 auto;
+                color: #FFF;
+                font-weight: 700;
+                line-height: 34px;
+            }
+
+            .bd-button {
+                height: 30px;
+                border-radius: 3px;
+                padding: 2px 16px;
+
+                &.bd-tp {
+                    background: transparent;
+
+                    &:hover {
+                        text-decoration: underline;
+                        background: transparent;
+                    }
+                }
+            }
+        }
     }
 }

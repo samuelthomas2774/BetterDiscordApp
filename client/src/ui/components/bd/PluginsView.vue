@@ -33,9 +33,7 @@
             </div>
         </div>
         <div v-if="settingsOpen !== null" class="bd-backdrop" @click="settingsOpen = null"></div>
-        <div v-if="settingsOpen !== null" class="bd-modal">
-            <PluginSettingsModal :plugin="settingsOpen" />
-        </div>
+        <PluginSettingsModal v-if="settingsOpen !== null" :plugin="settingsOpen" />
     </SettingsWrapper>
 </template>
 

@@ -1,11 +1,11 @@
 {
-  "info": {
-    "name": "Example Plugin",
-    "authors": ["Jiiks"],
-    "version": 1.0,
-    "description": "Example Plugin Description"
-  },
-  "main": "index.js",
+    "info": {
+        "name": "Example Plugin",
+        "authors": ["Jiiks"],
+        "version": 1.0,
+        "description": "Example Plugin Description"
+    },
+    "main": "index.js",
     "defaultConfig": [
         {
             "id": "test-setting-1",
@@ -20,6 +20,62 @@
             "value": "defaultValue",
             "text": "Text Test Setting",
             "hint": "Text Test Setting Hint"
+        },
+        {
+            "id": "test-setting-3",
+            "type": "bool",
+            "value": false,
+            "text": "Bool Test Setting 2",
+            "hint": "Bool Test Setting Hint 2"
+        },
+        {
+            "id": "test-setting-4",
+            "type": "bool",
+            "value": false,
+            "text": "Bool Test Setting 3",
+            "hint": "Bool Test Setting Hint 3"
+        },
+        {
+            "id": "test-setting-5",
+            "type": "bool",
+            "value": false,
+            "text": "Bool Test Setting 4",
+            "hint": "Bool Test Setting Hint 4"
+        },
+        {
+            "id": "test-setting-6",
+            "type": "bool",
+            "value": false,
+            "text": "Bool Test Setting 5",
+            "hint": "Bool Test Setting Hint 5"
+        },
+        {
+            "id": "test-setting-7",
+            "type": "bool",
+            "value": false,
+            "text": "Bool Test Setting 6",
+            "hint": "Bool Test Setting Hint 6"
+        },
+        {
+            "id": "test-setting-8",
+            "type": "bool",
+            "value": false,
+            "text": "Bool Test Setting 7",
+            "hint": "Bool Test Setting Hint 7"
+        },
+        {
+            "id": "test-setting-9",
+            "type": "bool",
+            "value": false,
+            "text": "Bool Test Setting 8",
+            "hint": "Bool Test Setting Hint 8"
+        },
+        {
+            "id": "test-setting-10",
+            "type": "bool",
+            "value": false,
+            "text": "Bool Test Setting 9",
+            "hint": "Bool Test Setting Hint 9"
         }
     ]
 }

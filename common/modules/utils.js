@@ -16,12 +16,11 @@ const
 import  { Vendor } from 'modules';
 
 export class Utils {
-    static overload(fn, cb, p) {
+    static overload(fn, cb) {
         const orig = fn;
         return function (...args) {
-            orig.call(p, ...args);
-           // cb.apply(...args);
-            // cb(...args);
+            orig(...args);
+            cb(...args);
         }
     }
 

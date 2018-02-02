@@ -10,16 +10,18 @@
 
 const
     path = require('path'),
-    fs = require('fs');
+    fs = require('fs'),
+    _ = require('lodash');
 
 import  { Vendor } from 'modules';
 
 export class Utils {
-    static overload(fn, cb) {
+    static overload(fn, cb, p) {
         const orig = fn;
         return function (...args) {
-            orig(...args);
-            cb(...args);
+            orig.call(p, ...args);
+           // cb.apply(...args);
+            // cb(...args);
         }
     }
 
@@ -32,6 +34,17 @@ export class Utils {
                 err
             });
         }
+    }
+
+    static toCamelCase(o) {
+        const camelCased = {};
+        _.forEach(o, (value, key) => {
+            if (_.isPlainObject(value) || _.isArray(value)) {
+                value = this.toCamelCase(value);
+            }
+            camelCased[_.camelCase(key)] = value;
+        });
+        return camelCased;
     }
 }
 

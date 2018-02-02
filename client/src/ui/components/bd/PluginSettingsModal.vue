@@ -10,9 +10,8 @@
 
 <template>
     <Modal :headerText="plugin.name + ' Settings'" :close="() => {  }">
-        <div slot="body" v-for="setting in plugin.pluginConfig" class="bd-plugin-settings-body">
-            <div class="bd-form-item">
-
+        <div slot="body" class="bd-plugin-settings-body">
+            <div v-for="setting in plugin.pluginConfig" class="bd-form-item">
                 <div v-if="setting.type === 'bool'" class="bd-setting-switch">
                     <div class="bd-title">
                         <h3>{{setting.text}}</h3>
@@ -37,13 +36,12 @@
                 <div class="bd-form-divider"></div>
             </div>
 
-        </div>
-
-        <div slot="footer">
-            <div class="footer-alert" :class="{'bd-active': changed}">
-                <div class="footer-alert-text">Unsaved changes</div>
-                <div class="bd-reset-button">Reset</div>
-                <div class="bd-button bd-ok">Save Changes</div>
+            <div slot="footer">
+                <div class="footer-alert" :class="{'bd-active': changed}">
+                    <div class="footer-alert-text">Unsaved changes</div>
+                    <div class="bd-reset-button">Reset</div>
+                    <div class="bd-button bd-ok">Save Changes</div>
+                </div>
             </div>
         </div>
     </Modal>

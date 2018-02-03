@@ -13,8 +13,8 @@
         <SidebarView :contentVisible="this.activeIndex >= 0" :animating="this.animating">
             <Sidebar slot="sidebar">
                 <div class="bd-settings-x" @click="close">
-                    <SvgX size="17"/>
-                    <span>ESC</span>
+                    <MiClose size="17"/>
+                    <span class="bd-x-text">ESC</span>
                 </div>
                 <SidebarItem v-for="item in sidebarItems" :item="item" :key="item.id" :onClick="itemOnClick" />
                 <div class="bd-info">
@@ -53,7 +53,7 @@
     import { Settings } from 'modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView } from './bd';
-    import { SvgX, MiGithubCircle, MiWeb } from './common';
+    import { SvgX, MiGithubCircle, MiWeb, MiClose } from './common';
 
     // Constants
     const sidebarItems = [
@@ -86,8 +86,7 @@
         },
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, MiGithubCircle, MiWeb,
-            SvgX
+            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, MiGithubCircle, MiWeb, MiClose
         },
         methods: {
             itemOnClick(id) {

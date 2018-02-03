@@ -55,7 +55,7 @@
         display: flex;
         padding: 15px;
 
-        span {
+        .bd-modal-headertext {
             color: #FFF;
             font-weight: 700;
             margin-bottom: 15px;
@@ -73,6 +73,10 @@
             align-content: center;
             justify-content: center;
             align-items: center;
+
+            .bd-material-design-icon {
+                fill: #FFF;
+            }
 
             &:hover {
                 background: #2d2f34;

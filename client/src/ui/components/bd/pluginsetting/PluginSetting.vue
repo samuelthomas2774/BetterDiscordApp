@@ -12,6 +12,7 @@
     <div class="bd-form-item">
         <BoolSetting v-if="setting.type === 'bool'" :setting="setting" :change="change"/>
         <StringSetting v-if="setting.type === 'text'" :setting="setting" :change="change"/>
+        <FileSetting v-if="setting.type === 'file'" :setting="setting" :change="change"/>
         <div class="bd-form-divider"></div>
     </div>
 </template>
@@ -19,11 +20,17 @@
     // Imports
     import BoolSetting from './Bool.vue';
     import StringSetting from './String.vue';
+    import FileSetting from './File.vue';
 
     export default {
-        props: ['setting', 'change'],
+        props: [
+            'setting',
+            'change'
+        ],
         components: {
-            BoolSetting, StringSetting
+            BoolSetting,
+            StringSetting,
+            FileSetting
         }
     }
 </script>

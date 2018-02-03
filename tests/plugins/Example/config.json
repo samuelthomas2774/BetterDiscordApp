@@ -79,6 +79,28 @@
             "value": false,
             "text": "Bool Test Setting 9",
             "hint": "Bool Test Setting Hint 9"
+        },
+        {
+            "id": "test-setting-file-1",
+            "type": "file",
+            "value": null,
+            "text": "Test File Setting 1",
+            "hint": "File selector with the default options."
+        },
+        {
+            "id": "test-setting-file-2",
+            "type": "file",
+            "value": null,
+            "text": "Test File Setting 2",
+            "hint": "File selector with custom button text and the ability to open directories and multiple items.",
+            "dialogOptions": {
+                "buttonLabel": "Select",
+                "properties": [
+                    "openFile",
+                    "openDirectory",
+                    "multiSelections"
+                ]
+            }
         }
     ]
 }

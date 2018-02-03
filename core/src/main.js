@@ -5,7 +5,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 const path = require('path');
@@ -24,7 +24,7 @@ const __pluginPath = path.resolve(__dirname, '..', '..', 'tests', 'plugins');
 const __themePath = path.resolve(__dirname, '..', '..', 'tests', 'themes');
 
 const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor } = require('./modules');
-const { BrowserWindow } = require('electron');
+const { BrowserWindow, dialog } = require('electron');
 
 const Common = {};
 
@@ -56,6 +56,12 @@ class Comms {
 
         BDIpc.on('bd-readFile', this.readFile);
         BDIpc.on('bd-readJson', o => this.readFile(o, true));
+
+        BDIpc.on('bd-native-open', o => {
+            dialog.showOpenDialog(BrowserWindow.fromWebContents(o.ipcEvent.sender), o.args, filenames => {
+                o.reply(filenames);
+            });
+        });
     }
 
     async readFile(o, json) {

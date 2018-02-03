@@ -16,6 +16,7 @@
                     <slot name="sidebar" />
                 </ScrollerWrap>
             </div>
+            <slot name="sidebarfooter"/>
         </div>
         <div class="bd-content-region">
             <slot name="content" />

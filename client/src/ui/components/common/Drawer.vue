@@ -21,7 +21,7 @@
 </template>
 
 <script>
-    import MiPlus from 'vue-material-design-icons/plus.vue';
+    import { MiPlus } from './MaterialIcon';
 
     export default {
         props: [

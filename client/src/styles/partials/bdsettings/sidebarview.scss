@@ -53,9 +53,9 @@
 
     .bd-info {
         display: flex;
-        flex-grow: 1;
         align-items: flex-end;
         overflow: hidden;
+        padding: 0 25px;
 
         .bd-vtext {
             color: #414245;

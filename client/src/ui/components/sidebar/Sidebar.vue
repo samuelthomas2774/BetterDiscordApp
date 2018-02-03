@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-sidebar bd-scroller">
+    <div class="bd-sidebar">
         <slot/>
     </div>
 </template>

@@ -8,6 +8,11 @@
     opacity: .85;
     padding: 20px;
     z-index: 9000;
+
+    animation: bd-backdrop-in 0.22s ease;
+    &.bd-backdrop-out {
+        animation: bd-backdrop-out 0.22s ease;
+    }
 }
 
 .bd-modal {
@@ -31,6 +36,11 @@
     box-sizing: border-box;
     pointer-events: none;
     z-index: 9001;
+
+    animation: bd-modal-in 0.22s ease;
+    &.bd-modal-out {
+        animation: bd-modal-out 0.22s ease;
+    }
 }
 
 .bd-modal .bd-modal-inner {

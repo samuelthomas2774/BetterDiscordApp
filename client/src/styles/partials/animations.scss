@@ -69,6 +69,25 @@
     }
 }
 
+@keyframes bd-modal-in {
+    0% { transform: scale(0.8); opacity: 0; }
+    90% { transform: scale(1.01); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes bd-modal-out {
+    0% { transform: scale(1); opacity: 1; }
+    10% { transform: scale(1.01); opacity: 1; }
+    90% { opacity: 0; }
+    100% { transform: scale(0.8); opacity: 0; }
+}
+
+@keyframes bd-backdrop-in {
+    0% { opacity: 0; }
+}
+@keyframes bd-backdrop-out {
+    100% { opacity: 0; }
+}
+
 @keyframes bd-warn-shake {
     10%, 90% {
         transform: translate3d(-4px, -4px, 0);

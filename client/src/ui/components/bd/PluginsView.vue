@@ -32,10 +32,7 @@
                 <div class="bd-spinner-2"></div>
             </div>
         </div>
-        <div v-if="settingsOpen !== null" class="bd-backdrop" @click="settingsOpen = null"></div>
-        <div v-if="settingsOpen !== null" class="bd-modal">
-            <PluginSettingsModal :plugin="settingsOpen" />
-        </div>
+        <PluginSettingsModal v-if="settingsOpen !== null" :plugin="settingsOpen" :close="closeSettings" />
     </SettingsWrapper>
 </template>
 
@@ -94,6 +91,9 @@
             },
             showSettings(plugin) {
                 this.settingsOpen = plugin;
+            },
+            closeSettings() {
+                this.settingsOpen = null;
             }
         }
     }

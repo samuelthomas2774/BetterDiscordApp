@@ -24,7 +24,7 @@ const __pluginPath = path.resolve(__dirname, '..', '..', 'tests', 'plugins');
 const __themePath = path.resolve(__dirname, '..', '..', 'tests', 'themes');
 
 const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor, AppMenu } = require('./modules');
-const { BrowserWindow } = require('electron');
+const { BrowserWindow, dialog } = require('electron');
 
 const Common = {};
 
@@ -55,6 +55,12 @@ class Comms {
 
         BDIpc.on('bd-readFile', this.readFile);
         BDIpc.on('bd-readJson', o => this.readFile(o, true));
+
+        BDIpc.on('bd-native-open', o => {
+            dialog.showOpenDialog(BrowserWindow.fromWebContents(o.ipcEvent.sender), o.args, filenames => {
+                o.reply(filenames);
+            });
+        });
     }
 
     async readFile(o, json) {

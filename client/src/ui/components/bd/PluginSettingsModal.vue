@@ -9,63 +9,89 @@
 */
 
 <template>
-    <Modal :headerText="plugin.name + ' Settings'" :close="() => {  }">
-        <div slot="body" v-for="setting in plugin.pluginConfig" class="bd-plugin-settings-body">
-            <div class="bd-form-item">
+    <div>
+        <div class="bd-backdrop" @click="attemptToClose"></div>
+        <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose">
+            <div slot="body" class="bd-plugin-settings-body">
 
-                <div v-if="setting.type === 'bool'" class="bd-setting-switch">
-                    <div class="bd-title">
-                        <h3>{{setting.text}}</h3>
-                        <label class="bd-switch-wrapper">
-                            <input type="checkbox" class="bd-switch-checkbox" />
-                            <div class="bd-switch" :class="{'bd-checked': setting.value}" />
-                        </label>
+                <template v-for="category in categories">
+                    <template v-if="category === 'default'">
+                        <PluginSetting v-for="setting in configCache" v-if="!setting.category || setting.category === 'default'" :key="setting.id" :setting="setting" :change="settingChange" />
+                    </template>
+                    <div v-else class="bd-category-container">
+                        <span>{{category}}</span>
+                        <PluginSetting v-for="setting in configCache" v-if="setting.category === category" :key="setting.id" :setting="setting" :change="settingChange" />
                     </div>
-                    <div class="bd-hint">{{setting.hint}}</div>
-                </div>
+                </template>
 
-                <div v-else-if="setting.type === 'text'" class="bd-form-textinput">
-                    <div class="bd-title">
-                        <h3>{{setting.text}}</h3>
-                        <div class="bd-textinput-wrapper">
-                            <input type="text" v-model="setting.value" @keyup.stop @keydown="textInputKd" />
-                        </div>
-                    </div>
-                    <div class="bd-hint">{{setting.hint}}</div>
-                </div>
-
-                <div class="bd-form-divider"></div>
             </div>
-
-        </div>
-
-        <div slot="footer">
-            <div class="footer-alert" :class="{'bd-active': changed}">
-                <div class="footer-alert-text">Unsaved changes</div>
-                <div class="bd-reset-button">Reset</div>
-                <div class="bd-button bd-ok">Save Changes</div>
+            <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed, 'bd-warn': warnclose}">
+                <div class="bd-footer-alert-text">Unsaved changes</div>
+                <div class="bd-button bd-reset-button bd-tp" @click="resetSettings">Reset</div>
+                <div class="bd-button bd-ok" @click="saveSettings">Save Changes</div>
             </div>
-        </div>
-    </Modal>
+        </Modal>
+    </div>
 </template>
 <script>
     // Imports
     import { Modal } from '../common';
+    import PluginSetting from './pluginsetting/PluginSetting.vue';
 
     export default {
-        props: ['plugin'],
+        props: ['plugin','close'],
         data() {
             return {
-                'changed': false
+                changed: false,
+                warnclose: false,
+                configCache: [],
+                categories: ['default']
             }
         },
         components: {
-            Modal
+            Modal,
+            PluginSetting
         },
         methods: {
-            textInputKd(e) {
-                this.changed = true;
+            checkForChanges() {
+                for (let cachedSetting of this.configCache) {
+                    if (this.plugin.pluginConfig.find(s => s.id === cachedSetting.id && s.value !== cachedSetting.value)) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            textInputKd(settingId) {
+            },
+            settingChange(settingId, newValue) {
+                this.configCache.find(s => s.id === settingId).value = newValue;
+                this.changed = this.checkForChanges();
+            },
+            saveSettings() {
+                this.plugin.saveSettings(this.configCache);
+                this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+                this.changed = false;
+            },
+            resetSettings() {
+                this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+                this.changed = false;
+            },
+            attemptToClose() {
+                if (!this.changed) return this.close();
+                this.warnclose = true;
+                setTimeout(() => {
+                    this.warnclose = false;
+                }, 400);
             }
+        },
+        beforeMount() {
+            this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+            this.configCache.forEach(s => {
+                if (!s.category || s.category === 'default') return;
+                if (this.categories.includes(s.category)) return;
+                this.categories.push(s.category);
+            });
+            this.changed = this.checkForChanges();
         }
     }
 </script>

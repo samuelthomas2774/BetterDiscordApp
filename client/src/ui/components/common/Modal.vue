@@ -12,13 +12,17 @@
     <div class="bd-modal">
         <div class="bd-modal-inner">
             <div class="bd-modal-header">
-                <span>{{headerText}}</span>
+                <span class="bd-modal-headertext">{{headerText}}</span>
                 <div class="bd-modal-x" @click="close">
-                    <SvgX size="18"/>
+                    <MiClose size="18"/>
                 </div>
             </div>
             <div class="bd-modal-body">
-                <slot name="body"></slot>
+                <div class="bd-scroller-wrap">
+                    <div class="bd-scroller">
+                        <slot name="body"></slot>
+                     </div>
+                </div>
             </div>
             <div class="bd-modal-footer">
                 <slot name="footer"></slot>
@@ -29,12 +33,12 @@
 
 <script>
     // Imports
-    import SvgX from './SvgX.vue';
+    import { MiClose } from './MaterialIcon';
 
     export default {
         props: ['headerText', 'close'],
         components: {
-            SvgX
+            MiClose
         }
     }
 </script>

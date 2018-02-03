@@ -38,7 +38,7 @@
         align-items: center;
         cursor: pointer;
 
-        span {
+        .bd-x-text {
             color: #72767d;
             position: absolute;
             top: 32px;
@@ -46,8 +46,18 @@
             font-size: 13px;
         }
 
+        .bd-material-design-icon {
+            justify-content: center;
+            display: flex;
+            fill: #72767d;
+        }
+
         &:hover {
             background-color: hsla(218,5%,47%,.3);
+
+            .bd-material-design-icon {
+                fill: #FFF;
+            }
         }
 
         .platform-darwin & {
@@ -79,19 +89,14 @@
             cursor: pointer;
 
             &:hover {
-                .material-design-icon {
+                .bd-material-design-icon {
                     fill: #FFF;
                 }
             }
         }
 
-        .material-design-icon {
+        .bd-material-design-icon {
             fill: #414245;
-
-            svg {
-                width: 16px;
-                height: 16px;
-            }
 
             &:hover {
                 fill: #FFF;

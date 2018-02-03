@@ -5,3 +5,5 @@ export { default as MiDelete } from './materialicons/Delete.vue';
 export { default as MiGithubCircle } from './materialicons/GithubCircle.vue';
 export { default as MiWeb } from './materialicons/Web.vue';
 export { default as MiClose } from './materialicons/Close.vue';
+export { default as MiMinus } from './materialicons/Minus.vue';
+export { default as MiOpenInNew } from './materialicons/OpenInNew.vue';

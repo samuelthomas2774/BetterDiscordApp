@@ -30,17 +30,12 @@
 <script>
     import { shell } from 'electron';
     import { ClientIPC } from 'common';
-    import MiOpen from 'vue-material-design-icons/open-in-new.vue';
-    import MiMinus from 'vue-material-design-icons/minus.vue';
+    import { MiOpenInNew, MiMinus } from '../../common';
 
     export default {
-        props: [
-            'setting',
-            'change'
-        ],
+        props: ['setting', 'change'],
         components: {
-            MiOpen,
-            MiMinus
+            MiOpenInNew, MiMinus
         },
         methods: {
             async openDialog(e) {

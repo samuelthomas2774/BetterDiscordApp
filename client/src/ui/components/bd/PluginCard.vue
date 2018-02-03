@@ -25,16 +25,16 @@
                 <div class="bd-controls">
                     <ButtonGroup>
                         <Button v-tooltip="'Settings'" v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
-                            <MaterialIcon name="settings" size="18"/>
+                            <MiSettings size="18"/>
                         </Button>
                         <Button v-tooltip="'Reload'" :onClick="() => reloadPlugin(plugin)">
-                            <MaterialIcon name="refresh" size="18" />
+                            <MiRefresh size="18" />
                         </Button>
                         <Button v-tooltip="'Edit'" :onClick="editPlugin">
-                            <MaterialIcon name="pencil" size="18" />
+                            <MiPencil size="18" />
                         </Button>
                         <Button v-tooltip="'Uninstall'" type="err">
-                            <MaterialIcon name="delete" size="18" />
+                            <MiDelete size="18" />
                         </Button>
                     </ButtonGroup>
                 </div>
@@ -45,7 +45,7 @@
 <script>
     // Imports
     import { shell } from 'electron';
-    import { Button, ButtonGroup, SettingSwitch, MaterialIcon } from '../common';
+    import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete } from '../common';
 
     export default {
         data() {
@@ -55,7 +55,7 @@
         },
         props: ['plugin', 'togglePlugin', 'reloadPlugin', 'showSettings'],
         components: {
-            Button, ButtonGroup, SettingSwitch, MaterialIcon
+            Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete
         },
         methods: {
             editPlugin() {

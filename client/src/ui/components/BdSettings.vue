@@ -20,10 +20,10 @@
                 <div class="bd-info">
                     <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
                     <div @click="openGithub" v-tooltip="'Github'" class="bd-material-button">
-                        <MaterialIcon name="github-circle" size="16"/>
+                        <MiGithubCircle size="16"/>
                     </div>
                     <div @click="openWebsite" v-tooltip="'BetterDiscord'" class="bd-material-button">
-                        <MaterialIcon name="web" size="16"/>
+                        <MiWeb size="16"/>
                      </div>
                 </div>
             </Sidebar>
@@ -53,9 +53,7 @@
     import { Settings } from 'modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView } from './bd';
-    import { SvgX, MaterialIcon } from './common';
-    import MiGithub from 'vue-material-design-icons/github-circle.vue';
-    import MiWeb from 'vue-material-design-icons/web.vue';
+    import { SvgX, MiGithubCircle, MiWeb } from './common';
 
     // Constants
     const sidebarItems = [
@@ -88,7 +86,7 @@
         },
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, MaterialIcon,
+            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, MiGithubCircle, MiWeb,
             SvgX
         },
         methods: {

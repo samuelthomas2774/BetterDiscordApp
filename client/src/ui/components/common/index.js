@@ -5,4 +5,4 @@ export { default as ButtonGroup } from './ButtonGroup.vue';
 export { default as Button } from './Button.vue';
 export { default as Modal } from './Modal.vue';
 export { default as SvgX } from './SvgX.vue';
-export { default as MaterialIcon } from './MaterialIcon.vue';
+export * from './MaterialIcon';

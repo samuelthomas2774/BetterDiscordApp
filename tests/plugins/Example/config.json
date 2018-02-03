@@ -8,99 +8,110 @@
     "main": "index.js",
     "defaultConfig": [
         {
-            "id": "test-setting-1",
-            "category":  "test category", 
-            "type": "bool",
-            "value": false,
-            "text": "Bool Test Setting",
-            "hint": "Bool Test Setting Hint"
+            "category_default_comment": "default category has no header and is always displayed first",
+            "category": "default",
+            "settings": [
+                {
+                    "id": "default-0",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                },
+                {
+                    "id": "default-1",
+                    "type": "text",
+                    "value": "defaultValue",
+                    "text": "Text Test Setting",
+                    "hint": "Text Test Setting Hint"
+                },
+                {
+                    "id": "default-2",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                },
+                {
+                    "id": "default-3",
+                    "type": "file",
+                    "value": null,
+                    "text": "Test File Setting 1",
+                    "hint": "File selector with the default options."
+                },
+                {
+                    "id": "default-4",
+                    "type": "file",
+                    "value": null,
+                    "text": "Test File Setting 2",
+                    "hint": "File selector with custom button text and the ability to open directories and multiple items.",
+                    "dialogOptions": {
+                        "buttonLabel": "Select",
+                        "properties": [
+                            "openFile",
+                            "openDirectory",
+                            "multiSelections"
+                        ]
+                    }
+                }
+            ]
         },
         {
-            "id": "test-setting-2",
-            "category":  "test category 2", 
-            "type": "text",
-            "value": "defaultValue",
-            "text": "Text Test Setting",
-            "hint": "Text Test Setting Hint"
+            "category_header_comment": "Setting a category other than default has a header with category name as the text",
+            "category": "Test Category",
+            "drawer_type_comment": "// Drawer type will create an expandable drawer for the settings",
+            "type": "drawer",
+            "settings": [
+                {
+                    "id": "drawer-0",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                },
+                {
+                    "id": "drawer-1",
+                    "type": "text",
+                    "value": "defaultValue",
+                    "text": "Text Test Setting",
+                    "hint": "Text Test Setting Hint"
+                },
+                {
+                    "id": "drawer-2",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                }
+            ]
         },
         {
-            "id": "test-setting-3",
-            "type": "bool",
-            "value": false,
-            "text": "Bool Test Setting 2",
-            "hint": "Bool Test Setting Hint 2"
-        },
-        {
-            "id": "test-setting-4",
-            "type": "bool",
-            "value": false,
-            "text": "Bool Test Setting 3",
-            "hint": "Bool Test Setting Hint 3"
-        },
-        {
-            "id": "test-setting-5",
-            "category":  "test category", 
-            "type": "bool",
-            "value": false,
-            "text": "Bool Test Setting 4",
-            "hint": "Bool Test Setting Hint 4"
-        },
-        {
-            "id": "test-setting-6",
-            "type": "bool",
-            "value": false,
-            "text": "Bool Test Setting 5",
-            "hint": "Bool Test Setting Hint 5"
-        },
-        {
-            "id": "test-setting-7",
-            "type": "bool",
-            "value": false,
-            "text": "Bool Test Setting 6",
-            "hint": "Bool Test Setting Hint 6"
-        },
-        {
-            "id": "test-setting-8",
-            "type": "bool",
-            "value": false,
-            "text": "Bool Test Setting 7",
-            "hint": "Bool Test Setting Hint 7"
-        },
-        {
-            "id": "test-setting-9",
-            "type": "bool",
-            "value": false,
-            "text": "Bool Test Setting 8",
-            "hint": "Bool Test Setting Hint 8"
-        },
-        {
-            "id": "test-setting-10",
-            "type": "bool",
-            "value": false,
-            "text": "Bool Test Setting 9",
-            "hint": "Bool Test Setting Hint 9"
-        },
-        {
-            "id": "test-setting-file-1",
-            "type": "file",
-            "value": null,
-            "text": "Test File Setting 1",
-            "hint": "File selector with the default options."
-        },
-        {
-            "id": "test-setting-file-2",
-            "type": "file",
-            "value": null,
-            "text": "Test File Setting 2",
-            "hint": "File selector with custom button text and the ability to open directories and multiple items.",
-            "dialogOptions": {
-                "buttonLabel": "Select",
-                "properties": [
-                    "openFile",
-                    "openDirectory",
-                    "multiSelections"
-                ]
-            }
+            "category": "Test Category 2",
+            "static_type_comment": "Static type will behave like default but will have a header",
+            "type": "static",
+            "settings": [
+                {
+                    "id": "static-0",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                },
+                {
+                    "id": "static-1",
+                    "type": "text",
+                    "value": "defaultValue",
+                    "text": "Text Test Setting",
+                    "hint": "Text Test Setting Hint"
+                },
+                {
+                    "id": "static-2",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                }
+            ]
         }
     ]
 }

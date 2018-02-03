@@ -98,11 +98,14 @@ export default class {
 
             try {
                 const readUserConfig = await this.readUserConfig(contentPath);
-                userConfig.config = userConfig.defaultConfig.map(config => {
+                userConfig.enabled = readUserConfig.enabled || false;
+                userConfig.config = readConfig.defaultConfig.map(config => {
                     const userSet = readUserConfig.config.find(c => c.id === config.id);
                     return userSet || config;
                 });
-            } catch (err) {/*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/ }
+            } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
+     
+            }
 
             const configs = {
                 defaultConfig: readConfig.defaultConfig,

@@ -7,3 +7,4 @@ export { default as MiWeb } from './materialicons/Web.vue';
 export { default as MiClose } from './materialicons/Close.vue';
 export { default as MiMinus } from './materialicons/Minus.vue';
 export { default as MiOpenInNew } from './materialicons/OpenInNew.vue';
+export { default as MiTwitterCircle } from './materialicons/TwitterCircle.vue';

@@ -23,6 +23,9 @@
                 <div @click="openGithub" v-tooltip="'Github'" class="bd-material-button">
                     <MiGithubCircle size="16" />
                 </div>
+                <div @click="openTwitter" v-tooltip="'@Jiiksi'" class="bd-material-button">
+                    <MiTwitterCircle size="16" />
+                </div>
                 <div @click="openWebsite" v-tooltip="'BetterDiscord'" class="bd-material-button">
                     <MiWeb size="16" />
                 </div>
@@ -53,7 +56,7 @@
     import { Settings } from 'modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView } from './bd';
-    import { SvgX, MiGithubCircle, MiWeb, MiClose } from './common';
+    import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
 
     // Constants
     const sidebarItems = [
@@ -86,7 +89,8 @@
         },
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, MiGithubCircle, MiWeb, MiClose
+            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView,
+            MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         methods: {
             itemOnClick(id) {
@@ -134,6 +138,9 @@
             },
             openWebsite() {
                 shell.openExternal('https://betterdiscord.net');
+            },
+            openTwitter() {
+                shell.openExternal('https://twitter.coom/Jiiksi');
             }
         }
     }

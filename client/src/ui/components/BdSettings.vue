@@ -140,7 +140,7 @@
                 shell.openExternal('https://betterdiscord.net');
             },
             openTwitter() {
-                shell.openExternal('https://twitter.coom/Jiiksi');
+                shell.openExternal('https://twitter.com/Jiiksi');
             }
         }
     }

@@ -31,6 +31,7 @@
     box-sizing: border-box;
     pointer-events: none;
     z-index: 9001;
+    justify-content: center;
 }
 
 .bd-modal .bd-modal-inner {
@@ -46,6 +47,8 @@
     flex-grow: 1;
     border-radius: 4px;
     max-height: 100%;
+    max-width: 500px;
+    width: 500px;
 }
 
 .bd-modal .bd-modal-body {

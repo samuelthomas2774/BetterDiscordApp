@@ -1,5 +1,5 @@
 .bd-backdrop {
-    position: absolute;
+    position: fixed;
     right: 0px;
     left: 0px;
     top: 0px;
@@ -7,6 +7,13 @@
     background: #000;
     opacity: .85;
     padding: 20px;
+    z-index: 9000;
+    justify-content: center;
+
+    animation: bd-backdrop-in 0.22s ease;
+    &.bd-backdrop-out {
+        animation: bd-backdrop-out 0.22s ease;
+    }
 }
 
 .bd-modal {
@@ -29,6 +36,13 @@
     align-items: center;
     box-sizing: border-box;
     pointer-events: none;
+    z-index: 9001;
+    justify-content: center;
+    animation: bd-modal-in 0.22s ease;
+
+    &.bd-modal-out {
+        animation: bd-modal-out 0.22s ease;
+    }
 }
 
 .bd-modal .bd-modal-inner {
@@ -44,6 +58,8 @@
     flex-grow: 1;
     border-radius: 4px;
     max-height: 100%;
+    max-width: 500px;
+    width: 500px;
 }
 
 .bd-modal .bd-modal-body {
@@ -54,34 +70,48 @@
     .bd-modal-header {
         display: flex;
         padding: 15px;
+        flex: 0 0;
+        -webkit-transition: -webkit-box-shadow .1s ease-out;
+        transition: -webkit-box-shadow .1s ease-out;
+        transition: box-shadow .1s ease-out;
 
         .bd-modal-headertext {
             color: #FFF;
             font-weight: 700;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
             flex-grow: 1;
+            line-height: 18px;
+            padding: 1px;
         }
 
         .bd-modal-x {
             display: flex;
             width: 20px;
             height: 20px;
-            border: 1px solid transparent;
             border-radius: 3px;
             cursor: pointer;
             align-content: center;
             justify-content: center;
             align-items: center;
+            margin-left: -2px -2px -2px 10px;
+            padding: 2px;
 
             .bd-material-design-icon {
-                fill: #FFF;
+                fill: #ccc;
             }
 
             &:hover {
                 background: #2d2f34;
+
+                .bd-material-design-icon {
+                    fill: #fff;
+                }
             }
         }
+    }
+
+    &.bd-modal-scrolled .bd-modal-header {
+        -webkit-box-shadow: 0 1px 0 0 rgba(24,25,28,.3), 0 1px 2px 0 rgba(24,25,28,.3);
+        box-shadow: 0 1px 0 0 rgba(24,25,28,.3), 0 1px 2px 0 rgba(24,25,28,.3);
     }
 
     .bd-modal-body {
@@ -90,10 +120,8 @@
 
     .bd-modal-footer {
         .bd-footer-alert {
-            position: absolute;
-            bottom: 80px;
-            left: 70px;
-            right: 70px;
+            margin: 10px;
+            height: 0;
             display: flex;
             background-color: rgba(32, 34, 37, 0.9);
             box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
@@ -110,6 +138,7 @@
             }
 
             &.bd-active {
+                height: auto;
                 opacity: 1;
                 transform: none;
             }

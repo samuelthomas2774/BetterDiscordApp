@@ -10,23 +10,29 @@
 
 <template>
     <div class="bd-settings" :class="{active: active}" @keyup="close">
-        <SidebarView :contentVisible="this.activeIndex >= 0" :animating="this.animating">
+        <SidebarView :contentVisible="this.activeIndex >= 0" :animating="this.animating" :class="{'bd-stop': !first}">
             <Sidebar slot="sidebar">
+                <div class="bd-settings-button bd-active">
+                    <div class="bd-settings-button-btn"></div>
+                </div>
                 <div class="bd-settings-x" @click="close">
                     <MiClose size="17"/>
                     <span class="bd-x-text">ESC</span>
                 </div>
                 <SidebarItem v-for="item in sidebarItems" :item="item" :key="item.id" :onClick="itemOnClick" />
-                <div class="bd-info">
-                    <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
-                    <div @click="openGithub" v-tooltip="'Github'" class="bd-material-button">
-                        <MiGithubCircle size="16"/>
-                    </div>
-                    <div @click="openWebsite" v-tooltip="'BetterDiscord'" class="bd-material-button">
-                        <MiWeb size="16"/>
-                     </div>
-                </div>
             </Sidebar>
+            <div slot="sidebarfooter" class="bd-info">
+                <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
+                <div @click="openGithub" v-tooltip="'Github'" class="bd-material-button">
+                    <MiGithubCircle size="16" />
+                </div>
+                <div @click="openTwitter" v-tooltip="'@Jiiksi'" class="bd-material-button">
+                    <MiTwitterCircle size="16" />
+                </div>
+                <div @click="openWebsite" v-tooltip="'BetterDiscord'" class="bd-material-button">
+                    <MiWeb size="16" />
+                </div>
+            </div>
             <ContentColumn slot="content">
                 <div v-if="activeContent('core') || animatingContent('core')" :class="{active: activeContent('core'), animating: animatingContent('core')}">
                     <CoreSettings :settings="coreSettings" :enableSetting="enableSetting" :disableSetting="disableSetting" />
@@ -54,7 +60,7 @@
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView } from './bd';
     import { ClientIPC } from 'common';
-    import { SvgX, MiGithubCircle, MiWeb, MiClose } from './common';
+    import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
 
     // Constants
     const sidebarItems = [
@@ -87,7 +93,8 @@
         },
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, MiGithubCircle, MiWeb, MiClose
+            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView,
+            MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         methods: {
             itemOnClick(id) {
@@ -98,11 +105,8 @@
                 this.lastActiveIndex = this.activeIndex;
                 this.activeIndex = id;
 
-                if (this.first) {
-                    this.first = false;
-                }
-
                 setTimeout(() => {
+                    this.first = false;
                     this.animating = false;
                     this.lastActiveIndex = -1;
                 }, 400);
@@ -143,6 +147,9 @@
             },
             openWebsite() {
                 shell.openExternal('https://betterdiscord.net');
+            },
+            openTwitter() {
+                shell.openExternal('https://twitter.com/Jiiksi');
             }
         },
         created() {

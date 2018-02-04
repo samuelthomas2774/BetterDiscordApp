@@ -20,7 +20,7 @@
                 <!-- Maybe add a preview here later? -->
                 <!-- For now just show the selected file path -->
                 <span class="bd-file-path">{{ file_path }}</span>
-                <span class="bd-file-open" @click="() => openItem(file_path)"><MiOpen /></span>
+                <span class="bd-file-open" @click="() => openItem(file_path)"><MiOpenInNew /></span>
                 <span class="bd-file-remove" @click="() => removeItem(file_path)"><MiMinus /></span>
             </div>
         </div>
@@ -30,17 +30,12 @@
 <script>
     import { shell } from 'electron';
     import { ClientIPC } from 'common';
-    import MiOpen from 'vue-material-design-icons/open-in-new.vue';
-    import MiMinus from 'vue-material-design-icons/minus.vue';
+    import { MiOpenInNew, MiMinus } from '../../common';
 
     export default {
-        props: [
-            'setting',
-            'change'
-        ],
+        props: ['setting', 'change'],
         components: {
-            MiOpen,
-            MiMinus
+            MiOpenInNew, MiMinus
         },
         methods: {
             async openDialog(e) {

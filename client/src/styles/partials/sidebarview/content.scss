@@ -36,7 +36,9 @@
     > div:not(.active) {
         opacity: 0;
         position: absolute;
-        width: 100%;
+        left: 310px;
+        right: 0;
+        // width: 100%;
         height: 100%;
         pointer-events: none;
     }

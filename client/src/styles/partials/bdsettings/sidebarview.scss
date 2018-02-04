@@ -67,10 +67,9 @@
 
     .bd-info {
         display: flex;
-        flex: 1 0 auto;
         align-items: flex-end;
         overflow: hidden;
-        margin-top: 10px;
+        padding: 0 25px;
 
         .bd-vtext {
             color: #414245;
@@ -116,4 +115,17 @@
     .platform-linux & {
         top: 0;
     }
+}
+
+.bd-settings .bd-sidebar-view.bd-stop .bd-content-region {
+	z-index: 3003;
+}
+
+.bd-backdrop {
+	z-index: 3003;
+}
+
+.bd-sidebar .bd-settings-button {
+    position: absolute;
+	top: 0;
 }

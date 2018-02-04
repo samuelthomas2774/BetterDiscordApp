@@ -1,0 +1,69 @@
+.bd-plugin-settings-modal {
+    .bd-modal .bd-modal-body {
+        padding: 0;
+    }
+
+    .bd-modal .bd-modal-footer {
+        .bd-ok {
+            width: 100px;
+        }
+    }
+
+    .bd-plugin-settings-body {
+        padding: 0 15px;
+
+        .bd-setting-switch {
+            .bd-switch-wrapper {
+                flex: 0 0 auto;
+                user-select: none;
+                position: relative;
+                width: 40px;
+                height: 20px;
+                display: block;
+
+                input {
+                    position: absolute;
+                    opacity: 0;
+                    cursor: pointer;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 1;
+                }
+
+                .bd-switch {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    left: 0;
+                    background: #72767d;
+                    border-radius: 14px;
+                    transition: background .15s ease-in-out,box-shadow .15s ease-in-out,border .15s ease-in-out;
+
+                    &:before {
+                        content: "";
+                        display: block;
+                        width: 14px;
+                        height: 14px;
+                        position: absolute;
+                        top: 3px;
+                        left: 3px;
+                        bottom: 3px;
+                        background: #f6f6f7;
+                        border-radius: 10px;
+                        transition: all .15s ease;
+                        box-shadow: 0 3px 1px 0 rgba(0,0,0,.05), 0 2px 2px 0 rgba(0,0,0,.1), 0 3px 3px 0 rgba(0,0,0,.05);
+                    }
+
+                    &.bd-checked {
+                        background: $colbdblue;
+
+                        &::before {
+                            transform: translateX(20px);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,106 @@
+.bd-dropdown {
+    position: relative;
+
+    .bd-dropdown-current {
+        color: #f6f6f7;
+        background: rgba(0,0,0,.1);
+        border: 1px solid rgba(0,0,0,.3);
+        border-radius: 3px;
+        padding: 11px;
+        cursor: default;
+        outline: none;
+        transition: border .15s ease;
+        width: 180px;
+        box-sizing: border-box;
+        display: flex;
+
+        .bd-dropdown-text {
+            flex: 1 1 auto;
+        }
+
+        .bd-dropdown-arrow-wrap {
+            flex: 0 0 auto;
+            margin-left: 10px;
+
+            .bd-dropdown-arrow {
+                border-color: rgb(153, 153, 153) transparent transparent;
+                border-style: solid;
+                border-width: 5px 5px 2.5px;
+                display: inline-block;
+                transition: transform 0.15s ease;
+                transform: none;
+            }
+        }
+
+        &:hover {
+            border-color: #040405;
+
+            .bd-dropdown-arrow-wrap .bd-dropdown-arrow {
+                border-color: #f6f6f7 transparent transparent;
+            }
+        }
+    }
+
+    &.bd-active {
+        .bd-dropdown-current {
+            border-color: #040405;
+        }
+
+        .bd-dropdown-arrow-wrap .bd-dropdown-arrow {
+            transform: rotateX(180deg) translateY(2px);
+            border-color: #f6f6f7 transparent transparent;
+        }
+    }
+
+    .bd-dropdown-options {
+        position: absolute;
+        top: calc(100% - 2.5px);
+        width: 100%;
+        max-height: 180px;
+        box-sizing: border-box;
+        background-color: #303237;
+        border: 1px solid #202225;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        overflow-y: scroll;
+
+        .bd-dropdown-option {
+            color: white;
+            padding: 11px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+
+            &.bd-dropdown-option-selected {
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        &::-webkit-scrollbar {
+            width: 14px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #1e2124;
+            border-color: #36393e;
+            border-color: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb,
+        &::-webkit-scrollbar-track-piece {
+            background-clip: padding-box;
+            border-width: 3px;
+            border-style: solid;
+            border-radius: 7px;
+            border-color: transparent;
+        }
+
+        &::-webkit-scrollbar-track-piece {
+            background-color: #2f3136;
+            border-color: #36393e;
+            border-color: transparent;
+        }
+    }
+}

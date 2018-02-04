@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div>
+    <div class="bd-plugin-settings-modal">
         <div class="bd-backdrop" @click="attemptToClose"></div>
         <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose">
             <div slot="body" class="bd-plugin-settings-body">
@@ -18,13 +18,14 @@
                         <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
                     </div>
                     <div v-else-if="category.type === 'static'">
-                        {{category.category}} static with header
+                        <div class="bd-form-header">
+                            <span class="bd-form-header-text">{{category.category}} static with header</span>
+                        </div>
                         <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
                     </div>
-                    <div v-else-if="category.type === 'drawer'">
-                        {{category.category}} drawer
+                    <Drawer v-else-if="category.type === 'drawer'" :label="category.category + ' drawer'">
                         <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
-                    </div>
+                    </Drawer>
                     <div v-else>
                         <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
                     </div>
@@ -43,6 +44,7 @@
     // Imports
     import { Modal } from '../common';
     import PluginSetting from './pluginsetting/PluginSetting.vue';
+    import Drawer from '../common/Drawer.vue';
 
     export default {
         props: ['plugin','close'],
@@ -55,7 +57,8 @@
         },
         components: {
             Modal,
-            PluginSetting
+            PluginSetting,
+            Drawer
         },
         methods: {
             checkForChanges() {

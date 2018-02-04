@@ -1,5 +1,5 @@
 /**
- * BetterDiscord ¨Modal Component
+ * BetterDiscord Modal Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-modal">
+    <div :class="['bd-modal', {'bd-modal-scrolled': scrolled}]">
         <div class="bd-modal-inner">
             <div class="bd-modal-header">
                 <span class="bd-modal-headertext">{{headerText}}</span>
@@ -19,7 +19,7 @@
             </div>
             <div class="bd-modal-body">
                 <div class="bd-scroller-wrap">
-                    <div class="bd-scroller">
+                    <div class="bd-scroller" @scroll="e => scrolled = e.target.scrollTop !== 0">
                         <slot name="body"></slot>
                      </div>
                 </div>
@@ -39,6 +39,11 @@
         props: ['headerText', 'close'],
         components: {
             MiClose
+        },
+        data() {
+            return {
+                scrolled: false
+            };
         }
     }
 </script>

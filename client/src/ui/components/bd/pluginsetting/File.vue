@@ -20,7 +20,7 @@
                 <!-- Maybe add a preview here later? -->
                 <!-- For now just show the selected file path -->
                 <span class="bd-file-path">{{ file_path }}</span>
-                <span class="bd-file-open" @click="() => openItem(file_path)"><MiOpen /></span>
+                <span class="bd-file-open" @click="() => openItem(file_path)"><MiOpenInNew /></span>
                 <span class="bd-file-remove" @click="() => removeItem(file_path)"><MiMinus /></span>
             </div>
         </div>

@@ -13,7 +13,7 @@
         <div class="bd-title">
             <h3>{{setting.text}}</h3>
             <div class="bd-number">
-                <input type="number" :value="setting.value" :min="setting.min" :max="setting.max" :step="setting.step" @keyup.stop @change="change"/>
+                <input type="number" :value="setting.value" :min="setting.min" :max="setting.max" :step="setting.step" @keyup.stop @input="input"/>
                 <div class="bd-number-spinner bd-flex bd-flex-col">
                     <div class="bd-arrow" @click="changeBy(true)"><div class="bd-up-arrow"></div></div>
                     <div class="bd-arrow" @click="changeBy(false)"><div class="bd-down-arrow"></div></div>
@@ -28,7 +28,10 @@
         props: ['setting', 'change'],
         methods: {
             input(e) {
-                this.change(this.setting.id, parseFloat(e.target.value));
+                let number = parseFloat(e.target.value)
+                if (Number.isNaN(number)) return;
+
+                this.change(this.setting.id, number);
             },
             changeBy(positive) {
                 let step = this.setting.step == undefined ? 1 : this.settings.step;

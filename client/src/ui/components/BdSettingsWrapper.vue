@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-settings-wrapper" :class="[{active: active}, 'platform-' + this.platform]">
-        <div class="bd-settings-button" :class="{active: active}" @click="showSettings">
+        <div class="bd-settings-button" :class="{'bd-hide': active}" @click="showSettings">
             <div class="bd-settings-button-btn" :class="[{'bd-loading': !loaded}]"></div>
         </div>
         <BdSettings :active="active" :close="hideSettings" />
@@ -40,6 +40,7 @@
             hideSettings() { this.active = false },
             toggleSettings() { this.active = !this.active },
             keyupListener(e) {
+                if (document.getElementsByClassName('bd-backdrop').length) return;
                 if (this.active && e.which === 27) return this.hideSettings();
                 if (!e.metaKey && !e.ctrlKey || e.key !== 'b') return;
                 this.toggleSettings();

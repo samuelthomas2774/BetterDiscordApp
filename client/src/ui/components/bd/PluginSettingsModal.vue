@@ -92,7 +92,7 @@
                 this.changed = false;
             },
             attemptToClose(e) {
-                if (!this.chagned) {
+                if (!this.changed) {
                     this.closing = true;
                     setTimeout(() => {
                         this.close();

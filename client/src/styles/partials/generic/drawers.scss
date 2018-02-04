@@ -1,8 +1,17 @@
 .bd-drawer {
+    .bd-form-header {
+        cursor: pointer;
+    }
     .bd-drawer-open-button {
+        position: relative;
+        margin-right: 15px;
+        .bd-chevron-1, .bd-chevron-2 {
+            position: absolute;
+        }
+
         svg {
-            transition: transform 0.2s ease;
-            transform: rotate(0deg);
+            transition: transform 0.5s ease;
+            transform: none;
         }
     }
 
@@ -17,8 +26,17 @@
 
     &.bd-drawer-open {
         .bd-drawer-open-button {
-            svg {
-                transform: rotate(45deg);
+            .bd-chevron-1 {
+                svg {
+                    transform: rotate(90deg)
+                }
+            }
+
+            .bd-chevron-2 {
+                margin-left: -4px;
+                svg {
+                    transform: rotate(270deg)
+                }
             }
         }
 

@@ -10,9 +10,12 @@
 
 <template>
     <div :class="['bd-drawer', {'bd-drawer-open': open}]">
-        <div class="bd-form-header bd-drawer-header">
+        <div class="bd-form-header bd-drawer-header" @click="() => open = !open">
             <span class="bd-form-header-text">{{ label }}</span>
-            <span class="bd-form-header-button bd-drawer-open-button" @click="() => open = !open"><MiPlus /></span>
+            <span class="bd-form-header-button bd-drawer-open-button">
+                <span class="bd-chevron-1"><MiChevronDown /></span>
+                <span class="bd-chevron-2"><MiChevronDown /></span>
+            </span>
         </div>
         <div class="bd-drawer-contents">
             <slot />
@@ -21,14 +24,14 @@
 </template>
 
 <script>
-    import { MiPlus } from './MaterialIcon';
+    import { MiChevronDown } from './MaterialIcon';
 
     export default {
         props: [
             'label'
         ],
         components: {
-            MiPlus
+            MiChevronDown
         },
         data() {
             return {

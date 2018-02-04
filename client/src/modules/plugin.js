@@ -19,9 +19,10 @@ export default class {
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
     }
-
+    
     get configs() { return this.__pluginInternals.configs }
     get info() { return this.__pluginInternals.info }
+    get icon() { return this.info.icon }
     get paths() { return this.__pluginInternals.paths }
     get main() { return this.__pluginInternals.main }
     get defaultConfig() { return this.configs.defaultConfig }

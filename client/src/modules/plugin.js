@@ -38,18 +38,31 @@ export default class {
         return this.userConfig.config.find(setting => setting.id === settingId);
     }
 
-    saveSettings(newSettings) {
-        console.log(this);
-        let changed = false;
-        for (let newSetting of newSettings) {
-            const setting = this.pluginConfig.find(s => s.id === newSetting.id && s.value !== newSetting.value);
-            if (!setting) continue;
-            setting.value = newSetting.value;
-            if (this.settingSaved) this.settingSaved(setting);
-            changed = true;
+    async sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async saveSettings(newSettings) {
+        await this.sleep(2000); // Fake sleep to test loading
+        for (let category of newSettings) {
+            const oldCategory = this.pluginConfig.find(c => c.category === category.category);
+            for (let setting of category.settings) {
+                const oldSetting = oldCategory.settings.find(s => s.id === setting.id);
+                if (oldSetting.value === setting.value) continue;
+                oldSetting.value = setting.value;
+                if (this.settingChanged) this.settingChanged(category.category, setting.id, setting.value);
+            }
         }
-        if (changed && this.settingsSaved) this.settingsSaved(this.pluginConfig);
-        FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({enabled: this.enabled, config: this.pluginConfig}));
+
+        try {
+            await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({ enabled: this.enabled, config: this.pluginConfig }));
+        } catch (err) {
+            throw err;
+        }
+
+        if (this.settingsChanged) this.settingsChanged(this.pluginConfig);
+
+        return this.pluginConfig;
     }
 
     start() {

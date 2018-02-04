@@ -34,8 +34,13 @@
             </div>
             <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed, 'bd-warn': warnclose}">
                 <div class="bd-footer-alert-text">Unsaved changes</div>
-                <div class="bd-button bd-reset-button bd-tp" @click="resetSettings">Reset</div>
-                <div class="bd-button bd-ok" @click="saveSettings">Save Changes</div>
+                <div class="bd-button bd-reset-button bd-tp" :class="{'bd-disabled': saving}" @click="resetSettings">Reset</div>
+                <div class="bd-button bd-ok" :class="{'bd-disabled': saving}" @click="saveSettings">
+                    <div v-if="saving" class="bd-spinner-7"></div>
+                    <template v-else>
+                        Save Changes
+                    </template>
+                </div>
             </div>
         </Modal>
     </div>
@@ -53,7 +58,8 @@
                 changed: false,
                 warnclose: false,
                 configCache: [],
-                closing: false
+                closing: false,
+                saving: false
             }
         },
         components: {
@@ -81,13 +87,21 @@
                 }
                 this.changed = this.checkForChanges();
             },
-            saveSettings() {
-                //this.plugin.saveSettings(this.configCache);
-                //this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
-                // TODO later
-                this.changed = false;
+            async saveSettings() {
+                if (this.saving) return;
+                this.saving = true;
+                try {
+                    await this.plugin.saveSettings(this.configCache);
+                    this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+                    this.changed = false;
+                } catch (err) {
+                    // TODO Display error that settings failed to save
+                    console.log(err);
+                }
+                this.saving = false;
             },
             resetSettings() {
+                if (this.saving) return;
                 this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
                 this.changed = false;
             },

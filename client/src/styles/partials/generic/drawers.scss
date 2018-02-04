@@ -1,10 +1,16 @@
 .bd-drawer {
     .bd-form-header {
         cursor: pointer;
+
+        &:hover {
+            color: rgba(255, 255, 255, 0.25);
+        }
     }
+
     .bd-drawer-open-button {
         position: relative;
         margin-right: 15px;
+
         .bd-chevron-1, .bd-chevron-2 {
             position: absolute;
         }

@@ -1,0 +1,66 @@
+.bd-form-textinput,
+.bd-form-numberinput {
+    input[type="text"],
+    input[type="number"] {
+        background: transparent;
+        border: none;
+        color: #b9bbbe;
+        border-bottom: 2px solid rgba(114, 118, 126, 0.3);
+        outline: none;
+        line-height: 24px;
+        font-size: 100%;
+        font-weight: 500;
+        width: 180px;
+
+        &:focus {
+            color: #fff;
+            border-color: $colbdblue;
+        }
+    }
+}
+
+.bd-number {
+    position: relative;
+
+    input[type="number"] {
+        &::-webkit-inner-spin-button,
+        ::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    }
+
+    .bd-number-spinner {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        justify-content: space-around;
+
+        .bd-arrow {
+            padding: 3px 5px;
+            cursor: pointer;
+            font-size: 0;
+
+            .bd-up-arrow {
+                border-color: transparent transparent rgb(153, 153, 153);
+                border-style: solid;
+                border-width: 2.5px 5px 5px;
+            }
+
+            &:hover .bd-up-arrow {
+                border-color: transparent transparent rgb(200, 200, 200);
+            }
+
+            .bd-down-arrow {
+                border-color: rgb(153, 153, 153) transparent transparent;
+                border-style: solid;
+                border-width: 5px 5px 2.5px;
+            }
+
+            &:hover .bd-down-arrow {
+                border-color: rgb(200, 200, 200) transparent transparent;
+            }
+        }
+    }
+}

@@ -1,0 +1,29 @@
+.bd-form-textinput,
+.bd-form-fileinput,
+.bd-form-dropdown,
+.bd-form-radio,
+.bd-form-numberinput,
+.bd-setting-switch {
+    .bd-title {
+        display: flex;
+
+        h3 {
+            font-weight: 500;
+            color: #f6f6f7;
+            flex: 1;
+            line-height: 24px;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+    }
+
+    .bd-hint {
+        flex: 1 1 auto;
+        color: #72767d;
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 5px;
+        line-height: 20px;
+        border-bottom: 0px solid rgba(114, 118, 126, 0.1);
+    }
+}

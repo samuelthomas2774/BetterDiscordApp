@@ -9,63 +9,99 @@
 */
 
 <template>
-    <Modal :headerText="plugin.name + ' Settings'" :close="() => {  }">
-        <div slot="body" v-for="setting in plugin.pluginConfig" class="bd-plugin-settings-body">
-            <div class="bd-form-item">
-
-                <div v-if="setting.type === 'bool'" class="bd-setting-switch">
-                    <div class="bd-title">
-                        <h3>{{setting.text}}</h3>
-                        <label class="bd-switch-wrapper">
-                            <input type="checkbox" class="bd-switch-checkbox" />
-                            <div class="bd-switch" :class="{'bd-checked': setting.value}" />
-                        </label>
+    <div class="bd-plugin-settings-modal">
+        <div class="bd-backdrop" @click="attemptToClose"></div>
+        <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose">
+            <div slot="body" class="bd-plugin-settings-body">
+                <template v-for="category in configCache">
+                    <div v-if="category.category === 'default' || !category.type">
+                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
                     </div>
-                    <div class="bd-hint">{{setting.hint}}</div>
-                </div>
-
-                <div v-else-if="setting.type === 'text'" class="bd-form-textinput">
-                    <div class="bd-title">
-                        <h3>{{setting.text}}</h3>
-                        <div class="bd-textinput-wrapper">
-                            <input type="text" v-model="setting.value" @keyup.stop @keydown="textInputKd" />
+                    <div v-else-if="category.type === 'static'">
+                        <div class="bd-form-header">
+                            <span class="bd-form-header-text">{{category.category}} static with header</span>
                         </div>
+                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
                     </div>
-                    <div class="bd-hint">{{setting.hint}}</div>
-                </div>
+                    <Drawer v-else-if="category.type === 'drawer'" :label="category.category + ' drawer'">
+                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                    </Drawer>
+                    <div v-else>
+                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                    </div>
+                </template>
 
-                <div class="bd-form-divider"></div>
             </div>
-
-        </div>
-
-        <div slot="footer">
-            <div class="footer-alert" :class="{'bd-active': changed}">
-                <div class="footer-alert-text">Unsaved changes</div>
-                <div class="bd-reset-button">Reset</div>
-                <div class="bd-button bd-ok">Save Changes</div>
+            <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed, 'bd-warn': warnclose}">
+                <div class="bd-footer-alert-text">Unsaved changes</div>
+                <div class="bd-button bd-reset-button bd-tp" @click="resetSettings">Reset</div>
+                <div class="bd-button bd-ok" @click="saveSettings">Save Changes</div>
             </div>
-        </div>
-    </Modal>
+        </Modal>
+    </div>
 </template>
 <script>
     // Imports
     import { Modal } from '../common';
+    import PluginSetting from './pluginsetting/PluginSetting.vue';
+    import Drawer from '../common/Drawer.vue';
 
     export default {
-        props: ['plugin'],
+        props: ['plugin','close'],
         data() {
             return {
-                'changed': false
+                changed: false,
+                warnclose: false,
+                configCache: []
             }
         },
         components: {
-            Modal
+            Modal,
+            PluginSetting,
+            Drawer
         },
         methods: {
-            textInputKd(e) {
-                this.changed = true;
+            checkForChanges() {
+                for (let category of this.configCache) {
+                    const cat = this.plugin.pluginConfig.find(c => c.category === category.category);
+                    for (let setting of category.settings) {
+                        if (cat.settings.find(s => s.id === setting.id).value !== setting.value) return true;
+                    }
+                }
+                return false;
+            },
+            settingChange(settingId, newValue) {
+                for (let category of this.configCache) {
+                    const found = category.settings.find(s => s.id === settingId);
+                    if (found) {
+                        found.value = newValue;
+                        break;
+                    }
+                }
+                this.changed = this.checkForChanges();
+            },
+            saveSettings() {
+                //this.plugin.saveSettings(this.configCache);
+                //this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+                // TODO later
+                this.changed = false;
+            },
+            resetSettings() {
+                this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+                this.changed = false;
+            },
+            attemptToClose(e) {
+                if (!this.changed) return this.close();
+                this.warnclose = true;
+                setTimeout(() => {
+                    this.warnclose = false;
+                }, 400);
             }
+        },
+        beforeMount() {
+            this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+            console.log(this.configCache);
+            this.changed = this.checkForChanges();
         }
     }
 </script>

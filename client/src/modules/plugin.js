@@ -8,10 +8,13 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { FileUtils } from 'common';
+
 export default class {
 
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;
+        this.saveSettings = this.saveSettings.bind(this);
         this.hasSettings = this.pluginConfig && this.pluginConfig.length > 0;
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
@@ -30,6 +33,24 @@ export default class {
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
     get pluginConfig() { return this.userConfig.config }
+
+    getSetting(settingId) {
+        return this.userConfig.config.find(setting => setting.id === settingId);
+    }
+
+    saveSettings(newSettings) {
+        console.log(this);
+        let changed = false;
+        for (let newSetting of newSettings) {
+            const setting = this.pluginConfig.find(s => s.id === newSetting.id && s.value !== newSetting.value);
+            if (!setting) continue;
+            setting.value = newSetting.value;
+            if (this.settingSaved) this.settingSaved(setting);
+            changed = true;
+        }
+        if (changed && this.settingsSaved) this.settingsSaved(this.pluginConfig);
+        FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({enabled: this.enabled, config: this.pluginConfig}));
+    }
 
     start() {
         if (this.onStart) {

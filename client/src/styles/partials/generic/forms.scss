@@ -1,3 +1,39 @@
+.bd-form-header {
+    margin: 15px 0 10px;
+    color: rgba(255, 255, 255, 0.15);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 16px;
+    text-transform: uppercase;
+    font-weight: 600;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
+    display: flex;
+
+    .bd-form-header-text {
+        flex: 1 1 auto;
+    }
+
+    .bd-form-header-button {
+        flex: 0 0;
+        margin-left: 5px;
+
+        svg {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            fill: #ccc;
+
+            &:hover {
+                fill: #fff;
+            }
+        }
+    }
+}
+
 .bd-form-item h5 {
     color: #b9bbbe;
     text-transform: uppercase;
@@ -10,6 +46,12 @@
     margin-top: 20px;
     margin-bottom: 30px;
     background: hsla(218,5%,47%,.3);
+
+    .bd-form-textinput + &,
+    .bd-form-fileinput + &,
+    .bd-setting-switch + & {
+        margin: 15px 0;
+    }
 }
 
 .bd-form-warning {
@@ -52,8 +94,9 @@
     user-select: none;
 }
 
-.bd-form-textinput {
-
+.bd-form-textinput,
+.bd-form-fileinput,
+.bd-setting-switch {
     .bd-title {
         display: flex;
 
@@ -65,22 +108,6 @@
             margin-bottom: 0;
             margin-top: 0;
         }
-
-        input[type="text"] {
-            background: transparent;
-            border: none;
-            color: #b9bbbe;
-            border-bottom: 2px solid rgba(114, 118, 126, 0.3);
-            outline: none;
-            line-height: 24px;
-            font-size: 100%;
-            font-weight: 500;
-
-            &:focus {
-                color: #FFF;
-                border-color: $colbdblue;
-            }
-        }
     }
 
     .bd-hint {
@@ -88,8 +115,67 @@
         color: #72767d;
         font-size: 14px;
         font-weight: 500;
-        margin-bottom: 15px;
-        line-height: 30px;
+        margin-top: 5px;
+        line-height: 20px;
         border-bottom: 0px solid rgba(114, 118, 126, 0.1);
+    }
+}
+
+.bd-form-textinput {
+    input[type="text"] {
+        background: transparent;
+        border: none;
+        color: #b9bbbe;
+        border-bottom: 2px solid rgba(114, 118, 126, 0.3);
+        outline: none;
+        line-height: 24px;
+        font-size: 100%;
+        font-weight: 500;
+
+        &:focus {
+            color: #FFF;
+            border-color: $colbdblue;
+        }
+    }
+}
+
+.bd-form-fileinput {
+    .bd-button.bd-button-primary {
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    .bd-selected-files {
+        margin: 15px 0;
+
+        .bd-selected-file {
+            margin: 10px 0;
+            color: #aaa;
+            font-size: 15px;
+            display: flex;
+
+            .bd-file-path {
+                flex: 1 1;
+            }
+
+            .bd-file-open,
+            .bd-file-remove {
+                flex: 0 0;
+                margin-left: 5px;
+
+                svg {
+                    width: 16px;
+                    height: 16px;
+                    cursor: pointer;
+                    fill: #ccc;
+
+                    &:hover {
+                        fill: #fff;
+                    }
+                }
+            }
+        }
     }
 }

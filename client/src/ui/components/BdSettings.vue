@@ -13,20 +13,23 @@
         <SidebarView :contentVisible="this.activeIndex >= 0" :animating="this.animating">
             <Sidebar slot="sidebar">
                 <div class="bd-settings-x" @click="close">
-                    <SvgX size="17"/>
-                    <span>ESC</span>
+                    <MiClose size="17"/>
+                    <span class="bd-x-text">ESC</span>
                 </div>
                 <SidebarItem v-for="item in sidebarItems" :item="item" :key="item.id" :onClick="itemOnClick" />
-                <div class="bd-info">
-                    <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
-                    <div @click="openGithub" v-tooltip="'Github'" class="bd-material-button">
-                        <MiGithub/>
-                    </div>
-                    <div @click="openWebsite" v-tooltip="'BetterDiscord'" class="bd-material-button">
-                        <MiWeb/>
-                     </div>
-                </div>
             </Sidebar>
+            <div slot="sidebarfooter" class="bd-info">
+                <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
+                <div @click="openGithub" v-tooltip="'Github'" class="bd-material-button">
+                    <MiGithubCircle size="16" />
+                </div>
+                <div @click="openTwitter" v-tooltip="'@Jiiksi'" class="bd-material-button">
+                    <MiTwitterCircle size="16" />
+                </div>
+                <div @click="openWebsite" v-tooltip="'BetterDiscord'" class="bd-material-button">
+                    <MiWeb size="16" />
+                </div>
+            </div>
             <ContentColumn slot="content">
                 <div v-if="activeContent('core') || animatingContent('core')" :class="{active: activeContent('core'), animating: animatingContent('core')}">
                     <CoreSettings :settings="coreSettings" :enableSetting="enableSetting" :disableSetting="disableSetting" />
@@ -53,9 +56,7 @@
     import { Settings } from 'modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView } from './bd';
-    import { SvgX } from './common';
-    import MiGithub from 'vue-material-design-icons/github-circle.vue';
-    import MiWeb from 'vue-material-design-icons/web.vue';
+    import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
 
     // Constants
     const sidebarItems = [
@@ -89,8 +90,7 @@
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
             CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView,
-            SvgX,
-            MiGithub, MiWeb
+            MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         methods: {
             itemOnClick(id) {
@@ -138,6 +138,9 @@
             },
             openWebsite() {
                 shell.openExternal('https://betterdiscord.net');
+            },
+            openTwitter() {
+                shell.openExternal('https://twitter.com/Jiiksi');
             }
         }
     }

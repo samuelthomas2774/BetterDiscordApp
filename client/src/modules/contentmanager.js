@@ -100,11 +100,22 @@ export default class {
                 const readUserConfig = await this.readUserConfig(contentPath);
                 userConfig.enabled = readUserConfig.enabled || false;
                 userConfig.config = readConfig.defaultConfig.map(config => {
-                    const userSet = readUserConfig.config.find(c => c.id === config.id);
-                    return userSet || config;
+                    const userSet = readUserConfig.config.find(c => c.category === config.category);
+                    // return userSet || config;
+                    if (!userSet) return config;
+
+                    config.settings = config.settings.map(setting => {
+                        const userSetting = userSet.settings.find(s => s.id === setting.id);
+                        if (!userSetting) return setting;
+
+                        setting.value = userSetting.value;
+                        return setting;
+                    });
+                    return config;
                 });
+                // userConfig.config = readUserConfig.config;
             } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
-     
+
             }
 
             const configs = {
@@ -127,7 +138,7 @@ export default class {
             throw err;
         }
     }
-    
+
     static async readConfig(configPath) {
         configPath = path.resolve(configPath, 'config.json');
         return FileUtils.readJsonFromFile(configPath);

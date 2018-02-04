@@ -8,6 +8,12 @@
     opacity: .85;
     padding: 20px;
     z-index: 9000;
+    justify-content: center;
+
+    animation: bd-backdrop-in 0.22s ease;
+    &.bd-backdrop-out {
+        animation: bd-backdrop-out 0.22s ease;
+    }
 }
 
 .bd-modal {

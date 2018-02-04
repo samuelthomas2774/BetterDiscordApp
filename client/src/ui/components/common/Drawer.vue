@@ -17,8 +17,10 @@
                 <span class="bd-chevron-2"><MiChevronDown /></span>
             </span>
         </div>
-        <div class="bd-drawer-contents">
-            <slot />
+        <div class="bd-drawer-contents-wrap">
+            <div class="bd-drawer-contents">
+                <slot />
+            </div>
         </div>
     </div>
 </template>

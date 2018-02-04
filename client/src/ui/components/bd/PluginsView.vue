@@ -15,13 +15,13 @@
                 <div class="bd-flex-grow bd-button" :class="{'bd-active': local}" @click="showLocal">
                     <h3>Local</h3>
                     <div class="bd-material-button" @click="refreshLocal">
-                        <refresh />
+                        <MiRefresh />
                     </div>
                 </div>
                 <div class="bd-flex-grow bd-button" :class="{'bd-active': !local}" @click="showOnline">
                     <h3>Online</h3>
                     <div class="bd-material-button">
-                        <refresh />
+                        <MiRefresh />
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
     import { SettingsWrapper } from './';
     import PluginCard from './PluginCard.vue';
     import PluginSettingsModal from './PluginSettingsModal.vue';
-    import Refresh from 'vue-material-design-icons/refresh.vue';
+    import { MiRefresh } from '../common';
 
     export default {
         data() {
@@ -53,7 +53,8 @@
             }
         },
         components: {
-            SettingsWrapper, PluginCard, PluginSettingsModal, Refresh
+            SettingsWrapper, PluginCard, PluginSettingsModal,
+            MiRefresh
         },
         methods: {
             showLocal() {

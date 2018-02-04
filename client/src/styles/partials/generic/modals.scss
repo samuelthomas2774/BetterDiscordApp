@@ -32,6 +32,11 @@
     pointer-events: none;
     z-index: 9001;
     justify-content: center;
+    animation: bd-modal-in 0.22s ease;
+
+    &.bd-modal-out {
+        animation: bd-modal-out 0.22s ease;
+    }
 }
 
 .bd-modal .bd-modal-inner {

@@ -98,3 +98,16 @@
         }
     }
 }
+
+.bd-settings .bd-sidebar-view.bd-stop .bd-content-region {
+	z-index: 3003;
+}
+
+.bd-backdrop {
+	z-index: 3003;
+}
+
+.bd-sidebar .bd-settings-button {
+    position: absolute;
+	top: 0;
+}

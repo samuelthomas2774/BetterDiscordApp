@@ -39,9 +39,15 @@
         backface-visibility: hidden;
     }
 
+    &.bd-stop {
+        .bd-content-region {
+            transform: none;
+        }
+    }
+
     &.active {
         .bd-content-region {
-            animation: bd-slidein .6s forwards;
+            animation: bd-slidein .6s;
         }
     }
 }

@@ -1,5 +1,5 @@
 .bd-backdrop {
-    position: absolute;
+    position: fixed;
     right: 0px;
     left: 0px;
     top: 0px;
@@ -31,6 +31,7 @@
     box-sizing: border-box;
     pointer-events: none;
     z-index: 9001;
+    justify-content: center;
 }
 
 .bd-modal .bd-modal-inner {
@@ -46,6 +47,8 @@
     flex-grow: 1;
     border-radius: 4px;
     max-height: 100%;
+    max-width: 500px;
+    width: 500px;
 }
 
 .bd-modal .bd-modal-body {
@@ -106,10 +109,8 @@
 
     .bd-modal-footer {
         .bd-footer-alert {
-            position: absolute;
-            bottom: 80px;
-            left: 70px;
-            right: 70px;
+            margin: 10px;
+            height: 0;
             display: flex;
             background-color: rgba(32, 34, 37, 0.9);
             box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
@@ -126,6 +127,7 @@
             }
 
             &.bd-active {
+                height: auto;
                 opacity: 1;
                 transform: none;
             }

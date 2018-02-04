@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-form-item">
+    <div class="bd-form-item" :class="{'bd-form-item-changed': changed}">
         <BoolSetting v-if="setting.type === 'bool'" :setting="setting" :change="change"/>
         <DropdownSetting v-if="setting.type === 'dropdown'" :setting="setting" :change="change"/>
         <NumberSetting v-if="setting.type === 'number'" :setting="setting" :change="change"/>
@@ -31,7 +31,8 @@
     export default {
         props: [
             'setting',
-            'change'
+            'change',
+            'changed'
         ],
         components: {
             BoolSetting,

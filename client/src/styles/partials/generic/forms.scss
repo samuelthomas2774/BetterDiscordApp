@@ -43,6 +43,10 @@
     font-size: 12px;
 }
 
+.bd-form-item-changed .bd-form-divider {
+    background: $colok;
+}
+
 .bd-form-divider {
     height: 1px;
     margin: 15px 0;

@@ -10,8 +10,8 @@
 
 <template>
     <div class="bd-plugin-settings-modal">
-        <div class="bd-backdrop" @click="attemptToClose"></div>
-        <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose">
+        <div class="bd-backdrop" @click="attemptToClose" :class="{'bd-backdrop-out': closing}"></div>
+        <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose" :class="{'bd-modal-out': closing}">
             <div slot="body" class="bd-plugin-settings-body">
                 <template v-for="category in configCache">
                     <div v-if="category.category === 'default' || !category.type">
@@ -52,7 +52,8 @@
             return {
                 changed: false,
                 warnclose: false,
-                configCache: []
+                configCache: [],
+                closing: false
             }
         },
         components: {
@@ -91,7 +92,13 @@
                 this.changed = false;
             },
             attemptToClose(e) {
-                if (!this.changed) return this.close();
+                if (!this.changed) {
+                    this.closing = true;
+                    setTimeout(() => {
+                        this.close();
+                    }, 200);
+                    return;
+                }
                 this.warnclose = true;
                 setTimeout(() => {
                     this.warnclose = false;

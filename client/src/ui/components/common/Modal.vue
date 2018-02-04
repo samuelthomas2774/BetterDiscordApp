@@ -53,7 +53,6 @@
         },
         methods: {
             keyupListener(e) {
-                console.log('key up!');
                 if (e.which === 27) {
                     this.close();
                 }

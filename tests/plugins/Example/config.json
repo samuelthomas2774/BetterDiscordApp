@@ -27,10 +27,38 @@
                 },
                 {
                     "id": "default-2",
-                    "type": "bool",
-                    "value": false,
-                    "text": "Bool Test Setting 3",
-                    "hint": "Bool Test Setting Hint 3"
+                    "type": "dropdown",
+                    "value": "opt1",
+                    "text": "Dropdown Test Setting",
+                    "hint": "Dropdown Test Setting Hint",
+                    "options": [
+                        {"value": "opt1", "text": "Option 1"},
+                        {"value": "opt2", "text": "Option 2"},
+                        {"value": "opt3", "text": "Option 3"},
+                        {"value": "opt4", "text": "Option 4"},
+                        {"value": "opt5", "text": "Option 5"}
+                    ]
+                },
+                {
+                    "id": "default-5",
+                    "type": "radio",
+                    "value": "opt1",
+                    "text": "Radio Test Setting",
+                    "hint": "Radio Test Setting Hint",
+                    "options": [
+                        {"value": "opt1", "text": "Option 1"},
+                        {"value": "opt2", "text": "Option 2"},
+                        {"value": "opt3", "text": "Option 3"},
+                        {"value": "opt4", "text": "Option 4"},
+                        {"value": "opt5", "text": "Option 5"}
+                    ]
+                },
+                {
+                    "id": "default-6",
+                    "type": "number",
+                    "value": 0,
+                    "text": "Number Test Setting",
+                    "hint": "Number Test Setting Hint"
                 },
                 {
                     "id": "default-3",

@@ -11,6 +11,9 @@
 <template>
     <div class="bd-form-item">
         <BoolSetting v-if="setting.type === 'bool'" :setting="setting" :change="change"/>
+        <DropdownSetting v-if="setting.type === 'dropdown'" :setting="setting" :change="change"/>
+        <NumberSetting v-if="setting.type === 'number'" :setting="setting" :change="change"/>
+        <RadioSetting v-if="setting.type === 'radio'" :setting="setting" :change="change"/>
         <StringSetting v-if="setting.type === 'text'" :setting="setting" :change="change"/>
         <FileSetting v-if="setting.type === 'file'" :setting="setting" :change="change"/>
         <div class="bd-form-divider"></div>
@@ -19,6 +22,9 @@
 <script>
     // Imports
     import BoolSetting from './Bool.vue';
+    import DropdownSetting from './Dropdown.vue';
+    import NumberSetting from './Number.vue';
+    import RadioSetting from './Radio.vue';
     import StringSetting from './String.vue';
     import FileSetting from './File.vue';
 
@@ -29,6 +35,9 @@
         ],
         components: {
             BoolSetting,
+            DropdownSetting,
+            NumberSetting,
+            RadioSetting,
             StringSetting,
             FileSetting
         }

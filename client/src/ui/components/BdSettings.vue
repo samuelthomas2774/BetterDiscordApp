@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-settings" :class="{active: active}" @keyup="close">
-        <SidebarView :contentVisible="this.activeIndex >= 0" :animating="this.animating">
+        <SidebarView :contentVisible="this.activeIndex >= 0" :animating="this.animating" :class="{'bd-stop': !first}">
             <Sidebar slot="sidebar">
                 <div class="bd-settings-x" @click="close">
                     <MiClose size="17"/>
@@ -101,11 +101,8 @@
                 this.lastActiveIndex = this.activeIndex;
                 this.activeIndex = id;
 
-                if (this.first) {
-                    this.first = false;
-                }
-
                 setTimeout(() => {
+                    this.first = false;
                     this.animating = false;
                     this.lastActiveIndex = -1;
                 }, 400);

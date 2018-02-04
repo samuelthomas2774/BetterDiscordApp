@@ -1,3 +1,39 @@
+.bd-form-header {
+    margin: 15px 0 10px;
+    color: rgba(255, 255, 255, 0.15);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 16px;
+    text-transform: uppercase;
+    font-weight: 600;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
+    display: flex;
+
+    .bd-form-header-text {
+        flex: 1 1 auto;
+    }
+
+    .bd-form-header-button {
+        flex: 0 0;
+        margin-left: 5px;
+
+        svg {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            fill: #ccc;
+
+            &:hover {
+                fill: #fff;
+            }
+        }
+    }
+}
+
 .bd-form-item h5 {
     color: #b9bbbe;
     text-transform: uppercase;
@@ -14,7 +50,7 @@
     .bd-form-textinput + &,
     .bd-form-fileinput + &,
     .bd-setting-switch + & {
-        margin: 0 0 15px 0;
+        margin: 15px 0;
     }
 }
 
@@ -59,7 +95,8 @@
 }
 
 .bd-form-textinput,
-.bd-form-fileinput {
+.bd-form-fileinput,
+.bd-setting-switch {
     .bd-title {
         display: flex;
 
@@ -79,7 +116,6 @@
         font-size: 14px;
         font-weight: 500;
         margin-top: 5px;
-        margin-bottom: 15px;
         line-height: 20px;
         border-bottom: 0px solid rgba(114, 118, 126, 0.1);
     }

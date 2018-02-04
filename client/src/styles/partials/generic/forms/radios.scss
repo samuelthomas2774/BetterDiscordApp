@@ -1,14 +1,14 @@
 .bd-form-radio {
     display: flex;
+    flex-direction: column;
 
     .bd-form-radio-details {
         flex: 1 1 auto;
     }
 
     .bd-form-radio-group {
-        width: 180px;
         flex: 0 0 auto;
-        margin-left: 20px;
+        margin-top: 10px;
     }
 }
 

@@ -14,7 +14,6 @@
             <div class="bd-title">
                 <h3>{{setting.text}}</h3>
             </div>
-            <div class="bd-hint">{{setting.hint}}</div>
         </div>
         <div class="bd-form-radio-group">
             <label class="bd-radio" v-for="option in setting.options" :class="{'bd-radio-selected': setting.value === option.value}" @click="selectOption(option)">

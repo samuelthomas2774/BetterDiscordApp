@@ -36,7 +36,14 @@
             changeBy(positive) {
                 let step = this.setting.step == undefined ? 1 : this.settings.step;
                 this.change(this.setting.id, this.setting.value + (positive ? step : -step));
-            }
+            },
+            handleWheel() {} // No idea why this works but it does
+        },
+        beforeMount() {
+            window.addEventListener('wheel', this.handleWheel);
+        },
+        destroyed() {
+            window.removeEventListener('wheel', this.handleWheel);
         }
     }
 </script>

@@ -11,7 +11,10 @@
 <template>
     <div class="bd-plugin-card">
         <div class="bd-plugin-header">
-            <span v-tooltip="'wat'">{{plugin.name}}</span>
+            <div class="bd-plugin-icon" :style="{backgroundImage: plugin.icon ? `url(${plugin.icon})` : null}">
+                <MiExtension v-if="!plugin.icon" :size="30"/>
+            </div>
+            <span>{{plugin.name}}</span>
             <div class="bd-flex-spacer" />
             <label class="bd-switch-wrapper" @click="() => { togglePlugin(plugin); this.$forceUpdate(); }">
                 <input type="checkbox" class="bd-switch-checkbox" />
@@ -45,7 +48,7 @@
 <script>
     // Imports
     import { shell } from 'electron';
-    import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete } from '../common';
+    import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension } from '../common';
 
     export default {
         data() {
@@ -55,7 +58,7 @@
         },
         props: ['plugin', 'togglePlugin', 'reloadPlugin', 'showSettings'],
         components: {
-            Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete
+            Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
         },
         methods: {
             editPlugin() {

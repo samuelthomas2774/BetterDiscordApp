@@ -15,19 +15,19 @@
             <div slot="body" class="bd-plugin-settings-body">
                 <template v-for="category in configCache">
                     <div v-if="category.category === 'default' || !category.type">
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
                     </div>
                     <div v-else-if="category.type === 'static'">
                         <div class="bd-form-header">
                             <span class="bd-form-header-text">{{category.category}} static with header</span>
                         </div>
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
                     </div>
                     <Drawer v-else-if="category.type === 'drawer'" :label="category.category + ' drawer'">
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
                     </Drawer>
                     <div v-else>
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
                     </div>
                 </template>
 
@@ -69,13 +69,17 @@
         },
         methods: {
             checkForChanges() {
+                let changed = false;
                 for (let category of this.configCache) {
                     const cat = this.plugin.pluginConfig.find(c => c.category === category.category);
                     for (let setting of category.settings) {
-                        if (cat.settings.find(s => s.id === setting.id).value !== setting.value) return true;
+                        if (cat.settings.find(s => s.id === setting.id).value !== setting.value) {
+                            changed = true;
+                            setting.changed = true;
+                        }
                     }
                 }
-                return false;
+                return changed;
             },
             settingChange(settingId, newValue) {
                 for (let category of this.configCache) {
@@ -86,6 +90,7 @@
                     }
                 }
                 this.changed = this.checkForChanges();
+                this.$forceUpdate();
             },
             async saveSettings() {
                 if (this.saving) return;
@@ -104,6 +109,7 @@
                 if (this.saving) return;
                 this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
                 this.changed = false;
+                this.$forceUpdate();
             },
             attemptToClose(e) {
                 if (!this.changed) {

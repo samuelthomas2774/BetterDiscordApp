@@ -9,13 +9,18 @@
 */
 
 <template>
-    <div class="bd-setting-switch"> 
+    <div class="bd-form-dropdown">
         <div class="bd-title">
             <h3>{{setting.text}}</h3>
-            <div class="bd-dropdown">
-                <div class="bd-dropdown-current" @click="expanded = true">{{getOptionText(setting.value)}}<span class="bd-dropdown-arrow"></span></div>
-                <div class="bd-dropdown-options bd-flex bd-flex-col" ref="options" v-if="expanded">
-                    <div v-for="option in setting.options" @click="selectOption(setting.id, option.value)">{{option.text}}</div>
+            <div class="bd-dropdown" :class="{'bd-active': active}">
+                <div class="bd-dropdown-current" @click="() => active = !active">
+                    <span class="bd-dropdown-text">{{getOptionText(setting.value)}}</span>
+                    <span class="bd-dropdown-arrow-wrap">
+                        <span class="bd-dropdown-arrow"></span>
+                    </span>
+                </div>
+                <div class="bd-dropdown-options bd-flex bd-flex-col" ref="options" v-if="active">
+                    <div class="bd-dropdown-option" v-for="option in setting.options" :class="{'bd-dropdown-option-selected': setting.value === option.value}" @click="selectOption(option)">{{option.text}}</div>
                 </div>
             </div>
         </div>
@@ -26,7 +31,9 @@
     export default {
         props: ['setting', 'change'],
         data() {
-            return { expanded: false }
+            return {
+                active: false
+            };
         },
         methods: {
             getOptionText(value) {
@@ -34,16 +41,16 @@
                 if (matching.length == 0) return "";
                 else return matching[0].text;
             },
-            selectOption(settingID, value) {
-                this.expanded = false;
-                this.change(settingID, value)
+            selectOption(option) {
+                this.active = false;
+                this.change(this.setting.id, option.value);
             }
         },
         mounted() {
             document.addEventListener("click", e => {
                 let options = this.$refs.options;
                 if (options && !options.contains(e.target) && options !== e.target) {
-                    this.expanded = false;
+                    this.active = false;
                 }
             });
         }

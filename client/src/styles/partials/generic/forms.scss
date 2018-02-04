@@ -233,6 +233,7 @@
     border-radius: 5px;
     padding: 3px;
     align-items: center;
+    cursor: pointer;
 
     input[type="radio"] {
         display: none;
@@ -270,6 +271,7 @@
         border: 2px solid rgb(39, 39, 39);
         border-radius: 5px;
         padding: 8px;
+        cursor: pointer;
 
         .bd-dropdown-arrow {
             border-color: rgb(153, 153, 153) transparent transparent;
@@ -295,6 +297,7 @@
         div {
             color: white;
             padding: 5px;
+            cursor: pointer;
 
             &:hover {
                 background: rgb(59, 59, 59);

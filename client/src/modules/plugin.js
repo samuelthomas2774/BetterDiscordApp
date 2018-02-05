@@ -44,13 +44,15 @@ export default class {
     }
 
     async saveSettings(newSettings) {
-        for (let category of newSettings) {
-            const oldCategory = this.pluginConfig.find(c => c.category === category.category);
-            for (let setting of category.settings) {
-                const oldSetting = oldCategory.settings.find(s => s.id === setting.id);
-                if (oldSetting.value === setting.value) continue;
-                oldSetting.value = setting.value;
-                if (this.settingChanged) this.settingChanged(category.category, setting.id, setting.value);
+        if (newSettings) {
+            for (let category of newSettings) {
+                const oldCategory = this.pluginConfig.find(c => c.category === category.category);
+                for (let setting of category.settings) {
+                    const oldSetting = oldCategory.settings.find(s => s.id === setting.id);
+                    if (oldSetting.value === setting.value) continue;
+                    oldSetting.value = setting.value;
+                    if (this.settingChanged) this.settingChanged(category.category, setting.id, setting.value);
+                }
             }
         }
 
@@ -68,25 +70,23 @@ export default class {
     start() {
         if (this.onStart) {
             const started = this.onStart();
-            if (started) {
-                return this.userConfig.enabled = true;
-            }
-            return false;
+            if (!started) return false;
         }
-        return this.userConfig.enabled = true; //Assume plugin started since it doesn't have onStart
+
+        this.userConfig.enabled = true;
+        this.saveSettings();
+        return true;
     }
 
     stop() {
         if (this.onStop) {
             const stopped = this.onStop();
-            if (stopped) {
-                this.userConfig.enabled = false;
-                return true;
-            }
-            return false;
+            if (!stopped) return false;
         }
+
         this.userConfig.enabled = false;
-        return true; //Assume plugin stopped since it doesn't have onStop
+        this.saveSettings();
+        return true;
     }
 
 }

@@ -9,45 +9,31 @@
 */
 
 <template>
-    <div class="bd-theme-card">
-        <div class="bd-theme-header">
-            <div class="bd-theme-icon" :style="{backgroundImage: theme.icon ? `url(${theme.icon})` : null}">
-                <MiExtension v-if="!theme.icon" :size="30" />
-            </div>
-            <span>{{theme.name}}</span>
-            <div class="bd-flex-spacer" />
-            <label class="bd-switch-wrapper" @click="() => { toggleTheme(theme); this.$forceUpdate(); }">
-                <input type="checkbox" class="bd-switch-checkbox" />
-                <div class="bd-switch" :class="{'bd-checked': theme.enabled}" />
-            </label>
-        </div>
-        <div class="bd-theme-body">
-            <div class="bd-theme-description">{{theme.description}}</div>
-            <div class="bd-theme-footer">
-                <div class="bd-theme-extra">v{{theme.version}} by {{theme.authors.join(', ').replace(/,(?!.*,)/gmi, ' and')}}</div>
-                <div class="bd-controls">
-                    <ButtonGroup>
-                        <Button v-tooltip="'Settings'" v-if="theme.hasSettings" :onClick="() => showSettings(theme)">
-                            <MiSettings size="18" />
-                        </Button>
-                        <Button v-tooltip="'Reload'" :onClick="() => reloadTheme(theme)">
-                            <MiRefresh size="18" />
-                        </Button>
-                        <Button v-tooltip="'Edit'" :onClick="editTheme">
-                            <MiPencil size="18" />
-                        </Button>
-                        <Button v-tooltip="'Uninstall'" type="err">
-                            <MiDelete size="18" />
-                        </Button>
-                    </ButtonGroup>
-                </div>
-            </div>
-        </div>
-    </div>
+    <Card :item="theme">
+        <label slot="toggle" class="bd-switch-wrapper" @click="() => { toggleTheme(theme); this.$forceUpdate(); }">
+            <input type="checkbox" class="bd-switch-checkbox" />
+            <div class="bd-switch" :class="{'bd-checked': theme.enabled}" />
+        </label>
+        <ButtonGroup slot="controls">
+            <Button v-tooltip="'Settings'" v-if="theme.hasSettings" :onClick="() => showSettings(theme)">
+                <MiSettings size="18" />
+            </Button>
+            <Button v-tooltip="'Reload'" :onClick="() => reloadTheme(theme)">
+                <MiRefresh size="18" />
+            </Button>
+            <Button v-tooltip="'Edit'" :onClick="editTheme">
+                <MiPencil size="18" />
+            </Button>
+            <Button v-tooltip="'Uninstall'" type="err">
+                <MiDelete size="18" />
+            </Button>
+        </ButtonGroup>
+    </Card>
 </template>
 <script>
     // Imports
     import { shell } from 'electron';
+    import Card from './Card.vue';
     import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension } from '../common';
 
     export default {
@@ -58,7 +44,7 @@
         },
         props: ['theme', 'toggleTheme', 'reloadTheme', 'showSettings'],
         components: {
-            Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
+            Card, Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
         },
         methods: {
             editTheme() {

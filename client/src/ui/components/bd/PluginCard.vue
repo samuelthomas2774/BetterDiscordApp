@@ -9,45 +9,31 @@
 */
 
 <template>
-    <div class="bd-plugin-card">
-        <div class="bd-plugin-header">
-            <div class="bd-plugin-icon" :style="{backgroundImage: plugin.icon ? `url(${plugin.icon})` : null}">
-                <MiExtension v-if="!plugin.icon" :size="30"/>
-            </div>
-            <span>{{plugin.name}}</span>
-            <div class="bd-flex-spacer" />
-            <label class="bd-switch-wrapper" @click="() => { togglePlugin(plugin); this.$forceUpdate(); }">
-                <input type="checkbox" class="bd-switch-checkbox" />
-                <div class="bd-switch" :class="{'bd-checked': plugin.enabled}" />
-            </label>
-        </div>
-        <div class="bd-plugin-body">
-            <div class="bd-plugin-description">{{plugin.description}}</div>
-            <div class="bd-plugin-footer">
-                <div class="bd-plugin-extra">v{{plugin.version}} by {{plugin.authors.join(', ').replace(/,(?!.*,)/gmi, ' and')}}</div>
-                <div class="bd-controls">
-                    <ButtonGroup>
-                        <Button v-tooltip="'Settings'" v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
-                            <MiSettings size="18"/>
-                        </Button>
-                        <Button v-tooltip="'Reload'" :onClick="() => reloadPlugin(plugin)">
-                            <MiRefresh size="18" />
-                        </Button>
-                        <Button v-tooltip="'Edit'" :onClick="editPlugin">
-                            <MiPencil size="18" />
-                        </Button>
-                        <Button v-tooltip="'Uninstall'" type="err">
-                            <MiDelete size="18" />
-                        </Button>
-                    </ButtonGroup>
-                </div>
-            </div>
-        </div>
-    </div>
+    <Card :item="plugin">
+        <label slot="toggle" class="bd-switch-wrapper" @click="() => { togglePlugin(plugin); this.$forceUpdate(); }">
+            <input type="checkbox" class="bd-switch-checkbox" />
+            <div class="bd-switch" :class="{'bd-checked': plugin.enabled}" />
+        </label>
+        <ButtonGroup slot="controls">
+            <Button v-tooltip="'Settings'" v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
+                <MiSettings size="18" />
+            </Button>
+            <Button v-tooltip="'Reload'" :onClick="() => reloadPlugin(plugin)">
+                <MiRefresh size="18" />
+            </Button>
+            <Button v-tooltip="'Edit'" :onClick="editPlugin">
+                <MiPencil size="18" />
+            </Button>
+            <Button v-tooltip="'Uninstall'" type="err">
+                <MiDelete size="18" />
+            </Button>
+        </ButtonGroup>
+    </Card>
 </template>
 <script>
     // Imports
     import { shell } from 'electron';
+    import Card from './Card.vue';
     import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension } from '../common';
 
     export default {
@@ -58,7 +44,7 @@
         },
         props: ['plugin', 'togglePlugin', 'reloadPlugin', 'showSettings'],
         components: {
-            Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
+            Card, Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
         },
         methods: {
             editPlugin() {

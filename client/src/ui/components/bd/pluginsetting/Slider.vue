@@ -14,11 +14,16 @@
             <h3>{{ setting.text }}</h3>
             <div class="bd-slider">
                 <div class="bd-slider-container">
+                    <div class="bd-slider-points">
+                        <div class="bd-slider-point" v-for="(label, point) in setting.points" :style="{left: `${getPointPosition(point) * 100}%`}">{{ label }}</div>
+                    </div>
                     <div class="bd-slider-bar">
-                        <div class="bd-slider-bar-filled" :style="{width: `${(((this.setting.value - (this.setting.min || 0)) / ((this.setting.max || 100) - (this.setting.min || 0))) * 100)}%`}"></div>
+                        <div class="bd-slider-bar-filled" :style="{width: `${getPointPosition() * 100}%`}"></div>
+                    </div>
+                    <div class="bd-slider-thumb-wrap">
+                        <div class="bd-slider-thumb" v-tooltip="{content: (setting.value || '0') + setting.unit, show: toolTip, trigger: 'manual'}" :style="{left: `${getPointPosition() * 100}%`}"></div>
                     </div>
                     <input type="range" :value="setting.value" :min="setting.min || 0" :max="setting.max || 100" :step="setting.step || 1" @keyup.stop @input="input" />
-                    <span class="bd-slider-thumb" v-tooltip="{content: setting.value || '0', show: toolTip, trigger: 'manual'}" :style="{left: `${(((this.setting.value - (this.setting.min || 0)) / ((this.setting.max || 100) - (this.setting.min || 0))) * 100)}%`}"></span>
                 </div>
             </div>
         </div>
@@ -39,6 +44,9 @@
                 let number = parseFloat(e.target.value);
                 if (Number.isNaN(number)) return;
                 this.change(this.setting.id, number);
+            },
+            getPointPosition(value) {
+                return ((value || this.setting.value) - (this.setting.min || 0)) / ((this.setting.max || 100) - (this.setting.min || 0));
             },
             showTooltip() {
                 this.toolTip = true;

@@ -19,6 +19,30 @@
     }
 }
 
+.bd-form-textarea {
+    .bd-form-textarea-wrap {
+        margin-top: 15px;
+        background: rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.3);
+        border-radius: 3px;
+        color: #b9bbbe;
+        overflow-y: scroll;
+        max-height: 140px;
+
+        &:focus {
+            color: #fff;
+            border-color: #040405;
+        }
+
+        @include scrollbar;
+    }
+
+    div[contenteditable] {
+        padding: 11px;
+        cursor: text;
+    }
+}
+
 .bd-number {
     position: relative;
 

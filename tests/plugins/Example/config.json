@@ -62,6 +62,13 @@
                     "hint": "Number Test Setting Hint"
                 },
                 {
+                    "id": "test-multiline-1",
+                    "type": "text",
+                    "multiline": true,
+                    "text": "Multiline Text Test Setting",
+                    "hint": "Multiline Text Test Setting Hint"
+                },
+                {
                     "id": "test-slider-1",
                     "type": "slider",
                     "value": 0,

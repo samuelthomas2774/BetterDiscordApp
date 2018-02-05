@@ -76,6 +76,8 @@
                         if (cat.settings.find(s => s.id === setting.id).value !== setting.value) {
                             changed = true;
                             setting.changed = true;
+                        } else {
+                            setting.changed = false;
                         }
                     }
                 }

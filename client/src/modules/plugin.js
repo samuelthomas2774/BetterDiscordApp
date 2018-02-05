@@ -19,7 +19,7 @@ export default class {
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
     }
-    
+
     get configs() { return this.__pluginInternals.configs }
     get info() { return this.__pluginInternals.info }
     get icon() { return this.info.icon }
@@ -44,7 +44,6 @@ export default class {
     }
 
     async saveSettings(newSettings) {
-        await this.sleep(2000); // Fake sleep to test loading
         for (let category of newSettings) {
             const oldCategory = this.pluginConfig.find(c => c.category === category.category);
             for (let setting of category.settings) {

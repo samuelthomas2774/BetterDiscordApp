@@ -62,6 +62,39 @@
                     "hint": "Number Test Setting Hint"
                 },
                 {
+                    "id": "test-multiline-1",
+                    "type": "text",
+                    "multiline": true,
+                    "text": "Multiline Text Test Setting",
+                    "hint": "Multiline Text Test Setting Hint"
+                },
+                {
+                    "id": "test-slider-1",
+                    "type": "slider",
+                    "value": 0,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "unit": "%",
+                    "text": "Slider Test Setting",
+                    "hint": "Slider Test Setting Hint"
+                },
+                {
+                    "id": "test-slider-2",
+                    "type": "slider",
+                    "value": 0,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "unit": "%",
+                    "points": {
+                        "0": "0%",
+                        "100": "100%"
+                    },
+                    "text": "Slider Test Setting",
+                    "hint": "Slider with two points."
+                },
+                {
                     "id": "default-3",
                     "type": "file",
                     "value": null,

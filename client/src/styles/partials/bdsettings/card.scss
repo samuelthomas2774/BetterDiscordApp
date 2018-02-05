@@ -1,4 +1,4 @@
-.bd-plugin-card {
+.bd-card {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -9,19 +9,33 @@
     color: #b9bbbe;
     margin-top: 10px;
 
-    .bd-plugin-header {
+    .bd-card-header {
         padding-bottom: 5px;
         display: flex;
         flex-grow: 0;
         font-weight: 700;
+        align-items: center;
+
+        .bd-card-icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        > span {
+            margin-left: 10px;
+        }
+
+        svg {
+            fill: #afb1b4;
+        }
     }
 
-    .bd-plugin-body {
+    .bd-card-body {
         display: flex;
         flex-grow: 1;
         flex-direction: column;
 
-        .bd-plugin-description {
+        .bd-card-description {
             flex-grow: 1;
             overflow-y: auto;
             max-height: 60px;
@@ -34,12 +48,12 @@
             margin-top: 5px;
         }
 
-        .bd-plugin-footer {
+        .bd-card-footer {
             display: flex;
             flex-grow: 1;
             align-items: flex-end;
 
-            .bd-plugin-extra {
+            .bd-card-extra {
                 color: rgba(255, 255, 255, 0.15);
                 font-size: 10px;
                 font-weight: 700;

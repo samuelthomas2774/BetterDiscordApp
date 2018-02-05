@@ -9,3 +9,5 @@ export { default as MiMinus } from './materialicons/Minus.vue';
 export { default as MiOpenInNew } from './materialicons/OpenInNew.vue';
 export { default as MiTwitterCircle } from './materialicons/TwitterCircle.vue';
 export { default as MiPlus } from './materialicons/Plus.vue';
+export { default as MiChevronDown } from './materialicons/ChevronDown.vue';
+export { default as MiExtension } from './materialicons/Extension.vue';

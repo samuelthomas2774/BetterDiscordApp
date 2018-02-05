@@ -1,0 +1,40 @@
+.bd-form-fileinput {
+    .bd-button.bd-button-primary {
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    .bd-selected-files {
+        margin: 15px 0;
+
+        .bd-selected-file {
+            margin: 10px 0;
+            color: #aaa;
+            font-size: 15px;
+            display: flex;
+
+            .bd-file-path {
+                flex: 1 1;
+            }
+
+            .bd-file-open,
+            .bd-file-remove {
+                flex: 0 0;
+                margin-left: 5px;
+
+                svg {
+                    width: 16px;
+                    height: 16px;
+                    cursor: pointer;
+                    fill: #ccc;
+
+                    &:hover {
+                        fill: #fff;
+                    }
+                }
+            }
+        }
+    }
+}

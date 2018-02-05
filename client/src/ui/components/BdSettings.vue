@@ -49,6 +49,9 @@
                 <div v-if="activeContent('plugins') || animatingContent('plugins')" :class="{active: activeContent('plugins'), animating: animatingContent('plugins')}">
                     <PluginsView />
                 </div>
+                <div v-if="activeContent('themes') || animatingContent('themes')" :class="{active: activeContent('themes'), animating: animatingContent('themes')}">
+                    <ThemesView />
+                </div>
             </ContentColumn>
         </SidebarView>
     </div>
@@ -58,7 +61,7 @@
     import { shell } from 'electron';
     import { Settings } from 'modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView } from './bd';
+    import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, ThemesView } from './bd';
     import { ClientIPC } from 'common';
     import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
 
@@ -93,7 +96,7 @@
         },
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView,
+            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, ThemesView,
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         methods: {

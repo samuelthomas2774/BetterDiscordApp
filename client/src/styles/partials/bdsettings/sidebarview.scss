@@ -128,4 +128,8 @@
 .bd-sidebar .bd-settings-button {
     position: absolute;
 	top: 0;
+
+    .platform-darwin & {
+        top: 22px;
+    }
 }

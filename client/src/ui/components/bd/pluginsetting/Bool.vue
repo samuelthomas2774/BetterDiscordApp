@@ -12,7 +12,7 @@
     <div class="bd-setting-switch">
         <div class="bd-title">
             <h3>{{setting.text}}</h3>
-            <label class="bd-switch-wrapper">
+            <label class="bd-switch-wrapper" @click="toggle">
                 <input type="checkbox" class="bd-switch-checkbox" />
                 <div class="bd-switch" :class="{'bd-checked': setting.value}" />
             </label>
@@ -22,6 +22,11 @@
 </template>
 <script>
     export default {
-        props: ['setting', 'change']
+        props: ['setting', 'change'],
+        methods: {
+            toggle() {
+                this.change(this.setting.id, !this.setting.value);
+            }
+        }
     }
 </script>

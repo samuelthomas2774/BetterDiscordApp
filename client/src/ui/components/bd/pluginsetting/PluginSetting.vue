@@ -16,6 +16,7 @@
         <RadioSetting v-if="setting.type === 'radio'" :setting="setting" :change="change"/>
         <StringSetting v-if="setting.type === 'text' && !setting.multiline" :setting="setting" :change="change"/>
         <MultilineTextSetting v-if="setting.type === 'text' && setting.multiline" :setting="setting" :change="change"/>
+        <SliderSetting v-if="setting.type === 'slider'" :setting="setting" :change="change"/>
         <FileSetting v-if="setting.type === 'file'" :setting="setting" :change="change"/>
         <div class="bd-form-divider"></div>
     </div>
@@ -28,6 +29,7 @@
     import RadioSetting from './Radio.vue';
     import StringSetting from './String.vue';
     import MultilineTextSetting from './Multiline.vue';
+    import SliderSetting from './Slider.vue';
     import FileSetting from './File.vue';
 
     export default {
@@ -43,6 +45,7 @@
             RadioSetting,
             StringSetting,
             MultilineTextSetting,
+            SliderSetting,
             FileSetting
         }
     }

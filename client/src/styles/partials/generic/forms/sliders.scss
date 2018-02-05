@@ -1,16 +1,78 @@
 .bd-slider {
-    height: 24px;
+    min-height: 24px;
+    min-width: 180px;
 
     .bd-slider-container {
-        margin-top: 8px;
-        border-radius: 8px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .bd-slider-points {
+        padding: 0 5px;
+
+        .bd-slider-point {
+            left: 0;
+            margin-left: -12px;
+            position: relative;
+            top: -6px;
+            width: 24px;
+
+            color: #72767d;
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: -26px;
+            text-align: center;
+
+            &::after {
+                content: "";
+                background-color: #4f545c;
+                height: 24px;
+                width: 2px;
+                position: relative;
+                display: block;
+                top: 4px;
+                margin-bottom: -22px;
+                margin-left: 11px;
+            }
+
+            + .bd-slider-point {
+                top: -14px;
+            }
+        }
+    }
+
+    .bd-slider-bar {
+        background-color: #4f545c;
+        height: 8px;
+        border-radius: 4px;
+        padding: 0 5px;
+        overflow: hidden;
+
+        &::before {
+            content: "";
+            background-color: $colbdblue;
+            height: 8px;
+            width: 5px;
+            display: block;
+            margin-left: -5px;
+        }
+
+        .bd-slider-bar-filled {
+            background-color: $colbdblue;
+            height: 8px;
+            width: 100%;
+            margin-top: -8px;
+        }
+    }
+
+    .bd-slider-thumb-wrap {
+        margin: -16px 0;
+        padding: 0 5px;
 
         .bd-slider-thumb {
             width: 10px;
             height: 24px;
-            display: block;
             position: relative;
-            bottom: 16px;
             pointer-events: none;
             background: #FFF;
             border: 1px solid #dcddde;
@@ -21,27 +83,14 @@
         }
     }
 
-    .bd-slider-bar {
-        background-color: #4f545c;
-        height: 8px;
-        border-radius: 4px;
-
-        .bd-slider-bar-filled {
-            background-color: $colbdblue;
-            height: 8px;
-            border-radius: 4px 0 0 4px;
-            width: 100%;
-        }
-    }
-
     input {
         border-radius: 4px;
         display: block;
-        height: 8px;
+        height: 24px;
         background-color: transparent;
         outline: none;
-        width: 180px;
-        margin: -8px 0 0;
+        width: 100%;
+        margin: -24px 0 0;
         -webkit-appearance: none;
         appearance: none;
 
@@ -53,11 +102,10 @@
             border-radius: 3px;
             cursor: ew-resize;
             height: 24px;
-            left: 0;
-            top: 50%;
             width: 10px;
             background: transparent;
             box-sizing: border-box;
+            position: relative;
         }
     }
 }

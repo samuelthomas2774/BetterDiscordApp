@@ -9,15 +9,16 @@
 */
 
 <template>
-    <div class="bd-form-slider">
+    <div class="bd-form-slider" @mouseenter="showTooltip" @mouseleave="hideTooltip">
         <div class="bd-title">
             <h3>{{ setting.text }}</h3>
             <div class="bd-slider">
                 <div class="bd-slider-container">
                     <div class="bd-slider-bar">
-                        <div class="bd-slider-bar-filled" :style="'width: ' + (((this.setting.value - (this.setting.min || 0)) / ((this.setting.max || 100) - (this.setting.min || 0))) * 100) + '%;'"></div>
+                        <div class="bd-slider-bar-filled" :style="{width: `${(((this.setting.value - (this.setting.min || 0)) / ((this.setting.max || 100) - (this.setting.min || 0))) * 100)}%`}"></div>
                     </div>
                     <input type="range" :value="setting.value" :min="setting.min || 0" :max="setting.max || 100" :step="setting.step || 1" @keyup.stop @input="input" />
+                    <span class="bd-slider-thumb" v-tooltip="{content: setting.value || '0', show: toolTip, trigger: 'manual'}" :style="{left: `${(((this.setting.value - (this.setting.min || 0)) / ((this.setting.max || 100) - (this.setting.min || 0))) * 100)}%`}"></span>
                 </div>
             </div>
         </div>
@@ -29,15 +30,21 @@
         props: ['setting', 'change'],
         data() {
             return {
-                fillpercentage: 0
+                fillpercentage: 0,
+                toolTip: false
             };
         },
         methods: {
             input(e) {
                 let number = parseFloat(e.target.value);
                 if (Number.isNaN(number)) return;
-
                 this.change(this.setting.id, number);
+            },
+            showTooltip() {
+                this.toolTip = true;
+            },
+            hideTooltip() {
+                this.toolTip = false;
             }
         }
     }

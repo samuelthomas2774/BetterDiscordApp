@@ -38,10 +38,12 @@ class Theme {
     get id() { return this.name.toLowerCase().replace(/\s+/g, '-') }
 
     enable() {
+        this.userConfig.enabled = true;
         DOM.injectTheme(this.css, this.id);
     }
 
     disable() {
+        this.userConfig.enabled = false;
         DOM.deleteTheme(this.id);
     }
 
@@ -70,6 +72,23 @@ export default class extends ContentManager {
         } catch (err) {
             throw err;
         }
+    }
+
+
+    static async loadPlugin(paths, configs, info, main) {
+        const plugin = window.require(paths.mainPath)(Plugin, {}, {});
+        const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName } });
+
+        if (instance.enabled) instance.start();
+        return instance;
+    }
+
+    static enableTheme(theme) {
+        theme.enable();
+    }
+
+    static disableTheme(theme) {
+        theme.disable();
     }
 
 }

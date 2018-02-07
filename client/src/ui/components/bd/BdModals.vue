@@ -19,7 +19,9 @@
                    :class="[{'bd-err': modal.type && modal.type === 'err'}, {'bd-modal-out': modal.closing}]">
                     <MiError v-if="modal.type === 'err'" slot="icon" size="20"/>
                 <div slot="body">
-                    {{modal.text}}
+                    <div v-for="(content, index) in modal.content">
+                        <ErrorModal v-if="content._type === 'err'" :content="content" :hideStack="hideStack" :showStack="showStack"/>
+                    </div>
                 </div>
                 <div slot="footer" class="bd-modal-controls">
                     <span class="bd-modal-tip">Ctrl+Shift+I for more details</span>
@@ -36,6 +38,7 @@
     import { Events } from 'modules';
     import { Modal } from '../common';
     import { MiError } from '../common/MaterialIcon';
+    import ErrorModal from '../common/ErrorModal.vue';
 
     export default {
         data() {
@@ -44,12 +47,13 @@
             }
         },
         components: {
-            Modal, MiError
+            Modal, MiError, ErrorModal
         },
         beforeMount() {
             Events.on('bd-error', e => {
                 e.closing = false;
                 this.modals.push(e);
+                console.log(this.modals);
             });
         },
         methods: {
@@ -58,6 +62,12 @@
                 setTimeout(() => {
                     this.modals.splice(index, 1);
                 }, 200);
+            },
+            showStack(error) {
+                error.showStack = true;
+            },
+            hideStack(error) {
+                error.showStack = false;
             }
         }
     }

@@ -19,6 +19,10 @@ export default class extends ContentManager {
         return this.localContent;
     }
 
+    static get contentType() {
+        return 'plugin';
+    }
+
     static get moduleName() {
         return 'PluginManager';
     }

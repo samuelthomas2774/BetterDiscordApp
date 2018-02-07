@@ -12,6 +12,7 @@ export class Error {
 
     constructor(args) {
         this.args = args;
+        this.showStack = false; // For error modal
     }
 
     get module() {
@@ -24,6 +25,14 @@ export class Error {
 
     get err() {
         return this.args.err;
+    }
+
+    get stackTrace() {
+        return this.err.stack;
+    }
+
+    get _type() {
+        return 'err';
     }
 
 }

@@ -12,6 +12,7 @@
     <div :class="['bd-modal', {'bd-modal-scrolled': scrolled}]">
         <div class="bd-modal-inner">
             <div class="bd-modal-header">
+                <slot name="icon"/>
                 <span class="bd-modal-headertext">{{headerText}}</span>
                 <div class="bd-modal-x" @click="close">
                     <MiClose size="18"/>

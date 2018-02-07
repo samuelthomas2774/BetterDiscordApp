@@ -10,21 +10,6 @@
 
 import DiscordEvent from './discordevent';
 
-export class TYPING_START extends DiscordEvent {
-    get channelId() { return this.args.channelId }
-    get userId() { return this.args.userId }
-}
-
-export class PRESENCE_UPDATE extends DiscordEvent {
-    get game() { return this.args.game }
-    get guildId() { return this.args.guildId }
-    get nick() { return this.args.nick }
-    get roles() { return this.args.roles }
-    get status() { return this.args.status }
-    get user() { return this.args.user }
-    get lastModified() { return this.args.lastModified }
-}
-
 export class VOICE_STATE_UPDATE extends DiscordEvent {
     get channelId() { return this.args.channelId }
     get deaf() { return this.args.deaf }
@@ -38,12 +23,4 @@ export class VOICE_STATE_UPDATE extends DiscordEvent {
     get userId() { return this.args.userId }
 }
 
-// Doesn't have everything
-export class USER_SETTINGS_UPDATE extends DiscordEvent {
-    get status() { return this.args.status }
-    get messageDisplayCompact() { return this.args.messageDisplayCompact }
-    get theme() { return this.args.theme }
-}
-
-export class USER_GUILD_SETTINGS_UPDATE extends DiscordEvent { }
 export class ACTIVITY_START extends DiscordEvent {}

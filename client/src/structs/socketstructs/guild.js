@@ -52,9 +52,12 @@ export class GUILD_SYNC extends DiscordEvent {
 
 export class GUILD_MEMBERS_CHUNK extends DiscordEvent {}
 
-export class GUILD_BAN_ADD extends DiscordEvent {}
+export class GUILD_BAN_ADD extends DiscordEvent {
+    get guildId() { return this.args.guildId }
+    get user() { return this.args.suer }
+}
 
-export class GUILD_BAN_REMOVE extends DiscordEvent {}
+export class GUILD_BAN_REMOVE extends GUILD_BAN_ADD {}
 
 export class GUILD_MEMBER_ADD extends DiscordEvent {
     get guildId() { return this.args.guildId }
@@ -65,19 +68,33 @@ export class GUILD_MEMBER_ADD extends DiscordEvent {
     get user() { return this.args.user }
 }
 
-export class GUILD_MEMBER_UPDATE extends DiscordEvent {}
+export class GUILD_MEMBER_UPDATE extends DiscordEvent {
+    get guildId() { return this.args.guildId }
+    get nick() { return this.args.nick }
+    get roles() { return this.args.roles }
+    get user() { return this.args.user }
+}
 
 export class GUILD_MEMBER_REMOVE extends DiscordEvent {
     get guildId() { return this.args.guildId }
     get user() { return this.args.user }
 }
 
-export class GUILD_ROLE_CREATE extends DiscordEvent {}
+export class GUILD_ROLE_CREATE extends DiscordEvent {
+    get guildId() { return this.args.guildId }
+    get role() { return this.args.role }
+}
 
-export class GUILD_ROLE_UPDATE extends DiscordEvent {}
+export class GUILD_ROLE_UPDATE extends GUILD_ROLE_CREATE {}
 
-export class GUILD_ROLE_DELETE extends DiscordEvent {}
+export class GUILD_ROLE_DELETE extends DiscordEvent {
+    get guildId() { return this.args.guildId }
+    get roleId() { return this.args.roleId }
+}
 
-export class GUILD_EMOJIS_UPDATE extends DiscordEvent {}
+export class GUILD_EMOJIS_UPDATE extends DiscordEvent {
+    get guildId() { return this.args.guildId }
+    get emojis() { return this.args.emojis }
+}
 
 export class GUILD_INTEGRATIONS_UPDATE extends DiscordEvent {}

@@ -16,6 +16,7 @@ import { ClientLogger as Logger } from 'common';
 class BetterDiscord {
 
     constructor() {
+        window.css = CssEditor;
         window.pm = PluginManager;
         window.events = Events;
         window.wpm = WebpackModules;

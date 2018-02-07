@@ -12,8 +12,13 @@ import Globals from './globals';
 import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import { Events } from 'modules';
+import { Error } from 'structs';
 
 export default class {
+
+    static get errors() {
+        return this._errors || (this._errors = []);
+    }
 
     static get localContent() {
         return this._localContent ? this._localContent : (this._localContent = []);
@@ -32,15 +37,25 @@ export default class {
                 try {
                     await this.preloadContent(dir);
                 } catch (err) {
-                    //We don't want every plugin/theme to fail loading when one does
-                    Events.emit('bd-error', {
-                        header: `${this.moduleName} - Failed to load plugin: ${dir}`,
-                        text: err.message,
-                        type: 'err'
-                    });
+                    this.errors.push(new Error({
+                        module: this.moduleName,
+                        message: `Failed to load ${dir}`,
+                        err
+                    }));
+                    
                     Logger.err(this.moduleName, err);
                 }
             }
+
+            if (this.errors.length) {
+                Events.emit('bd-error', {
+                    header: `${this.moduleName} - one or more ${this.contentType}(s) failed to load`,
+                    module: this.moduleName,
+                    type: 'err',
+                    content: this.errors
+                });
+            }
+            this._errors = [];
 
             return this.localContent;
         } catch (err) {

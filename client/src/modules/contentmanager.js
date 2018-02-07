@@ -12,6 +12,7 @@ import Globals from './globals';
 import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import { Events } from 'modules';
+import { Error } from 'structs';
 
 export default class {
 
@@ -33,11 +34,11 @@ export default class {
                     await this.preloadContent(dir);
                 } catch (err) {
                     //We don't want every plugin/theme to fail loading when one does
-                    Events.emit('bd-error', {
+                    /*Events.emit('bd-error', {
                         header: `${this.moduleName} - Failed to load plugin: ${dir}`,
                         text: err.message,
                         type: 'err'
-                    });
+                    });*/
                     Logger.err(this.moduleName, err);
                 }
             }

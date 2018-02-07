@@ -231,7 +231,7 @@
         transform: scaleY(1) translateY(0%);
         margin-top: 0%;
         opacity: 1;
-
+        user-select: all;
         span {
             font-weight: 700;
         }

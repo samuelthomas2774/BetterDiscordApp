@@ -1,7 +1,8 @@
 <template>
     <div class="bd-modals-container">
         <div v-for="(modal, index) in modals" :key="`bd-modal-${index}`">
-            <div class="bd-backdrop" @click="closeModal(index)"></div>
+            <div v-if="index === 0" class="bd-backdrop" @click="closeModal(index)"></div>
+            <div v-else :style="{opacity: 0}" class="bd-backdrop" @click="closeModal(index)"></div>
             <Modal :headerText="modal.header" 
                    :close="() => closeModal(index)" 
                    :class="[{'bd-err': modal.type && modal.type === 'err'}, {'bd-modal-out': modal.closing}]">

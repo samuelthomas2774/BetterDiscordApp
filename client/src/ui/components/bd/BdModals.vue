@@ -6,7 +6,16 @@
             <Modal :headerText="modal.header" 
                    :close="() => closeModal(index)" 
                    :class="[{'bd-err': modal.type && modal.type === 'err'}, {'bd-modal-out': modal.closing}]">
-                    <MiError v-if="modal.type === 'err'" slot="icon"/>
+                    <MiError v-if="modal.type === 'err'" slot="icon" size="20"/>
+                <div slot="body">
+                    {{modal.text}}
+                </div>
+                <div slot="footer" class="bd-modal-controls">
+                    <span class="bd-modal-tip">Ctrl+Shift+I for more details</span>
+                    <div class="bd-button bd-ok" @click="closeModal(index)">
+                        OK
+                    </div>
+                </div>
             </Modal>
         </div>
     </div>

@@ -15,14 +15,23 @@ export class CHANNEL_PINS_UPDATE extends DiscordEvent {
     get lastPinTimestamp() { return this.args.lastPinTimestamp }
 }
 
-// TODO
-export class CHANNEL_CREATE extends DiscordEvent {}
-
-export class CHANNEL_DELETE extends DiscordEvent {}
-
-export class CHANNEL_UPDATE extends DiscordEvent {}
-
 export class CHANNEL_PINS_ACK {
     get channelId() { return this.args.channelId }
     get timestamp() { return this.args.timestamp }
 }
+
+export class CHANNEL_CREATE extends DiscordEvent {
+    get guildId() { return this.args.guildId }
+    get id() { return this.args.id }
+    get lastMessageId() { return this.args.lastMessageId }
+    get name() { return this.args.name }
+    get nsfw() { return this.args.nsfw }
+    get parentId() { return this.args.parentId }
+    get permissionOverwrites() { return this.args.permissionOverwrites }
+    get position() { return this.args.position }
+    get topic() { return this.args.topic }
+    get type() { return this.args.type }
+}
+
+export class CHANNEL_UPDATE extends CHANNEL_CREATE { }
+export class CHANNEL_DELETE extends CHANNEL_CREATE {}

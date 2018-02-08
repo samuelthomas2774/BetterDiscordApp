@@ -11,11 +11,16 @@
 import ContentManager from './contentmanager';
 import Plugin from './plugin';
 import { ClientLogger as Logger } from 'common';
+import { Events } from 'modules';
 
 export default class extends ContentManager {
 
     static get localPlugins() {
         return this.localContent;
+    }
+
+    static get contentType() {
+        return 'plugin';
     }
 
     static get moduleName() {

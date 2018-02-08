@@ -13,8 +13,8 @@ import { Utils } from 'common';
 import Events from './events';
 
 import {
-     MESSAGE_CREATE
-    } from '../structs/socketstructs';
+    MESSAGE_CREATE
+} from '../structs/socketstructs';
 
 
 export default class extends EventListener {
@@ -30,7 +30,7 @@ export default class extends EventListener {
     }
 
     hook() {
- 
+
     }
 
     get eventsModule() {
@@ -38,7 +38,7 @@ export default class extends EventListener {
     }
 
     emit(e, action, data) {
-        switch(e) {
+        switch (e) {
             case 'dispatch':
                 return this.dispatch(action, data);
         }
@@ -139,5 +139,5 @@ export default class extends EventListener {
             BRAINTREE_POPUP_BRIDGE_CALLBACK: 'BRAINTREE_POPUP_BRIDGE_CALLBACK' // What
         }
     }
-    
+
 }

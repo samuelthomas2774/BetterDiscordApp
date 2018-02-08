@@ -9,6 +9,10 @@
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 2px 0 rgba(0, 0, 0, 0.06);
     opacity: 1;
 
+    .platform-darwin & {
+        top: 27px;
+    }
+
     .bd-settings-button-btn {
         background-image: $logoSmallBw;
         background-size: 50% 50%;

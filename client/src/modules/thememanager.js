@@ -96,6 +96,7 @@ export default class extends ContentManager {
         try {
             const css = await FileUtils.readFile(paths.mainPath);
             const instance = new Theme({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName }, css });
+            if (instance.enabled) instance.enable();
             return instance;
         } catch (err) {
             throw err;

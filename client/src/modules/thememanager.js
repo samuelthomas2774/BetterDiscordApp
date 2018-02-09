@@ -16,6 +16,8 @@ class Theme {
 
     constructor(themeInternals) {
         this.__themeInternals = themeInternals;
+        this.hasSettings = this.themeConfig && this.themeConfig.length > 0;
+        this.saveSettings = this.saveSettings.bind(this);
         this.enable = this.enable.bind(this);
         this.disable = this.disable.bind(this);
     }
@@ -37,13 +39,39 @@ class Theme {
     get css() { return this.__themeInternals.css }
     get id() { return this.name.toLowerCase().replace(/\s+/g, '-') }
 
+    async saveSettings(newSettings) {
+        if (newSettings) {
+            for (let category of newSettings) {
+                const oldCategory = this.themeConfig.find(c => c.category === category.category);
+                for (let setting of category.settings) {
+                    const oldSetting = oldCategory.settings.find(s => s.id === setting.id);
+                    if (oldSetting.value === setting.value) continue;
+                    oldSetting.value = setting.value;
+                    if (this.settingChanged) this.settingChanged(category.category, setting.id, setting.value);
+                }
+            }
+        }
+
+        try {
+            await FileUtils.writeFile(`${this.themePath}/user.config.json`, JSON.stringify({ enabled: this.enabled, config: this.themeConfig }));
+        } catch (err) {
+            throw err;
+        }
+
+        if (this.settingsChanged) this.settingsChanged(this.themeConfig);
+
+        return this.pluginConfig;
+    }
+
     enable() {
         this.userConfig.enabled = true;
+        this.saveSettings();
         DOM.injectTheme(this.css, this.id);
     }
 
     disable() {
         this.userConfig.enabled = false;
+        this.saveSettings();
         DOM.deleteTheme(this.id);
     }
 
@@ -68,19 +96,11 @@ export default class extends ContentManager {
         try {
             const css = await FileUtils.readFile(paths.mainPath);
             const instance = new Theme({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName }, css });
+            if (instance.enabled) instance.enable();
             return instance;
         } catch (err) {
             throw err;
         }
-    }
-
-
-    static async loadPlugin(paths, configs, info, main) {
-        const plugin = window.require(paths.mainPath)(Plugin, {}, {});
-        const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName } });
-
-        if (instance.enabled) instance.start();
-        return instance;
     }
 
     static enableTheme(theme) {

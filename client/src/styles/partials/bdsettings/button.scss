@@ -13,6 +13,10 @@
         top: 27px;
     }
 
+	.platform-linux & {
+		top: 0;
+	}
+
     .bd-settings-button-btn {
         background-image: $logoSmallBw;
         background-size: 50% 50%;

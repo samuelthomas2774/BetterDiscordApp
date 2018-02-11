@@ -1,5 +1,7 @@
+@import 'vars.scss';
+
 div {
-    background: red;
+    background: $divBg;
 }
 
 span {

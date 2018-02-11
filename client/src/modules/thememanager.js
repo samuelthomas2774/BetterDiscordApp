@@ -10,7 +10,7 @@
 
 import ContentManager from './contentmanager';
 import { DOM } from 'ui';
-import { FileUtils } from 'common';
+import { FileUtils, ClientIPC } from 'common';
 
 class Theme {
 
@@ -94,7 +94,12 @@ export default class extends ContentManager {
     static get loadContent() { return this.loadTheme }
     static async loadTheme(paths, configs, info, main) {
         try {
-            const css = await FileUtils.readFile(paths.mainPath);
+            let css = '';
+            if (info.type === 'sass') {
+                css = await ClientIPC.send('bd-compileSass', { path: paths.mainPath });
+            } else {
+                css = await FileUtils.readFile(paths.mainPath);
+            }
             const instance = new Theme({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName }, css });
             if (instance.enabled) instance.enable();
             return instance;

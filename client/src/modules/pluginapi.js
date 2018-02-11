@@ -9,6 +9,7 @@
 */
 
 import { ClientLogger as Logger } from 'common';
+import Events from './events';
 
 export default class PluginApi {
 
@@ -31,10 +32,35 @@ export default class PluginApi {
         };
     }
 
+    get eventSubs() {
+        return this._eventSubs || (this._eventSubs = []);
+    }
 
+    eventSubscribe(event, callback) {
+        if (this.eventSubs.find(e => e.event === event)) return;
+        this.eventSubs.push({
+            event,
+            callback
+        });
+        Events.on(event, callback);
+    }
+    eventUnsubscribe(event) {
+        const index = this.eventSubs.findIndex(e => e.event === event);
+        if (index < 0) return;
+        Events.off(event, this.eventSubs[0].callback);
+        this.eventSubs.splice(index, 1);
+    }
+    eventUnsubscribeAll() {
+        this.eventSubs.forEach(event => {
+            Events.off(event.event, event.callback);
+        });
+        this._eventSubs = [];
+    }
     get Events() {
         return {
-            
+            subscribe: this.eventSubscribe.bind(this),
+            unsubscribe: this.eventUnsubscribe.bind(this),
+            unsubscribeAll: this.eventUnsubscribeAll.bind(this)
         }
     }
     

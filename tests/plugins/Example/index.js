@@ -2,22 +2,22 @@ module.exports = (Plugin, Api, Vendor) => {
 
     const { $, moment, _ } = Vendor;
     const { Events, Logger } = Api;
-
-    const test = 'Testing';
-
     return class extends Plugin {
-        test() {
-            return test;
-        }
 
         onStart() {
+            Events.subscribe('TEST_EVENT', this.eventTest);
             Logger.log('onStart');
             return true;
         }
 
         onStop() {
+            Events.unsubscribeAll();
             Logger.log('onStop');
             return true;
+        }
+
+        eventTest(e) {
+            Logger.log(e);
         }
     }
 

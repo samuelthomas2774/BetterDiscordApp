@@ -92,7 +92,7 @@ class Theme {
         if (this.info.type === 'sass') {
             css = await ClientIPC.send('bd-compileSass', {
                 scss: ThemeManager.getConfigAsSCSS(this.themeConfig),
-                path: this.paths.mainPath
+                path: this.paths.mainPath.replace(/\\/g, '/')
             });
             console.log(css);
         } else {

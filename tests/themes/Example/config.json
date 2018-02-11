@@ -21,6 +21,18 @@
                     "scss_raw": true
                 },
                 {
+                    "id": "spanOpacity",
+                    "type": "slider",
+                    "value": 50,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1, 
+                    "unit": "%",
+                    "multi": "0.01",
+                    "text": "Span border opacity",
+                    "hint":  "test" 
+                },
+                {
                     "id": "default-0",
                     "type": "text",
                     "value": null,

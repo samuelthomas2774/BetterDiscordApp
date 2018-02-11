@@ -157,6 +157,10 @@ export default class ThemeManager extends ContentManager {
         theme.disable();
     }
 
+    static reloadTheme(theme) {
+        theme.recompile();
+    }
+
     static getConfigAsSCSS(config) {
         const variables = [];
 

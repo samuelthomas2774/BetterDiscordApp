@@ -1,7 +1,7 @@
 module.exports = (Plugin, Api, Vendor) => {
 
-    const { $, moment } = Vendor;
-    const { Events } = Api;
+    const { $, moment, _ } = Vendor;
+    const { Events, Logger } = Api;
 
     const test = 'Testing';
 
@@ -11,12 +11,12 @@ module.exports = (Plugin, Api, Vendor) => {
         }
 
         onStart() {
-            console.log('Example Plugin 1 onStart');
+            Logger.log('onStart');
             return true;
         }
 
         onStop() {
-            console.log('Example Plugin 1 onStop');
+            Logger.log('onStop');
             return true;
         }
     }

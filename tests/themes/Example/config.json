@@ -21,6 +21,25 @@
                     "scss_raw": true
                 },
                 {
+                    "id": "spanOpacity",
+                    "type": "slider",
+                    "value": 50,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "unit": "%",
+                    "multi": "0.01",
+                    "text": "Span border opacity",
+                    "hint": "test"
+                },
+                {
+                    "id": "avatar",
+                    "type": "text",
+                    "value": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+                    "text": "Avatar replace",
+                    "hint": "Replace all avatars" 
+                },
+                {
                     "id": "default-0",
                     "type": "text",
                     "value": null,

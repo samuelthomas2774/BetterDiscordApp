@@ -170,10 +170,15 @@ export default class ThemeManager extends ContentManager {
                 let scss_value = null;
                 let scss_line = null;
 
-                if (typeof setting.value == 'string')
-                    scss_value = setting.scss_raw ? setting.value : '\'' + setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') + '\'';
-                else if (typeof setting.value === 'boolean' || typeof setting.value === 'number')
+                if (typeof setting.value == 'string') {
+                    scss_value = setting.scss_raw
+                        ? setting.value
+                        : '\'' + setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') + '\'';
+                } else if (setting.type === 'slider') {
+                    scss_value = setting.value * setting.multi || 1;
+                } else if (typeof setting.value === 'boolean' || typeof setting.value === 'number') {
                     scss_value = setting.value.toString();
+                }
 
                 scss_name = setting.id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
 

@@ -39,32 +39,43 @@ export default class {
         return this.userConfig.config.find(setting => setting.id === settingId);
     }
 
-    async sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     async saveSettings(newSettings) {
-        if (newSettings) {
-            for (let category of newSettings) {
-                const oldCategory = this.pluginConfig.find(c => c.category === category.category);
-                for (let setting of category.settings) {
-                    const oldSetting = oldCategory.settings.find(s => s.id === setting.id);
-                    if (oldSetting.value === setting.value) continue;
-                    oldSetting.value = setting.value;
-                    if (this.settingChanged) this.settingChanged(category.category, setting.id, setting.value);
-                }
+        for (let category of newSettings) {
+            const oldCategory = this.pluginConfig.find(c => c.category === category.category);
+            for (let setting of category.settings) {
+                const oldSetting = oldCategory.settings.find(s => s.id === setting.id);
+                if (oldSetting.value === setting.value) continue;
+                oldSetting.value = setting.value;
+                if (this.settingChanged) this.settingChanged(category.category, setting.id, setting.value);
             }
         }
 
-        try {
-            await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({ enabled: this.enabled, config: this.pluginConfig }));
-        } catch (err) {
-            throw err;
-        }
+        this.saveConfiguration();
 
         if (this.settingsChanged) this.settingsChanged(this.pluginConfig);
 
         return this.pluginConfig;
+    }
+
+    async saveConfiguration() {
+        try {
+            await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({
+                enabled: this.enabled,
+                config: this.pluginConfig.map(category => {
+                    return {
+                        category: category.category,
+                        settings: category.settings.map(setting => {
+                            return {
+                                id: setting.id,
+                                value: setting.value
+                            };
+                        })
+                    };
+                })
+            }));
+        } catch (err) {
+            throw err;
+        }
     }
 
     start() {
@@ -73,8 +84,11 @@ export default class {
             if (!started) return false;
         }
 
-        this.userConfig.enabled = true;
-        this.saveSettings();
+        if (!this.enabled) {
+            this.userConfig.enabled = true;
+            this.saveConfiguration();
+        }
+
         return true;
     }
 
@@ -85,7 +99,7 @@ export default class {
         }
 
         this.userConfig.enabled = false;
-        this.saveSettings();
+        this.saveConfiguration();
         return true;
     }
 

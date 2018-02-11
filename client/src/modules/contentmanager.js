@@ -42,7 +42,7 @@ export default class {
                         message: `Failed to load ${dir}`,
                         err
                     }));
-                    
+
                     Logger.err(this.moduleName, err);
                 }
             }
@@ -134,6 +134,7 @@ export default class {
                     });
                     return config;
                 });
+                userConfig.css = readUserConfig.css || null;
                 // userConfig.config = readUserConfig.config;
             } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
 

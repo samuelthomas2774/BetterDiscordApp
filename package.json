@@ -33,6 +33,7 @@
     "gulp-watch": "^5.0.0",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
+    "node-gyp": "^3.6.2",
     "node-sass": "^4.7.2",
     "pump": "^2.0.0",
     "sass-loader": "^6.0.6",
@@ -49,6 +50,7 @@
     "watch_client": "npm run watch --prefix client",
     "watch_core": "npm run watch --prefix core",
     "lint": "eslint -f unix client/src core/src csseditor/src",
-    "test": "npm run build && npm run lint"
+    "test": "npm run build && npm run lint",
+    "build_node-sass": "node scripts/build-node-sass.js"
   }
 }

@@ -10,6 +10,8 @@
 
 import ContentManager from './contentmanager';
 import Plugin from './plugin';
+import PluginApi from './pluginapi';
+import Vendor from './vendor';
 import { ClientLogger as Logger } from 'common';
 import { Events } from 'modules';
 
@@ -36,7 +38,7 @@ export default class extends ContentManager {
 
     static get loadContent() { return this.loadPlugin }
     static async loadPlugin(paths, configs, info, main) {
-        const plugin = window.require(paths.mainPath)(Plugin, {}, {});
+        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor);
         const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName } });
 
         if (instance.enabled) instance.start();

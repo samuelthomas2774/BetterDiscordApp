@@ -9,6 +9,7 @@
 */
 
 const path = require('path');
+const sass = require('node-sass');
 
 /**
  * DEVELOPMENT VARIABLES
@@ -60,6 +61,20 @@ class Comms {
         BDIpc.on('bd-native-open', o => {
             dialog.showOpenDialog(BrowserWindow.fromWebContents(o.ipcEvent.sender), o.args, filenames => {
                 o.reply(filenames);
+            });
+        });
+
+        BDIpc.on('bd-compileSass', o => {
+            const { scss, path } = o.args;
+            if (!scss && !path) return;
+            const data = scss ? `${scss} @import '${path}';` : `@import '${path}';`;
+
+            sass.render({ data }, (err, result) => {
+                if (err) {
+                    o.reply({ err });
+                    return;
+                }
+                o.reply(result.css.toString());
             });
         });
     }

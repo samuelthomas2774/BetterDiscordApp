@@ -1,0 +1,9 @@
+@import 'vars.scss';
+
+div {
+    background: $divBg;
+}
+
+span {
+    border: 1px solid rgba(20, 20, 20, $spanOpacity);
+}

@@ -11,11 +11,12 @@
 import { DOM, BdUI } from 'ui';
 import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, PluginManager, ThemeManager, ModuleManager, WebpackModules } from 'modules';
-import { ClientLogger as Logger } from 'common';
+import { ClientLogger as Logger, ClientIPC } from 'common';
 
 class BetterDiscord {
 
     constructor() {
+        window.ClientIPC = ClientIPC;
         window.css = CssEditor;
         window.pm = PluginManager;
         window.events = Events;

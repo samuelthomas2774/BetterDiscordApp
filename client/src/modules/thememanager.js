@@ -36,48 +36,87 @@ class Theme {
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
     get themeConfig() { return this.userConfig.config }
-    get css() { return this.__themeInternals.css }
+    get css() { return this.userConfig.css }
     get id() { return this.name.toLowerCase().replace(/\s+/g, '-') }
 
     async saveSettings(newSettings) {
-        if (newSettings) {
-            for (let category of newSettings) {
-                const oldCategory = this.themeConfig.find(c => c.category === category.category);
-                for (let setting of category.settings) {
-                    const oldSetting = oldCategory.settings.find(s => s.id === setting.id);
-                    if (oldSetting.value === setting.value) continue;
-                    oldSetting.value = setting.value;
-                    if (this.settingChanged) this.settingChanged(category.category, setting.id, setting.value);
-                }
+        for (let category of newSettings) {
+            const oldCategory = this.themeConfig.find(c => c.category === category.category);
+            for (let setting of category.settings) {
+                const oldSetting = oldCategory.settings.find(s => s.id === setting.id);
+                if (oldSetting.value === setting.value) continue;
+                oldSetting.value = setting.value;
+                if (this.settingChanged) this.settingChanged(category.category, setting.id, setting.value);
             }
         }
 
-        try {
-            await FileUtils.writeFile(`${this.themePath}/user.config.json`, JSON.stringify({ enabled: this.enabled, config: this.themeConfig }));
-        } catch (err) {
-            throw err;
-        }
+        // As the theme's configuration has changed it needs recompiling
+        // When the compiled CSS has been save it will also save the configuration
+        await this.recompile();
 
         if (this.settingsChanged) this.settingsChanged(this.themeConfig);
 
         return this.pluginConfig;
     }
 
+    async saveConfiguration() {
+        try {
+            await FileUtils.writeFile(`${this.themePath}/user.config.json`, JSON.stringify({
+                enabled: this.enabled,
+                config: this.themeConfig,
+                css: this.css
+            }));
+        } catch (err) {
+            throw err;
+        }
+    }
+
     enable() {
-        this.userConfig.enabled = true;
-        this.saveSettings();
+        if (!this.enabled) {
+            this.userConfig.enabled = true;
+            this.saveConfiguration();
+        }
         DOM.injectTheme(this.css, this.id);
     }
 
     disable() {
         this.userConfig.enabled = false;
-        this.saveSettings();
+        this.saveConfiguration();
         DOM.deleteTheme(this.id);
+    }
+
+    async compile() {
+        console.log('Compiling CSS');
+
+        let css = '';
+        if (this.info.type === 'sass') {
+            css = await ClientIPC.send('bd-compileSass', {
+                scss: ThemeManager.getConfigAsSCSS(this.themeConfig),
+                path: this.paths.mainPath
+            });
+            console.log(css);
+        } else {
+            css = await FileUtils.readFile(this.paths.mainPath);
+        }
+
+        return css;
+    }
+
+    async recompile() {
+        const css = await this.compile();
+        this.userConfig.css = css;
+
+        await this.saveConfiguration();
+
+        if (this.enabled) {
+            DOM.deleteTheme(this.id);
+            DOM.injectTheme(this.css, this.id);
+        }
     }
 
 }
 
-export default class extends ContentManager {
+export default class ThemeManager extends ContentManager {
 
     static get localThemes() {
         return this.localContent;
@@ -94,14 +133,16 @@ export default class extends ContentManager {
     static get loadContent() { return this.loadTheme }
     static async loadTheme(paths, configs, info, main) {
         try {
-            let css = '';
-            if (info.type === 'sass') {
-                css = await ClientIPC.send('bd-compileSass', { path: paths.mainPath });
-            } else {
-                css = await FileUtils.readFile(paths.mainPath);
-            }
-            const instance = new Theme({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName }, css });
-            if (instance.enabled) instance.enable();
+            const instance = new Theme({
+                configs, info, main,
+                paths: {
+                    contentPath: paths.contentPath,
+                    dirName: paths.dirName,
+                    mainPath: paths.mainPath
+                }
+            });
+            if (!instance.css) instance.recompile();
+            else if (instance.enabled) instance.enable();
             return instance;
         } catch (err) {
             throw err;
@@ -114,6 +155,30 @@ export default class extends ContentManager {
 
     static disableTheme(theme) {
         theme.disable();
+    }
+
+    static getConfigAsSCSS(config) {
+        const variables = [];
+
+        for (let category of config) {
+            for (let setting of category.settings) {
+                let scss_name = null;
+                let scss_value = null;
+                let scss_line = null;
+
+                if (typeof setting.value == 'string')
+                    scss_value = setting.scss_raw ? setting.value : '\'' + setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') + '\'';
+                else if (typeof setting.value === 'boolean' || typeof setting.value === 'number')
+                    scss_value = setting.value.toString();
+
+                scss_name = setting.id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
+
+                scss_line = `$${scss_name}: ${scss_value};`;
+                variables.push(scss_line);
+            }
+        }
+
+        return variables.join('\n');
     }
 
 }

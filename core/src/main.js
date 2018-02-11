@@ -67,11 +67,9 @@ class Comms {
         BDIpc.on('bd-compileSass', o => {
             const { scss, path } = o.args;
             if (!scss && !path) return;
+            const data = scss ? `${scss} @import '${path}';` : `@import '${path}';`;
 
-            sass.render({
-                file: path,
-                data: scss
-            }, (err, result) => {
+            sass.render({ data }, (err, result) => {
                 if (err) {
                     o.reply({ err });
                     return;

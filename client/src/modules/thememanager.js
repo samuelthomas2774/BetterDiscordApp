@@ -63,7 +63,17 @@ class Theme {
         try {
             await FileUtils.writeFile(`${this.themePath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
-                config: this.themeConfig,
+                config: this.themeConfig.map(category => {
+                    return {
+                        category: category.category,
+                        settings: category.settings.map(setting => {
+                            return {
+                                id: setting.id,
+                                value: setting.value
+                            };
+                        })
+                    };
+                }),
                 css: this.css
             }));
         } catch (err) {

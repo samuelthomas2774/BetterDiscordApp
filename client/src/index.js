@@ -10,7 +10,7 @@
 
 import { DOM, BdUI } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, PluginManager, ThemeManager, ModuleManager, WebpackModules } from 'modules';
+import { Events, CssEditor, Globals, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 
 class BetterDiscord {
@@ -21,11 +21,13 @@ class BetterDiscord {
         window.pm = PluginManager;
         window.events = Events;
         window.wpm = WebpackModules;
+        window.bdsettings = Settings;
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }
 
     async init() {
+        await Settings.loadSettings();
         await ModuleManager.initModules();
         await PluginManager.loadAllPlugins();
         await ThemeManager.loadAllThemes();

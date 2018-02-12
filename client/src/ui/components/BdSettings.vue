@@ -126,14 +126,18 @@
             enableSetting(cat, id) {
                 switch (cat) {
                     case 'core':
-                        return this.coreSettings.find(setting => setting.id === id).enabled = true;
+                        this.coreSettings.find(setting => setting.id === id).enabled = true; break;
                 }
+
+                Settings.saveSettings();
             },
             disableSetting(cat, id) {
                 switch (cat) {
                     case 'core':
-                        return this.coreSettings.find(setting => setting.id === id).enabled = false;
+                        this.coreSettings.find(setting => setting.id === id).enabled = false; break;
                 }
+
+                Settings.saveSettings();
             },
             openGithub() {
                 console.log('open github?');

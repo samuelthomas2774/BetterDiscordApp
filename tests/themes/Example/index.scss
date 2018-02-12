@@ -10,4 +10,5 @@ span {
 
 .avatar-large {
     background-image: url($avatar) !important;
+    border-radius: $avatarRadius !important;
 }

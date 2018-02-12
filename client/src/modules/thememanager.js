@@ -176,28 +176,32 @@ export default class ThemeManager extends ContentManager {
 
         for (let category of config) {
             for (let setting of category.settings) {
-                let scss_name = null;
-                let scss_value = null;
-                let scss_line = null;
-
-                if (typeof setting.value == 'string') {
-                    scss_value = setting.scss_raw
-                        ? setting.value
-                        : '\'' + setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') + '\'';
-                } else if (setting.type === 'slider') {
-                    scss_value = setting.value * setting.multi || 1;
-                } else if (typeof setting.value === 'boolean' || typeof setting.value === 'number') {
-                    scss_value = setting.value.toString();
-                }
-
-                scss_name = setting.id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
-
-                scss_line = `$${scss_name}: ${scss_value};`;
-                variables.push(scss_line);
+                variables.push(this.parseSetting(setting));
             }
         }
-
         return variables.join('\n');
+    }
+
+    static parseSetting(setting) {
+        const { type, id, value } = setting;
+        const name = id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
+
+        if (type === 'slider') {
+            return `$${name}: ${value * setting.multi || 1};`;
+        }
+
+        if (type === 'dropdown') {
+            return `$${name}: ${setting.options.find(opt => opt.value === value).text};`;
+        }
+
+        if (typeof value === 'boolean' || typeof value === 'number') {
+            return `$${name}: ${value};`; 
+        }
+
+        if (typeof value === 'string') {
+            return `$${name}: ${setting.scss_raw ? value : `'${setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`};`; 
+        }
+
     }
 
 }

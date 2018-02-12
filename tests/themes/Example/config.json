@@ -37,7 +37,36 @@
                     "type": "text",
                     "value": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
                     "text": "Avatar replace",
-                    "hint": "Replace all avatars" 
+                    "hint": "Replace all avatars"
+                },
+                {
+                    "id": "avatarRadius",
+                    "type": "dropdown",
+                    "value": "opt1",
+                    "text": "Dropdown Test Setting",
+                    "hint": "Dropdown Test Setting Hint",
+                    "options": [
+                        {
+                            "value": "opt1",
+                            "text": "8px"
+                        },
+                        {
+                            "value": "opt2",
+                            "text": "12px"
+                        },
+                        {
+                            "value": "opt3",
+                            "text": "16px"
+                        },
+                        {
+                            "value": "opt4",
+                            "text": "20px"
+                        },
+                        {
+                            "value": "opt5",
+                            "text": "30px"
+                        }
+                    ]
                 },
                 {
                     "id": "default-0",
@@ -60,9 +89,18 @@
                     "text": "Test Radio Setting",
                     "hint": "Just some test settings to test the settings panel for themes",
                     "options": [
-                        { "value": 1, "text": "Option 1" },
-                        { "value": 2, "text": "Option 2" },
-                        { "value": 3, "text": "Option 3" }
+                        {
+                            "value": 1,
+                            "text": "Option 1"
+                        },
+                        {
+                            "value": 2,
+                            "text": "Option 2"
+                        },
+                        {
+                            "value": 3,
+                            "text": "Option 3"
+                        }
                     ]
                 }
             ]

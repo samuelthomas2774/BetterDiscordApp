@@ -86,7 +86,7 @@
         props: ['active', 'close'],
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            SettingsWrapper, SettingsPanel, PluginsView, ThemesView,
+            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView,
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         methods: {

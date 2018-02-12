@@ -35,8 +35,14 @@ export default class {
     get enabled() { return this.userConfig.enabled }
     get pluginConfig() { return this.userConfig.config }
 
-    getSetting(settingId) {
-        return this.userConfig.config.find(setting => setting.id === settingId);
+    getSetting(setting_id, category_id) {
+        for (let category of this.pluginConfig) {
+            if (category_id && category.category !== category_id) return;
+            for (let setting of category.settings) {
+                if (setting.id !== setting_id) return;
+                return setting.value;
+            }
+        }
     }
 
     async saveSettings(newSettings) {

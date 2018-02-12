@@ -7,6 +7,7 @@ div {
 span {
     border: 1px solid rgba(20, 20, 20, $spanOpacity);
     color: $radioTest !important;
+    opacity: $spanOpacity2 !important;
 }
 
 .avatar-large {

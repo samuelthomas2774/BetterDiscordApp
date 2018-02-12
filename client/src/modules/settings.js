@@ -29,7 +29,7 @@ export default class {
                 if (!set) continue;
 
                 for (let newCategory of newSet.settings) {
-                    let category = this.settings.find(c => c.category === newCategory.category);
+                    let category = set.settings.find(c => c.category === newCategory.category);
                     if (!category) continue;
 
                     for (let newSetting of newCategory.settings) {

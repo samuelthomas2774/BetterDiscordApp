@@ -112,6 +112,8 @@ export default class {
             const readConfig = await this.readConfig(contentPath);
             const mainPath = path.join(contentPath, readConfig.main);
 
+            readConfig.defaultConfig = readConfig.defaultConfig || [];
+
             const userConfig = {
                 enabled: false,
                 config: readConfig.defaultConfig
@@ -187,5 +189,17 @@ export default class {
     static getContentById(id) { return this.localContent.find(c => c.id === id) }
     static getContentByPath(path) { return this.localContent.find(c => c.contentPath === path) }
     static getContentByDirName(dirName) { return this.localContent.find(c => c.dirName === dirName) }
+
+    static waitForContent(content_id) {
+        return new Promise((resolve, reject) => {
+            const check = () => {
+                const content = this.getContentById(content_id);
+                if (content) return resolve(content);
+
+                setTimeout(check, 100);
+            };
+            check();
+        });
+    }
 
 }

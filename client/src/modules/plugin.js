@@ -27,13 +27,15 @@ export default class {
     get main() { return this.__pluginInternals.main }
     get defaultConfig() { return this.configs.defaultConfig }
     get userConfig() { return this.configs.userConfig }
+    get id() { return this.info.id || this.info.name.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
     get name() { return this.info.name }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
     get pluginPath() { return this.paths.contentPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
-    get pluginConfig() { return this.userConfig.config }
+    get pluginConfig() { return this.userConfig.config || [] }
+    get exports() { return this._exports ? this._exports : (this._exports = this.getExports()) }
 
     getSetting(setting_id, category_id) {
         for (let category of this.pluginConfig) {
@@ -85,10 +87,8 @@ export default class {
     }
 
     start() {
-        if (this.onStart) {
-            const started = this.onStart();
-            if (!started) return false;
-        }
+        if (this.onstart && !this.onstart()) return false;
+        if (this.onStart && !this.onStart()) return false;
 
         if (!this.enabled) {
             this.userConfig.enabled = true;
@@ -99,10 +99,8 @@ export default class {
     }
 
     stop() {
-        if (this.onStop) {
-            const stopped = this.onStop();
-            if (!stopped) return false;
-        }
+        if (this.onstop && !this.onstop()) return false;
+        if (this.onStop && !this.onStop()) return false;
 
         this.userConfig.enabled = false;
         this.saveConfiguration();

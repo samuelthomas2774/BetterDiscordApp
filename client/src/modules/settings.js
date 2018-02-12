@@ -92,10 +92,12 @@ export default class {
         const category = this.getCategory(set_id, category_id);
         if (!category) return;
 
-        const setting = category.settings.find(s => s.id === setting_id);
-        if (!setting) return;
+        return category.settings.find(s => s.id === setting_id);
+    }
 
-        return setting.value;
+    static get(set_id, category_id, setting_id) {
+        const setting = this.getSetting(set_id, category_id, setting_id);
+        return setting ? setting.value : null;
     }
 
     static setSetting(set_id, category_id, setting_id, value) {

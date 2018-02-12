@@ -12,21 +12,18 @@
     <div class="bd-setting-switch">
         <div class="bd-title">
             <h3>{{setting.text}}</h3>
-            <label class="bd-switch-wrapper" @click="toggle">
-                <input type="checkbox" class="bd-switch-checkbox" />
-                <div class="bd-switch" :class="{'bd-checked': setting.value}" />
-            </label>
+            <SettingSwitch :checked="setting.value" :change="change" />
         </div>
         <div class="bd-hint">{{setting.hint}}</div>
     </div>
 </template>
 <script>
+    import SettingSwitch from '../../common/SettingSwitch.vue';
+
     export default {
         props: ['setting', 'change'],
-        methods: {
-            toggle() {
-                this.change(!this.setting.value);
-            }
+        components: {
+            SettingSwitch
         }
     }
 </script>

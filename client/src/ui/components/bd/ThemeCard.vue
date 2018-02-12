@@ -10,10 +10,7 @@
 
 <template>
     <Card :item="theme">
-        <label slot="toggle" class="bd-switch-wrapper" @click="() => { toggleTheme(theme); this.$forceUpdate(); }">
-            <input type="checkbox" class="bd-switch-checkbox" />
-            <div class="bd-switch" :class="{'bd-checked': theme.enabled}" />
-        </label>
+        <SettingSwitch slot="toggle" :checked="theme.enabled" :change="() => theme.enabled ? theme.disable() : theme.enable()" />
         <ButtonGroup slot="controls">
             <Button v-tooltip="'Settings'" v-if="theme.hasSettings" :onClick="() => showSettings(theme)">
                 <MiSettings size="18" />

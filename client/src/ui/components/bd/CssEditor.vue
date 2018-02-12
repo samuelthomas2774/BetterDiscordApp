@@ -15,17 +15,13 @@
                 <h5>Custom Editor</h5>
                 <div class="bd-form-warning">
                     <div class="bd-text">Custom Editor is not installed!</div>
-                    <FormButton>
-                        Install
-                    </FormButton>
+                    <FormButton>Install</FormButton>
                 </div>
                 <span style="color: #FFF; font-size: 12px; font-weight: 700;">*This is displayed if editor is not installed</span>
-                <FormButton :onClick="openInternalEditor">
-                    Open
-                </FormButton>
+                <FormButton :onClick="openInternalEditor">Open</FormButton>
             </div>
             <div class="bd-form-divider"></div>
-            <SettingSwitch :setting="dummySetting" :onClick="settingClicked" />
+            <Setting :setting="liveUpdateSetting" :change="enabled => liveUpdateSetting.value = enabled" />
             <div class="bd-form-item">
                 <h5>System Editor</h5>
                 <FormButton>
@@ -33,12 +29,8 @@
                 </FormButton>
             </div>
             <div class="bd-form-divider"></div>
-            <FormButton :onClick="settingClicked">
-                Enabled
-            </FormButton>
-            <FormButton :disabled="true">
-                <span>Disabled</span>
-            </FormButton>
+            <FormButton :onClick="() => {}">Enabled</FormButton>
+            <FormButton :disabled="true"><span>Disabled</span></FormButton>
             <FormButton :loading="true" />
         </div>
     </SettingsWrapper>
@@ -48,27 +40,29 @@
     // Imports
     import { CssEditor } from 'modules';
     import { SettingsWrapper } from './';
-    import { SettingSwitch, FormButton } from '../common';
+    import { FormButton } from '../common';
+    import Setting from './setting/Setting.vue';
 
     export default {
         components: {
             SettingsWrapper,
-            SettingSwitch, FormButton
+            Setting,
+            FormButton
+        },
+        data() {
+            return {
+                liveUpdateSetting: {
+                    id: "live-update",
+                    type: "bool",
+                    text: "Live Update",
+                    hint: "Automatically update client css when saved.",
+                    value: true
+                }
+            }
         },
         methods: {
             openInternalEditor() {
                 CssEditor.show();
-            },
-            settingClicked() {
-            }
-        },
-        data() {
-            return {
-                dummySetting: {
-                    title: "Live Update",
-                    hint: "Automatically update client css when saved.",
-                    checked: true
-                }
             }
         }
     }

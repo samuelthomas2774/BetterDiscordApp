@@ -97,7 +97,7 @@ export default class {
 
     static get(set_id, category_id, setting_id) {
         const setting = this.getSetting(set_id, category_id, setting_id);
-        return setting ? setting.value : null;
+        return setting ? setting.value : undefined;
     }
 
     static setSetting(set_id, category_id, setting_id, value) {

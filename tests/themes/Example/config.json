@@ -43,7 +43,7 @@
                     "id": "avatarRadius",
                     "type": "dropdown",
                     "value": "opt1",
-                    "text": "Dropdown Test Setting",
+                    "text": "Avatar border radius",
                     "hint": "Dropdown Test Setting Hint",
                     "options": [
                         {

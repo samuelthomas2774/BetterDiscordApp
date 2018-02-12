@@ -15,19 +15,19 @@
             <div slot="body" class="bd-plugin-settings-body">
                 <template v-for="category in configCache">
                     <div v-if="category.category === 'default' || !category.type">
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
                     </div>
                     <div v-else-if="category.type === 'static'">
                         <div class="bd-form-header">
                             <span class="bd-form-header-text">{{category.category}} static with header</span>
                         </div>
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
                     </div>
                     <Drawer v-else-if="category.type === 'drawer'" :label="category.category + ' drawer'">
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
                     </Drawer>
                     <div v-else>
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
                     </div>
                 </template>
 
@@ -48,7 +48,7 @@
 <script>
     // Imports
     import { Modal } from '../common';
-    import PluginSetting from './pluginsetting/PluginSetting.vue';
+    import Setting from './setting/Setting.vue';
     import Drawer from '../common/Drawer.vue';
 
     export default {
@@ -64,7 +64,7 @@
         },
         components: {
             Modal,
-            PluginSetting,
+            Setting,
             Drawer
         },
         methods: {

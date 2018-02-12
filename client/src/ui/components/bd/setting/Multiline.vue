@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Setting Multiline Text Component
+ * BetterDiscord Setting Multiline Text Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net

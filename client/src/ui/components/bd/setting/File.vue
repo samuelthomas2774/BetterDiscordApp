@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Setting File Component
+ * BetterDiscord Setting File Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net

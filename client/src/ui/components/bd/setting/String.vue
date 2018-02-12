@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Setting Bool Component
+ * BetterDiscord Setting String Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -9,13 +9,12 @@
 */
 
 <template>
-    <div class="bd-setting-switch">
+    <div class="bd-form-textinput">
         <div class="bd-title">
             <h3>{{setting.text}}</h3>
-            <label class="bd-switch-wrapper" @click="toggle">
-                <input type="checkbox" class="bd-switch-checkbox" />
-                <div class="bd-switch" :class="{'bd-checked': setting.value}" />
-            </label>
+            <div class="bd-textinput-wrapper">
+                <input type="text" :value="setting.value" @keyup.stop @input="input"/>
+            </div>
         </div>
         <div class="bd-hint">{{setting.hint}}</div>
     </div>
@@ -24,8 +23,8 @@
     export default {
         props: ['setting', 'change'],
         methods: {
-            toggle() {
-                this.change(this.setting.id, !this.setting.value);
+            input(e) {
+                this.change(this.setting.id, e.target.value);
             }
         }
     }

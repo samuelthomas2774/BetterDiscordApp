@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Setting Dropdown Component
+ * BetterDiscord Setting Dropdown Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net

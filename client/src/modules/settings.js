@@ -77,6 +77,27 @@ export default class {
         }
     }
 
+    static getSet(set_id) {
+        return this.getSettings.find(s => s.id === set_id);
+    }
+
+    static getCategory(set_id, category_id) {
+        const set = this.getSet(set_id);
+        if (!set) return;
+
+        return set.settings.find(c => c.category === category_id);
+    }
+
+    static getSetting(set_id, category_id, setting_id) {
+        const category = this.getCategory(set_id, category_id);
+        if (!category) return;
+
+        const setting = category.settings.find(s => s.id === setting_id);
+        if (!setting) return;
+
+        return setting.value;
+    }
+
     static setSetting(set_id, category_id, setting_id, value) {
         for (let set of this.getSettings) {
             if (set.id !== set_id) continue;

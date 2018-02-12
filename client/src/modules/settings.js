@@ -86,14 +86,20 @@ export default class {
 
                 for (let setting of category.settings) {
                     if (setting.id !== setting_id) continue;
+                    if (setting.value === value) return true;
 
                     setting.value = value;
+                    this.settingUpdated(set_id, category_id, setting_id, value);
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    static settingUpdated(set_id, category_id, setting_id, value) {
+        Logger.log('Settings', `${set_id}/${category_id}/${setting_id} was set to ${value}`);
     }
 
     static get getSettings() {

@@ -60,8 +60,8 @@
                     {
                         "id": "hide-button",
                         "type": "bool",
-                        "text": "Hide the BetterDiscord menu button",
-                        "hint": "When this is enabled you can use Control/Command + B to open the BetterDiscord menu",
+                        "text": "Hide the BetterDiscord button",
+                        "hint": "When this is enabled you can use Ctrl/Cmd + B to open the BetterDiscord settings menu.",
                         "value": false,
                         "disabled": false
                     }

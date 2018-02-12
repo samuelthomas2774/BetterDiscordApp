@@ -190,7 +190,7 @@ export default class ThemeManager extends ContentManager {
             return `$${name}: ${value * setting.multi || 1};`;
         }
 
-        if (type === 'dropdown') {
+        if (type === 'dropdown' || type === 'radio') {
             return `$${name}: ${setting.options.find(opt => opt.value === value).text};`;
         }
 

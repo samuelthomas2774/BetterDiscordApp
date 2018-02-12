@@ -69,6 +69,35 @@
                     ]
                 },
                 {
+                    "id": "radioTest",
+                    "type": "radio",
+                    "value": "opt1",
+                    "text": "Span text colour",
+                    "hint": "Radio Test Setting Hint",
+                    "options": [
+                        {
+                            "value": "opt1",
+                            "text": "red"
+                        },
+                        {
+                            "value": "opt2",
+                            "text": "green"
+                        },
+                        {
+                            "value": "opt3",
+                            "text": "blue"
+                        },
+                        {
+                            "value": "opt4",
+                            "text": "orange"
+                        },
+                        {
+                            "value": "opt5",
+                            "text": "white"
+                        }
+                    ]
+                },
+                {
                     "id": "default-0",
                     "type": "text",
                     "value": null,
@@ -81,27 +110,6 @@
                     "value": true,
                     "text": "Work properly",
                     "hint": "Just some test settings to test the settings panel for themes"
-                },
-                {
-                    "id": "default-2",
-                    "type": "radio",
-                    "value": "opt1",
-                    "text": "Test Radio Setting",
-                    "hint": "Just some test settings to test the settings panel for themes",
-                    "options": [
-                        {
-                            "value": 1,
-                            "text": "Option 1"
-                        },
-                        {
-                            "value": 2,
-                            "text": "Option 2"
-                        },
-                        {
-                            "value": 3,
-                            "text": "Option 3"
-                        }
-                    ]
                 }
             ]
         }

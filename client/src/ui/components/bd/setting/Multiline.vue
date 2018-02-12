@@ -26,7 +26,7 @@
         props: ['setting', 'change'],
         methods: {
             input(e) {
-                this.change(this.setting.id, e.target.textContent);
+                this.change(e.target.textContent);
             }
         }
     }

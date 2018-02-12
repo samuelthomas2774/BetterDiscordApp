@@ -24,7 +24,7 @@
         props: ['setting', 'change'],
         methods: {
             input(e) {
-                this.change(this.setting.id, e.target.value);
+                this.change(e.target.value);
             }
         }
     }

@@ -31,11 +31,11 @@
                 let number = parseFloat(e.target.value)
                 if (Number.isNaN(number)) return;
 
-                this.change(this.setting.id, number);
+                this.change(number);
             },
             changeBy(positive) {
                 let step = this.setting.step == undefined ? 1 : this.settings.step;
-                this.change(this.setting.id, this.setting.value + (positive ? step : -step));
+                this.change(this.setting.value + (positive ? step : -step));
             },
             handleWheel() {} // No idea why this works but it does
         },

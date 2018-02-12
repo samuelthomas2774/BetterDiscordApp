@@ -30,7 +30,7 @@
         props: ['setting', 'change'],
         methods: {
             selectOption(option) {
-                this.change(this.setting.id, option.id);
+                this.change(option.id);
             }
         }
     }

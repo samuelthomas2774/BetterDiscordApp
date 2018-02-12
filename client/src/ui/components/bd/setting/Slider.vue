@@ -43,7 +43,7 @@
             input(e) {
                 let number = parseFloat(e.target.value);
                 if (Number.isNaN(number)) return;
-                this.change(this.setting.id, number);
+                this.change(number);
             },
             getPointPosition(value) {
                 return ((value || this.setting.value) - (this.setting.min || 0)) / ((this.setting.max || 100) - (this.setting.min || 0));

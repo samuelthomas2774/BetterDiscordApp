@@ -25,7 +25,7 @@
         props: ['setting', 'change'],
         methods: {
             toggle() {
-                this.change(this.setting.id, !this.setting.value);
+                this.change(!this.setting.value);
             }
         }
     }

@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-form-item" :class="{'bd-form-item-changed': changed}">
+    <div class="bd-form-item" :class="{'bd-form-item-changed': changed, 'bd-disabled': disabled}">
         <BoolSetting v-if="setting.type === 'bool'" :setting="setting" :change="change"/>
         <DropdownSetting v-if="setting.type === 'dropdown'" :setting="setting" :change="change"/>
         <NumberSetting v-if="setting.type === 'number'" :setting="setting" :change="change"/>
@@ -50,6 +50,9 @@
         computed: {
             changed() {
                 return this.setting.changed || false;
+            },
+            disabled() {
+                return this.setting.disabled || false;
             }
         }
     }

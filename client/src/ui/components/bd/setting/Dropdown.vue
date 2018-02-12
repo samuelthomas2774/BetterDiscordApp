@@ -13,7 +13,7 @@
         <div class="bd-title">
             <h3>{{setting.text}}</h3>
             <div class="bd-dropdown" :class="{'bd-active': active}">
-                <div class="bd-dropdown-current" @click="() => active = !active">
+                <div class="bd-dropdown-current" @click="() => active = !active && !setting.disabled">
                     <span class="bd-dropdown-text">{{getOptionText(setting.value)}}</span>
                     <span class="bd-dropdown-arrow-wrap">
                         <span class="bd-dropdown-arrow"></span>
@@ -43,7 +43,7 @@
             },
             selectOption(option) {
                 this.active = false;
-                this.change(this.setting.id, option.id);
+                this.change(option.id);
             }
         },
         mounted() {

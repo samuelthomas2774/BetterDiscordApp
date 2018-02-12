@@ -12,19 +12,19 @@
     <div>
         <template v-for="category in settings">
             <div v-if="category.category === 'default' || !category.type">
-                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
             </div>
             <div v-else-if="category.type === 'static'">
                 <div class="bd-form-header">
                     <span class="bd-form-header-text">{{category.category}} static with header</span>
                 </div>
-                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
             </div>
             <Drawer v-else-if="category.type === 'drawer'" :label="category.category">
-                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
             </Drawer>
             <div v-else>
-                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" />
+                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
             </div>
         </template>
     </div>
@@ -42,15 +42,9 @@
             Drawer
         },
         methods: {
-            settingChange(setting_id, value) {
-                for (let category of this.settings) {
-                    let setting = category.settings.find(s => s.id === setting_id);
-                    if (!setting) continue;
-
-                    this.change(category.category, setting_id, value);
-                }
-
-                this.$forceUpdate();
+            settingChange(category, setting, value) {
+                if (setting.disabled) return;
+                this.change(category.category, setting.id, value);
             }
         }
     }

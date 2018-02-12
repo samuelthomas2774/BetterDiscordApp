@@ -35,8 +35,7 @@
     export default {
         props: [
             'setting',
-            'change',
-            'changed'
+            'change'
         ],
         components: {
             BoolSetting,
@@ -47,6 +46,11 @@
             MultilineTextSetting,
             SliderSetting,
             FileSetting
+        },
+        computed: {
+            changed() {
+                return this.setting.changed || false;
+            }
         }
     }
 </script>

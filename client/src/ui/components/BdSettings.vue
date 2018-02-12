@@ -34,17 +34,13 @@
                 </div>
             </div>
             <ContentColumn slot="content">
-                <div v-if="activeContent('core') || animatingContent('core')" :class="{active: activeContent('core'), animating: animatingContent('core')}">
-                    <CoreSettings :settings="coreSettings" :enableSetting="enableSetting" :disableSetting="disableSetting" />
-                </div>
-                <div v-if="activeContent('ui') || animatingContent('ui')" :class="{active: activeContent('ui'), animating: animatingContent('ui')}">
-                    <UISettings />
+                <div v-for="set in settings" v-if="activeContent(set.id) || animatingContent(set.id)" :class="{active: activeContent(set.id), animating: animatingContent(set.id)}">
+                    <SettingsWrapper :headertext="set.headertext">
+                        <SettingsPanel :settings="set.settings" :change="(c, s, v) => changeSetting(set.id, c, s, v)" />
+                    </SettingsWrapper>
                 </div>
                 <div v-if="activeContent('css') || animatingContent('css')" :class="{active: activeContent('css'), animating: animatingContent('css')}">
                     <CssEditorView />
-                </div>
-                <div v-if="activeContent('emotes') || animatingContent('emotes')" :class="{active: activeContent('emotes'), animating: animatingContent('emotes')}">
-                    <EmoteSettings />
                 </div>
                 <div v-if="activeContent('plugins') || animatingContent('plugins')" :class="{active: activeContent('plugins'), animating: animatingContent('plugins')}">
                     <PluginsView />
@@ -61,7 +57,7 @@
     import { shell } from 'electron';
     import { Settings } from 'modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, ThemesView } from './bd';
+    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView } from './bd';
     import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
 
     // Constants
@@ -88,14 +84,9 @@
             }
         },
         props: ['active', 'close'],
-        computed: {
-            coreSettings() {
-                return this.settings.find(settingset => settingset.id === 'core').settings;
-            }
-        },
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            CoreSettings, UISettings, EmoteSettings, CssEditorView, PluginsView, ThemesView,
+            SettingsWrapper, SettingsPanel, PluginsView, ThemesView,
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         methods: {
@@ -123,24 +114,11 @@
                 if (!item) return false;
                 return item.id === this.lastActiveIndex;
             },
-            enableSetting(cat, id) {
-                switch (cat) {
-                    case 'core':
-                        this.coreSettings.find(setting => setting.id === id).enabled = true; break;
-                }
-
-                Settings.saveSettings();
-            },
-            disableSetting(cat, id) {
-                switch (cat) {
-                    case 'core':
-                        this.coreSettings.find(setting => setting.id === id).enabled = false; break;
-                }
-
+            changeSetting(set_id, category_id, setting_id, value) {
+                Settings.setSetting(set_id, category_id, setting_id, value);
                 Settings.saveSettings();
             },
             openGithub() {
-                console.log('open github?');
                 shell.openExternal('https://github.com/JsSucks/BetterDiscordApp');
             },
             openWebsite() {

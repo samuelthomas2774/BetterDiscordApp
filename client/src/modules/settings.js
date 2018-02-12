@@ -24,15 +24,20 @@ export default class {
 
             this.settings = defaultSettings;
 
-            for (let newCategory of settings) {
-                let category = this.settings.find(c => c.id === newCategory.id);
-                if (!category) continue;
+            for (let newSet of settings) {
+                let set = this.settings.find(s => s.id === newSet.id);
+                if (!set) continue;
 
-                for (let newSetting of newCategory.settings) {
-                    let setting = category.settings.find(s => s.id === newSetting.id);
-                    if (!setting) continue;
+                for (let newCategory of newSet.settings) {
+                    let category = this.settings.find(c => c.category === newCategory.category);
+                    if (!category) continue;
 
-                    setting.enabled = newSetting.enabled;
+                    for (let newSetting of newCategory.settings) {
+                        let setting = category.settings.find(s => s.id === newSetting.id);
+                        if (!setting) continue;
+
+                        setting.value = newSetting.value;
+                    }
                 }
             }
         } catch (err) {
@@ -48,13 +53,18 @@ export default class {
 
             const settingsPath = path.resolve(this.dataPath, 'user.settings.json');
             await FileUtils.writeJsonToFile(settingsPath, {
-                settings: this.getSettings.map(category => {
+                settings: this.getSettings.map(set => {
                     return {
-                        id: category.id,
-                        settings: category.settings.map(setting => {
+                        id: set.id,
+                        settings: set.settings.map(category => {
                             return {
-                                id: setting.id,
-                                enabled: setting.enabled
+                                category: category.category,
+                                settings: category.settings.map(setting => {
+                                    return {
+                                        id: setting.id,
+                                        value: setting.value
+                                    };
+                                })
                             };
                         })
                     };
@@ -65,6 +75,25 @@ export default class {
             // This probably means that the user doesn't have any settings yet
             Logger.err('Settings', err);
         }
+    }
+
+    static setSetting(set_id, category_id, setting_id, value) {
+        for (let set of this.getSettings) {
+            if (set.id !== set_id) continue;
+
+            for (let category of set.settings) {
+                if (category.category !== category_id) continue;
+
+                for (let setting of category.settings) {
+                    if (setting.id !== setting_id) continue;
+
+                    setting.value = value;
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     static get getSettings() {

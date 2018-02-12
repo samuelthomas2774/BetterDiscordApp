@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Setting Radio Component
+ * BetterDiscord Setting Radio Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -30,7 +30,7 @@
         props: ['setting', 'change'],
         methods: {
             selectOption(option) {
-                this.change(this.setting.id, option.id);
+                this.change(option.id);
             }
         }
     }

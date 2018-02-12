@@ -2,52 +2,83 @@
     {
         "id": "core",
         "text": "Core",
+        "headertext": "Core Settings",
         "settings": [
             {
-                "id": "test-setting",
-                "text": "Test Setting",
-                "hint": "Test Setting",
-                "enabled": false,
-                "disabled": false
+                "category": "default",
+                "settings": [
+                    {
+                        "id": "test-setting",
+                        "type": "bool",
+                        "text": "Test Setting",
+                        "hint": "Test Setting",
+                        "value": false,
+                        "disabled": false
+                    },
+                    {
+                        "id": "test-setting2",
+                        "type": "bool",
+                        "text": "Test Setting 2",
+                        "hint": "Test Setting 2",
+                        "value": true,
+                        "disabled": false
+                    },
+                    {
+                        "id": "voice-disconnect",
+                        "type": "bool",
+                        "text": "Voice Disconnect",
+                        "hint": "Disconnect from voice server when Discord closes",
+                        "value": false,
+                        "disabled": true
+                    }
+                ]
             },
             {
-                "id": "test-setting2",
-                "text": "Test Setting 2",
-                "hint": "Test Setting 2",
-                "enabled": true,
-                "disabled": false
-            },
-            {
-                "id": "voice-disconnect",
-                "text": "Voice Disconnect",
-                "hint": "Disconnect from voice server when Discord closes",
-                "enabled": false,
-                "disabled": true
-            },
-            {
-                "id": "developer-mode",
-                "text": "Developer Mode",
-                "hint": "BetterDiscord developer mode",
-                "enabled": false,
-                "disabled": true
+                "category": "Advanced",
+                "type": "drawer",
+                "settings": [
+                    {
+                        "id": "developer-mode",
+                        "type": "bool",
+                        "text": "Developer Mode",
+                        "hint": "BetterDiscord developer mode",
+                        "value": false,
+                        "disabled": true
+                    }
+                ]
             }
         ]
     },
     {
         "id": "ui",
         "text": "UI",
+        "headertext": "UI Settings",
         "settings": [
-
+            {
+                "category": "default",
+                "settings": [
+                    {
+                        "id": "hide-button",
+                        "type": "bool",
+                        "text": "Hide the BetterDiscord button",
+                        "hint": "When this is enabled you can use Ctrl/Cmd + B to open the BetterDiscord settings menu.",
+                        "value": false,
+                        "disabled": false
+                    }
+                ]
+            }
         ]
     },
     {
         "id": "emotes",
         "text": "Emotes",
+        "headertext": "Emote Settings",
         "settings": []
     },
     {
         "id": "security",
         "text": "Security",
+        "headertext": "Security Settings",
         "settings": [
 
         ]

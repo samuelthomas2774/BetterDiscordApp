@@ -9,37 +9,16 @@
 */
 
 <template>
-    <div class="bd-plugin-settings-modal">
+    <div class="bd-plugin-settings-modal" :class="{'bd-edited': changed}">
         <div class="bd-backdrop" @click="attemptToClose" :class="{'bd-backdrop-out': closing}"></div>
         <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose" :class="{'bd-modal-out': closing}">
-            <div slot="body" class="bd-plugin-settings-body">
-                <template v-for="category in configCache">
-                    <div v-if="category.category === 'default' || !category.type">
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
-                    </div>
-                    <div v-else-if="category.type === 'static'">
-                        <div class="bd-form-header">
-                            <span class="bd-form-header-text">{{category.category}} static with header</span>
-                        </div>
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
-                    </div>
-                    <Drawer v-else-if="category.type === 'drawer'" :label="category.category + ' drawer'">
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
-                    </Drawer>
-                    <div v-else>
-                        <PluginSetting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="settingChange" :changed="setting.changed"/>
-                    </div>
-                </template>
-
-            </div>
+            <SettingsPanel :settings="configCache" :change="settingChange" slot="body" class="bd-plugin-settings-body" />
             <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed, 'bd-warn': warnclose}">
                 <div class="bd-footer-alert-text">Unsaved changes</div>
                 <div class="bd-button bd-reset-button bd-tp" :class="{'bd-disabled': saving}" @click="resetSettings">Reset</div>
                 <div class="bd-button bd-ok" :class="{'bd-disabled': saving}" @click="saveSettings">
                     <div v-if="saving" class="bd-spinner-7"></div>
-                    <template v-else>
-                        Save Changes
-                    </template>
+                    <template v-else>Save Changes</template>
                 </div>
             </div>
         </Modal>
@@ -47,9 +26,9 @@
 </template>
 <script>
     // Imports
+    import Vue from 'vue';
     import { Modal } from '../common';
-    import PluginSetting from './pluginsetting/PluginSetting.vue';
-    import Drawer from '../common/Drawer.vue';
+    import SettingsPanel from './SettingsPanel.vue';
 
     export default {
         props: ['plugin','close'],
@@ -64,8 +43,7 @@
         },
         components: {
             Modal,
-            PluginSetting,
-            Drawer
+            SettingsPanel,
         },
         methods: {
             checkForChanges() {
@@ -75,22 +53,23 @@
                     for (let setting of category.settings) {
                         if (cat.settings.find(s => s.id === setting.id).value !== setting.value) {
                             changed = true;
-                            setting.changed = true;
+                            Vue.set(setting, 'changed', true);
                         } else {
-                            setting.changed = false;
+                            Vue.set(setting, 'changed', false);
                         }
                     }
                 }
                 return changed;
             },
-            settingChange(settingId, newValue) {
-                for (let category of this.configCache) {
-                    const found = category.settings.find(s => s.id === settingId);
-                    if (found) {
-                        found.value = newValue;
-                        break;
-                    }
-                }
+            settingChange(category_id, setting_id, value) {
+                const category = this.configCache.find(c => c.category === category_id);
+                if (!category) return;
+
+                const setting = category.settings.find(s => s.id === setting_id);
+                if (!setting) return;
+
+                setting.value = value;
+
                 this.changed = this.checkForChanges();
                 this.$forceUpdate();
             },

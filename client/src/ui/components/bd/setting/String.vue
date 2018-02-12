@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Setting String Component
+ * BetterDiscord Setting String Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -24,7 +24,7 @@
         props: ['setting', 'change'],
         methods: {
             input(e) {
-                this.change(this.setting.id, e.target.value);
+                this.change(e.target.value);
             }
         }
     }

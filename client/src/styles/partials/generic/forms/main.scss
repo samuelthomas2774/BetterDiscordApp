@@ -28,4 +28,12 @@
         line-height: 20px;
         border-bottom: 0px solid rgba(114, 118, 126, 0.1);
     }
+
+    .bd-disabled & {
+        opacity: 0.6;
+
+        &, input {
+            cursor: not-allowed !important;
+        }
+    }
 }

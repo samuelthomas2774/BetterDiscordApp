@@ -21,6 +21,7 @@ const __DEV = {
     clientScriptPath: `${clientScriptPath}/betterdiscord.client.js`
 }
 
+const __dataPath = path.resolve(__dirname, '..', '..', 'tests', 'data');
 const __pluginPath = path.resolve(__dirname, '..', '..', 'tests', 'plugins');
 const __themePath = path.resolve(__dirname, '..', '..', 'tests', 'themes');
 
@@ -33,6 +34,7 @@ const dummyArgs = {
     'version': '0.3.1',
     'paths': [
         { 'id': 'base', 'path': 'basePath' },
+        { 'id': 'data', 'path': __dataPath },
         { 'id': 'plugins', 'path': __pluginPath },
         { 'id': 'themes', 'path': __themePath }
     ]

@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Setting Component
+ * BetterDiscord Setting Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-form-item" :class="{'bd-form-item-changed': changed}">
+    <div class="bd-form-item" :class="{'bd-form-item-changed': changed, 'bd-disabled': disabled}">
         <BoolSetting v-if="setting.type === 'bool'" :setting="setting" :change="change"/>
         <DropdownSetting v-if="setting.type === 'dropdown'" :setting="setting" :change="change"/>
         <NumberSetting v-if="setting.type === 'number'" :setting="setting" :change="change"/>
@@ -35,8 +35,7 @@
     export default {
         props: [
             'setting',
-            'change',
-            'changed'
+            'change'
         ],
         components: {
             BoolSetting,
@@ -47,6 +46,14 @@
             MultilineTextSetting,
             SliderSetting,
             FileSetting
+        },
+        computed: {
+            changed() {
+                return this.setting.changed || false;
+            },
+            disabled() {
+                return this.setting.disabled || false;
+            }
         }
     }
 </script>

@@ -8,6 +8,9 @@ module.exports = (Plugin, Api, Vendor) => {
             Events.subscribe('TEST_EVENT', this.eventTest);
             Logger.log('onStart');
             Logger.log(`Setting "default-0" value: ${this.getSetting('default-0')}`);
+
+            const exampleModule = new (Api.import('Example Module'));
+            Logger.log(`2+4=${exampleModule.add(2, 4)}`);
             return true;
         }
 

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-export class ExtModule {
+export default class ExtModule {
 
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;

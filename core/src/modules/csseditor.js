@@ -50,10 +50,12 @@ class CSSEditor extends Module {
     }
 
     send(channel, data) {
+        if (!this.editor) return;
         this.editor.webContents.send(channel, data);
     }
 
     set alwaysOnTop(state) {
+        if (!this.editor) return;
         this.editor.setAlwaysOnTop(state);
     }
 

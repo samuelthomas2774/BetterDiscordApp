@@ -24,7 +24,7 @@ module.exports = (Plugin, Api, Vendor) => {
             Logger.log(e);
         }
 
-        getExports() {
+        get bridge() {
             return {
                 test1: this.test1.bind(this),
                 test2: this.test2.bind(this)

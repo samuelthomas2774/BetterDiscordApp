@@ -37,7 +37,16 @@ export default class extends ContentManager {
     static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
-    static async loadPlugin(paths, configs, info, main) {
+    static async loadPlugin(paths, configs, info, main, type) {
+        if (type === 'module') return {
+            paths,
+            configs,
+            info,
+            main,
+            type,
+            module: window.require(paths.mainPath)
+        }
+
         const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor);
         const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName } });
 

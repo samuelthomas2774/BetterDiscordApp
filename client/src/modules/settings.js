@@ -45,7 +45,7 @@ export default class {
             }
 
             CssEditor.updateScss(scss, true);
-            CssEditor.editor_bounds = css_editor_bounds;
+            CssEditor.editor_bounds = css_editor_bounds || {};
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet

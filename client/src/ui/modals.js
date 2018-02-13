@@ -9,11 +9,11 @@
 */
 
 import { FileUtils } from 'common';
-import { Events } from 'modules';
+import { Events, PluginManager, ThemeManager } from 'modules';
 import BasicModal from './components/bd/modals/BasicModal.vue';
 import ErrorModal from './components/bd/modals/ErrorModal.vue';
 
-export default class Modals {
+export default class {
 
     static add(modal, component) {
         modal.component = modal.component || {
@@ -57,6 +57,23 @@ export default class Modals {
 
     static error(event) {
         return this.add({ event }, ErrorModal);
+    }
+
+    static showContentManagerErrors() {
+        // Get any errors from PluginManager and ThemeManager
+        this.error({
+            header:
+                (PluginManager.errors.length && ThemeManager.errors.length ? '' :
+                (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName) + ' - ') +
+                (PluginManager.errors.length ? `${PluginManager.errors.length} ${PluginManager.contentType}${PluginManager.errors.length !== 1 ? 's' : ''}` : '') +
+                (PluginManager.errors.length && ThemeManager.errors.length ? ' and ' : '') +
+                (ThemeManager.errors.length ? `${ThemeManager.errors.length} ${ThemeManager.contentType}${ThemeManager.errors.length !== 1 ? 's' : ''}` : '') +
+                ' failed to load',
+            module: (PluginManager.errors.length && ThemeManager.errors.length ? 'Content Manager' :
+                    (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName)),
+            type: 'err',
+            content: ([]).concat(PluginManager.errors).concat(ThemeManager.errors)
+        });
     }
 
     static get stack() {

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI } from 'ui';
+import { DOM, BdUI, Modals } from 'ui';
 import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
@@ -22,6 +22,7 @@ class BetterDiscord {
         window.events = Events;
         window.wpm = WebpackModules;
         window.bdsettings = Settings;
+        window.bdmodals = Modals;
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }
@@ -29,8 +30,9 @@ class BetterDiscord {
     async init() {
         await Settings.loadSettings();
         await ModuleManager.initModules();
-        await PluginManager.loadAllPlugins();
-        await ThemeManager.loadAllThemes();
+        await PluginManager.loadAllPlugins(true);
+        await ThemeManager.loadAllThemes(true);
+        Modals.showContentManagerErrors();
         Events.emit('ready');
         Events.emit('discord-ready');
     }

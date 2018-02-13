@@ -29,7 +29,7 @@ export default class {
         return this._contentPath ? this._contentPath : (this._contentPath = Globals.getObject('paths').find(path => path.id === this.pathId).path);
     }
 
-    static async loadAllContent() {
+    static async loadAllContent(supressErrors) {
         try {
             await FileUtils.ensureDirectory(this.contentPath);
             const directories = await FileUtils.listDirectory(this.contentPath);
@@ -48,15 +48,15 @@ export default class {
                 }
             }
 
-            if (this.errors.length) {
+            if (this.errors.length && !supressErrors) {
                 Modals.error({
                     header: `${this.moduleName} - ${this.errors.length} ${this.contentType}${this.errors.length !== 1 ? 's' : ''} failed to load`,
                     module: this.moduleName,
                     type: 'err',
                     content: this.errors
                 });
+                this._errors = [];
             }
-            this._errors = [];
 
             return this.localContent;
         } catch (err) {

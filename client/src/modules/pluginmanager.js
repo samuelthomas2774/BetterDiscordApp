@@ -52,15 +52,15 @@ export default class extends ContentManager {
     }
 
     static get moduleName() {
-        return 'PluginManager';
+        return 'Plugin Manager';
     }
 
     static get pathId() {
         return 'plugins';
     }
 
-    static async loadAllPlugins() {
-        const loadAll = await this.loadAllContent();
+    static async loadAllPlugins(supressErrors) {
+        const loadAll = await this.loadAllContent(supressErrors);
         this.localPlugins.forEach(plugin => {
             if (plugin.type === 'module') return;
             if (plugin.enabled) plugin.start();

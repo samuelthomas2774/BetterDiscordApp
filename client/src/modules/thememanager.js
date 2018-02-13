@@ -132,6 +132,14 @@ export default class ThemeManager extends ContentManager {
         return this.localContent;
     }
 
+    static get contentType() {
+        return 'theme';
+    }
+
+    static get moduleName() {
+        return 'Theme Manager';
+    }
+
     static get pathId() {
         return 'themes';
     }
@@ -195,11 +203,11 @@ export default class ThemeManager extends ContentManager {
         }
 
         if (typeof value === 'boolean' || typeof value === 'number') {
-            return `$${name}: ${value};`; 
+            return `$${name}: ${value};`;
         }
 
         if (typeof value === 'string') {
-            return `$${name}: ${setting.scss_raw ? value : `'${setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`};`; 
+            return `$${name}: ${setting.scss_raw ? value : `'${setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`};`;
         }
 
     }

@@ -13,6 +13,7 @@ import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import { Events } from 'modules';
 import { Error } from 'structs';
+import { Modals } from 'ui';
 
 export default class {
 
@@ -48,8 +49,8 @@ export default class {
             }
 
             if (this.errors.length) {
-                Events.emit('bd-error', {
-                    header: `${this.moduleName} - one or more ${this.contentType}(s) failed to load`,
+                Modals.error({
+                    header: `${this.moduleName} - ${this.errors.length} ${this.contentType}${this.errors.length !== 1 ? 's' : ''} failed to load`,
                     module: this.moduleName,
                     type: 'err',
                     content: this.errors

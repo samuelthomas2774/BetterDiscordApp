@@ -9,6 +9,7 @@
 */
 
 import { ClientIPC } from 'common';
+import Settings from './settings';
 import { DOM } from 'ui';
 
 export default class {
@@ -18,8 +19,8 @@ export default class {
         ClientIPC.on('bd-update-scss', (e, scss) => this.updateScss(scss));
 
         ClientIPC.on('bd-save-scss', async (e, scss) => {
-            this.updateScss(scss);
-            e.reply(await this.save(scss));
+            await this.updateScss(scss);
+            await this.save();
         });
     }
 
@@ -27,18 +28,25 @@ export default class {
         await ClientIPC.send('openCssEditor', {});
     }
 
-    static updateScss(scss) {
-        this.compile(scss).then(css => {
-            this.css = css;
-            this._scss = scss;
-            this.sendToEditor('scss-error', null);
-        }).catch(err => {
-            this.sendToEditor('scss-error', err);
+    static updateScss(scss, sendSource) {
+        if (sendSource)
+            this.sendToEditor('set-scss', { scss });
+
+        return new Promise((resolve, reject) => {
+            this.compile(scss).then(css => {
+                this.css = css;
+                this._scss = scss;
+                this.sendToEditor('scss-error', null);
+                resolve();
+            }).catch(err => {
+                this.sendToEditor('scss-error', err);
+                reject(err);
+            });
         });
     }
 
-    static async save(scss) {
-        console.log('Saving SCSS:', scss);
+    static async save() {
+        Settings.saveSettings();
     }
 
     static async compile(scss) {

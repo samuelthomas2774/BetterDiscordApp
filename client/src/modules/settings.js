@@ -9,7 +9,8 @@
 */
 
 import defaultSettings from '../data/user.settings.default';
-import { default as Globals } from './globals';
+import Globals from './globals';
+import CssEditor from './csseditor';
 import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 
@@ -20,7 +21,7 @@ export default class {
 
             const settingsPath = path.resolve(this.dataPath, 'user.settings.json');
             const user_config = await FileUtils.readJsonFromFile(settingsPath);
-            const { settings } = user_config;
+            const { settings, scss } = user_config;
 
             this.settings = defaultSettings;
 
@@ -40,6 +41,8 @@ export default class {
                     }
                 }
             }
+
+            CssEditor.updateScss(scss, true);
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
@@ -68,7 +71,8 @@ export default class {
                             };
                         })
                     };
-                })
+                }),
+                scss: CssEditor.scss
             });
         } catch (err) {
             // There was an error loading settings

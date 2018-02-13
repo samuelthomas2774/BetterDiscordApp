@@ -1,0 +1,96 @@
+.bd-modal-wrap {
+    transition: all 0.2s ease;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 9000;
+
+    .bd-modal-close-area {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.bd-modal {
+    position: fixed;
+    align-content: space-around;
+    display: flex;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    user-select: none;
+    padding: 60px;
+    transform: scale(1) translateZ(0px);
+    -webkit-box-direction: normal;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 9001;
+    justify-content: center;
+    animation: bd-modal-in 0.22s ease;
+
+    &.bd-modal-out {
+        animation: bd-modal-out 0.22s ease;
+    }
+
+    .bd-modal-inner {
+        background: #36393e;
+        contain: layout;
+        flex-direction: column;
+        pointer-events: auto;
+        -webkit-box-direction: normal;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        flex-grow: 1;
+        border-radius: 4px;
+        max-height: 100%;
+        max-width: 500px;
+        width: 500px;
+    }
+
+    .bd-modal-body {
+        padding: 0 15px;
+        display: flex;
+
+        .bd-scroller-wrap .bd-scroller {
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+    }
+
+    .bd-modal-titlelink {
+        cursor: pointer;
+        color: $colbdblue;
+
+        &:hover {
+            text-decoration: underline;
+            color: lighten($colbdblue, 5%);
+        }
+    }
+
+    .bd-modal-controls {
+        display: flex;
+        padding: 15px;
+        border-top: 1px solid #4a4a4a;
+
+        .bd-modal-tip {
+            flex-grow: 1;
+            line-height: 26px;
+            color: #FFF;
+        }
+
+        .bd-button {
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+    }
+}

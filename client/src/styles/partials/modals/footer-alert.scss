@@ -1,0 +1,49 @@
+.bd-modal-footer {
+    .bd-footer-alert {
+        margin: -64px 10px 10px;
+        height: 0;
+        display: flex;
+        background-color: rgba(32, 34, 37, 0.9);
+        box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+        padding: 10px 10px 10px 16px;
+        overflow: hidden;
+        border-radius: 5px;
+        transform: translateY(100%);
+        opacity: 0;
+        transition: all .2s ease-in-out;
+        position: relative;
+
+        &.bd-warn {
+            background-color: $colerr;
+            animation: bd-warn-shake 0.4s;
+        }
+
+        &.bd-active {
+            height: auto;
+            opacity: 1;
+            transform: none;
+        }
+
+        .bd-footer-alert-text {
+            flex: 1 1 auto;
+            color: #fff;
+            font-weight: 700;
+            line-height: 34px;
+        }
+
+        .bd-button {
+            height: 30px;
+            border-radius: 3px;
+            padding: 2px 16px;
+
+            &.bd-tp {
+                background: transparent;
+
+                &:hover {
+                    text-decoration: underline;
+                    background: transparent;
+                }
+            }
+        }
+    }
+}

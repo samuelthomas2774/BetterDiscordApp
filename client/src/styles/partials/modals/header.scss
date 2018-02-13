@@ -1,0 +1,50 @@
+.bd-modal-header {
+    display: flex;
+    padding: 15px;
+    flex: 0 0;
+    -webkit-transition: -webkit-box-shadow .1s ease-out;
+    transition: -webkit-box-shadow .1s ease-out;
+    transition: box-shadow .1s ease-out;
+
+    .bd-modal-headertext {
+        color: #fff;
+        font-weight: 700;
+        flex-grow: 1;
+        line-height: 18px;
+        padding: 1px;
+    }
+
+    .bd-modal-icon .bd-material-design-icon {
+        margin-right: 5px;
+    }
+
+    .bd-modal-x {
+        display: flex;
+        width: 20px;
+        height: 20px;
+        border-radius: 3px;
+        cursor: pointer;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+        margin-left: -2px -2px -2px 10px;
+        padding: 2px;
+
+        .bd-material-design-icon {
+            fill: #ccc;
+        }
+
+        &:hover {
+            background: #2d2f34;
+
+            .bd-material-design-icon {
+                fill: #fff;
+            }
+        }
+    }
+}
+
+.bd-modal-scrolled .bd-modal-header {
+    -webkit-box-shadow: 0 1px 0 0 rgba(24,25,28,.3), 0 1px 2px 0 rgba(24,25,28,.3);
+    box-shadow: 0 1px 0 0 rgba(24,25,28,.3), 0 1px 2px 0 rgba(24,25,28,.3);
+}

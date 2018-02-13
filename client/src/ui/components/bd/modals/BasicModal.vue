@@ -9,8 +9,8 @@
 */
 
 <template>
-    <Modal :class="{'bd-modal-out': modal.closing}" :headerText="modal.title" :close="modal.close">
-        <div slot="body">{{ modal.text }}</div>
+    <Modal :class="['bd-modal-basic', {'bd-modal-out': modal.closing}]" :headerText="modal.title" :close="modal.close">
+        <div slot="body" class="bd-modal-basic-body">{{ modal.text }}</div>
         <div slot="footer" class="bd-modal-controls">
             <div class="bd-flex-grow"></div>
             <div class="bd-button bd-ok" @click="modal.close">OK</div>

@@ -59,7 +59,15 @@ export default class extends ContentManager {
         return 'plugins';
     }
 
-    static get loadAllPlugins() { return this.loadAllContent }
+    static async loadAllPlugins() {
+        const loadAll = await this.loadAllContent();
+        this.localPlugins.forEach(plugin => {
+            if (plugin.type === 'module') return;
+            if (plugin.enabled) plugin.start();
+        });
+
+        return loadAll;
+    }
     static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
@@ -69,8 +77,6 @@ export default class extends ContentManager {
 
         const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor);
         const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName, mainPath: paths.mainPath } });
-
-        if (instance.enabled) instance.start();
         return instance;
     }
 

@@ -10,7 +10,7 @@
 
 <template>
     <Card :item="plugin">
-        <SettingSwitch slot="toggle" :checked="plugin.enabled" :change="() => plugin.enabled ? plugin.stop() : plugin.start()" />
+        <SettingSwitch v-if="plugin.type === 'plugin'" slot="toggle" :checked="plugin.enabled" :change="() => plugin.enabled ? plugin.stop() : plugin.start()" />
         <ButtonGroup slot="controls">
             <Button v-tooltip="'Settings'" v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
                 <MiSettings size="18" />

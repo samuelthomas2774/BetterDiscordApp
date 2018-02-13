@@ -20,6 +20,7 @@ export default class {
         this.stop = this.stop.bind(this);
     }
 
+    get type() { return 'plugin' }
     get configs() { return this.__pluginInternals.configs }
     get info() { return this.__pluginInternals.info }
     get icon() { return this.info.icon }

@@ -15,31 +15,6 @@ import Vendor from './vendor';
 import { ClientLogger as Logger } from 'common';
 import { Events } from 'modules';
 
-class Module {
-
-    constructor(pluginInternals) {
-        this.__pluginInternals = pluginInternals;
-        this.__require = window.require(this.paths.mainPath);
-        this.hasSettings = false;
-    }
-
-    get type() { return 'module' }
-    get configs() { return this.__pluginInternals.configs }
-    get info() { return this.__pluginInternals.info }
-    get icon() { return this.info.icon }
-    get paths() { return this.__pluginInternals.paths }
-    get main() { return this.__pluginInternals.main }
-    get defaultConfig() { return this.configs.defaultConfig }
-    get userConfig() { return this.configs.userConfig }
-    get id() { return this.info.id || this.info.name.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
-    get name() { return this.info.name }
-    get authors() { return this.info.authors }
-    get version() { return this.info.version }
-    get pluginPath() { return this.paths.contentPath }
-    get dirName() { return this.paths.dirName }
-    get enabled() { return true }
-    get pluginConfig() { return this.userConfig.config || [] }
-}
 
 export default class extends ContentManager {
 
@@ -62,7 +37,6 @@ export default class extends ContentManager {
     static async loadAllPlugins(supressErrors) {
         const loadAll = await this.loadAllContent(supressErrors);
         this.localPlugins.forEach(plugin => {
-            if (plugin.type === 'module') return;
             if (plugin.enabled) plugin.start();
         });
 
@@ -72,9 +46,6 @@ export default class extends ContentManager {
 
     static get loadContent() { return this.loadPlugin }
     static async loadPlugin(paths, configs, info, main, type) {
-
-        if (type === 'module') return new Module({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName, mainPath: paths.mainPath } });
-
         const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor);
         const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName, mainPath: paths.mainPath } });
         return instance;

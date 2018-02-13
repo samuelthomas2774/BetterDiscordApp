@@ -24,6 +24,7 @@ const __DEV = {
 const __dataPath = path.resolve(__dirname, '..', '..', 'tests', 'data');
 const __pluginPath = path.resolve(__dirname, '..', '..', 'tests', 'plugins');
 const __themePath = path.resolve(__dirname, '..', '..', 'tests', 'themes');
+const __modulePath = path.resolve(__dirname, '..', '..', 'tests', 'modules');
 
 const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor } = require('./modules');
 const { BrowserWindow, dialog } = require('electron');
@@ -36,7 +37,8 @@ const dummyArgs = {
         { 'id': 'base', 'path': 'basePath' },
         { 'id': 'data', 'path': __dataPath },
         { 'id': 'plugins', 'path': __pluginPath },
-        { 'id': 'themes', 'path': __themePath }
+        { 'id': 'themes', 'path': __themePath },
+        { 'id': 'modules', 'path': __modulePath }
     ]
 };
 

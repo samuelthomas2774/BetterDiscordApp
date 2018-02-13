@@ -11,7 +11,7 @@
 import { FileUtils } from 'common';
 import { Modals } from 'ui';
 
-export default class {
+export default class Plugin {
 
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;

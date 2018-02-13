@@ -12,6 +12,8 @@ import { FileUtils } from 'common';
 import { Events, PluginManager, ThemeManager } from 'modules';
 import BasicModal from './components/bd/modals/BasicModal.vue';
 import ErrorModal from './components/bd/modals/ErrorModal.vue';
+import PluginSettingsModal from './components/bd/modals/PluginSettingsModal.vue';
+import ThemeSettingsModal from './components/bd/modals/ThemeSettingsModal.vue';
 
 export default class {
 
@@ -74,6 +76,14 @@ export default class {
             type: 'err',
             content: ([]).concat(PluginManager.errors).concat(ThemeManager.errors)
         });
+    }
+
+    static pluginSettings(plugin) {
+        return this.add({ plugin }, PluginSettingsModal);
+    }
+
+    static themeSettings(theme) {
+        return this.add({ theme }, ThemeSettingsModal);
     }
 
     static get stack() {

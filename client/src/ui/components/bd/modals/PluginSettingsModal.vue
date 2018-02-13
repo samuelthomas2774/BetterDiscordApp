@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Theme Settings Modal Component
+ * BetterDiscord Plugin Settings Modal Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -10,8 +10,7 @@
 
 <template>
     <div class="bd-plugin-settings-modal" :class="{'bd-edited': changed}">
-        <div class="bd-backdrop" @click="attemptToClose" :class="{'bd-backdrop-out': closing}"></div>
-        <Modal :headerText="theme.name + ' Settings'" :close="attemptToClose" :class="{'bd-modal-out': closing}">
+        <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose" :class="{'bd-modal-out': modal.closing}">
             <SettingsPanel :settings="configCache" :change="settingChange" slot="body" class="bd-plugin-settings-body" />
             <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed, 'bd-warn': warnclose}">
                 <div class="bd-footer-alert-text">Unsaved changes</div>
@@ -27,11 +26,11 @@
 <script>
     // Imports
     import Vue from 'vue';
-    import { Modal } from '../common';
-    import SettingsPanel from './SettingsPanel.vue';
+    import { Modal } from '../../common';
+    import SettingsPanel from '../SettingsPanel.vue';
 
     export default {
-        props: ['theme', 'close'],
+        props: ['modal'],
         data() {
             return {
                 changed: false,
@@ -45,11 +44,14 @@
             Modal,
             SettingsPanel
         },
+        computed: {
+            plugin() { return this.modal.plugin; }
+        },
         methods: {
             checkForChanges() {
                 let changed = false;
                 for (let category of this.configCache) {
-                    const cat = this.theme.themeConfig.find(c => c.category === category.category);
+                    const cat = this.plugin.pluginConfig.find(c => c.category === category.category);
                     for (let setting of category.settings) {
                         if (cat.settings.find(s => s.id === setting.id).value !== setting.value) {
                             changed = true;
@@ -77,8 +79,8 @@
                 if (this.saving) return;
                 this.saving = true;
                 try {
-                    await this.theme.saveSettings(this.configCache);
-                    this.configCache = JSON.parse(JSON.stringify(this.theme.themeConfig));
+                    await this.plugin.saveSettings(this.configCache);
+                    this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
                     this.changed = false;
                 } catch (err) {
                     // TODO Display error that settings failed to save
@@ -88,7 +90,7 @@
             },
             resetSettings() {
                 if (this.saving) return;
-                this.configCache = JSON.parse(JSON.stringify(this.theme.themeConfig));
+                this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
                 this.changed = false;
                 this.$forceUpdate();
             },
@@ -96,7 +98,7 @@
                 if (!this.changed) {
                     this.closing = true;
                     setTimeout(() => {
-                        this.close();
+                        this.modal.close();
                     }, 200);
                     return;
                 }
@@ -107,7 +109,7 @@
             }
         },
         beforeMount() {
-            this.configCache = JSON.parse(JSON.stringify(this.theme.themeConfig));
+            this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
             console.log(this.configCache);
             this.changed = this.checkForChanges();
         }

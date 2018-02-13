@@ -9,6 +9,8 @@
 */
 
 import { ClientLogger as Logger } from 'common';
+import PluginManager from './pluginmanager';
+import ThemeManager from './thememanager';
 import Events from './events';
 
 export default class PluginApi {
@@ -63,5 +65,38 @@ export default class PluginApi {
             unsubscribeAll: this.eventUnsubscribeAll.bind(this)
         }
     }
-    
+
+    async getPlugin(plugin_id) {
+        // This should require extra permissions
+        return await PluginManager.waitForPlugin(plugin_id);
+    }
+    getPlugins(plugin_id) {
+        return PluginManager.localContent.map(plugin => plugin.id);
+    }
+    get Plugins() {
+        return {
+            getPlugin: this.getPlugin.bind(this),
+            getPlugins: this.getPlugins.bind(this)
+        };
+    }
+
+    async getTheme(theme_id) {
+        // This should require extra permissions
+        return await ThemeManager.waitForContent(theme_id);
+    }
+    getThemes(plugin_id) {
+        return ThemeManager.localContent.map(theme => theme.id);
+    }
+    get Themes() {
+        return {
+            getTheme: this.getTheme.bind(this),
+            getThemes: this.getThemes.bind(this)
+        };
+    }
+
+    async require(plugin_id) {
+        const plugin = await PluginManager.waitForPlugin(plugin_id);
+        return plugin.exports;
+    }
+
 }

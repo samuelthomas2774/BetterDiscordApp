@@ -99,4 +99,6 @@ export default class extends ContentManager {
     static get getPluginByPath() { return this.getContentByPath }
     static get getPluginByDirName() { return this.getContentByDirName }
 
+    static get waitForPlugin() { return this.waitForContent }
+
 }

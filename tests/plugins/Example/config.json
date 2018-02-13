@@ -1,5 +1,6 @@
 {
     "info": {
+        "id": "example-plugin",
         "name": "Example Plugin",
         "authors": [ "Jiiks" ],
         "version": 1.0,

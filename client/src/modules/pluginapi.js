@@ -9,6 +9,7 @@
 */
 
 import { ClientLogger as Logger } from 'common';
+import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
@@ -101,7 +102,7 @@ export default class PluginApi {
 
     get require() { return this.import }
     import(m) {
-        const module = PluginManager.findPlugin(m);
+        const module = ExtModuleManager.findModule(m);
         if (module && module.__require) return module.__require;
         return null;
     }

@@ -8,10 +8,12 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-export class Error {
+import Event from './event';
+
+export default class ErrorEvent extends Event {
 
     constructor(args) {
-        this.args = args;
+        super(args);
         this.showStack = false; // For error modal
     }
 
@@ -31,8 +33,8 @@ export class Error {
         return this.err.stack;
     }
 
-    get _type() {
-        return 'err';
+    get __eventType() {
+        return 'error';
     }
 
 }

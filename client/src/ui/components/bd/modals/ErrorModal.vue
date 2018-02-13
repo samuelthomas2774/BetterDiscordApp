@@ -4,7 +4,7 @@
         <MiError v-if="modal.event.type === 'err'" slot="icon" size="20"/>
         <div slot="body">
             <div v-for="(content, index) in modal.event.content">
-                <div v-if="content._type === 'err'" class="bd-modal-error" :class="{'bd-open': content.showStack}">
+                <div class="bd-modal-error" :class="{'bd-open': content.showStack}">
                     <div class="bd-modal-error-title bd-flex">
                         <span class="bd-modal-title-text bd-flex-grow">{{content.message}}</span>
                         <span class="bd-modal-titlelink" v-if="content.showStack" @click="() => { content.showStack = false; $forceUpdate(); }">Hide Stacktrace</span>

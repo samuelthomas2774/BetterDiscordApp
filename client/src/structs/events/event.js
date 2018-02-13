@@ -11,8 +11,6 @@
 export default class Event {
 
     constructor(args) {
-        this.args = args;
-
         this.__eventInfo = {
             args: arguments,
             type: this.__eventType
@@ -21,6 +19,10 @@ export default class Event {
 
     get event() {
         return this.__eventInfo;
+    }
+
+    get args() {
+        return this.event.args[0];
     }
 
     get __eventType() { return null; }

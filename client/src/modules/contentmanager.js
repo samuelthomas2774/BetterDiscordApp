@@ -12,7 +12,7 @@ import Globals from './globals';
 import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import { Events } from 'modules';
-import { Error } from 'structs';
+import { ErrorEvent } from 'structs';
 import { Modals } from 'ui';
 
 export default class {
@@ -38,7 +38,7 @@ export default class {
                 try {
                     await this.preloadContent(dir);
                 } catch (err) {
-                    this.errors.push(new Error({
+                    this.errors.push(new ErrorEvent({
                         module: this.moduleName,
                         message: `Failed to load ${dir}`,
                         err

@@ -9,7 +9,7 @@
 */
 
 import ContentManager from './contentmanager';
-import { DOM } from 'ui';
+import { DOM, Modals } from 'ui';
 import { FileUtils, ClientIPC } from 'common';
 
 class Theme {
@@ -38,6 +38,10 @@ class Theme {
     get themeConfig() { return this.userConfig.config }
     get css() { return this.userConfig.css }
     get id() { return this.name.toLowerCase().replace(/\s+/g, '-') }
+
+    showSettingsModal() {
+        return Modals.themeSettings(this);
+    }
 
     async saveSettings(newSettings) {
         for (let category of newSettings) {

@@ -32,29 +32,26 @@
                 <div class="bd-spinner-2"></div>
             </div>
         </div>
-        <ThemeSettingsModal v-if="settingsOpen !== null" :theme="settingsOpen" :close="closeSettings" />
     </SettingsWrapper>
 </template>
 
 <script>
     // Imports
     import { ThemeManager } from 'modules';
+    import { Modals } from 'ui';
     import { SettingsWrapper } from './';
     import { MiRefresh } from '../common';
-    import ThemeSettingsModal from './ThemeSettingsModal.vue';
     import ThemeCard from './ThemeCard.vue';
 
     export default {
         data() {
             return {
                 local: true,
-                settingsOpen: null,
                 localThemes: ThemeManager.localThemes
             }
         },
         components: {
             SettingsWrapper, ThemeCard,
-            ThemeSettingsModal,
             MiRefresh
         },
         methods: {
@@ -92,12 +89,8 @@
                 })();
             },
             showSettings(theme) {
-                this.settingsOpen = theme;
-            },
-            closeSettings() {
-                this.settingsOpen = null;
+                return Modals.themeSettings(theme);
             }
         }
     }
-
 </script>

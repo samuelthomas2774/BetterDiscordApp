@@ -9,6 +9,7 @@
 */
 
 import { FileUtils } from 'common';
+import { Modals } from 'ui';
 
 export default class {
 
@@ -46,6 +47,10 @@ export default class {
                 return setting.value;
             }
         }
+    }
+
+    showSettingsModal() {
+        return Modals.pluginSettings(this);
     }
 
     async saveSettings(newSettings) {

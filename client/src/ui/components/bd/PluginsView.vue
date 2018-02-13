@@ -32,28 +32,26 @@
                 <div class="bd-spinner-2"></div>
             </div>
         </div>
-        <PluginSettingsModal v-if="settingsOpen !== null" :plugin="settingsOpen" :close="closeSettings" />
     </SettingsWrapper>
 </template>
 
 <script>
     // Imports
     import { PluginManager } from 'modules';
+    import { Modals } from 'ui';
     import { SettingsWrapper } from './';
     import PluginCard from './PluginCard.vue';
-    import PluginSettingsModal from './PluginSettingsModal.vue';
     import { MiRefresh } from '../common';
 
     export default {
         data() {
             return {
                 local: true,
-                settingsOpen: null,
                 localPlugins: PluginManager.localPlugins
             }
         },
         components: {
-            SettingsWrapper, PluginCard, PluginSettingsModal,
+            SettingsWrapper, PluginCard,
             MiRefresh
         },
         methods: {
@@ -91,12 +89,8 @@
                 })();
             },
             showSettings(plugin) {
-                this.settingsOpen = plugin;
-            },
-            closeSettings() {
-                this.settingsOpen = null;
+                return Modals.pluginSettings(plugin);
             }
         }
     }
-
 </script>

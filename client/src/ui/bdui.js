@@ -35,9 +35,9 @@ export default class {
     }
 
     static injectUi() {
-        DOM.createElement('bdtooltips').appendTo(DOM.bdBody);
         DOM.createElement('div', null, 'bd-settings').appendTo(DOM.bdBody);
         DOM.createElement('div', null, 'bd-modals').appendTo(DOM.bdModals);
+        DOM.createElement('bd-tooltips').appendTo(DOM.bdBody);
 
         const modals = new Vue({
             el: '#bd-modals',

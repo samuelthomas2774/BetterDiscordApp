@@ -17,6 +17,7 @@ module.exports = (Plugin, Api, Vendor) => {
         onStop() {
             Events.unsubscribeAll();
             Logger.log('onStop');
+            console.log(this.showSettingsModal());
             return true;
         }
 

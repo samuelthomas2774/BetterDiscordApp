@@ -8,66 +8,50 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-
 <template>
     <div class="bd-modals-container">
-        <div v-for="(modal, index) in modals" :key="`bd-modal-${index}`">
-            <div v-if="index === 0" class="bd-backdrop" @click="closeModal(index)"></div>
-            <div v-else :style="{opacity: 0}" class="bd-backdrop" @click="closeModal(index)"></div>
-            <Modal :headerText="modal.header" 
-                   :close="() => closeModal(index)" 
-                   :class="[{'bd-err': modal.type && modal.type === 'err'}, {'bd-modal-out': modal.closing}]">
-                    <MiError v-if="modal.type === 'err'" slot="icon" size="20"/>
-                <div slot="body">
-                    <div v-for="(content, index) in modal.content">
-                        <ErrorModal v-if="content._type === 'err'" :content="content" :hideStack="hideStack" :showStack="showStack"/>
-                    </div>
-                </div>
-                <div slot="footer" class="bd-modal-controls">
-                    <span class="bd-modal-tip">Ctrl+Shift+I for more details</span>
-                    <div class="bd-button bd-ok" @click="closeModal(index)">
-                        OK
-                    </div>
-                </div>
-            </Modal>
+        <div v-for="(modal, index) in modals.stack" :key="`bd-modal-${index}`">
+            <div class="bd-backdrop" :class="{'bd-backdrop-out': modal.closing}" :style="{opacity: index === 0 ? undefined : 0}"></div>
+            <div class="bd-modal-wrap" :style="{transform: `scale(${downscale(index + 1, 0.2)})`, opacity: downscale(index + 1, 1)}">
+                <div class="bd-modal-close-area" @click="closeModal(modal)"></div>
+                <component :is="modal.component" />
+            </div>
         </div>
     </div>
 </template>
 <script>
     // Imports
     import { Events } from 'modules';
+    import { Modals } from 'ui';
     import { Modal } from '../common';
     import { MiError } from '../common/MaterialIcon';
-    import ErrorModal from '../common/ErrorModal.vue';
+    import ErrorModal from './modals/ErrorModal.vue';
 
     export default {
+        components: {
+            Modal, MiError
+        },
         data() {
             return {
-                modals: []
-            }
+                modals: Modals,
+                eventListener: null
+            };
         },
-        components: {
-            Modal, MiError, ErrorModal
-        },
-        beforeMount() {
-            Events.on('bd-error', e => {
-                e.closing = false;
-                this.modals.push(e);
-                console.log(this.modals);
+        created() {
+            console.log(this);
+            Events.on('bd-refresh-modals', this.eventListener = () => {
+                this.$forceUpdate();
             });
         },
+        destroyed() {
+            if (this.eventListener) Events.off('bd-refresh-modals', this.eventListener);
+        },
         methods: {
-            closeModal(index) {
-                this.modals[index].closing = true;
-                setTimeout(() => {
-                    this.modals.splice(index, 1);
-                }, 200);
+            closeModal(modal) {
+                modal.close();
             },
-            showStack(error) {
-                error.showStack = true;
-            },
-            hideStack(error) {
-                error.showStack = false;
+            downscale(index, times) {
+                return 1 - ((this.modals.stack.filter(m => !m.closing).length - index) * times);
             }
         }
     }

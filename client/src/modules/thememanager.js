@@ -9,7 +9,7 @@
 */
 
 import ContentManager from './contentmanager';
-import { DOM } from 'ui';
+import { DOM, Modals } from 'ui';
 import { FileUtils, ClientIPC } from 'common';
 
 class Theme {
@@ -38,6 +38,10 @@ class Theme {
     get themeConfig() { return this.userConfig.config }
     get css() { return this.userConfig.css }
     get id() { return this.name.toLowerCase().replace(/\s+/g, '-') }
+
+    showSettingsModal() {
+        return Modals.themeSettings(this);
+    }
 
     async saveSettings(newSettings) {
         for (let category of newSettings) {
@@ -132,6 +136,14 @@ export default class ThemeManager extends ContentManager {
         return this.localContent;
     }
 
+    static get contentType() {
+        return 'theme';
+    }
+
+    static get moduleName() {
+        return 'Theme Manager';
+    }
+
     static get pathId() {
         return 'themes';
     }
@@ -195,11 +207,11 @@ export default class ThemeManager extends ContentManager {
         }
 
         if (typeof value === 'boolean' || typeof value === 'number') {
-            return `$${name}: ${value};`; 
+            return `$${name}: ${value};`;
         }
 
         if (typeof value === 'string') {
-            return `$${name}: ${setting.scss_raw ? value : `'${setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`};`; 
+            return `$${name}: ${setting.scss_raw ? value : `'${setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`};`;
         }
 
     }

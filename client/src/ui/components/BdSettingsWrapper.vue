@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-settings-wrapper" :class="[{active: active}, 'platform-' + this.platform]">
-        <div class="bd-settings-button" @click="showSettings">
+        <div class="bd-settings-button" :class="{'bd-active': active}" @click="showSettings">
             <div class="bd-settings-button-btn" :class="[{'bd-loading': !loaded}]"></div>
         </div>
         <BdSettings :active="active" :close="hideSettings" />

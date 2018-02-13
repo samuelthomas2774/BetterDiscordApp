@@ -10,7 +10,7 @@
 
 import { DOM, BdUI, Modals } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings } from 'modules';
+import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 
 class BetterDiscord {
@@ -30,6 +30,7 @@ class BetterDiscord {
     async init() {
         await Settings.loadSettings();
         await ModuleManager.initModules();
+        await ExtModuleManager.loadAllModules(true);
         await PluginManager.loadAllPlugins(true);
         await ThemeManager.loadAllThemes(true);
         Modals.showContentManagerErrors();

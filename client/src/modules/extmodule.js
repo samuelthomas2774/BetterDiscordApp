@@ -8,6 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { EventEmitter } from 'events';
+
 class ExtModuleEvents {
     constructor(extmodule) {
         this.extmodule = extmodule;

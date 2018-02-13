@@ -9,6 +9,8 @@
 */
 
 import ThemeManager from './thememanager';
+import { EventEmitter } from 'events';
+import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { DOM, Modals } from 'ui';
 import { FileUtils, ClientIPC } from 'common';
 

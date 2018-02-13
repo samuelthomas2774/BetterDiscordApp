@@ -13,7 +13,7 @@ import Vue from 'vue';
 import VTooltip from 'v-tooltip';
 
 Vue.use(VTooltip, {
-    defaultContainer: 'bdtooltips',
+    defaultContainer: 'bd-tooltips',
     defaultClass: 'bd-tooltip',
     defaultTargetClass: 'bd-has-tooltip',
     defaultInnerSelector: '.bd-tooltip-inner',

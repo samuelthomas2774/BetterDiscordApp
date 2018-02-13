@@ -38,10 +38,9 @@ export default class extends ContentManager {
     static get refreshModules() { return this.refreshContent }
 
     static get loadContent() { return this.loadModule }
-    static async loadModule(paths, configs, info, main, type) {
+    static async loadModule(paths, configs, info, main) {
         return new ExtModule({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName, mainPath: paths.mainPath } });
     }
-
 
     static get findModule() { return this.findContent }
     static get getModuleIndex() { return this.getContentIndex }

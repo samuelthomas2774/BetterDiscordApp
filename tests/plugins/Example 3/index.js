@@ -5,12 +5,12 @@ module.exports = (Plugin, Api, Vendor) => {
 
     return class extends Plugin {
         async onstart() {
-            const example_plugin = await Api.require('example-plugin');
+            const example_plugin = await Api.bridge('example-plugin');
             console.log('Example plugin exports:', example_plugin.test1());
         }
 
         async onstop() {
-            const example_plugin = await Api.require('example-plugin');
+            const example_plugin = await Api.bridge('example-plugin');
             console.log('Example plugin exports:', example_plugin.test2());
         }
     }

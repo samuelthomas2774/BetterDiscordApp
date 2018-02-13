@@ -94,11 +94,12 @@ export default class PluginApi {
         };
     }
 
-    async require(plugin_id) {
+    async bridge(plugin_id) {
         const plugin = await PluginManager.waitForPlugin(plugin_id);
-        return plugin.exports;
+        return plugin.bridge;
     }
 
+    get require() { return this.import }
     import(m) {
         const module = PluginManager.findPlugin(m);
         if (module && module.__require) return module.__require;

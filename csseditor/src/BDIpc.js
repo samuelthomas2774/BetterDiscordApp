@@ -1,6 +1,6 @@
 const { ipcRenderer } = window.require('electron');
 
-class BDIpc {
+export default class {
 
     static on(channel, cb) {
         ipcRenderer.on(channel, (event, args) => cb(event, args));
@@ -21,6 +21,8 @@ class BDIpc {
         });
     }
 
-}
+    static sendToDiscord(channel, message) {
+        this.send('bd-sendToDiscord', { channel, message });
+    }
 
-module.exports = { BDIpc };
+}

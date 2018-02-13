@@ -1,3 +1,13 @@
+.parser-error {
+    padding: 4px 6px;
+    background: #292b2f;
+    border-top: 1px solid hsla(218,5%,47%,.3);
+    color: #d84040;
+    font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+    white-space: pre-wrap;
+    font-size: 12px;
+}
+
 .tools {
     height: 36px;
     background: #292b2f;
@@ -24,16 +34,18 @@
         cursor: pointer;
         border: 0;
         margin-right: 4px;
+        flex: 0 0 auto;
 
         &:hover {
             background: #44474e;
-            color: #FFF;
+            color: #fff;
         }
     }
 
     #chkboxLiveUpdate {
         padding: 3px 10px;
         line-height: 22px;
+        flex: 0 0 auto;
 
         input[type="checkbox"] {
             margin: 0 6px 0 0;

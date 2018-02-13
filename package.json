@@ -49,6 +49,7 @@
     "build": "npm run build --prefix client && npm run build --prefix core && npm run build --prefix csseditor",
     "watch_client": "npm run watch --prefix client",
     "watch_core": "npm run watch --prefix core",
+    "watch_csseditor": "npm run watch --prefix csseditor",
     "lint": "eslint -f unix client/src core/src csseditor/src",
     "test": "npm run build && npm run lint",
     "build_node-sass": "node scripts/build-node-sass.js"

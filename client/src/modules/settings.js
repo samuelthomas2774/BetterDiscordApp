@@ -11,7 +11,9 @@
 import defaultSettings from '../data/user.settings.default';
 import Globals from './globals';
 import CssEditor from './csseditor';
+import Events from './events';
 import { FileUtils, ClientLogger as Logger } from 'common';
+import { SettingUpdatedEvent } from 'structs';
 import path from 'path';
 
 export default class {
@@ -122,8 +124,9 @@ export default class {
                     if (setting.id !== setting_id) continue;
                     if (setting.value === value) return true;
 
+                    let old_value = setting.value;
                     setting.value = value;
-                    this.settingUpdated(set_id, category_id, setting_id, value);
+                    this.settingUpdated(set_id, category_id, setting_id, value, old_value);
                     return true;
                 }
             }
@@ -132,8 +135,12 @@ export default class {
         return false;
     }
 
-    static settingUpdated(set_id, category_id, setting_id, value) {
-        Logger.log('Settings', `${set_id}/${category_id}/${setting_id} was set to ${value}`);
+    static settingUpdated(set_id, category_id, setting_id, value, old_value) {
+        Logger.log('Settings', `${set_id}/${category_id}/${setting_id} was changed from ${old_value} to ${value}`);
+
+        const event = new SettingUpdatedEvent({ set_id, category_id, setting_id, value, old_value });
+        Events.emit('setting-updated', event);
+        Events.emit(`setting-updated-${set_id}_{$category_id}_${setting_id}`, event);
     }
 
     static get getSettings() {

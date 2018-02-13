@@ -17,6 +17,7 @@ export default class {
     static init() {
         ClientIPC.on('bd-get-scss', () => this.sendToEditor('set-scss', { scss: this.scss }));
         ClientIPC.on('bd-update-scss', (e, scss) => this.updateScss(scss));
+        ClientIPC.on('bd-save-csseditor-bounds', (e, bounds) => this.saveEditorBounds(bounds));
 
         ClientIPC.on('bd-save-scss', async (e, scss) => {
             await this.updateScss(scss);
@@ -25,7 +26,7 @@ export default class {
     }
 
     static async show() {
-        await ClientIPC.send('openCssEditor', {});
+        await ClientIPC.send('openCssEditor', this.editor_bounds);
     }
 
     static updateScss(scss, sendSource) {
@@ -49,6 +50,11 @@ export default class {
         Settings.saveSettings();
     }
 
+    static saveEditorBounds(bounds) {
+        this.editor_bounds = bounds;
+        Settings.saveSettings();
+    }
+
     static async compile(scss) {
         return await ClientIPC.send('bd-compileSass', { data: scss });
     }
@@ -62,8 +68,7 @@ export default class {
     }
 
     static set scss(scss) {
-        this.sendToEditor('set-scss', { scss: this.scss });
-        this.updateScss(scss);
+        this.updateScss(scss, true);
     }
 
     static set css(css) {

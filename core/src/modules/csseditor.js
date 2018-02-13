@@ -16,6 +16,11 @@ const { WindowUtils } = require('./utils');
 
 class CSSEditor extends Module {
 
+    constructor(bd) {
+        super();
+        this.bd = bd;
+    }
+
     openEditor(o) {
         if (this.editor) {
             if (this.editor.isFocused()) return;
@@ -26,12 +31,18 @@ class CSSEditor extends Module {
             return;
         }
 
-        this.editor = new BrowserWindow(this.options);
+        const options = this.options;
+        for (let option in o.args) {
+            options[option] = o.args[option];
+        }
+
+        this.editor = new BrowserWindow(options);
         this.editor.loadURL('about:blank');
         this.editor.setSheetOffset(33);
         this.editorUtils = new WindowUtils({ window: this.editor });
 
-        this.editor.webContents.on('close', () => {
+        this.editor.on('close', () => {
+            this.bd.windowUtils.send('bd-save-csseditor-bounds', this.editor.getBounds());
             this.editor = null;
         });
 
@@ -59,7 +70,6 @@ class CSSEditor extends Module {
         this.editor.setAlwaysOnTop(state);
     }
 
-    //TODO user options from config
     get options() {
         return {
             width: 800,
@@ -77,6 +87,4 @@ class CSSEditor extends Module {
 
 }
 
-module.exports = {
-    CSSEditor: new CSSEditor()
-};
+module.exports = { CSSEditor };

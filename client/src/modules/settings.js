@@ -21,7 +21,7 @@ export default class {
 
             const settingsPath = path.resolve(this.dataPath, 'user.settings.json');
             const user_config = await FileUtils.readJsonFromFile(settingsPath);
-            const { settings, scss } = user_config;
+            const { settings, scss, css_editor_bounds } = user_config;
 
             this.settings = defaultSettings;
 
@@ -43,6 +43,7 @@ export default class {
             }
 
             CssEditor.updateScss(scss, true);
+            CssEditor.editor_bounds = css_editor_bounds;
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
@@ -72,7 +73,13 @@ export default class {
                         })
                     };
                 }),
-                scss: CssEditor.scss
+                scss: CssEditor.scss,
+                css_editor_bounds: {
+                    width: CssEditor.editor_bounds.width,
+                    height: CssEditor.editor_bounds.height,
+                    x: CssEditor.editor_bounds.x,
+                    y: CssEditor.editor_bounds.y
+                }
             });
         } catch (err) {
             // There was an error loading settings

@@ -10,11 +10,44 @@
 
 import ContentManager from './contentmanager';
 import ExtModule from './extmodule';
-import PluginApi from './pluginapi';
-import Vendor from './vendor';
 import { ClientLogger as Logger } from 'common';
 import { Events } from 'modules';
 
 export default class extends ContentManager {
+
+    static get localModules() {
+        return this.localContent;
+    }
+
+    static get contentType() {
+        return 'module';
+    }
+
+    static get moduleName() {
+        return 'Ext Module Manager';
+    }
+
+    static get pathId() {
+        return 'modules';
+    }
+
+    static get loadAllModules() {
+        return this.loadAllContent;
+    }
+
+    static get refreshModules() { return this.refreshContent }
+
+    static get loadContent() { return this.loadModule }
+    static async loadModule(paths, configs, info, main, type) {
+        return new ExtModule({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName, mainPath: paths.mainPath } });
+    }
+
+
+    static get findModule() { return this.findContent }
+    static get getModuleIndex() { return this.getContentIndex }
+    static get getModuleByName() { return this.getContentByName }
+    static get getModuleById() { return this.getContentById }
+    static get getModuleByPath() { return this.getContentByPath }
+    static get getModuleByDirName() { return this.getContentByDirName }
 
 }

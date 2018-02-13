@@ -7,7 +7,12 @@ module.exports = (Plugin, Api, Vendor) => {
         onStart() {
             Events.subscribe('TEST_EVENT', this.eventTest);
             Logger.log('onStart');
-            Logger.log(`Setting "default-0" value: ${this.getSetting('default-0')}`);
+            Logger.log(`Plugin setting "default-0" value: ${this.getSetting('default-0')}`);
+            Logger.log(`Internal setting "core/default/test-setting" value: ${Api.Settings.get('core', 'default', 'test-setting')}`);
+
+            Events.subscribe('setting-updated', setting => {
+                console.log('Received internal setting update:', setting);
+            });
 
             const exampleModule = new (Api.import('Example Module'));
             Logger.log(`2+4=${exampleModule.add(2, 4)}`);

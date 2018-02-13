@@ -55,7 +55,7 @@ class Comms {
         });
 
         BDIpc.on('bd-openCssEditor', o => CSSEditor.openEditor(o));
-        BDIpc.on('bd-setCss', o => CSSEditor.setCSS(o.args));
+        BDIpc.on('bd-sendToCssEditor', o => CSSEditor.send(o.args.channel, o.args.data));
 
         BDIpc.on('bd-readFile', this.readFile);
         BDIpc.on('bd-readJson', o => this.readFile(o, true));
@@ -67,11 +67,13 @@ class Comms {
         });
 
         BDIpc.on('bd-compileSass', o => {
-            const { scss, path } = o.args;
-            if (!scss && !path) return;
-            const data = scss ? `${scss} @import '${path}';` : `@import '${path}';`;
+            if (!o.args.data && !o.args.path) return;
+            if (o.args.path && o.args.data) {
+                o.args.data = `${o.args.data} @import '${o.args.path}';`;
+                o.args.path = undefined;
+            }
 
-            sass.render({ data }, (err, result) => {
+            sass.render(o.args, (err, result) => {
                 if (err) {
                     o.reply({ err });
                     return;
@@ -180,4 +182,4 @@ class BetterDiscord {
 
 module.exports = {
     BetterDiscord
-}
+};

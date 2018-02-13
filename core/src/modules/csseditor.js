@@ -12,6 +12,7 @@ const path = require('path');
 const { BrowserWindow } = require('electron');
 
 const { Module } = require('./modulebase');
+const { WindowUtils } = require('./utils');
 
 class CSSEditor extends Module {
 
@@ -26,25 +27,30 @@ class CSSEditor extends Module {
         }
 
         this.editor = new BrowserWindow(this.options);
-        this.editor.loadURL(`file://${this.editorPath}/index.html`);
-        this.editor.open = true;
+        this.editor.loadURL('about:blank');
         this.editor.setSheetOffset(33);
+        this.editorUtils = new WindowUtils({ window: this.editor });
 
         this.editor.webContents.on('close', () => {
             this.editor = null;
         });
 
         this.editor.once('ready-to-show', () => {
-            this.editor.show()
+            this.editor.show();
         });
 
         this.editor.webContents.on('did-finish-load', () => {
+            this.editorUtils.injectScript(path.join(this.editorPath, 'csseditor.js'));
             o.reply(true);
         });
     }
 
-    setCSS(css) {
-        this.editor.webContents.send("set-css", css);
+    setSCSS(scss) {
+        this.send('set-scss', scss);
+    }
+
+    send(channel, data) {
+        this.editor.webContents.send(channel, data);
     }
 
     set alwaysOnTop(state) {
@@ -69,4 +75,6 @@ class CSSEditor extends Module {
 
 }
 
-module.exports = { 'CSSEditor': new CSSEditor() };
+module.exports = {
+    CSSEditor: new CSSEditor()
+};

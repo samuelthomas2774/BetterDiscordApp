@@ -1,15 +1,21 @@
-const styles = require('./styles/index.scss');
+// const styles = require('./styles/index.scss');
 
 import Vue from 'vue';
+import VueCodemirror from 'vue-codemirror';
+
 import Editor from './Editor.vue';
-import VueCodemirror from 'vue-codemirror'
+import styles from './styles/index.scss';
 
 Vue.use(VueCodemirror, {});
 
 window.cmCommands = VueCodemirror.CodeMirror.commands;
 
-new Vue({
-    el: '#root',
+const mount = document.createElement('div');
+mount.classList.add('container');
+document.body.appendChild(mount);
+
+const vue = new Vue({
+    el: mount,
     components: { Editor },
     template: '<Editor/>'
 });

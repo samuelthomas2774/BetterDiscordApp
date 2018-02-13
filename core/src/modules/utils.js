@@ -133,8 +133,12 @@ class WindowUtils extends Module {
 
     injectScript(fpath, variable) {
         console.log(`Injecting: ${fpath}`);
-        if (variable) this.executeJavascript(`${variable} = require("${fpath}");`);
-        else this.executeJavascript(`require("${fpath}");`);
+
+        const escaped_path = fpath.replace(/\\/g, '\\\\').replace(/"/g, '\\\"');
+        const escaped_variable = variable ? variable.replace(/\\/g, '\\\\').replace(/"/g, '\\\"') : null;
+
+        if (variable) this.executeJavascript(`window["${escaped_variable}"] = require("${escaped_path}");`);
+        else this.executeJavascript(`require("${escaped_path}");`);
     }
 
     events(event, callback) {
@@ -152,4 +156,4 @@ module.exports = {
     Utils,
     FileUtils,
     WindowUtils
-}
+};

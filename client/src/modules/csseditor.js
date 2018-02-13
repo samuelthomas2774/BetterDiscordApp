@@ -13,14 +13,53 @@ import { DOM } from 'ui';
 
 export default class {
 
-    static async show() {
-        const t = await ClientIPC.send('openCssEditor', {});
-        ClientIPC.send('setCss', { css: DOM.getStyleCss('bd-customcss') });
+    static init() {
+        ClientIPC.on('bd-get-scss', () => this.sendToEditor('set-scss', { scss: this.scss }));
+        ClientIPC.on('bd-update-scss', (e, scss) => this.updateScss(scss));
 
-        ClientIPC.on('bd-update-css', this.updateCss);
+        ClientIPC.on('bd-save-scss', async (e, scss) => {
+            this.updateScss(scss);
+            e.reply(await this.save(scss));
+        });
     }
 
-    static updateCss(e, css) {
+    static async show() {
+        await ClientIPC.send('openCssEditor', {});
+    }
+
+    static updateScss(scss) {
+        this.compile(scss).then(css => {
+            this.css = css;
+            this._scss = scss;
+            this.sendToEditor('scss-error', null);
+        }).catch(err => {
+            this.sendToEditor('scss-error', err);
+        });
+    }
+
+    static async save(scss) {
+        console.log('Saving SCSS:', scss);
+    }
+
+    static async compile(scss) {
+        return await ClientIPC.send('bd-compileSass', { data: scss });
+    }
+
+    static async sendToEditor(channel, data) {
+        return await ClientIPC.send('sendToCssEditor', { channel, data });
+    }
+
+    static get scss() {
+        return this._scss || '';
+    }
+
+    static set scss(scss) {
+        this.sendToEditor('set-scss', { scss: this.scss });
+        this.updateScss(scss);
+    }
+
+    static set css(css) {
         DOM.injectStyle(css, 'bd-customcss');
     }
+
 }

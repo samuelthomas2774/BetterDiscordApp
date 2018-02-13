@@ -10,7 +10,7 @@
 
 /*Module Manager initializes all modules when everything is ready*/
 
-import { Events, SocketProxy, EventHook } from 'modules';
+import { Events, SocketProxy, EventHook, CssEditor } from 'modules';
 import { ProfileBadges } from 'ui';
 
 export default class {
@@ -19,7 +19,8 @@ export default class {
         return this._modules ? this._modules : (this._modules = [
             new ProfileBadges(),
             new SocketProxy(),
-            new EventHook()
+            new EventHook(),
+            CssEditor
         ]);
     }
 

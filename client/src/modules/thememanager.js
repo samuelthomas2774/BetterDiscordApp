@@ -101,7 +101,7 @@ class Theme {
         let css = '';
         if (this.info.type === 'sass') {
             css = await ClientIPC.send('bd-compileSass', {
-                scss: ThemeManager.getConfigAsSCSS(this.themeConfig),
+                data: ThemeManager.getConfigAsSCSS(this.themeConfig),
                 path: this.paths.mainPath.replace(/\\/g, '/')
             });
             console.log(css);
@@ -195,11 +195,11 @@ export default class ThemeManager extends ContentManager {
         }
 
         if (typeof value === 'boolean' || typeof value === 'number') {
-            return `$${name}: ${value};`; 
+            return `$${name}: ${value};`;
         }
 
         if (typeof value === 'string') {
-            return `$${name}: ${setting.scss_raw ? value : `'${setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`};`; 
+            return `$${name}: ${setting.scss_raw ? value : `'${setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`};`;
         }
 
     }

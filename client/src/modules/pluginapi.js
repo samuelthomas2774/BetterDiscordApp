@@ -99,4 +99,10 @@ export default class PluginApi {
         return plugin.exports;
     }
 
+    import(m) {
+        const module = PluginManager.findPlugin(m);
+        if (module && module.__require) return module.__require;
+        return null;
+    }
+
 }

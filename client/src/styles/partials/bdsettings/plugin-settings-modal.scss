@@ -11,6 +11,7 @@
 
     .bd-plugin-settings-body {
         padding: 0 15px;
+        margin: 0 0 74px;
 
         .bd-switch-wrapper {
             width: 40px;
@@ -20,6 +21,12 @@
                 width: 14px;
                 height: 14px;
             }
+        }
+    }
+
+    &.bd-edited {
+        .bd-scroller::-webkit-scrollbar-track {
+            margin-bottom: 74px;
         }
     }
 }

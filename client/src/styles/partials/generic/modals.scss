@@ -57,60 +57,23 @@
         animation: bd-modal-out 0.22s ease;
     }
 
-    .bd-modal-header .bd-modal-icon .bd-material-design-icon {
-        margin-right: 5px;
-    }
-
-    &.bd-err {
-        .bd-modal-header .bd-modal-icon svg {
-            fill: $colerr;
-        }
-    }
-
-    .bd-modal-body .bd-scroller-wrap .bd-scroller {
-        color: #FFF;
-    }
-
-    .bd-modal-controls {
+    .bd-modal-inner {
+        background: #36393e;
+        contain: layout;
+        flex-direction: column;
+        pointer-events: auto;
+        -webkit-box-direction: normal;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
-        padding: 15px;
-        border-top: 1px solid #4a4a4a;
-
-        .bd-modal-tip {
-            flex-grow: 1;
-            line-height: 26px;
-            color: #FFF;
-        }
-
-        .bd-button {
-            padding: 5px 10px;
-            border-radius: 3px;
-        }
+        flex-grow: 1;
+        border-radius: 4px;
+        max-height: 100%;
+        max-width: 500px;
+        width: 500px;
     }
-}
 
-.bd-modal .bd-modal-inner {
-    background: #36393e;
-    contain: layout;
-    flex-direction: column;
-    pointer-events: auto;
-    -webkit-box-direction: normal;
-    -webkit-box-orient: vertical;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    flex-grow: 1;
-    border-radius: 4px;
-    max-height: 100%;
-    max-width: 500px;
-    width: 500px;
-}
-
-.bd-modal .bd-modal-body {
-    display: flex;
-}
-
-.bd-modal {
     .bd-modal-header {
         display: flex;
         padding: 15px;
@@ -120,11 +83,15 @@
         transition: box-shadow .1s ease-out;
 
         .bd-modal-headertext {
-            color: #FFF;
+            color: #fff;
             font-weight: 700;
             flex-grow: 1;
             line-height: 18px;
             padding: 1px;
+        }
+
+        .bd-modal-icon .bd-material-design-icon {
+            margin-right: 5px;
         }
 
         .bd-modal-x {
@@ -160,11 +127,45 @@
 
     .bd-modal-body {
         padding: 0 15px;
+        display: flex;
+
+        .bd-scroller-wrap .bd-scroller {
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+    }
+
+    .bd-modal-titlelink {
+        cursor: pointer;
+        color: $colbdblue;
+
+        &:hover {
+            text-decoration: underline;
+            color: lighten($colbdblue, 5%);
+        }
+    }
+
+    .bd-modal-controls {
+        display: flex;
+        padding: 15px;
+        border-top: 1px solid #4a4a4a;
+
+        .bd-modal-tip {
+            flex-grow: 1;
+            line-height: 26px;
+            color: #FFF;
+        }
+
+        .bd-button {
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
     }
 
     .bd-modal-footer {
         .bd-footer-alert {
-            margin: 10px;
+            margin: -64px 10px 10px;
             height: 0;
             display: flex;
             background-color: rgba(32, 34, 37, 0.9);
@@ -175,6 +176,7 @@
             transform: translateY(100%);
             opacity: 0;
             transition: all .2s ease-in-out;
+            position: relative;
 
             &.bd-warn {
                 background-color: $colerr;
@@ -189,7 +191,7 @@
 
             .bd-footer-alert-text {
                 flex: 1 1 auto;
-                color: #FFF;
+                color: #fff;
                 font-weight: 700;
                 line-height: 34px;
             }
@@ -209,70 +211,5 @@
                 }
             }
         }
-    }
-}
-
-.bd-modal-error .bd-modal-error-title {
-    padding: 5px;
-    background: rgba(0,0,0,.3);
-    border-radius: 3px 3px 0 0;
-}
-
-.bd-modal-error {
-    margin-top: 5px;
-
-    .bd-scroller-wrap {
-        background: rgba(0,0,0,.2);
-
-        .bd-scroller {
-            overflow-x: auto;
-            padding: 0;
-
-            &::-webkit-scrollbar-corner {
-                background: transparent;
-            }
-        }
-    }
-}
-
-.bd-modal-error .bd-scroller-wrap {
-    opacity: 0;
-}
-
-.bd-modal-error.bd-open {
-    .bd-modal-error-body {
-        transform: scaleY(1) translateY(0%);
-        margin-top: 0%;
-        opacity: 1;
-        user-select: all;
-        span {
-            font-weight: 700;
-        }
-    }
-    .bd-scroller-wrap {
-        opacity: 1;
-    }
-}
-
-.bd-modal-error .bd-modal-error-body {
-    white-space: pre-wrap;
-    font-size: 12px;
-    font-family: 'Consolas';
-    padding: 0 5px;
-    border-radius: 3px;
-    max-height: 100px;
-    width: auto;
-    transition: transform 0.2s ease, margin-top 0.2s ease, opacity 0.2s ease;
-    transform: scaleY(0) translateY(0%);
-    margin-top: -50%;
-    opacity: 0;
-}
-
-.bd-modal-titlelink {
-    cursor: pointer;
-    color: $colbdblue;
-    &:hover {
-        text-decoration: underline;
-        color: lighten($colbdblue, 5%);
     }
 }

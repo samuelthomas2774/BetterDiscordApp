@@ -1,0 +1,129 @@
+{
+    "info": {
+        "name": "Example Theme 1",
+        "authors": [ "Jiiks" ],
+        "version": 1.0,
+        "description": "Example Theme 1 Description",
+        "icon": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FscXVlXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjAwMCAyMDAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyMDAwIDIwMDAiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnPjxwYXRoIGZpbGw9IiMzRTgyRTUiIGQ9Ik0xNDAyLjIsNjMxLjdjLTkuNy0zNTMuNC0yODYuMi00OTYtNjQyLjYtNDk2SDY4LjR2NzE0LjFsNDQyLDM5OFY0OTAuN2gyNTdjMjc0LjUsMCwyNzQuNSwzNDQuOSwwLDM0NC45SDU5Ny42djMyOS41aDE2OS44YzI3NC41LDAsMjc0LjUsMzQ0LjgsMCwzNDQuOGgtNjk5djM1NC45aDY5MS4yYzM1Ni4zLDAsNjMyLjgtMTQyLjYsNjQyLjYtNDk2YzAtMTYyLjYtNDQuNS0yODQuMS0xMjIuOS0zNjguNkMxMzU3LjcsOTE1LjgsMTQwMi4yLDc5NC4zLDE0MDIuMiw2MzEuN3oiLz48cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTI2Mi41LDEzNS4yTDEyNjIuNSwxMzUuMmwtNzYuOCwwYzI2LjYsMTMuMyw1MS43LDI4LjEsNzUsNDQuM2M3MC43LDQ5LjEsMTI2LjEsMTExLjUsMTY0LjYsMTg1LjNjMzkuOSw3Ni42LDYxLjUsMTY1LjYsNjQuMywyNjQuNmwwLDEuMnYxLjJjMCwxNDEuMSwwLDU5Ni4xLDAsNzM3LjF2MS4ybDAsMS4yYy0yLjcsOTktMjQuMywxODgtNjQuMywyNjQuNmMtMzguNSw3My44LTkzLjgsMTM2LjItMTY0LjYsMTg1LjNjLTIyLjYsMTUuNy00Ni45LDMwLjEtNzIuNiw0My4xaDcyLjVjMzQ2LjIsMS45LDY3MS0xNzEuMiw2NzEtNTY3LjlWNzE2LjdDMTkzMy41LDMxMi4yLDE2MDguNywxMzUuMiwxMjYyLjUsMTM1LjJ6Ii8+PC9nPjwvc3ZnPg==",
+        "type": "sass"
+    },
+    "main": "index.scss",
+    "defaultConfig": [
+        {
+            "category": "default",
+            "settings": [
+                {
+                    "id": "divBg",
+                    "type": "text",
+                    "value": "#00ff00",
+                    "text": "Primary colour",
+                    "hint": "A colour setting type would be nice here",
+                    "scss_raw": true
+                },
+                {
+                    "id": "spanOpacity",
+                    "type": "slider",
+                    "value": 50,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "unit": "%",
+                    "multi": "0.01",
+                    "text": "Span border opacity",
+                    "hint": "test"
+                },
+                {
+                    "id": "avatar",
+                    "type": "text",
+                    "value": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+                    "text": "Avatar replace",
+                    "hint": "Replace all avatars"
+                },
+                {
+                    "id": "avatarRadius",
+                    "type": "dropdown",
+                    "value": "opt1",
+                    "text": "Avatar border radius",
+                    "hint": "Dropdown Test Setting Hint",
+                    "options": [
+                        {
+                            "id": "opt1",
+                            "text": "small", 
+                            "value": "8px"
+                        },
+                        {
+                            "id": "opt2",
+                            "text": "medium", 
+                            "value": "12px"
+                        },
+                        {
+                            "id": "opt3",
+                            "text": "high", 
+                            "value": "16px"
+                        },
+                        {
+                            "id": "opt4",
+                            "text": "ultra",
+                            "value": "20px"
+                        }
+                    ]
+                },
+                {
+                    "id": "radioTest",
+                    "type": "radio",
+                    "value": "opt1",
+                    "text": "Span text colour",
+                    "hint": "Radio Test Setting Hint",
+                    "options": [
+                        {
+                            "id": "opt1",
+                            "text": "red",
+                            "value": "red" 
+                        },
+                        {
+                            "id": "opt2",
+                            "text": "green",
+                            "value": "green" 
+                        },
+                        {
+                            "id": "opt3",
+                            "text": "blue",
+                            "value": "blue" 
+                        },
+                        {
+                            "id": "opt4",
+                            "text": "orange",
+                            "value": "orange" 
+                        },
+                        {
+                            "id": "opt5",
+                            "text": "white",
+                            "value": "white" 
+                        }
+                    ]
+                },
+                {
+                    "id": "spanOpacity2",
+                    "type": "number",
+                    "value": 0,
+                    "text": "Span opacity",
+                    "hint": "Number Test Setting Hint"
+                },
+                {
+                    "id": "default-0",
+                    "type": "text",
+                    "value": null,
+                    "text": "Test setting #1",
+                    "hint": "Just some test settings to test the settings panel for themes"
+                },
+                {
+                    "id": "default-1",
+                    "type": "bool",
+                    "value": true,
+                    "text": "Work properly",
+                    "hint": "Just some test settings to test the settings panel for themes"
+                }
+            ]
+        }
+    ]
+}

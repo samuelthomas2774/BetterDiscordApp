@@ -1,0 +1,14 @@
+export { default as MiSettings } from './materialicons/Settings.vue';
+export { default as MiRefresh } from './materialicons/Refresh.vue';
+export { default as MiPencil } from './materialicons/Pencil.vue';
+export { default as MiDelete } from './materialicons/Delete.vue';
+export { default as MiGithubCircle } from './materialicons/GithubCircle.vue';
+export { default as MiWeb } from './materialicons/Web.vue';
+export { default as MiClose } from './materialicons/Close.vue';
+export { default as MiMinus } from './materialicons/Minus.vue';
+export { default as MiOpenInNew } from './materialicons/OpenInNew.vue';
+export { default as MiTwitterCircle } from './materialicons/TwitterCircle.vue';
+export { default as MiPlus } from './materialicons/Plus.vue';
+export { default as MiChevronDown } from './materialicons/ChevronDown.vue';
+export { default as MiExtension } from './materialicons/Extension.vue';
+export { default as MiError } from './materialicons/Error.vue';

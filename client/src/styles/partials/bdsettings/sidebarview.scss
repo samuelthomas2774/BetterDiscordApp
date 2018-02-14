@@ -15,9 +15,19 @@
         opacity: 1;
     }
 
+    .bd-sidebar-view::after {
+        content: "";
+        height: 100%;
+        width: 310px;
+        background-color: #202225;
+        top: 100%;
+        display: block;
+        position: absolute;
+    }
+
     .bd-settings-x {
         position: absolute;
-        top: 15px;
+        top: 18px;
         left: 250px;
         border: 2px solid #6e6e6e;
         border-radius: 50%;
@@ -28,7 +38,11 @@
         align-items: center;
         cursor: pointer;
 
-        span {
+        .platform-darwin & {
+            top: 40px;
+        }
+
+        .bd-x-text {
             color: #72767d;
             position: absolute;
             top: 32px;
@@ -36,16 +50,31 @@
             font-size: 13px;
         }
 
+        .bd-material-design-icon {
+            justify-content: center;
+            display: flex;
+            fill: #72767d;
+        }
+
         &:hover {
             background-color: hsla(218,5%,47%,.3);
+
+            .bd-material-design-icon {
+                fill: #FFF;
+            }
         }
+    }
+
+    .bd-sidebar-region .bd-scroller {
+        padding-top: 0;
     }
 
     .bd-info {
         display: flex;
-        flex-grow: 1;
         align-items: flex-end;
         overflow: hidden;
+        padding: 0 25px;
+        margin: 10px 0;
 
         .bd-vtext {
             color: #414245;
@@ -64,19 +93,14 @@
             cursor: pointer;
 
             &:hover {
-                .material-design-icon {
+                .bd-material-design-icon {
                     fill: #FFF;
                 }
             }
         }
 
-        .material-design-icon {
+        .bd-material-design-icon {
             fill: #414245;
-
-            svg {
-                width: 16px;
-                height: 16px;
-            }
 
             &:hover {
                 fill: #FFF;
@@ -91,5 +115,26 @@
         .bd-sidebar-view .bd-content-region {
             padding-top: 22px;
         }
+    }
+
+    .platform-linux & {
+        top: 0;
+    }
+}
+
+.bd-settings .bd-sidebar-view.bd-stop .bd-content-region {
+	z-index: 3003;
+}
+
+.bd-backdrop {
+	z-index: 3003;
+}
+
+.bd-sidebar .bd-settings-button {
+    position: absolute;
+	top: 0;
+
+    .platform-darwin & {
+        top: 22px;
     }
 }

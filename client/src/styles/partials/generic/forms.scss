@@ -1,3 +1,41 @@
+.bd-form-header {
+    margin: 15px 0 10px;
+    color: rgba(255, 255, 255, 0.15);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 16px;
+    text-transform: uppercase;
+    font-weight: 600;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
+    display: flex;
+
+    .bd-form-header-text {
+        flex: 1 1 auto;
+    }
+
+    .bd-form-header-button {
+        flex: 0 0;
+        margin-left: 5px;
+
+        svg {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            fill: #ccc;
+        }
+    }
+
+    &:hover {
+        .bd-form-header-button svg {
+            fill: #fff;
+        }
+    }
+}
+
 .bd-form-item h5 {
     color: #b9bbbe;
     text-transform: uppercase;
@@ -5,10 +43,13 @@
     font-size: 12px;
 }
 
+.bd-form-item-changed .bd-form-divider {
+    background: $colok;
+}
+
 .bd-form-divider {
     height: 1px;
-    margin-top: 8px;
-    margin-bottom: 40px;
+    margin: 15px 0;
     background: hsla(218,5%,47%,.3);
 }
 
@@ -50,46 +91,4 @@
     cursor: pointer;
     font-weight: 500;
     user-select: none;
-}
-
-.bd-form-textinput {
-
-    .bd-title {
-        display: flex;
-
-        h3 {
-            font-weight: 500;
-            color: #f6f6f7;
-            flex: 1;
-            line-height: 24px;
-            margin-bottom: 0;
-            margin-top: 0;
-        }
-
-        input[type="text"] {
-            background: transparent;
-            border: none;
-            color: #b9bbbe;
-            border-bottom: 2px solid rgba(114, 118, 126, 0.3);
-            outline: none;
-            line-height: 24px;
-            font-size: 100%;
-            font-weight: 500;
-
-            &:focus {
-                color: #FFF;
-                border-color: $colbdblue;
-            }
-        }
-    }
-
-    .bd-hint {
-        flex: 1 1 auto;
-        color: #72767d;
-        font-size: 14px;
-        font-weight: 500;
-        margin-bottom: 15px;
-        line-height: 30px;
-        border-bottom: 0px solid rgba(114, 118, 126, 0.1);
-    }
 }

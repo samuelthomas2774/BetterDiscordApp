@@ -9,6 +9,7 @@
 */
 
 const path = require('path');
+const sass = require('node-sass');
 
 /**
  * DEVELOPMENT VARIABLES
@@ -20,11 +21,13 @@ const __DEV = {
     clientScriptPath: `${clientScriptPath}/betterdiscord.client.js`
 }
 
+const __dataPath = path.resolve(__dirname, '..', '..', 'tests', 'data');
 const __pluginPath = path.resolve(__dirname, '..', '..', 'tests', 'plugins');
 const __themePath = path.resolve(__dirname, '..', '..', 'tests', 'themes');
+const __modulePath = path.resolve(__dirname, '..', '..', 'tests', 'modules');
 
 const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor, AppMenu } = require('./modules');
-const { BrowserWindow } = require('electron');
+const { BrowserWindow, dialog } = require('electron');
 
 const Common = {};
 
@@ -32,8 +35,10 @@ const dummyArgs = {
     'version': '0.3.1',
     'paths': [
         { 'id': 'base', 'path': 'basePath' },
+        { 'id': 'data', 'path': __dataPath },
         { 'id': 'plugins', 'path': __pluginPath },
-        { 'id': 'themes', 'path': __themePath }
+        { 'id': 'themes', 'path': __themePath },
+        { 'id': 'modules', 'path': __modulePath }
     ]
 };
 
@@ -41,7 +46,8 @@ console.log(dummyArgs);
 
 class Comms {
 
-    constructor() {
+    constructor(bd) {
+		this.bd = bd;
         this.initListeners();
     }
 
@@ -50,11 +56,36 @@ class Comms {
             o.reply(Common.Config.config);
         });
 
-        BDIpc.on('bd-openCssEditor', o => CSSEditor.openEditor(o));
-        BDIpc.on('bd-setCss', o => CSSEditor.setCSS(o.args));
+        BDIpc.on('bd-sendToDiscord', event => this.bd.windowUtils.send(event.args.channel, event.args.message));
+
+        BDIpc.on('bd-openCssEditor', o => this.bd.csseditor.openEditor(o));
+        // BDIpc.on('bd-setScss', o => this.bd.csseditor.setSCSS(o.args.scss));
+        BDIpc.on('bd-sendToCssEditor', o => this.bd.csseditor.send(o.args.channel, o.args.data));
 
         BDIpc.on('bd-readFile', this.readFile);
         BDIpc.on('bd-readJson', o => this.readFile(o, true));
+
+        BDIpc.on('bd-native-open', o => {
+            dialog.showOpenDialog(BrowserWindow.fromWebContents(o.ipcEvent.sender), o.args, filenames => {
+                o.reply(filenames);
+            });
+        });
+
+        BDIpc.on('bd-compileSass', o => {
+            if (!o.args.data && !o.args.path) return;
+            if (o.args.path && o.args.data) {
+                o.args.data = `${o.args.data} @import '${o.args.path}';`;
+                o.args.path = undefined;
+            }
+
+            sass.render(o.args, (err, result) => {
+                if (err) {
+                    o.reply({ err });
+                    return;
+                }
+                o.reply(result.css.toString());
+            });
+        });
     }
 
     async readFile(o, json) {
@@ -76,16 +107,25 @@ class Comms {
 class BetterDiscord {
 
     constructor(args) {
+        if (BetterDiscord.loaded) {
+            // Creating two BetterDiscord objects???
+            console.log('Creating two BetterDiscord objects???');
+            return null;
+        }
+        BetterDiscord.loaded = true;
+
         this.injectScripts = this.injectScripts.bind(this);
         this.ignite = this.ignite.bind(this);
         Common.Config = new Config(args || dummyArgs);
-        this.comms = new Comms();
+        this.comms = new Comms(this);
         this.init();
     }
 
     async init() {
         const window = await this.waitForWindow();
         this.windowUtils = new WindowUtils({ window });
+
+        this.csseditor = new CSSEditor(this);
 
         //Log some events for now
         //this.windowUtils.webContents.on('did-start-loading', e =>  this.windowUtils.executeJavascript(`console.info('did-start-loading');`));
@@ -103,8 +143,6 @@ class BetterDiscord {
         this.windowUtils.events('did-navigate-in-page', (event, url, isMainFrame) => {
             this.windowUtils.send('did-navigate-in-page', { event, url, isMainFrame });
         });
-
-        BDIpc.on('bd-sendToDiscord', event => this.windowUtils.send(event.args.channel, event.args.message));
 
         AppMenu.setState({ windowUtils: this.windowUtils });
 
@@ -156,4 +194,6 @@ class BetterDiscord {
 
 }
 
-module.exports = { BetterDiscord };
+module.exports = {
+    BetterDiscord
+};

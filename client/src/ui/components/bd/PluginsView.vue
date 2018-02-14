@@ -15,13 +15,13 @@
                 <div class="bd-flex-grow bd-button" :class="{'bd-active': local}" @click="showLocal">
                     <h3>Local</h3>
                     <div class="bd-material-button" @click="refreshLocal">
-                        <refresh />
+                        <MiRefresh />
                     </div>
                 </div>
                 <div class="bd-flex-grow bd-button" :class="{'bd-active': !local}" @click="showOnline">
                     <h3>Online</h3>
                     <div class="bd-material-button">
-                        <refresh />
+                        <MiRefresh />
                     </div>
                 </div>
             </div>
@@ -32,31 +32,27 @@
                 <div class="bd-spinner-2"></div>
             </div>
         </div>
-        <div v-if="settingsOpen !== null" class="bd-backdrop" @click="settingsOpen = null"></div>
-        <div v-if="settingsOpen !== null" class="bd-modal">
-            <PluginSettingsModal :plugin="settingsOpen" />
-        </div>
     </SettingsWrapper>
 </template>
 
 <script>
     // Imports
     import { PluginManager } from 'modules';
+    import { Modals } from 'ui';
     import { SettingsWrapper } from './';
     import PluginCard from './PluginCard.vue';
-    import PluginSettingsModal from './PluginSettingsModal.vue';
-    import Refresh from 'vue-material-design-icons/refresh.vue';
+    import { MiRefresh } from '../common';
 
     export default {
         data() {
             return {
                 local: true,
-                settingsOpen: null,
                 localPlugins: PluginManager.localPlugins
             }
         },
         components: {
-            SettingsWrapper, PluginCard, PluginSettingsModal, Refresh
+            SettingsWrapper, PluginCard,
+            MiRefresh
         },
         methods: {
             showLocal() {
@@ -93,9 +89,8 @@
                 })();
             },
             showSettings(plugin) {
-                this.settingsOpen = plugin;
+                return Modals.pluginSettings(plugin);
             }
         }
     }
-
 </script>

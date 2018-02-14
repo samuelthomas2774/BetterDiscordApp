@@ -24,7 +24,12 @@ export class ClientIPC {
         const __eid = Date.now().toString();
         ipcRenderer.send(channel, Object.assign(message ? message : {}, { __eid }));
         return new Promise((resolve, reject) => {
-            ipcRenderer.once(__eid, (event, arg) => resolve(arg));
+            ipcRenderer.once(__eid, (event, arg) => {
+                if (arg.err) {
+                    return reject(arg.err);
+                }
+                resolve(arg);
+            });
         });
     }
 }

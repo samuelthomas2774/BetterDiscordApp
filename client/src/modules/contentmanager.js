@@ -11,8 +11,15 @@
 import Globals from './globals';
 import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
+import { Events } from 'modules';
+import { Error } from 'structs';
+import { Modals } from 'ui';
 
 export default class {
+
+    static get errors() {
+        return this._errors || (this._errors = []);
+    }
 
     static get localContent() {
         return this._localContent ? this._localContent : (this._localContent = []);
@@ -22,7 +29,7 @@ export default class {
         return this._contentPath ? this._contentPath : (this._contentPath = Globals.getObject('paths').find(path => path.id === this.pathId).path);
     }
 
-    static async loadAllContent() {
+    static async loadAllContent(supressErrors) {
         try {
             await FileUtils.ensureDirectory(this.contentPath);
             const directories = await FileUtils.listDirectory(this.contentPath);
@@ -31,9 +38,24 @@ export default class {
                 try {
                     await this.preloadContent(dir);
                 } catch (err) {
-                    //We don't want every plugin/theme to fail loading when one does
+                    this.errors.push(new Error({
+                        module: this.moduleName,
+                        message: `Failed to load ${dir}`,
+                        err
+                    }));
+
                     Logger.err(this.moduleName, err);
                 }
+            }
+
+            if (this.errors.length && !supressErrors) {
+                Modals.error({
+                    header: `${this.moduleName} - ${this.errors.length} ${this.contentType}${this.errors.length !== 1 ? 's' : ''} failed to load`,
+                    module: this.moduleName,
+                    type: 'err',
+                    content: this.errors
+                });
+                this._errors = [];
             }
 
             return this.localContent;
@@ -91,6 +113,8 @@ export default class {
             const readConfig = await this.readConfig(contentPath);
             const mainPath = path.join(contentPath, readConfig.main);
 
+            readConfig.defaultConfig = readConfig.defaultConfig || [];
+
             const userConfig = {
                 enabled: false,
                 config: readConfig.defaultConfig
@@ -98,11 +122,26 @@ export default class {
 
             try {
                 const readUserConfig = await this.readUserConfig(contentPath);
-                userConfig.config = userConfig.defaultConfig.map(config => {
-                    const userSet = readUserConfig.config.find(c => c.id === config.id);
-                    return userSet || config;
+                userConfig.enabled = readUserConfig.enabled || false;
+                userConfig.config = readConfig.defaultConfig.map(config => {
+                    const userSet = readUserConfig.config.find(c => c.category === config.category);
+                    // return userSet || config;
+                    if (!userSet) return config;
+
+                    config.settings = config.settings.map(setting => {
+                        const userSetting = userSet.settings.find(s => s.id === setting.id);
+                        if (!userSetting) return setting;
+
+                        setting.value = userSetting.value;
+                        return setting;
+                    });
+                    return config;
                 });
-            } catch (err) {/*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/ }
+                userConfig.css = readUserConfig.css || null;
+                // userConfig.config = readUserConfig.config;
+            } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
+
+            }
 
             const configs = {
                 defaultConfig: readConfig.defaultConfig,
@@ -115,7 +154,7 @@ export default class {
                 mainPath
             }
 
-            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main);
+            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.type);
             if (reload) this.localContent[index] = content;
             else this.localContent.push(content);
             return content;
@@ -124,7 +163,7 @@ export default class {
             throw err;
         }
     }
-    
+
     static async readConfig(configPath) {
         configPath = path.resolve(configPath, 'config.json');
         return FileUtils.readJsonFromFile(configPath);
@@ -151,5 +190,17 @@ export default class {
     static getContentById(id) { return this.localContent.find(c => c.id === id) }
     static getContentByPath(path) { return this.localContent.find(c => c.contentPath === path) }
     static getContentByDirName(dirName) { return this.localContent.find(c => c.dirName === dirName) }
+
+    static waitForContent(content_id) {
+        return new Promise((resolve, reject) => {
+            const check = () => {
+                const content = this.getContentById(content_id);
+                if (content) return resolve(content);
+
+                setTimeout(check, 100);
+            };
+            check();
+        });
+    }
 
 }

@@ -9,18 +9,70 @@
 */
 
 import { ClientIPC } from 'common';
+import Settings from './settings';
 import { DOM } from 'ui';
 
 export default class {
 
-    static async show() {
-        const t = await ClientIPC.send('openCssEditor', {});
-        ClientIPC.send('setCss', { css: DOM.getStyleCss('bd-customcss') });
+    static init() {
+        ClientIPC.on('bd-get-scss', () => this.sendToEditor('set-scss', { scss: this.scss }));
+        ClientIPC.on('bd-update-scss', (e, scss) => this.updateScss(scss));
+        ClientIPC.on('bd-save-csseditor-bounds', (e, bounds) => this.saveEditorBounds(bounds));
 
-        ClientIPC.on('bd-update-css', this.updateCss);
+        ClientIPC.on('bd-save-scss', async (e, scss) => {
+            await this.updateScss(scss);
+            await this.save();
+        });
     }
 
-    static updateCss(e, css) {
+    static async show() {
+        await ClientIPC.send('openCssEditor', this.editor_bounds);
+    }
+
+    static updateScss(scss, sendSource) {
+        if (sendSource)
+            this.sendToEditor('set-scss', { scss });
+
+        return new Promise((resolve, reject) => {
+            this.compile(scss).then(css => {
+                this.css = css;
+                this._scss = scss;
+                this.sendToEditor('scss-error', null);
+                resolve();
+            }).catch(err => {
+                this.sendToEditor('scss-error', err);
+                reject(err);
+            });
+        });
+    }
+
+    static async save() {
+        Settings.saveSettings();
+    }
+
+    static saveEditorBounds(bounds) {
+        this.editor_bounds = bounds;
+        Settings.saveSettings();
+    }
+
+    static async compile(scss) {
+        return await ClientIPC.send('bd-compileSass', { data: scss });
+    }
+
+    static async sendToEditor(channel, data) {
+        return await ClientIPC.send('sendToCssEditor', { channel, data });
+    }
+
+    static get scss() {
+        return this._scss || '';
+    }
+
+    static set scss(scss) {
+        this.updateScss(scss, true);
+    }
+
+    static set css(css) {
         DOM.injectStyle(css, 'bd-customcss');
     }
+
 }

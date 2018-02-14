@@ -1,5 +1,5 @@
-                                                         /**
- * BetterDiscord Emote Settings Component
+/**
+ * BetterDiscord Setting Bool Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -9,18 +9,20 @@
 */
 
 <template>
-    <SettingsWrapper headertext="Emote Settings">
-    </SettingsWrapper>
+    <div class="bd-setting-switch">
+        <div class="bd-title">
+            <h3>{{setting.text}}</h3>
+            <SettingSwitch :checked="setting.value" :change="change" />
+        </div>
+        <div class="bd-hint">{{setting.hint}}</div>
+    </div>
 </template>
-
 <script>
-    // Imports
-    import { SettingsWrapper } from './';
-    import { SettingSwitch } from '../common';
+    import SettingSwitch from '../../common/SettingSwitch.vue';
 
     export default {
+        props: ['setting', 'change'],
         components: {
-            SettingsWrapper,
             SettingSwitch
         }
     }

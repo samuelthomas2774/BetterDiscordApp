@@ -5,6 +5,7 @@
     "version": 1.0,
     "description": "Example Plugin 2 Description"
   },
-  "main": "index.js",
+    "main": "index.js",
+    "type":  "plugin", 
     "defaultConfig": []
 }

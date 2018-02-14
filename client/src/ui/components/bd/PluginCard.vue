@@ -9,47 +9,29 @@
 */
 
 <template>
-    <div class="bd-plugin-card">
-        <div class="bd-plugin-header">
-            <span v-tooltip="'wat'">{{plugin.name}}</span>
-            <div class="bd-flex-spacer" />
-            <label class="bd-switch-wrapper" @click="() => { togglePlugin(plugin); this.$forceUpdate(); }">
-                <input type="checkbox" class="bd-switch-checkbox" />
-                <div class="bd-switch" :class="{'bd-checked': plugin.enabled}" />
-            </label>
-        </div>
-        <div class="bd-plugin-body">
-            <div class="bd-plugin-description">{{plugin.description}}</div>
-            <div class="bd-plugin-footer">
-                <div class="bd-plugin-extra">v{{plugin.version}} by {{plugin.authors.join(', ').replace(/,(?!.*,)/gmi, ' and')}}</div>
-                <div class="bd-controls">
-                    <ButtonGroup>
-                        <Button v-tooltip="'Settings'" v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
-                            <MiSettings />
-                        </Button>
-                        <Button v-tooltip="'Reload'" :onClick="() => reloadPlugin(plugin)">
-                            <MiReload />
-                        </Button>
-                        <Button v-tooltip="'Edit'" :onClick="editPlugin">
-                            <MiEdit />
-                        </Button>
-                        <Button v-tooltip="'Uninstall'" type="err">
-                            <MiDelete />
-                        </Button>
-                    </ButtonGroup>
-                </div>
-            </div>
-        </div>
-    </div>
+    <Card :item="plugin">
+        <SettingSwitch v-if="plugin.type === 'plugin'" slot="toggle" :checked="plugin.enabled" :change="() => plugin.enabled ? plugin.stop() : plugin.start()" />
+        <ButtonGroup slot="controls">
+            <Button v-tooltip="'Settings'" v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)">
+                <MiSettings size="18" />
+            </Button>
+            <Button v-tooltip="'Reload'" :onClick="() => reloadPlugin(plugin)">
+                <MiRefresh size="18" />
+            </Button>
+            <Button v-tooltip="'Edit'" :onClick="editPlugin">
+                <MiPencil size="18" />
+            </Button>
+            <Button v-tooltip="'Uninstall'" type="err">
+                <MiDelete size="18" />
+            </Button>
+        </ButtonGroup>
+    </Card>
 </template>
 <script>
     // Imports
     import { shell } from 'electron';
-    import { Button, ButtonGroup, SettingSwitch } from '../common';
-    import MiSettings from 'vue-material-design-icons/settings.vue';
-    import MiReload from 'vue-material-design-icons/refresh.vue';
-    import MiEdit from 'vue-material-design-icons/pencil.vue';
-    import MiDelete from 'vue-material-design-icons/delete.vue';
+    import Card from './Card.vue';
+    import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension } from '../common';
 
     export default {
         data() {
@@ -59,8 +41,7 @@
         },
         props: ['plugin', 'togglePlugin', 'reloadPlugin', 'showSettings'],
         components: {
-            Button, ButtonGroup, SettingSwitch,
-            MiSettings, MiReload, MiEdit, MiDelete
+            Card, Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
         },
         methods: {
             editPlugin() {

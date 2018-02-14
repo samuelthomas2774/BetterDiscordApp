@@ -9,6 +9,14 @@
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 2px 0 rgba(0, 0, 0, 0.06);
     opacity: 1;
 
+    .platform-darwin & {
+        top: 27px;
+    }
+
+	.platform-linux & {
+		top: 0;
+	}
+
     .bd-settings-button-btn {
         background-image: $logoSmallBw;
         background-size: 50% 50%;
@@ -16,7 +24,7 @@
         background-position: center;
         width: 100%;
         height: 100%;
-        z-index: 3000;
+        z-index: 3001;
         cursor: pointer;
         filter: grayscale(100%);
         opacity: 0.5;
@@ -32,11 +40,11 @@
         }
     }
 
-    &.active {
+    &.bd-active {
         background: transparent;
         opacity: 1;
         box-shadow: none;
-        z-index: 90000;
+        z-index: 3001;
 
         .bd-settings-button-btn {
             background-image: $logoBigBw;

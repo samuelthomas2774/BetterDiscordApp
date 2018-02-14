@@ -12,8 +12,14 @@ const path = require('path');
 const { BrowserWindow } = require('electron');
 
 const { Module } = require('./modulebase');
+const { WindowUtils } = require('./utils');
 
 class CSSEditor extends Module {
+
+    constructor(bd) {
+        super();
+        this.bd = bd;
+    }
 
     openEditor(o) {
         if (this.editor) {
@@ -25,33 +31,45 @@ class CSSEditor extends Module {
             return;
         }
 
-        this.editor = new BrowserWindow(this.options);
-        this.editor.loadURL(`file://${this.editorPath}/index.html`);
-        this.editor.open = true;
-        this.editor.setSheetOffset(33);
+        const options = this.options;
+        for (let option in o.args) {
+            options[option] = o.args[option];
+        }
 
-        this.editor.webContents.on('close', () => {
+        this.editor = new BrowserWindow(options);
+        this.editor.loadURL('about:blank');
+        this.editor.setSheetOffset(33);
+        this.editorUtils = new WindowUtils({ window: this.editor });
+
+        this.editor.on('close', () => {
+            this.bd.windowUtils.send('bd-save-csseditor-bounds', this.editor.getBounds());
             this.editor = null;
         });
 
         this.editor.once('ready-to-show', () => {
-            this.editor.show()
+            this.editor.show();
         });
 
         this.editor.webContents.on('did-finish-load', () => {
+            this.editorUtils.injectScript(path.join(this.editorPath, 'csseditor.js'));
             o.reply(true);
         });
     }
 
-    setCSS(css) {
-        this.editor.webContents.send("set-css", css);
+    setSCSS(scss) {
+        this.send('set-scss', scss);
+    }
+
+    send(channel, data) {
+        if (!this.editor) return;
+        this.editor.webContents.send(channel, data);
     }
 
     set alwaysOnTop(state) {
+        if (!this.editor) return;
         this.editor.setAlwaysOnTop(state);
     }
 
-    //TODO user options from config
     get options() {
         return {
             width: 800,
@@ -69,4 +87,4 @@ class CSSEditor extends Module {
 
 }
 
-module.exports = { 'CSSEditor': new CSSEditor() };
+module.exports = { CSSEditor };

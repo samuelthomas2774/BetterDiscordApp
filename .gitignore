@@ -21,3 +21,5 @@ Installers/**/*/obj
 Installers/**/*/packages
 .vs
 dist/
+user.config.json
+tests/data

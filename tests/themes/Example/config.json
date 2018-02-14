@@ -48,17 +48,17 @@
                     "options": [
                         {
                             "id": "opt1",
-                            "text": "small", 
+                            "text": "small",
                             "value": "8px"
                         },
                         {
                             "id": "opt2",
-                            "text": "medium", 
+                            "text": "medium",
                             "value": "12px"
                         },
                         {
                             "id": "opt3",
-                            "text": "high", 
+                            "text": "high",
                             "value": "16px"
                         },
                         {
@@ -78,27 +78,27 @@
                         {
                             "id": "opt1",
                             "text": "red",
-                            "value": "red" 
+                            "value": "red"
                         },
                         {
                             "id": "opt2",
                             "text": "green",
-                            "value": "green" 
+                            "value": "green"
                         },
                         {
                             "id": "opt3",
                             "text": "blue",
-                            "value": "blue" 
+                            "value": "blue"
                         },
                         {
                             "id": "opt4",
                             "text": "orange",
-                            "value": "orange" 
+                            "value": "orange"
                         },
                         {
                             "id": "opt5",
                             "text": "white",
-                            "value": "white" 
+                            "value": "white"
                         }
                     ]
                 },
@@ -122,6 +122,75 @@
                     "value": true,
                     "text": "Work properly",
                     "hint": "Just some test settings to test the settings panel for themes"
+                }
+            ]
+        }
+    ],
+    "configSchemes": [
+        {
+            "id": "scheme-1",
+            "name": "Test scheme",
+            "hint": "Sets the span border opacity to 1%.",
+            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+            "settings": [
+                {
+                    "category": "default",
+                    "settings": [
+                        {
+                            "id": "spanOpacity",
+                            "value": 1
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "scheme-2",
+            "name": "Another test scheme",
+            "hint": "Sets the primary colour to red and the span border opacity to 99%.",
+            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+            "settings": [
+                {
+                    "category": "default",
+                    "settings": [
+                        {
+                            "id": "divBg",
+                            "type": "text",
+                            "value": "red",
+                            "text": "Primary colour",
+                            "hint": "A colour setting type would be nice here",
+                            "scss_raw": true
+                        },
+                        {
+                            "id": "spanOpacity",
+                            "value": 99
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "scheme-3",
+            "name": "Final test scheme",
+            "hint": "Sets the primary colour to transparent and the span border opacity to 50%.",
+            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+            "settings": [
+                {
+                    "category": "default",
+                    "settings": [
+                        {
+                            "id": "divBg",
+                            "type": "text",
+                            "value": "transparent",
+                            "text": "Primary colour",
+                            "hint": "A colour setting type would be nice here",
+                            "scss_raw": true
+                        },
+                        {
+                            "id": "spanOpacity",
+                            "value": 50
+                        }
+                    ]
                 }
             ]
         }

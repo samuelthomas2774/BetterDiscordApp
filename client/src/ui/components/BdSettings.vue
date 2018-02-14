@@ -33,7 +33,7 @@
             <ContentColumn slot="content">
                 <div v-for="set in settings" v-if="activeContent(set.id) || animatingContent(set.id)" :class="{active: activeContent(set.id), animating: animatingContent(set.id)}">
                     <SettingsWrapper :headertext="set.headertext">
-                        <SettingsPanel :settings="set.settings" :change="(c, s, v) => changeSetting(set.id, c, s, v)" />
+                        <SettingsPanel :settings="set.settings" :schemes="set.schemes" :change="(c, s, v) => changeSetting(set.id, c, s, v)" />
                     </SettingsWrapper>
                 </div>
                 <div v-if="activeContent('css') || animatingContent('css')" :class="{active: activeContent('css'), animating: animatingContent('css')}">

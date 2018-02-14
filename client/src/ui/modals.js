@@ -24,15 +24,27 @@ export default class {
             created() { modal.vue = this; }
         };
         modal.closing = false;
-        modal.close = () => this.close(modal);
+        modal.close = force => this.close(modal, force);
 
         this.stack.push(modal);
         Events.emit('bd-refresh-modals');
         return modal;
     }
 
-    static close(modal) {
-        return new Promise((resolve, reject) => {
+    static close(modal, force) {
+        return new Promise(async (resolve, reject) => {
+            if (modal.beforeClose) {
+                try {
+                    let beforeCloseResult = modal.beforeClose(force);
+                    if (beforeCloseResult instanceof Promise)
+                        beforeCloseResult = await beforeCloseResult;
+
+                    if (beforeCloseResult && !force) return reject(beforeCloseResult);
+                } catch (err) {
+                    if (!force) return reject(err);
+                }
+            }
+
             modal.closing = true;
             setTimeout(() => {
                 this._stack = this.stack.filter(m => m !== modal);
@@ -62,7 +74,8 @@ export default class {
 
     static showContentManagerErrors() {
         // Get any errors from PluginManager and ThemeManager
-        this.error({
+        const errors = ([]).concat(PluginManager.errors).concat(ThemeManager.errors);
+        if (errors.length) return this.error({
             header:
                 (PluginManager.errors.length && ThemeManager.errors.length ? '' :
                 (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName) + ' - ') +
@@ -73,13 +86,13 @@ export default class {
             module: (PluginManager.errors.length && ThemeManager.errors.length ? 'Content Manager' :
                     (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName)),
             type: 'err',
-            content: ([]).concat(PluginManager.errors).concat(ThemeManager.errors)
+            content: errors
         });
     }
 
-    static settings(headertext, settings, settingsUpdated, settingUpdated, saveSettings) {
+    static settings(headertext, settings, schemes, settingsUpdated, settingUpdated, saveSettings) {
         return this.add({
-            headertext, settings,
+            headertext, settings, schemes,
             saveSettings: saveSettings ? saveSettings : newSettings => {
                 const updatedSettings = [];
 
@@ -105,11 +118,11 @@ export default class {
     static internalSettings(set_id) {
         const set = Settings.getSet(set_id);
         if (!set) return;
-        return this.settings(set.headertext, set.settings, null, null, newSettings => Settings.mergeSettings(set.id, newSettings));
+        return this.settings(set.headertext, set.settings, set.schemes, null, null, newSettings => Settings.mergeSettings(set.id, newSettings));
     }
 
     static contentSettings(content) {
-        return this.settings(content.name + ' Settings', content.config, null, null, content.saveSettings.bind(content));
+        return this.settings(content.name + ' Settings', content.config, content.configSchemes, null, null, content.saveSettings.bind(content));
     }
 
     static get stack() {

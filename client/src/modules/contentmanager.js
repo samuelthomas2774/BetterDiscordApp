@@ -173,6 +173,7 @@ export default class {
 
             const configs = {
                 defaultConfig: readConfig.defaultConfig,
+				schemes: readConfig.configSchemes,
                 userConfig
             }
 

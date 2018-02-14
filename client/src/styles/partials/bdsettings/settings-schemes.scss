@@ -12,6 +12,7 @@
     width: calc(33.3% - 15px);
     margin: 0 15px 15px 0;
     cursor: pointer;
+    vertical-align: top;
 
     .bd-settings-modal & {
         width: calc(50% - 15px);
@@ -35,6 +36,14 @@
     .bd-settings-scheme-name {
         font-weight: 500;
         color: #f6f6f7;
+    }
+
+    .bd-settings-scheme-hint {
+        flex: 1 1 auto;
+        color: #72767d;
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 10px;
     }
 
     &.bd-active {

@@ -15,7 +15,8 @@
                 <template v-for="scheme in schemes">
                     <div class="bd-settings-scheme" :class="{'bd-active': checkSchemeActive(scheme)}" @click="() => setActiveScheme(scheme)">
                         <div class="bd-settings-scheme-icon" :style="{'background-image': `url(&quot;${scheme.icon_url}&quot;)`}"></div>
-                        <div class="bd-settings-scheme-name">{{ scheme.name }}</div>
+                        <div class="bd-settings-scheme-name" v-if="scheme.name">{{ scheme.name }}</div>
+                        <div class="bd-settings-scheme-hint" v-if="scheme.hint">{{ scheme.hint }}</div>
                     </div>
                 </template>
             </div>

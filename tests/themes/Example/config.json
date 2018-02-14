@@ -130,6 +130,7 @@
         {
             "id": "scheme-1",
             "name": "Test scheme",
+            "hint": "Sets the span border opacity to 1%.",
             "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
             "settings": [
                 {
@@ -146,6 +147,7 @@
         {
             "id": "scheme-2",
             "name": "Another test scheme",
+            "hint": "Sets the primary colour to red and the span border opacity to 99%.",
             "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
             "settings": [
                 {
@@ -170,6 +172,7 @@
         {
             "id": "scheme-3",
             "name": "Final test scheme",
+            "hint": "Sets the primary colour to transparent and the span border opacity to 50%.",
             "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
             "settings": [
                 {

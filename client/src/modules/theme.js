@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Base
+ * BetterDiscord Theme Module
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -8,14 +8,15 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { FileUtils } from 'common';
-import { Modals } from 'ui';
+import ThemeManager from './thememanager';
 import { EventEmitter } from 'events';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
+import { DOM, Modals } from 'ui';
+import { FileUtils, ClientIPC } from 'common';
 
-class PluginEvents {
-    constructor(plugin) {
-        this.plugin = plugin;
+class ThemeEvents {
+    constructor(theme) {
+        this.theme = theme;
         this.emitter = new EventEmitter();
     }
 
@@ -32,48 +33,37 @@ class PluginEvents {
     }
 }
 
-export default class Plugin {
+export default class Theme {
 
-    constructor(pluginInternals) {
-        this.__pluginInternals = pluginInternals;
+    constructor(themeInternals) {
+        this.__themeInternals = themeInternals;
+        this.hasSettings = this.themeConfig && this.themeConfig.length > 0;
         this.saveSettings = this.saveSettings.bind(this);
-        this.hasSettings = this.pluginConfig && this.pluginConfig.length > 0;
-        this.start = this.start.bind(this);
-        this.stop = this.stop.bind(this);
+        this.enable = this.enable.bind(this);
+        this.disable = this.disable.bind(this);
     }
 
-    get type() { return 'plugin' }
-    get configs() { return this.__pluginInternals.configs }
-    get info() { return this.__pluginInternals.info }
+    get configs() { return this.__themeInternals.configs }
+    get info() { return this.__themeInternals.info }
     get icon() { return this.info.icon }
-    get paths() { return this.__pluginInternals.paths }
-    get main() { return this.__pluginInternals.main }
+    get paths() { return this.__themeInternals.paths }
+    get main() { return this.__themeInternals.main }
     get defaultConfig() { return this.configs.defaultConfig }
     get userConfig() { return this.configs.userConfig }
-    get id() { return this.info.id || this.name.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
+    get id() { return this.info.id || this.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/\s+/g, '-') }
     get name() { return this.info.name }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
-    get pluginPath() { return this.paths.contentPath }
+    get themePath() { return this.paths.contentPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
     get config() { return this.userConfig.config || [] }
-    get pluginConfig() { return this.config }
-    get exports() { return this._exports ? this._exports : (this._exports = this.getExports()) }
-    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new PluginEvents(this)) }
-
-    getSetting(setting_id, category_id) {
-        for (let category of this.pluginConfig) {
-            if (category_id && category.category !== category_id) return;
-            for (let setting of category.settings) {
-                if (setting.id !== setting_id) return;
-                return setting.value;
-            }
-        }
-    }
+    get themeConfig() { return this.config }
+    get css() { return this.userConfig.css }
+    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new ThemeEvents(this)) }
 
     showSettingsModal() {
-        return Modals.pluginSettings(this);
+        return Modals.themeSettings(this);
     }
 
     async saveSettings(newSettings) {
@@ -92,7 +82,10 @@ export default class Plugin {
             }
         }
 
-        this.saveConfiguration();
+        // As the theme's configuration has changed it needs recompiling
+        // When the compiled CSS has been save it will also save the configuration
+        await this.recompile();
+
         return this.settingsUpdated(updatedSettings);
     }
 
@@ -109,9 +102,9 @@ export default class Plugin {
 
     async saveConfiguration() {
         try {
-            await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({
+            await FileUtils.writeFile(`${this.themePath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
-                config: this.pluginConfig.map(category => {
+                config: this.themeConfig.map(category => {
                     return {
                         category: category.category,
                         settings: category.settings.map(setting => {
@@ -121,32 +114,55 @@ export default class Plugin {
                             };
                         })
                     };
-                })
+                }),
+                css: this.css
             }));
         } catch (err) {
             throw err;
         }
     }
 
-    start() {
-        if (this.onstart && !this.onstart()) return false;
-        if (this.onStart && !this.onStart()) return false;
-
+    enable() {
         if (!this.enabled) {
             this.userConfig.enabled = true;
             this.saveConfiguration();
         }
-
-        return true;
+        DOM.injectTheme(this.css, this.id);
     }
 
-    stop() {
-        if (this.onstop && !this.onstop()) return false;
-        if (this.onStop && !this.onStop()) return false;
-
+    disable() {
         this.userConfig.enabled = false;
         this.saveConfiguration();
-        return true;
+        DOM.deleteTheme(this.id);
+    }
+
+    async compile() {
+        console.log('Compiling CSS');
+
+        let css = '';
+        if (this.info.type === 'sass') {
+            css = await ClientIPC.send('bd-compileSass', {
+                data: ThemeManager.getConfigAsSCSS(this.themeConfig),
+                path: this.paths.mainPath.replace(/\\/g, '/')
+            });
+            console.log(css);
+        } else {
+            css = await FileUtils.readFile(this.paths.mainPath);
+        }
+
+        return css;
+    }
+
+    async recompile() {
+        const css = await this.compile();
+        this.userConfig.css = css;
+
+        await this.saveConfiguration();
+
+        if (this.enabled) {
+            DOM.deleteTheme(this.id);
+            DOM.injectTheme(this.css, this.id);
+        }
     }
 
 }

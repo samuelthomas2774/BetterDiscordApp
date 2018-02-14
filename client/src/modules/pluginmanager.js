@@ -15,7 +15,6 @@ import Vendor from './vendor';
 import { ClientLogger as Logger } from 'common';
 import { Events } from 'modules';
 
-
 export default class extends ContentManager {
 
     static get localPlugins() {
@@ -34,8 +33,8 @@ export default class extends ContentManager {
         return 'plugins';
     }
 
-    static async loadAllPlugins(supressErrors) {
-        const loadAll = await this.loadAllContent(supressErrors);
+    static async loadAllPlugins(suppressErrors) {
+        const loadAll = await this.loadAllContent(suppressErrors);
         this.localPlugins.forEach(plugin => {
             if (plugin.enabled) plugin.start();
         });
@@ -45,7 +44,7 @@ export default class extends ContentManager {
     static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
-    static async loadPlugin(paths, configs, info, main, type) {
+    static async loadPlugin(paths, configs, info, main) {
         const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor);
         const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName, mainPath: paths.mainPath } });
         return instance;

@@ -12,7 +12,7 @@ import Globals from './globals';
 import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import { Events } from 'modules';
-import { Error } from 'structs';
+import { ErrorEvent } from 'structs';
 import { Modals } from 'ui';
 
 export default class {
@@ -29,7 +29,7 @@ export default class {
         return this._contentPath ? this._contentPath : (this._contentPath = Globals.getObject('paths').find(path => path.id === this.pathId).path);
     }
 
-    static async loadAllContent(supressErrors) {
+    static async loadAllContent(suppressErrors) {
         try {
             await FileUtils.ensureDirectory(this.contentPath);
             const directories = await FileUtils.listDirectory(this.contentPath);
@@ -38,7 +38,7 @@ export default class {
                 try {
                     await this.preloadContent(dir);
                 } catch (err) {
-                    this.errors.push(new Error({
+                    this.errors.push(new ErrorEvent({
                         module: this.moduleName,
                         message: `Failed to load ${dir}`,
                         err
@@ -48,7 +48,7 @@ export default class {
                 }
             }
 
-            if (this.errors.length && !supressErrors) {
+            if (this.errors.length && !suppressErrors) {
                 Modals.error({
                     header: `${this.moduleName} - ${this.errors.length} ${this.contentType}${this.errors.length !== 1 ? 's' : ''} failed to load`,
                     module: this.moduleName,
@@ -154,7 +154,7 @@ export default class {
                 mainPath
             }
 
-            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.type);
+            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main);
             if (reload) this.localContent[index] = content;
             else this.localContent.push(content);
             return content;

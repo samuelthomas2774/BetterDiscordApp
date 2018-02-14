@@ -8,6 +8,27 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { EventEmitter } from 'events';
+
+class ExtModuleEvents {
+    constructor(extmodule) {
+        this.extmodule = extmodule;
+        this.emitter = new EventEmitter();
+    }
+
+    on(eventname, callback) {
+        this.emitter.on(eventname, callback);
+    }
+
+    off(eventname, callback) {
+        this.emitter.removeListener(eventname, callback);
+    }
+
+    emit(...args) {
+        this.emitter.emit(...args);
+    }
+}
+
 export default class ExtModule {
 
     constructor(pluginInternals) {
@@ -31,5 +52,7 @@ export default class ExtModule {
     get pluginPath() { return this.paths.contentPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return true }
-    get pluginConfig() { return this.userConfig.config || [] }
+    get config() { return this.userConfig.config || [] }
+    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new ExtModuleEvents(this)) }
+
 }

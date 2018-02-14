@@ -32,7 +32,16 @@ export default class {
     }
 
     static close(modal) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+            if (modal.beforeClose) {
+                let beforeCloseResult = modal.beforeClose();
+                if (beforeCloseResult instanceof Promise)
+                    beforeCloseResult = await beforeCloseResult;
+
+                if (beforeCloseResult)
+                    return reject(beforeCloseResult);
+            }
+
             modal.closing = true;
             setTimeout(() => {
                 this._stack = this.stack.filter(m => m !== modal);

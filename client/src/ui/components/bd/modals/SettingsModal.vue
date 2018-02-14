@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-settings-modal" :class="{'bd-edited': changed}">
-        <Modal :headerText="modal.headertext" :close="attemptToClose" :class="{'bd-modal-out': modal.closing}">
+        <Modal :headerText="modal.headertext" :close="modal.close" :class="{'bd-modal-out': modal.closing}">
             <SettingsPanel :settings="configCache" :schemes="modal.schemes" :change="settingChange" slot="body" class="bd-settings-modal-body" />
             <div slot="footer" class="bd-footer-alert" :class="{'bd-active': changed, 'bd-warn': warnclose}">
                 <div class="bd-footer-alert-text">Unsaved changes</div>
@@ -91,19 +91,15 @@
                 this.configCache = JSON.parse(JSON.stringify(this.modal.settings));
                 this.changed = false;
                 this.$forceUpdate();
-            },
-            attemptToClose(e) {
-                if (!this.changed) {
-                    this.closing = true;
-                    setTimeout(() => {
-                        this.modal.close();
-                    }, 200);
-                    return;
+            }
+        },
+        created() {
+            this.modal.beforeClose = () => {
+                if (this.changed) {
+                    this.warnclose = true;
+                    setTimeout(() => this.warnclose = false, 400);
+                    return true;
                 }
-                this.warnclose = true;
-                setTimeout(() => {
-                    this.warnclose = false;
-                }, 400);
             }
         },
         beforeMount() {

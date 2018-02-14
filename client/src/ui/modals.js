@@ -74,7 +74,8 @@ export default class {
 
     static showContentManagerErrors() {
         // Get any errors from PluginManager and ThemeManager
-        this.error({
+        const errors = ([]).concat(PluginManager.errors).concat(ThemeManager.errors);
+        if (errors.length) return this.error({
             header:
                 (PluginManager.errors.length && ThemeManager.errors.length ? '' :
                 (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName) + ' - ') +
@@ -85,7 +86,7 @@ export default class {
             module: (PluginManager.errors.length && ThemeManager.errors.length ? 'Content Manager' :
                     (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName)),
             type: 'err',
-            content: ([]).concat(PluginManager.errors).concat(ThemeManager.errors)
+            content: errors
         });
     }
 

@@ -9,6 +9,9 @@
     },
     "main": "index.js",
     "type": "plugin", 
+    "dependencies": {
+        "Example Module": "1.0" 
+    }, 
     "defaultConfig": [
         {
             "category_default_comment": "default category has no header and is always displayed first",

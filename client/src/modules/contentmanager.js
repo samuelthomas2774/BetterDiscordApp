@@ -154,7 +154,7 @@ export default class {
                 mainPath
             }
 
-            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main);
+            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies);
             if (reload) this.localContent[index] = content;
             else this.localContent.push(content);
             return content;

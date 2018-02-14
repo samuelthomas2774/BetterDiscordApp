@@ -1,4 +1,4 @@
-module.exports = (Plugin, Api, Vendor) => {
+module.exports = (Plugin, Api, Vendor, Dependencies) => {
 
     const { $, moment, _ } = Vendor;
     const { Events, Logger } = Api;
@@ -21,7 +21,7 @@ module.exports = (Plugin, Api, Vendor) => {
                 console.log('Received internal setting update:', event);
             });
 
-            const exampleModule = new (Api.import('Example Module'));
+            const exampleModule = new Dependencies['Example Module'];
             Logger.log(`2+4=${exampleModule.add(2, 4)}`);
             return true;
         }

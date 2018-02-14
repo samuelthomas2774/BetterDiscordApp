@@ -47,7 +47,9 @@
   },
   "scripts": {
     "build": "npm run build --prefix client && npm run build --prefix core && npm run build --prefix csseditor",
+    "build_client": "npm run build --prefix client",
     "watch_client": "npm run watch --prefix client",
+    "build_core": "npm run build --prefix core", 
     "watch_core": "npm run watch --prefix core",
     "watch_csseditor": "npm run watch --prefix csseditor",
     "lint": "eslint -f unix client/src core/src csseditor/src",

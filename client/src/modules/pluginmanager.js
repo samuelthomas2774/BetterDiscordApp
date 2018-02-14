@@ -56,7 +56,7 @@ export default class extends ContentManager {
                         'message': `Dependency: ${key}:${value} is not loaded`
                     };
                 }
-                deps.push(extModule);
+                deps[key] = extModule.__require;
             }
         }
 

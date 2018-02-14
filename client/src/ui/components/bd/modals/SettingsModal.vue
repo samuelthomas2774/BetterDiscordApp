@@ -94,11 +94,11 @@
             }
         },
         created() {
-            this.modal.beforeClose = () => {
-                if (this.changed) {
+            this.modal.beforeClose = force => {
+                if (this.changed && !force) {
                     this.warnclose = true;
                     setTimeout(() => this.warnclose = false, 400);
-                    return true;
+                    throw {message: 'Settings have been changed'};
                 }
             }
         },

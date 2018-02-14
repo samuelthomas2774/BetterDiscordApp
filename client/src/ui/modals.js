@@ -24,22 +24,25 @@ export default class {
             created() { modal.vue = this; }
         };
         modal.closing = false;
-        modal.close = () => this.close(modal);
+        modal.close = force => this.close(modal, force);
 
         this.stack.push(modal);
         Events.emit('bd-refresh-modals');
         return modal;
     }
 
-    static close(modal) {
+    static close(modal, force) {
         return new Promise(async (resolve, reject) => {
             if (modal.beforeClose) {
-                let beforeCloseResult = modal.beforeClose();
-                if (beforeCloseResult instanceof Promise)
-                    beforeCloseResult = await beforeCloseResult;
+                try {
+                    let beforeCloseResult = modal.beforeClose(force);
+                    if (beforeCloseResult instanceof Promise)
+                        beforeCloseResult = await beforeCloseResult;
 
-                if (beforeCloseResult)
-                    return reject(beforeCloseResult);
+                    if (beforeCloseResult && !force) return reject(beforeCloseResult);
+                } catch (err) {
+                    if (!force) return reject(err);
+                }
             }
 
             modal.closing = true;

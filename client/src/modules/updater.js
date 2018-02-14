@@ -57,9 +57,7 @@ export default class {
                     Events.emit('update-check-fail', err);
                 }
             },
-            fail: e => {
-                Events.emit('update-check-fail', e);
-            }
+            fail: e => Events.emit('update-check-fail', e)
         });
     }
 

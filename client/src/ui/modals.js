@@ -77,9 +77,9 @@ export default class {
         });
     }
 
-    static settings(headertext, settings, settingsUpdated, settingUpdated, saveSettings) {
+    static settings(headertext, settings, schemes, settingsUpdated, settingUpdated, saveSettings) {
         return this.add({
-            headertext, settings,
+            headertext, settings, schemes,
             saveSettings: saveSettings ? saveSettings : newSettings => {
                 const updatedSettings = [];
 
@@ -105,11 +105,11 @@ export default class {
     static internalSettings(set_id) {
         const set = Settings.getSet(set_id);
         if (!set) return;
-        return this.settings(set.headertext, set.settings, null, null, newSettings => Settings.mergeSettings(set.id, newSettings));
+        return this.settings(set.headertext, set.settings, set.schemes, null, null, newSettings => Settings.mergeSettings(set.id, newSettings));
     }
 
     static contentSettings(content) {
-        return this.settings(content.name + ' Settings', content.config, null, null, content.saveSettings.bind(content));
+        return this.settings(content.name + ' Settings', content.config, content.configSchemes, null, null, content.saveSettings.bind(content));
     }
 
     static get stack() {

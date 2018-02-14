@@ -11,7 +11,7 @@
 <template>
     <div class="bd-settings-modal" :class="{'bd-edited': changed}">
         <Modal :headerText="modal.headertext" :close="attemptToClose" :class="{'bd-modal-out': modal.closing}">
-            <SettingsPanel :settings="configCache" :change="settingChange" slot="body" class="bd-settings-modal-body" />
+            <SettingsPanel :settings="configCache" :schemes="modal.schemes" :change="settingChange" slot="body" class="bd-settings-modal-body" />
             <div slot="footer" class="bd-footer-alert" :class="{'bd-active': changed, 'bd-warn': warnclose}">
                 <div class="bd-footer-alert-text">Unsaved changes</div>
                 <div class="bd-button bd-reset-button bd-tp" :class="{'bd-disabled': saving}" @click="resetSettings">Reset</div>

@@ -51,6 +51,7 @@ export default class Plugin {
     get main() { return this.__pluginInternals.main }
     get defaultConfig() { return this.configs.defaultConfig }
     get userConfig() { return this.configs.userConfig }
+    get configSchemes() { return this.configs.schemes }
     get id() { return this.info.id || this.name.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
     get name() { return this.info.name }
     get authors() { return this.info.authors }

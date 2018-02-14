@@ -9,12 +9,12 @@
 */
 
 import ContentManager from './contentmanager';
+import ExtModuleManager from './extmodulemanager';
 import Plugin from './plugin';
 import PluginApi from './pluginapi';
 import Vendor from './vendor';
 import { ClientLogger as Logger } from 'common';
 import { Events } from 'modules';
-
 
 export default class extends ContentManager {
 
@@ -34,8 +34,8 @@ export default class extends ContentManager {
         return 'plugins';
     }
 
-    static async loadAllPlugins(supressErrors) {
-        const loadAll = await this.loadAllContent(supressErrors);
+    static async loadAllPlugins(suppressErrors) {
+        const loadAll = await this.loadAllContent(suppressErrors);
         this.localPlugins.forEach(plugin => {
             if (plugin.enabled) plugin.start();
         });
@@ -45,8 +45,22 @@ export default class extends ContentManager {
     static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
-    static async loadPlugin(paths, configs, info, main, type) {
-        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor);
+    static async loadPlugin(paths, configs, info, main, dependencies) {
+
+        const deps = [];
+        if (dependencies) {
+            for (const [key, value] of Object.entries(dependencies)) {
+                const extModule = ExtModuleManager.findModule(key);
+                if (!extModule) {
+                    throw {
+                        'message': `Dependency: ${key}:${value} is not loaded`
+                    };
+                }
+                deps[key] = extModule.__require;
+            }
+        }
+
+        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor, deps);
         const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName, mainPath: paths.mainPath } });
         return instance;
     }

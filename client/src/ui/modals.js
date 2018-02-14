@@ -9,7 +9,7 @@
 */
 
 import { Utils, FileUtils } from 'common';
-import { Events, PluginManager, ThemeManager } from 'modules';
+import { Settings, Events, PluginManager, ThemeManager } from 'modules';
 import BasicModal from './components/bd/modals/BasicModal.vue';
 import ErrorModal from './components/bd/modals/ErrorModal.vue';
 import SettingsModal from './components/bd/modals/SettingsModal.vue';
@@ -100,6 +100,12 @@ export default class {
                 return settingsUpdated ? settingsUpdated(updatedSettings) : updatedSettings;
             }
         }, SettingsModal);
+    }
+
+    static internalSettings(set_id) {
+        const set = Settings.getSet(set_id);
+        if (!set) return;
+        return this.settings(set.headertext, set.settings, null, null, newSettings => Settings.saveSettings(set.id, newSettings));
     }
 
     static pluginSettings(plugin) {

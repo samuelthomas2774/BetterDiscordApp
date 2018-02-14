@@ -12,7 +12,7 @@ import defaultSettings from '../data/user.settings.default';
 import Globals from './globals';
 import CssEditor from './csseditor';
 import Events from './events';
-import { FileUtils, ClientLogger as Logger } from 'common';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { SettingUpdatedEvent } from 'structs';
 import path from 'path';
 
@@ -113,6 +113,28 @@ export default class {
         return setting ? setting.value : undefined;
     }
 
+    static saveSettings(set_id, newSettings, settingsUpdated) {
+        const set = this.getSet(set_id);
+        if (!set) return;
+        const updatedSettings = [];
+
+        for (let newCategory of newSettings) {
+            let category = set.settings.find(c => c.category === newCategory.category);
+
+            for (let newSetting of newCategory.settings) {
+                let setting = category.settings.find(s => s.id === newSetting.id);
+                if (Utils.compare(setting.value, newSetting.value)) continue;
+
+                let old_value = setting.value;
+                setting.value = newSetting.value;
+                updatedSettings.push({ set_id: set.id, category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
+                this.settingUpdated(set.id, category.category, setting.id, setting.value, old_value);
+            }
+        }
+
+        return settingsUpdated ? settingsUpdated(updatedSettings) : updatedSettings;
+    }
+
     static setSetting(set_id, category_id, setting_id, value) {
         for (let set of this.getSettings) {
             if (set.id !== set_id) continue;
@@ -122,7 +144,7 @@ export default class {
 
                 for (let setting of category.settings) {
                     if (setting.id !== setting_id) continue;
-                    if (setting.value === value) return true;
+                    if (Utils.compare(setting.value, value)) return true;
 
                     let old_value = setting.value;
                     setting.value = value;

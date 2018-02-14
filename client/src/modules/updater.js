@@ -17,6 +17,7 @@ export default class {
 
     constructor() {
         window.updater = this;
+        this.updatesAvailable = false;
         this.init = this.init.bind(this);
         this.checkForUpdates = this.checkForUpdates.bind(this);
     }
@@ -29,7 +30,14 @@ export default class {
         setInterval(this.checkForUpdates, this.interval);
     }
 
+    update() {
+        // TODO
+        this.updatesAvailable = false;
+        Events.emit('update-check-end');
+    }
+
     checkForUpdates() {
+        if (this.updatesAvailable) return;
         Events.emit('update-check-start');
         Logger.info('Updater', 'Checking for updates');
         $.ajax({
@@ -37,8 +45,20 @@ export default class {
             url: 'https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json',
             cache: false,
             success: e => {
-                Logger.info('Updater', `Latest Version: ${e.version} - Current Version: ${Globals.getObject('version')}`);
-                Events.emit('update-check-end');
+                try {
+                    Events.emit('update-check-end');
+                    Logger.info('Updater',
+                        `Latest Version: ${e.version} - Current Version: ${Globals.getObject('version')}`);
+                    if (e.version !== Globals.getObject('version')) {
+                        this.updatesAvailable = true;
+                        Events.emit('updates-available');
+                    }
+                } catch (err) {
+                    Events.emit('update-check-fail', err);
+                }
+            },
+            fail: e => {
+                Events.emit('update-check-fail', e);
             }
         });
     }

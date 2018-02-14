@@ -27,7 +27,7 @@ export default class {
     }
 
     init() {
-        setInterval(this.checkForUpdates, this.interval);
+        this.updateInterval = setInterval(this.checkForUpdates, this.interval);
     }
 
     update() {

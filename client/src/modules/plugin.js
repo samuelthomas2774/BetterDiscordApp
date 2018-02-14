@@ -38,7 +38,7 @@ export default class Plugin {
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;
         this.saveSettings = this.saveSettings.bind(this);
-        this.hasSettings = this.pluginConfig && this.pluginConfig.length > 0;
+        this.hasSettings = this.config && this.config.length > 0;
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
     }
@@ -64,7 +64,7 @@ export default class Plugin {
     get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new PluginEvents(this)) }
 
     getSetting(setting_id, category_id) {
-        for (let category of this.pluginConfig) {
+        for (let category of this.config) {
             if (category_id && category.category !== category_id) return;
             for (let setting of category.settings) {
                 if (setting.id !== setting_id) return;
@@ -81,7 +81,7 @@ export default class Plugin {
         const updatedSettings = [];
 
         for (let newCategory of newSettings) {
-            const category = this.pluginConfig.find(c => c.category === newCategory.category);
+            const category = this.config.find(c => c.category === newCategory.category);
             for (let newSetting of newCategory.settings) {
                 const setting = category.settings.find(s => s.id === newSetting.id);
                 if (Utils.compare(setting.value, newSetting.value)) continue;
@@ -109,9 +109,9 @@ export default class Plugin {
     }
 
     async saveConfiguration() {
-        window.testConfig = new ContentConfig(this.pluginConfig);
+        window.testConfig = new ContentConfig(this.config);
         try {
-            const config = new ContentConfig(this.pluginConfig).strip();
+            const config = new ContentConfig(this.config).strip();
             await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
                 config

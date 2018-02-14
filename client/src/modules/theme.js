@@ -12,7 +12,7 @@ import ThemeManager from './thememanager';
 import { EventEmitter } from 'events';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { DOM, Modals } from 'ui';
-import { FileUtils, ClientIPC } from 'common';
+import { Utils, FileUtils, ClientIPC } from 'common';
 import ContentConfig from './contentconfig';
 
 class ThemeEvents {
@@ -38,7 +38,7 @@ export default class Theme {
 
     constructor(themeInternals) {
         this.__themeInternals = themeInternals;
-        this.hasSettings = this.themeConfig && this.themeConfig.length > 0;
+        this.hasSettings = this.config && this.config.length > 0;
         this.saveSettings = this.saveSettings.bind(this);
         this.enable = this.enable.bind(this);
         this.disable = this.disable.bind(this);
@@ -71,10 +71,10 @@ export default class Theme {
         const updatedSettings = [];
 
         for (let newCategory of newSettings) {
-            const category = this.themeConfig.find(c => c.category === newCategory.category);
+            const category = this.config.find(c => c.category === newCategory.category);
             for (let newSetting of newCategory.settings) {
                 const setting = category.settings.find(s => s.id === newSetting.id);
-                if (setting.value === newSetting.value) continue;
+                if (Utils.compare(setting.value, newSetting.value)) continue;
 
                 const old_value = setting.value;
                 setting.value = newSetting.value;
@@ -103,7 +103,7 @@ export default class Theme {
 
     async saveConfiguration() {
         try {
-            const config = new ContentConfig(this.themeConfig).strip();
+            const config = new ContentConfig(this.config).strip();
             await FileUtils.writeFile(`${this.themePath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
                 config,
@@ -134,7 +134,7 @@ export default class Theme {
         let css = '';
         if (this.info.type === 'sass') {
             css = await ClientIPC.send('bd-compileSass', {
-                data: ThemeManager.getConfigAsSCSS(this.themeConfig),
+                data: ThemeManager.getConfigAsSCSS(this.config),
                 path: this.paths.mainPath.replace(/\\/g, '/')
             });
             console.log(css);

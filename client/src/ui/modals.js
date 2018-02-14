@@ -109,12 +109,10 @@ export default class {
     }
 
     static pluginSettings(plugin) {
-        // return this.add({ headertext: plugin.name + ' Settings', settings: plugin.config, saveSettings: plugin.saveSettings }, SettingsModal);
         return this.settings(plugin.name + ' Settings', plugin.config, null, null, plugin.saveSettings.bind(plugin));
     }
 
     static themeSettings(theme) {
-        // return this.add({ headertext: theme.name + ' Settings', settings: theme.config, saveSettings: theme.saveSettings }, SettingsModal);
         return this.settings(theme.name + ' Settings', theme.config, null, null, theme.saveSettings.bind(theme));
     }
 

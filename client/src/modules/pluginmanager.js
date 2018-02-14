@@ -9,6 +9,7 @@
 */
 
 import ContentManager from './contentmanager';
+import ExtModuleManager from './extmodulemanager';
 import Plugin from './plugin';
 import PluginApi from './pluginapi';
 import Vendor from './vendor';
@@ -44,8 +45,22 @@ export default class extends ContentManager {
     static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
-    static async loadPlugin(paths, configs, info, main) {
-        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor);
+    static async loadPlugin(paths, configs, info, main, dependencies) {
+
+        const deps = [];
+        if (dependencies) {
+            for (const [key, value] of Object.entries(dependencies)) {
+                const extModule = ExtModuleManager.findModule(key);
+                if (!extModule) {
+                    throw {
+                        'message': `Dependency: ${key}:${value} is not loaded`
+                    };
+                }
+                deps.push(extModule);
+            }
+        }
+
+        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor, deps);
         const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName, mainPath: paths.mainPath } });
         return instance;
     }

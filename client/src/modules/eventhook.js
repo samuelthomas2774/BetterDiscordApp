@@ -17,6 +17,10 @@ import {
 } from '../structs/socketstructs';
 
 
+/**
+ * Discord socket event hook
+ * @extends {EventListener}
+ */
 export default class extends EventListener {
 
     bindings() {
@@ -29,14 +33,16 @@ export default class extends EventListener {
         ];
     }
 
-    hook() {
+    hook() {}
 
-    }
+    get eventsModule() {}
 
-    get eventsModule() {
-
-    }
-
+    /**
+     * Discord emit overload
+     * @param {any} e
+     * @param {any} action
+     * @param {any} data
+     */
     emit(e, action, data) {
         switch (e) {
             case 'dispatch':
@@ -44,6 +50,11 @@ export default class extends EventListener {
         }
     }
 
+    /**
+     * Emit callback
+     * @param {any} e Event Action
+     * @param {any} d Event Args
+     */
     dispatch(e, d) {
 
         Events.emit('raw-event', { type: e, data: d });
@@ -77,6 +88,9 @@ export default class extends EventListener {
         }
     }
 
+    /**
+     * All known socket actions
+     */
     get actions() {
         return {
             READY: 'READY', // Socket ready

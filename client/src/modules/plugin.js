@@ -11,6 +11,7 @@
 import { FileUtils } from 'common';
 import { Modals } from 'ui';
 import { EventEmitter } from 'events';
+import ContentConfig from './contentconfig';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
 class PluginEvents {
@@ -108,20 +109,12 @@ export default class Plugin {
     }
 
     async saveConfiguration() {
+        window.testConfig = new ContentConfig(this.pluginConfig);
         try {
+            const config = new ContentConfig(this.pluginConfig).strip();
             await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
-                config: this.pluginConfig.map(category => {
-                    return {
-                        category: category.category,
-                        settings: category.settings.map(setting => {
-                            return {
-                                id: setting.id,
-                                value: setting.value
-                            };
-                        })
-                    };
-                })
+                config
             }));
         } catch (err) {
             throw err;

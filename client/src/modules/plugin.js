@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { FileUtils } from 'common';
+import { Utils, FileUtils } from 'common';
 import { Modals } from 'ui';
 
 export default class Plugin {
@@ -54,13 +54,18 @@ export default class Plugin {
     }
 
     async saveSettings(newSettings) {
-        for (let category of newSettings) {
-            const oldCategory = this.pluginConfig.find(c => c.category === category.category);
-            for (let setting of category.settings) {
-                const oldSetting = oldCategory.settings.find(s => s.id === setting.id);
-                if (oldSetting.value === setting.value) continue;
-                oldSetting.value = setting.value;
-                if (this.settingChanged) this.settingChanged(category.category, setting.id, setting.value);
+        const updatedSettings = [];
+
+        for (let newCategory of newSettings) {
+            const category = this.pluginConfig.find(c => c.category === newCategory.category);
+            for (let newSetting of newCategory.settings) {
+                const setting = category.settings.find(s => s.id === newSetting.id);
+                if (Utils.compare(setting.value, newSetting.value)) continue;
+
+                let old_value = setting.value;
+                setting.value = newSetting.value;
+                updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
+                this.settingUpdated(category.category, setting.id, setting.value, old_value);
             }
         }
 

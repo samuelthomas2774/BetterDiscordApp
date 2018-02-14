@@ -15,21 +15,40 @@ import { Events } from 'modules';
 import { ErrorEvent } from 'structs';
 import { Modals } from 'ui';
 
+/**
+ * Base class for external content managing
+ */
 export default class {
 
+    /**
+     * Any errors that happened
+     * returns {Array}
+     */
     static get errors() {
         return this._errors || (this._errors = []);
     }
 
+    /**
+     * Locallly stored content
+     * returns {Array}
+     */
     static get localContent() {
         return this._localContent ? this._localContent : (this._localContent = []);
     }
 
+    /**
+     * Local path for content
+     * returns {String}
+     */
     static get contentPath() {
         return this._contentPath ? this._contentPath : (this._contentPath = Globals.getObject('paths').find(path => path.id === this.pathId).path);
     }
 
-    static async loadAllContent(suppressErrors) {
+    /**
+     * Load all locally stored content
+     * @param {bool} suppressErrors Suppress any errors that occur during loading of content
+     */
+    static async loadAllContent(suppressErrors = false) {
         try {
             await FileUtils.ensureDirectory(this.contentPath);
             const directories = await FileUtils.listDirectory(this.contentPath);
@@ -64,6 +83,9 @@ export default class {
         }
     }
 
+    /**
+     * Refresh locally stored content
+     */
     static async refreshContent() {
         if (!this.localContent.length) return this.loadAllContent();
 
@@ -97,6 +119,12 @@ export default class {
         }
     }
 
+    /**
+     * Common loading procedure for loading content before passing it to the actual loader
+     * @param {any} dirName Base directory for content
+     * @param {any} reload Is content being reloaded
+     * @param {any} index Index of content in {localContent}
+     */
     static async preloadContent(dirName, reload = false, index) {
         try {
             const contentPath = path.join(this.contentPath, dirName);
@@ -164,16 +192,28 @@ export default class {
         }
     }
 
+    /**
+     * Read content config file
+     * @param {any} configPath Config file path
+     */
     static async readConfig(configPath) {
         configPath = path.resolve(configPath, 'config.json');
         return FileUtils.readJsonFromFile(configPath);
     }
 
+    /**
+     * Read content user config file
+     * @param {any} configPath User config file path
+     */
     static async readUserConfig(configPath) {
         configPath = path.resolve(configPath, 'user.config.json');
         return FileUtils.readJsonFromFile(configPath);
     }
 
+    /**
+     * Wildcard content finder
+     * @param {any} wild Content name | id | path | dirname
+     */
     //TODO make this nicer
     static findContent(wild) {
         let content = this.getContentByName(wild);
@@ -191,6 +231,10 @@ export default class {
     static getContentByPath(path) { return this.localContent.find(c => c.contentPath === path) }
     static getContentByDirName(dirName) { return this.localContent.find(c => c.dirName === dirName) }
 
+    /**
+     * Wait for content to load
+     * @param {any} content_id
+     */
     static waitForContent(content_id) {
         return new Promise((resolve, reject) => {
             const check = () => {

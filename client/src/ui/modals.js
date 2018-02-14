@@ -109,7 +109,7 @@ export default class {
 
     static themeSettings(theme) {
         // return this.add({ headertext: theme.name + ' Settings', settings: theme.config, saveSettings: theme.saveSettings }, SettingsModal);
-        return this.settings(theme.name + ' Settings', theme.config, null, null, theme.saveSettings.bind(theme));
+        return this.settings(theme.name + ' Settings', theme.themeConfig, null, null, theme.saveSettings.bind(theme));
     }
 
     static get stack() {

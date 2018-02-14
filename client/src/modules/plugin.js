@@ -36,7 +36,8 @@ export default class Plugin {
     get pluginPath() { return this.paths.contentPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
-    get pluginConfig() { return this.userConfig.config || [] }
+    get config() { return this.userConfig.config || [] }
+    get pluginConfig() { return this.config }
     get exports() { return this._exports ? this._exports : (this._exports = this.getExports()) }
 
     getSetting(setting_id, category_id) {
@@ -57,7 +58,7 @@ export default class Plugin {
         const updatedSettings = [];
 
         for (let newCategory of newSettings) {
-            const category = this.pluginConfig.find(c => c.category === newCategory.category);
+            const category = this.config.find(c => c.category === newCategory.category);
             for (let newSetting of newCategory.settings) {
                 const setting = category.settings.find(s => s.id === newSetting.id);
                 if (Utils.compare(setting.value, newSetting.value)) continue;
@@ -80,7 +81,7 @@ export default class Plugin {
         try {
             await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
-                config: this.pluginConfig.map(category => {
+                config: this.config.map(category => {
                     return {
                         category: category.category,
                         settings: category.settings.map(setting => {

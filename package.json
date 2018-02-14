@@ -2,7 +2,7 @@
   "name": "betterdiscord",
   "description": "BetterDiscord",
   "author": "Jiiks",
-  "version": "2.0.0a",
+  "version": "2.0.1a",
   "homepage": "https://betterdiscord.net",
   "license": "MIT",
   "main": "./core/index.js",

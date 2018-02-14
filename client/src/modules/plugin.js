@@ -74,7 +74,7 @@ export default class Plugin {
     }
 
     showSettingsModal() {
-        return Modals.pluginSettings(this);
+        return Modals.contentSettings(this);
     }
 
     async saveSettings(newSettings) {

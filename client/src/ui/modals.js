@@ -108,12 +108,8 @@ export default class {
         return this.settings(set.headertext, set.settings, null, null, newSettings => Settings.saveSettings(set.id, newSettings));
     }
 
-    static pluginSettings(plugin) {
-        return this.settings(plugin.name + ' Settings', plugin.config, null, null, plugin.saveSettings.bind(plugin));
-    }
-
-    static themeSettings(theme) {
-        return this.settings(theme.name + ' Settings', theme.config, null, null, theme.saveSettings.bind(theme));
+    static contentSettings(content) {
+        return this.settings(content.name + ' Settings', content.config, null, null, content.saveSettings.bind(content));
     }
 
     static get stack() {

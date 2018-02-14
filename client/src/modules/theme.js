@@ -64,7 +64,7 @@ export default class Theme {
     get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new ThemeEvents(this)) }
 
     showSettingsModal() {
-        return Modals.themeSettings(this);
+        return Modals.contentSettings(this);
     }
 
     async saveSettings(newSettings) {

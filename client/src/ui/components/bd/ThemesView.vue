@@ -89,7 +89,7 @@
                 })();
             },
             showSettings(theme) {
-                return Modals.themeSettings(theme);
+                return Modals.contentSettings(theme);
             }
         }
     }

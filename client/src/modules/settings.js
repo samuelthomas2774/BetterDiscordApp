@@ -113,7 +113,7 @@ export default class {
         return setting ? setting.value : undefined;
     }
 
-    static saveSettings(set_id, newSettings, settingsUpdated) {
+    static mergeSettings(set_id, newSettings, settingsUpdated) {
         const set = this.getSet(set_id);
         if (!set) return;
         const updatedSettings = [];
@@ -132,6 +132,7 @@ export default class {
             }
         }
 
+        this.saveSettings();
         return settingsUpdated ? settingsUpdated(updatedSettings) : updatedSettings;
     }
 

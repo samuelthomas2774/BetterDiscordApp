@@ -105,7 +105,7 @@ export default class {
     static internalSettings(set_id) {
         const set = Settings.getSet(set_id);
         if (!set) return;
-        return this.settings(set.headertext, set.settings, null, null, newSettings => Settings.saveSettings(set.id, newSettings));
+        return this.settings(set.headertext, set.settings, null, null, newSettings => Settings.mergeSettings(set.id, newSettings));
     }
 
     static contentSettings(content) {

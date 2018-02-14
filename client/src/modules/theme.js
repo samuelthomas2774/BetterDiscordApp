@@ -13,6 +13,7 @@ import { EventEmitter } from 'events';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { DOM, Modals } from 'ui';
 import { FileUtils, ClientIPC } from 'common';
+import ContentConfig from './contentconfig';
 
 class ThemeEvents {
     constructor(theme) {
@@ -70,12 +71,12 @@ export default class Theme {
         const updatedSettings = [];
 
         for (let newCategory of newSettings) {
-            const category = this.pluginConfig.find(c => c.category === newCategory.category);
+            const category = this.themeConfig.find(c => c.category === newCategory.category);
             for (let newSetting of newCategory.settings) {
                 const setting = category.settings.find(s => s.id === newSetting.id);
                 if (setting.value === newSetting.value) continue;
 
-                let old_value = setting.value;
+                const old_value = setting.value;
                 setting.value = newSetting.value;
                 updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
                 this.settingUpdated(category.category, setting.id, setting.value, old_value);
@@ -102,19 +103,10 @@ export default class Theme {
 
     async saveConfiguration() {
         try {
+            const config = new ContentConfig(this.themeConfig).strip();
             await FileUtils.writeFile(`${this.themePath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
-                config: this.themeConfig.map(category => {
-                    return {
-                        category: category.category,
-                        settings: category.settings.map(setting => {
-                            return {
-                                id: setting.id,
-                                value: setting.value
-                            };
-                        })
-                    };
-                }),
+                config,
                 css: this.css
             }));
         } catch (err) {

@@ -11,6 +11,7 @@
 import { FileUtils } from 'common';
 import { Modals } from 'ui';
 import { EventEmitter } from 'events';
+import ContentConfig from './contentconfig';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
 class PluginEvents {
@@ -85,7 +86,7 @@ export default class Plugin {
                 const setting = category.settings.find(s => s.id === newSetting.id);
                 if (setting.value === newSetting.value) continue;
 
-                let old_value = setting.value;
+                const old_value = setting.value;
                 setting.value = newSetting.value;
                 updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
                 this.settingUpdated(category.category, setting.id, setting.value, old_value);
@@ -108,20 +109,12 @@ export default class Plugin {
     }
 
     async saveConfiguration() {
+        window.testConfig = new ContentConfig(this.pluginConfig);
         try {
+            const config = new ContentConfig(this.pluginConfig).strip();
             await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
-                config: this.pluginConfig.map(category => {
-                    return {
-                        category: category.category,
-                        settings: category.settings.map(setting => {
-                            return {
-                                id: setting.id,
-                                value: setting.value
-                            };
-                        })
-                    };
-                })
+                config
             }));
         } catch (err) {
             throw err;

@@ -32,9 +32,13 @@ export default class {
     checkForUpdates() {
         Events.emit('update-check-start');
         Logger.info('Updater', 'Checking for updates');
-        $.get('https://raw.githubusercontent.com/JsSucks/BetterDiscordApp/master/package.json', e => {
-            const parse = JSON.parse(e);
-            Logger.info('Updater', `Latest Version: ${parse.version} - Current Version: ${Globals.getObject('version')}`);
+        $.ajax({
+            type: 'GET',
+            url: 'https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json',
+            cache: false,
+            success: e => {
+                Logger.info('Updater', `Latest Version: ${e.version} - Current Version: ${Globals.getObject('version')}`);
+            }
         });
     }
 

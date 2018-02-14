@@ -16,11 +16,11 @@
             </div>
             <div v-else-if="category.type === 'static'">
                 <div class="bd-form-header">
-                    <span class="bd-form-header-text">{{category.category}} static with header</span>
+                    <span class="bd-form-header-text">{{ category.category_name }}</span>
                 </div>
                 <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
             </div>
-            <Drawer v-else-if="category.type === 'drawer'" :label="category.category">
+            <Drawer v-else-if="category.type === 'drawer'" :label="category.category_name">
                 <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
             </Drawer>
             <div v-else>

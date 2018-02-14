@@ -49,7 +49,7 @@
                 shell.openItem(file_path);
             },
             removeItem(file_path) {
-                this.change(this.setting.id, this.setting.value.filter(f => f !== file_path));
+                this.change(this.setting.value.filter(f => f !== file_path));
             }
         }
     }

@@ -8,12 +8,11 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { FileUtils } from 'common';
-import { Events, PluginManager, ThemeManager } from 'modules';
+import { Utils, FileUtils } from 'common';
+import { Settings, Events, PluginManager, ThemeManager } from 'modules';
 import BasicModal from './components/bd/modals/BasicModal.vue';
 import ErrorModal from './components/bd/modals/ErrorModal.vue';
-import PluginSettingsModal from './components/bd/modals/PluginSettingsModal.vue';
-import ThemeSettingsModal from './components/bd/modals/ThemeSettingsModal.vue';
+import SettingsModal from './components/bd/modals/SettingsModal.vue';
 
 export default class {
 
@@ -78,12 +77,39 @@ export default class {
         });
     }
 
-    static pluginSettings(plugin) {
-        return this.add({ plugin }, PluginSettingsModal);
+    static settings(headertext, settings, settingsUpdated, settingUpdated, saveSettings) {
+        return this.add({
+            headertext, settings,
+            saveSettings: saveSettings ? saveSettings : newSettings => {
+                const updatedSettings = [];
+
+                for (let newCategory of newSettings) {
+                    let category = settings.find(c => c.category === newCategory.category);
+
+                    for (let newSetting of newCategory.settings) {
+                        let setting = category.settings.find(s => s.id === newSetting.id);
+                        if (Utils.compare(setting.value, newSetting.value)) continue;
+
+                        let old_value = setting.value;
+                        setting.value = newSetting.value;
+                        updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
+                        if (settingUpdated) settingUpdated(category.category, setting.id, setting.value, old_value);
+                    }
+                }
+
+                return settingsUpdated ? settingsUpdated(updatedSettings) : updatedSettings;
+            }
+        }, SettingsModal);
     }
 
-    static themeSettings(theme) {
-        return this.add({ theme }, ThemeSettingsModal);
+    static internalSettings(set_id) {
+        const set = Settings.getSet(set_id);
+        if (!set) return;
+        return this.settings(set.headertext, set.settings, null, null, newSettings => Settings.mergeSettings(set.id, newSettings));
+    }
+
+    static contentSettings(content) {
+        return this.settings(content.name + ' Settings', content.config, null, null, content.saveSettings.bind(content));
     }
 
     static get stack() {

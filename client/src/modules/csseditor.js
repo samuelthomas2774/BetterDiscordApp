@@ -41,7 +41,7 @@ export default class {
     /**
      * Update css in client
      * @param {String} scss scss to compile
-     * @param {bool} sendSource send to css editor instance 
+     * @param {bool} sendSource send to css editor instance
      */
     static updateScss(scss, sendSource) {
         if (sendSource)
@@ -86,7 +86,7 @@ export default class {
 
     /**
      * Send css to open editor
-     * @param {any} channel 
+     * @param {any} channel
      * @param {any} data
      */
     static async sendToEditor(channel, data) {
@@ -94,14 +94,14 @@ export default class {
     }
 
     /**
-     * Current uncompiled scss 
+     * Current uncompiled scss
      */
     static get scss() {
         return this._scss || '';
     }
 
     /**
-     * Set current scss 
+     * Set current scss
      */
     static set scss(scss) {
         this.updateScss(scss, true);

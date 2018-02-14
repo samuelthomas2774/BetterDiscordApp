@@ -38,7 +38,6 @@
             };
         },
         created() {
-            console.log(this);
             Events.on('bd-refresh-modals', this.eventListener = () => {
                 this.$forceUpdate();
             });

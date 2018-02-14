@@ -38,6 +38,7 @@ export default class {
             cache: false,
             success: e => {
                 Logger.info('Updater', `Latest Version: ${e.version} - Current Version: ${Globals.getObject('version')}`);
+                Events.emit('update-check-end');
             }
         });
     }

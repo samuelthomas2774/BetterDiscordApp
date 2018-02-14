@@ -76,7 +76,7 @@ export default class Theme {
                 const setting = category.settings.find(s => s.id === newSetting.id);
                 if (setting.value === newSetting.value) continue;
 
-                let old_value = setting.value;
+                const old_value = setting.value;
                 setting.value = newSetting.value;
                 updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
                 this.settingUpdated(category.category, setting.id, setting.value, old_value);

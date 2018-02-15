@@ -49,7 +49,7 @@ export default class {
 
         if (!scss) {
             this._scss = this.css = '';
-            this.sendToEditor('scss-editor', null);
+            this.sendToEditor('scss-error', null);
             return Promise.resolve();
         }
 

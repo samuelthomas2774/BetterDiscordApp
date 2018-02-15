@@ -23,6 +23,8 @@ class BetterDiscord {
         window.wpm = WebpackModules;
         window.bdsettings = Settings;
         window.bdmodals = Modals;
+        window.bdlogs = Logger;
+
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }

@@ -34,7 +34,7 @@
             console.info(`[BetterDiscord|WebSocket Proxy] WebSocket stored to __bd['wsHook']`);
             window.__bd.wsHook = this;
         }
-        
+
     }
 
     window.WebSocket = WSHook;

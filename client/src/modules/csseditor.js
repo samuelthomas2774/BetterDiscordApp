@@ -47,6 +47,12 @@ export default class {
         if (sendSource)
             this.sendToEditor('set-scss', { scss });
 
+        if (!scss) {
+            this._scss = this.css = '';
+            this.sendToEditor('scss-editor', null);
+            return Promise.resolve();
+        }
+
         return new Promise((resolve, reject) => {
             this.compile(scss).then(css => {
                 this.css = css;

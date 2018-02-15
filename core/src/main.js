@@ -73,8 +73,8 @@ class Comms {
         });
 
         BDIpc.on('bd-compileSass', o => {
-            if (!o.args.data && !o.args.path) return;
-            if (o.args.path && o.args.data) {
+            if (typeof o.args.path !== 'string' && typeof o.args.data !== 'string') return;
+            if (typeof o.args.path === 'string' && typeof o.args.data === 'string') {
                 o.args.data = `${o.args.data} @import '${o.args.path}';`;
                 o.args.path = undefined;
             }

@@ -48,7 +48,7 @@ console.log(dummyArgs);
 class Comms {
 
     constructor(bd) {
-		this.bd = bd;
+        this.bd = bd;
         this.initListeners();
     }
 

@@ -20,18 +20,18 @@ export class ClientLogger {
     static dbg(module, message) { this.log(module, message, 'dbg'); }
 
     static log(module, message, level = 'log') {
-		level = this.parseLevel(level);
+        level = this.parseLevel(level);
         if (typeof message === 'object' && !(message instanceof Array)) {
             console[level]('[%cBetter%cDiscord:%s]', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, message);
             let message_string = message.toString();
             if (message_string === '[object Object]')
                 message_string += ' ' + JSON.stringify(message, null, 4);
 
-	        logs.push(`${level.toUpperCase()} : [${Vendor.moment().format('DD/MM/YY hh:mm:ss')}|${module}] ${message_string}${message_string === '[object Object]' ? ' ' + JSON.stringify(message, null, 4) : ''}`);
-			return;
+            logs.push(`${level.toUpperCase()} : [${Vendor.moment().format('DD/MM/YY hh:mm:ss')}|${module}] ${message_string}${message_string === '[object Object]' ? ' ' + JSON.stringify(message, null, 4) : ''}`);
+            return;
         }
 
-		message = typeof message === 'object' && message instanceof Array ? message : [message];
+        message = typeof message === 'object' && message instanceof Array ? message : [message];
         console[level]('[%cBetter%cDiscord:%s]', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, ...message);
         logs.push(`${level.toUpperCase()} : [${Vendor.moment().format('DD/MM/YY hh:mm:ss')}|${module}] ${message.join(' ')}`);
     }
@@ -44,9 +44,9 @@ export class ClientLogger {
         this.err(err.module, err.message);
     }
 
-	static get logs() {
-		return logs;
-	}
+    static get logs() {
+        return logs;
+    }
 
     static get levels() {
         return {

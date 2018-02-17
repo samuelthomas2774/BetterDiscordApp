@@ -27,12 +27,15 @@
             margin-top: 10px;
             margin-bottom: 20px;
             vertical-align: baseline;
+            display: flex;
+            flex: 0 0 auto;
 
             .bd-settingswrap-header-text {
                 color: $colbdblue;
                 text-transform: uppercase;
                 font-weight: 600;
                 font-size: 16px;
+                flex: 1 1 auto;
             }
         }
     }

@@ -12,7 +12,7 @@
         color: #87909c;
         font-size: 14px;
         font-weight: 500;
-        transition: color 0.2s ease;
+        transition: color 0.2s ease, border-bottom-color 0.2s ease;
         flex: 0 0;
         display: flex;
 
@@ -52,7 +52,7 @@
         &:hover,
         &.bd-active {
             background: transparent;
-            border-bottom: 2px solid $colbdblue;
+            border-bottom-color: $colbdblue;
             color: #fff;
 
             .bd-material-design-icon {
@@ -62,6 +62,21 @@
 
         &.bd-active {
             cursor: default;
+        }
+    }
+
+    .bd-settingswrap-header & {
+        margin-top: -10px;
+        margin-bottom: -20px;
+
+        .bd-button {
+            font-size: 16px;
+            padding: 13px 0;
+
+            .bd-material-button {
+                width: 18px;
+                height: 18px;
+            }
         }
     }
 }

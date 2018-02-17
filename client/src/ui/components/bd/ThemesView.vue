@@ -10,17 +10,18 @@
 
 <template>
     <SettingsWrapper headertext="Themes">
-        <div class="bd-flex bd-flex-col bd-themesView">
-            <div class="bd-tabbar">
-                <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
-                    <h3>Local</h3>
-                    <div class="bd-material-button" @click="refreshLocal"><MiRefresh /></div>
-                </div>
-                <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
-                    <h3>Online</h3>
-                    <div class="bd-material-button"><MiRefresh /></div>
-                </div>
+        <div class="bd-tabbar" slot="header">
+            <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
+                <h3>Local</h3>
+                <div class="bd-material-button" @click="refreshLocal"><MiRefresh /></div>
             </div>
+            <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
+                <h3>Online</h3>
+                <div class="bd-material-button"><MiRefresh /></div>
+            </div>
+        </div>
+
+        <div class="bd-flex bd-flex-col bd-themesView">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">
                 <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="toggleTheme" :reloadTheme="reloadTheme" :showSettings="showSettings" />
             </div>

@@ -10,17 +10,18 @@
 
 <template>
     <SettingsWrapper headertext="Plugins">
-        <div class="bd-flex bd-flex-col bd-pluginsView">
-            <div class="bd-tabbar">
-                <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
-                    <h3>Local</h3>
-                    <div class="bd-material-button" @click="refreshLocal"><MiRefresh /></div>
-                </div>
-                <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
-                    <h3>Online</h3>
-                    <div class="bd-material-button"><MiRefresh /></div>
-                </div>
+        <div class="bd-tabbar" slot="header">
+            <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
+                <h3>Local</h3>
+                <div class="bd-material-button" @click="refreshLocal"><MiRefresh /></div>
             </div>
+            <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
+                <h3>Online</h3>
+                <div class="bd-material-button"><MiRefresh /></div>
+            </div>
+        </div>
+
+        <div class="bd-flex bd-flex-col bd-pluginsView">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
                 <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="togglePlugin" :reloadPlugin="reloadPlugin" :showSettings="showSettings" />
             </div>

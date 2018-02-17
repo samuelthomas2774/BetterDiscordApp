@@ -58,11 +58,6 @@
             Setting,
             Drawer
         },
-        data() {
-            return {
-                active_scheme: 'scheme-1'
-            };
-        },
         methods: {
             checkSchemeActive(scheme) {
                 for (let schemeCategory of scheme.settings) {

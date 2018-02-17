@@ -1,0 +1,39 @@
+.bd-sidebar-region {
+    .bd-settingswrap {
+        display: flex;
+        height: 100%;
+        -webkit-box-flex: 1;
+        flex: 1;
+        min-height: 1px;
+        box-sizing: border-box;
+        padding: 80px 15px 15px 15px;
+    }
+}
+
+.bd-content-region {
+    .bd-settingswrap {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        padding: 20px 15px 15px 15px;
+
+        .bd-scroller-wrap {
+            flex-grow: 1;
+        }
+
+        .bd-settingswrap-header {
+            outline: 0;
+            padding: 0;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            vertical-align: baseline;
+
+            .bd-settingswrap-header-text {
+                color: $colbdblue;
+                text-transform: uppercase;
+                font-weight: 600;
+                font-size: 16px;
+            }
+        }
+    }
+}

@@ -11,18 +11,14 @@
 <template>
     <SettingsWrapper headertext="Themes">
         <div class="bd-flex bd-flex-col bd-themesView">
-            <div class="bd-flex bd-tabheader">
-                <div class="bd-flex-grow bd-button" :class="{'bd-active': local}" @click="showLocal">
+            <div class="bd-tabbar">
+                <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                     <h3>Local</h3>
-                    <div class="bd-material-button" @click="refreshLocal">
-                        <MiRefresh />
-                    </div>
+                    <div class="bd-material-button" @click="refreshLocal"><MiRefresh /></div>
                 </div>
-                <div class="bd-flex-grow bd-button" :class="{'bd-active': !local}" @click="showOnline">
+                <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
                     <h3>Online</h3>
-                    <div class="bd-material-button">
-                        <MiRefresh />
-                    </div>
+                    <div class="bd-material-button"><MiRefresh /></div>
                 </div>
             </div>
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">

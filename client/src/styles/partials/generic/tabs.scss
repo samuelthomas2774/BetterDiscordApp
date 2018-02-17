@@ -1,39 +1,51 @@
-.bd-tabheader {
+.bd-tabbar {
+    flex: 0 0 auto;
+    margin-right: -15px;
+    display: flex;
+
     .bd-button {
         background: transparent;
         border-bottom: 2px solid rgba(114, 118, 126, 0.3);
+        cursor: pointer;
+        margin-right: 15px;
+        padding: 15px 0;
+        color: #87909c;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s ease;
+        flex: 0 0;
+        display: flex;
 
         h3 {
-            -webkit-user-select: none;
-            user-select: none;
-            display: block;
-            font-size: 1.17em;
-            margin-top: 1em;
-            margin-bottom: 1em;
-            margin-left: 0;
-            margin-right: 0;
-            font-weight: bold;
-            flex-grow: 1;
+            flex: 0 0;
         }
 
         .bd-material-button {
-            width: 30px;
-            height: 30px;
+            width: 16px;
+            height: 16px;
+            flex: 0 0;
+            margin-left: 4px;
+            cursor: pointer;
 
             .material-design-icon,
             .bd-material-design-icon {
                 display: flex;
                 align-items: center;
-                fill: #fff;
+                fill: #87909c;
+                transition: fill 0.2s ease;
 
                 svg {
-                    width: 24px;
-                    height: 24px;
+                    width: 16px;
+                    height: 16px;
                 }
             }
 
             &:hover {
-                background: #2d2f34;
+                background-color: transparent;
+
+                .bd-material-design-icon {
+                    fill: #fff;
+                }
             }
         }
 
@@ -41,6 +53,15 @@
         &.bd-active {
             background: transparent;
             border-bottom: 2px solid $colbdblue;
+            color: #fff;
+
+            .bd-material-design-icon {
+                fill: #fff;
+            }
+        }
+
+        &.bd-active {
+            cursor: default;
         }
     }
 }

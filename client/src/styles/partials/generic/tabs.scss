@@ -21,10 +21,41 @@
         }
 
         .bd-material-button {
+            margin: -1px 0 -1px 4px;
+        }
+
+        &:hover,
+        &.bd-active {
+            background: transparent;
+            border-bottom-color: $colbdblue;
+            color: #fff;
+
+            .bd-material-design-icon {
+                fill: #fff;
+            }
+        }
+
+        &.bd-active {
+            cursor: default;
+        }
+    }
+
+    .bd-material-button-wrap {
+        margin-right: 15px;
+        flex: 0 0;
+        padding: 17px 0 18px;
+
+        .bd-material-button {
+            margin: 0;
+        }
+    }
+
+    .bd-button,
+    .bd-material-button-wrap {
+        .bd-material-button {
             width: 16px;
             height: 16px;
             flex: 0 0;
-            margin-left: 4px;
             cursor: pointer;
 
             .material-design-icon,
@@ -48,35 +79,20 @@
                 }
             }
         }
-
-        &:hover,
-        &.bd-active {
-            background: transparent;
-            border-bottom-color: $colbdblue;
-            color: #fff;
-
-            .bd-material-design-icon {
-                fill: #fff;
-            }
-        }
-
-        &.bd-active {
-            cursor: default;
-        }
     }
 
     .bd-settingswrap-header & {
-        margin-top: -10px;
+        margin-top: -17px;
         margin-bottom: -20px;
 
         .bd-button {
             font-size: 16px;
-            padding: 13px 0;
+            padding: 18px 0 17px;
+        }
 
-            .bd-material-button {
-                width: 18px;
-                height: 18px;
-            }
+        .bd-material-button {
+            width: 18px;
+            height: 18px;
         }
     }
 }

@@ -11,6 +11,7 @@
 import { Utils, FileUtils } from 'common';
 import { Settings, Events, PluginManager, ThemeManager } from 'modules';
 import BasicModal from './components/bd/modals/BasicModal.vue';
+import ConfirmModal from './components/bd/modals/ConfirmModal.vue';
 import ErrorModal from './components/bd/modals/ErrorModal.vue';
 import SettingsModal from './components/bd/modals/SettingsModal.vue';
 
@@ -67,6 +68,17 @@ export default class {
 
     static basic(title, text) {
         return this.add({ title, text }, BasicModal);
+    }
+
+    static confirm(title, text) {
+        const modal = { title, text };
+        const promise = new Promise((resolve, reject) => {
+            modal.confirm = () => resolve(true);
+            modal.beforeClose = () => reject();
+            this.add(modal, ConfirmModal);
+        });
+        modal.promise = promise;
+        return modal;
     }
 
     static error(event) {

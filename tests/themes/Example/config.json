@@ -21,6 +21,25 @@
                     "scss_raw": true
                 },
                 {
+                    "id": "additional-colours",
+                    "type": "array",
+                    "text": "Additional colours",
+                    "inline": true,
+                    "settings": [
+                        {
+                            "category": "default",
+                            "settings": [
+                                {
+                                    "id": "colour",
+                                    "type": "text",
+                                    "value": "#ff0000",
+                                    "scss_raw": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
                     "id": "spanOpacity",
                     "type": "slider",
                     "value": 50,

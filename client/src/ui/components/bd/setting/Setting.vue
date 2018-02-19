@@ -18,6 +18,7 @@
         <MultilineTextSetting v-if="setting.type === 'text' && setting.multiline" :setting="setting" :change="change"/>
         <SliderSetting v-if="setting.type === 'slider'" :setting="setting" :change="change"/>
         <FileSetting v-if="setting.type === 'file'" :setting="setting" :change="change"/>
+        <ArraySetting v-if="setting.type === 'array'" :setting="setting" :change="change" />
         <div class="bd-form-divider"></div>
     </div>
 </template>
@@ -31,6 +32,7 @@
     import MultilineTextSetting from './Multiline.vue';
     import SliderSetting from './Slider.vue';
     import FileSetting from './File.vue';
+    import ArraySetting from './Array.vue';
 
     export default {
         props: [
@@ -45,7 +47,8 @@
             StringSetting,
             MultilineTextSetting,
             SliderSetting,
-            FileSetting
+            FileSetting,
+            ArraySetting
         },
         computed: {
             changed() {

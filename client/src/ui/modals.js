@@ -25,6 +25,7 @@ export default class {
         };
         modal.closing = false;
         modal.close = force => this.close(modal, force);
+        modal.id = Date.now();
 
         this.stack.push(modal);
         Events.emit('bd-refresh-modals');

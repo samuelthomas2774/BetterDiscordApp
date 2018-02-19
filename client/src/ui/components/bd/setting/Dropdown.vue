@@ -11,7 +11,7 @@
 <template>
     <div class="bd-form-dropdown">
         <div class="bd-title">
-            <h3>{{setting.text}}</h3>
+            <h3 v-if="setting.text">{{setting.text}}</h3>
             <div class="bd-dropdown" :class="{'bd-active': active}">
                 <div class="bd-dropdown-current" @click="() => active = !active && !setting.disabled">
                     <span class="bd-dropdown-text">{{getOptionText(setting.value)}}</span>

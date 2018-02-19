@@ -11,7 +11,7 @@
 <template>
     <div class="bd-form-numberinput">
         <div class="bd-title">
-            <h3>{{setting.text}}</h3>
+            <h3 v-if="setting.text">{{setting.text}}</h3>
             <div class="bd-number">
                 <input type="number" :value="setting.value" :min="setting.min" :max="setting.max" :step="setting.step" @keyup.stop @input="input"/>
                 <div class="bd-number-spinner bd-flex bd-flex-col">

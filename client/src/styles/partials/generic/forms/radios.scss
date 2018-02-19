@@ -45,6 +45,8 @@
     .bd-radio-text {
         flex: 1 1 auto;
         color: white;
+        word-wrap: break-word;
+        width: 1px;
     }
 
     &:not(:last-child) {

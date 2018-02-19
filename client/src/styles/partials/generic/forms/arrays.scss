@@ -30,8 +30,13 @@
                     margin-bottom: 0;
                 }
 
-                + .bd-settingsarray-item-controls {
-                    flex-basis: 0%;
+                .bd-settings-category:only-child > div > .bd-form-item.bd-form-item-noheader:only-child {
+                    .bd-form-textinput,
+                    .bd-form-numberinput {
+                        + .bd-form-divider {
+                            display: none;
+                        }
+                    }
                 }
             }
 

@@ -27,7 +27,7 @@
                 </div>
 
                 <div class="bd-settingsarray-item-controls">
-                    <span class="bd-settingsarray-open" @click="() => showModal(item, index)"><MiOpenInNew v-if="setting.inline" /><MiSettings v-else /></span>
+                    <span class="bd-settingsarray-open" v-if="typeof setting.allow_external !== 'undefined' ? setting.allow_external || !setting.inline : true" @click="() => showModal(item, index)"><MiOpenInNew v-if="setting.inline" /><MiSettings v-else /></span>
                     <span class="bd-settingsarray-remove" :class="{'bd-disabled': setting.disabled || setting.min && items.length <= setting.min}" @click="() => removeItem(item)"><MiMinus /></span>
                 </div>
             </div>

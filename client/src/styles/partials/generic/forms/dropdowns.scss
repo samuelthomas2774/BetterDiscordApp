@@ -1,5 +1,10 @@
 .bd-dropdown {
     position: relative;
+    width: 100%;
+
+    h3 + & {
+        width: 180px;
+    }
 
     .bd-dropdown-current {
         color: #f6f6f7;
@@ -10,7 +15,6 @@
         cursor: default;
         outline: none;
         transition: border .15s ease;
-        width: 180px;
         box-sizing: border-box;
         display: flex;
 

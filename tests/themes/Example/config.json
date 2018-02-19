@@ -25,6 +25,7 @@
                     "type": "array",
                     "text": "Additional colours",
                     "inline": true,
+                    "allow_external": false,
                     "settings": [
                         {
                             "category": "default",

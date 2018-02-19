@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-form-item" :class="{'bd-form-item-changed': changed, 'bd-disabled': disabled}">
+    <div class="bd-form-item" :class="{'bd-form-item-changed': changed, 'bd-disabled': disabled, 'bd-form-item-noheader': !setting.text}">
         <BoolSetting v-if="setting.type === 'bool'" :setting="setting" :change="change"/>
         <DropdownSetting v-if="setting.type === 'dropdown'" :setting="setting" :change="change"/>
         <NumberSetting v-if="setting.type === 'number'" :setting="setting" :change="change"/>

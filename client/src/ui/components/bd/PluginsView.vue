@@ -13,17 +13,17 @@
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Local</h3>
-                <div class="bd-material-button" @click="refreshLocal"><MiRefresh /></div>
+                <div class="bd-material-button" v-if="local" @click="refreshLocal"><MiRefresh /></div>
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
                 <h3>Online</h3>
-                <div class="bd-material-button"><MiRefresh /></div>
+                <div class="bd-material-button" v-if="!local" @click="refreshOnline"><MiRefresh /></div>
             </div>
         </div>
 
         <div class="bd-flex bd-flex-col bd-pluginsView">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
-                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="togglePlugin" :reloadPlugin="reloadPlugin" :showSettings="showSettings" />
+                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :showSettings="() => showSettings(plugin)" />
             </div>
             <div v-if="!local" class="bd-spinner-container">
                 <div class="bd-spinner-2"></div>
@@ -58,32 +58,31 @@
             showOnline() {
                 this.local = false;
             },
-            refreshLocal() {
-                (async () => {
-                    await PluginManager.refreshPlugins();
-                })();
+            async refreshLocal() {
+                await PluginManager.refreshPlugins();
             },
-            togglePlugin(plugin) {
+            async refreshOnline() {
+
+            },
+            async togglePlugin(plugin) {
                 // TODO Display error if plugin fails to start/stop
                 try {
                     if (plugin.enabled) {
-                        PluginManager.stopPlugin(plugin);
+                        await PluginManager.stopPlugin(plugin);
                     } else {
-                        PluginManager.startPlugin(plugin);
+                        await PluginManager.startPlugin(plugin);
                     }
                 } catch (err) {
                     console.log(err);
                 }
             },
-            reloadPlugin(plugin) {
-                (async () => {
-                    try {
-                        await PluginManager.reloadPlugin(plugin);
-                        this.$forceUpdate();
-                    } catch (err) {
-                        console.log(err);
-                    }
-                })();
+            async reloadPlugin(plugin) {
+                try {
+                    await PluginManager.reloadPlugin(plugin);
+                    this.$forceUpdate();
+                } catch (err) {
+                    console.log(err);
+                }
             },
             showSettings(plugin) {
                 return Modals.contentSettings(plugin);

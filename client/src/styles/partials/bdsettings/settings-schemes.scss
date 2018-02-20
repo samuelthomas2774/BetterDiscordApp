@@ -46,6 +46,12 @@
         margin-top: 10px;
     }
 
+    &:hover {
+        .bd-settings-scheme-icon {
+            border-color: lighten($coldimwhite, 20%);
+        }
+    }
+
     &.bd-active {
         cursor: default;
 

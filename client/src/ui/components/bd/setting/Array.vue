@@ -67,7 +67,7 @@
                 this.update();
             },
             removeItem(item) {
-				if (this.setting.disabled || this.setting.min && this.items.length <= this.setting.min) return;
+                if (this.setting.disabled || this.setting.min && this.items.length <= this.setting.min) return;
                 this.items = this.items.filter(i => i !== item);
                 this.update();
             },

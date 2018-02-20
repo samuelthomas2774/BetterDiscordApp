@@ -25,6 +25,86 @@
                     "text": "Additional colours",
                     "inline": true,
                     "allow_external": false,
+                    "value": [
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#ff0000"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#ffff00"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#ffffff"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#00ffff"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#0000ff"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#000000"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
                     "settings": [
                         {
                             "category": "default",

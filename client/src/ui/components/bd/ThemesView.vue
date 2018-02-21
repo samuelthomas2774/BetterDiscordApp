@@ -23,7 +23,7 @@
 
         <div class="bd-flex bd-flex-col bd-themesView">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">
-                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="() => reloadTheme(theme)" :showSettings="() => showSettings(theme)" />
+                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="e => reloadTheme(theme, e.shiftKey)" :showSettings="() => showSettings(theme)" :deleteTheme="e => deleteTheme(theme, e.shiftKey)" />
             </div>
             <div v-if="!local" class="bd-spinner-container">
                 <div class="bd-spinner-2"></div>
@@ -59,29 +59,36 @@
                 this.local = false;
             },
             async refreshLocal() {
-                await ThemeManager.refreshTheme();
+                await ThemeManager.refreshThemes();
             },
             async refreshOnline() {
 
             },
-            toggleTheme(theme) {
+            async toggleTheme(theme) {
                 // TODO Display error if theme fails to enable/disable
                 try {
-                    if (theme.enabled) {
-                        ThemeManager.disableTheme(theme);
-                    } else {
-                        ThemeManager.enableTheme(theme);
-                    }
+                    await theme.enabled ? ThemeManager.disableTheme(theme) : ThemeManager.enableTheme(theme);
+                    this.$forceUpdate();
                 } catch (err) {
                     console.log(err);
                 }
             },
-            async reloadTheme(theme) {
+            async reloadTheme(theme, reload) {
                 try {
-                    await ThemeManager.reloadTheme(theme);
+                    if (reload) await ThemeManager.reloadTheme(theme);
+                    else await theme.recompile();
                     this.$forceUpdate();
                 } catch (err) {
                     console.log(err);
+                }
+            },
+            async deleteTheme(theme, unload) {
+                try {
+                    if (unload) await ThemeManager.unloadTheme(theme);
+                    else await ThemeManager.deleteTheme(theme);
+                    this.$forceUpdate();
+                } catch (err) {
+                    console.error(err);
                 }
             },
             showSettings(theme) {

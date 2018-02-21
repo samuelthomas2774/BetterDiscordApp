@@ -13,9 +13,9 @@
         <SettingSwitch slot="toggle" :checked="theme.enabled" :change="toggleTheme" />
         <ButtonGroup slot="controls">
             <Button v-tooltip="'Settings'" v-if="theme.hasSettings" :onClick="showSettings"><MiSettings size="18" /></Button>
-            <Button v-tooltip="'Reload'" :onClick="reloadTheme"><MiRefresh size="18" /></Button>
+            <Button v-tooltip="'Recompile (shift + click to reload)'" :onClick="reloadTheme"><MiRefresh size="18" /></Button>
             <Button v-tooltip="'Edit'" :onClick="editTheme"><MiPencil size="18" /></Button>
-            <Button v-tooltip="'Uninstall'" type="err"><MiDelete size="18" /></Button>
+            <Button v-tooltip="'Uninstall (shift + click to unload)'" :onClick="deleteTheme" type="err"><MiDelete size="18" /></Button>
         </ButtonGroup>
     </Card>
 </template>
@@ -31,7 +31,7 @@
                 settingsOpen: false
             }
         },
-        props: ['theme', 'toggleTheme', 'reloadTheme', 'showSettings'],
+        props: ['theme', 'toggleTheme', 'reloadTheme', 'deleteTheme', 'showSettings'],
         components: {
             Card, Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
         },

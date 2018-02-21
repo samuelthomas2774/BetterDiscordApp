@@ -185,6 +185,9 @@ export default class {
             };
 
             const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies);
+            if (!reload && this.getContentById(content.id))
+                throw {message: `A ${this.contentType} with the ID ${content.id} already exists.`};
+
             if (reload) this.localContent[index] = content;
             else this.localContent.push(content);
             return content;
@@ -192,6 +195,43 @@ export default class {
         } catch (err) {
             throw err;
         }
+    }
+
+    /**
+     * Unload content
+     * @param {any} content Content to unload
+     * @param {bool} reload Whether to reload the content after
+     */
+    static async unloadContent(content, reload) {
+        content = this.findContent(content);
+        if (!content) throw {message: `Could not find a ${this.contentType} from ${content}.`};
+
+        try {
+            if (content.enabled && content.disable) content.disable(false);
+            if (content.enabled && content.stop) content.stop(false);
+            if (content.onunload) content.onunload(reload);
+            if (content.onUnload) content.onUnload(reload);
+            const index = this.getContentIndex(content);
+
+            delete window.require.cache[window.require.resolve(content.paths.mainPath)];
+
+            if (reload) {
+                const newcontent = await this.preloadContent(content.dirName, true, index);
+                if (newcontent.enabled && newcontent.start) newcontent.start(false);
+                return newcontent;
+            } else this.localContent.splice(index, 1);
+        } catch (err) {
+            Logger.err(this.moduleName, err);
+            throw err;
+        }
+    }
+
+    /**
+     * Reload content
+     * @param {any} content Content to reload
+     */
+    static async reloadContent(content) {
+        return this.unloadContent(content, true);
     }
 
     /**
@@ -213,18 +253,25 @@ export default class {
     }
 
     /**
+     * Checks if the passed object is an instance of this content type.
+     * @param {any} content Object to check
+     */
+    static isThisContent(content) {
+        return false;
+    }
+
+    /**
      * Wildcard content finder
      * @param {any} wild Content name | id | path | dirname
+     * @param {bool} nonunique Allow searching attributes that may not be unique
      */
-    //TODO make this nicer
-    static findContent(wild) {
-        let content = this.getContentByName(wild);
-        if (content) return content;
-        content = this.getContentById(wild);
-        if (content) return content;
-        content = this.getContentByPath(wild);
-        if (content) return content;
-        return this.getContentByDirName(wild);
+    static findContent(wild, nonunique) {
+        if (this.isThisContent(wild)) return wild;
+        let content;
+        if (content = this.getContentById(wild)) return content;
+        if (content = this.getContentByDirName(wild)) return content;
+        if (content = this.getContentByPath(wild)) return content;
+        if (content = nonunique && this.getContentByName(wild)) return content;
     }
 
     static getContentIndex(content) { return this.localContent.findIndex(c => c === content) }

@@ -33,6 +33,11 @@ module.exports = (Plugin, Api, Vendor, Dependencies) => {
             return true;
         }
 
+        onUnload(reload) {
+            Logger.log('Unloading plugin');
+            delete require.cache[require.resolve('./component')];
+        }
+
         eventTest(e) {
             Logger.log(e);
         }

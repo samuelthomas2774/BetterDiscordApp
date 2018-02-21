@@ -52,7 +52,7 @@ export default class Plugin {
     get defaultConfig() { return this.configs.defaultConfig }
     get userConfig() { return this.configs.userConfig }
     get configSchemes() { return this.configs.schemes }
-    get id() { return this.info.id || this.name.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
+    get id() { return this.info.id || this.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
     get name() { return this.info.name }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
@@ -123,25 +123,32 @@ export default class Plugin {
         }
     }
 
-    start() {
+    start(save = true) {
         if (this.onstart && !this.onstart()) return false;
         if (this.onStart && !this.onStart()) return false;
 
         if (!this.enabled) {
             this.userConfig.enabled = true;
-            this.saveConfiguration();
+            if (save) this.saveConfiguration();
         }
 
         return true;
     }
 
-    stop() {
+    stop(save = true) {
         if (this.onstop && !this.onstop()) return false;
         if (this.onStop && !this.onStop()) return false;
 
-        this.userConfig.enabled = false;
-        this.saveConfiguration();
+        if (this.enabled) {
+            this.userConfig.enabled = false;
+            if (save) this.saveConfiguration();
+        }
+
         return true;
+    }
+
+    unload() {
+        PluginManager.unloadPlugin(this);
     }
 
 }

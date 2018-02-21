@@ -30,9 +30,8 @@ export default class ThemeManager extends ContentManager {
         return 'themes';
     }
 
-    static get loadAllThemes() {
-        return this.loadAllContent;
-    }
+    static get loadAllThemes() { return this.loadAllContent }
+    static get refreshThemes() { return this.refreshContent }
 
     static get loadContent() { return this.loadTheme }
     static async loadTheme(paths, configs, info, main) {
@@ -53,6 +52,9 @@ export default class ThemeManager extends ContentManager {
         }
     }
 
+    static get unloadTheme() { return this.unloadContent }
+    static get reloadTheme() { return this.reloadContent }
+
     static enableTheme(theme) {
         theme.enable();
     }
@@ -61,8 +63,15 @@ export default class ThemeManager extends ContentManager {
         theme.disable();
     }
 
-    static reloadTheme(theme) {
+    static get unloadTheme() { return this.unloadContent }
+    static async reloadTheme(theme) {
+        theme = await this.reloadContent(theme);
         theme.recompile();
+    }
+
+    static get isTheme() { return this.isThisContent }
+    static isThisContent(theme) {
+        return theme instanceof Theme;
     }
 
     static async getConfigAsSCSS(config) {

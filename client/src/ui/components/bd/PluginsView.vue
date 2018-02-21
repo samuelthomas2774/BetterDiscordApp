@@ -23,7 +23,7 @@
 
         <div class="bd-flex bd-flex-col bd-pluginsView">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
-                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :showSettings="() => showSettings(plugin)" />
+                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :deletePlugin="e => deletePlugin(plugin, e.shiftKey)" :showSettings="() => showSettings(plugin)" />
             </div>
             <div v-if="!local" class="bd-spinner-container">
                 <div class="bd-spinner-2"></div>
@@ -67,11 +67,8 @@
             async togglePlugin(plugin) {
                 // TODO Display error if plugin fails to start/stop
                 try {
-                    if (plugin.enabled) {
-                        await PluginManager.stopPlugin(plugin);
-                    } else {
-                        await PluginManager.startPlugin(plugin);
-                    }
+                    await plugin.enabled ? PluginManager.stopPlugin(plugin) : PluginManager.startPlugin(plugin);
+                    this.$forceUpdate();
                 } catch (err) {
                     console.log(err);
                 }
@@ -82,6 +79,15 @@
                     this.$forceUpdate();
                 } catch (err) {
                     console.log(err);
+                }
+            },
+            async deletePlugin(plugin, unload) {
+                try {
+                    if (unload) await PluginManager.unloadPlugin(plugin);
+                    else await PluginManager.deletePlugin(plugin);
+                    this.$forceUpdate();
+                } catch (err) {
+                    console.error(err);
                 }
             },
             showSettings(plugin) {

@@ -14,6 +14,7 @@ const
     _ = require('lodash');
 
 import { Vendor } from 'modules';
+import filetype from 'file-type';
 
 export class Utils {
     static overload(fn, cb) {
@@ -150,6 +151,15 @@ export class FileUtils {
         });
     }
 
+    static async readFileBuffer(path, options) {
+        return new Promise((resolve, reject) => {
+            fs.readFile(path, options || {}, (err, data) => {
+                if (err) return reject(err);
+                resolve(data);
+            });
+        });
+    }
+
     static async writeFile(path, data) {
         return new Promise((resolve, reject) => {
             fs.writeFile(path, data, err => {
@@ -195,5 +205,17 @@ export class FileUtils {
 
     static async readDir(path) {
         return this.listDirectory(path);
+    }
+
+    static async getFileType(buffer) {
+        if (typeof buffer === 'string') buffer = await this.readFileBuffer(buffer);
+
+        return filetype(buffer);
+    }
+
+    static async toDataURI(buffer, type) {
+        if (typeof buffer === 'string') buffer = await this.readFileBuffer(buffer);
+        if (!type) type = this.getFileType(buffer).mime;
+        return `data:${type};base64,${buffer.toString('base64')}`;
     }
 }

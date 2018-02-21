@@ -85,8 +85,9 @@ export default class {
 
     /**
      * Refresh locally stored content
+     * @param {bool} suppressErrors Suppress any errors that occur during loading of content
      */
-    static async refreshContent() {
+    static async refreshContent(suppressErrors = false) {
         if (!this.localContent.length) return this.loadAllContent();
 
         try {
@@ -101,19 +102,45 @@ export default class {
                     // Load if not
                     await this.preloadContent(dir);
                 } catch (err) {
-                    //We don't want every plugin/theme to fail loading when one does
+                    // We don't want every plugin/theme to fail loading when one does
+                    this.errors.push(new ErrorEvent({
+                        module: this.moduleName,
+                        message: `Failed to load ${dir}`,
+                        err
+                    }));
+
                     Logger.err(this.moduleName, err);
                 }
             }
 
             for (let content of this.localContent) {
                 if (directories.includes(content.dirName)) continue;
-                //Plugin/theme was deleted manually, stop it and remove any reference
-                this.unloadContent(content);
+
+                try {
+                    // Plugin/theme was deleted manually, stop it and remove any reference
+                    await this.unloadContent(content);
+                } catch (err) {
+                    this.errors.push(new ErrorEvent({
+                        module: this.moduleName,
+                        message: `Failed to unload ${dir}`,
+                        err
+                    }));
+
+                    Logger.err(this.moduleName, err);
+                }
+            }
+
+            if (this.errors.length && !suppressErrors) {
+                Modals.error({
+                    header: `${this.moduleName} - ${this.errors.length} ${this.contentType}${this.errors.length !== 1 ? 's' : ''} failed to load`,
+                    module: this.moduleName,
+                    type: 'err',
+                    content: this.errors
+                });
+                this._errors = [];
             }
 
             return this.localContent;
-
         } catch (err) {
             throw err;
         }

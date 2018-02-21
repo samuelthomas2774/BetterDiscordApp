@@ -31,19 +31,15 @@
     }
 
     .bd-drawer-contents {
+        // margin-top is set in JavaScript when the drawer is animating
+        // It still needs to be set here for it to animate
         transition: transform 0.2s ease, margin-top 0.2s ease, opacity 0.2s ease;
         transform: scaleY(0) translateY(0%);
-        margin-top: -50%;
+        margin-top: -100%;
         opacity: 0;
 
         > .bd-form-item:last-child > .bd-form-divider:last-child {
             display: none;
-        }
-
-        &::after {
-            content: "";
-            display: block;
-            margin-top: 15px;
         }
     }
 
@@ -67,6 +63,12 @@
             transform: scaleY(1) translateY(0%);
             margin-top: 0%;
             opacity: 1;
+
+            &::after {
+                content: "";
+                display: block;
+                margin-top: 15px;
+            }
         }
     }
 }

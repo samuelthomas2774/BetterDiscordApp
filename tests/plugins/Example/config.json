@@ -195,6 +195,51 @@
             ]
         },
         {
+            "category": "custom-settings",
+            "category_name": "Custom settings",
+            "type": "drawer",
+            "settings": [
+                {
+                    "id": "custom-1",
+                    "type": "custom",
+                    "value": false,
+                    "component": {
+                        "template": "<div style=\"margin-bottom: 15px; background-color: rgba(0, 0, 0, 0.2); border: 1px dashed rgba(255, 255, 255, 0.2); padding: 10px; color: #f6f6f7; font-weight: 500; font-size: 15px;\">Test custom setting {{ setting.id }}. This is included inline with the plugin/theme's config. (Which means it can't use any functions, but can still bind functions to events.) <button class=\"bd-button bd-button-primary\" style=\"display: inline-block; margin-left: 10px;\" @click=\"change(1)\">Set value to 1</button> <button class=\"bd-button bd-button-primary\" style=\"display: inline-block; margin-left: 10px;\" @click=\"change(2)\">Set value to 2</button></div>",
+                        "props": [
+                            "setting",
+                            "change"
+                        ]
+                    },
+                    "debug": true
+                },
+                {
+                    "id": "custom-2",
+                    "type": "custom",
+                    "value": false,
+                    "file": "component.js"
+                },
+                {
+                    "id": "custom-3",
+                    "type": "custom",
+                    "value": false,
+                    "component": "settingscomponent"
+                },
+                {
+                    "id": "custom-4",
+                    "type": "custom",
+                    "value": false,
+                    "function": "getSettingsComponent"
+                },
+                {
+                    "id": "custom-5",
+                    "type": "custom",
+                    "value": false,
+                    "function": "getSettingsComponentHTMLElement",
+                    "debug": true
+                }
+            ]
+        },
+        {
             "category_header_comment": "Setting a category other than default has a header with category name as the text",
             "category": "test-category",
             "category_name": "Test Category",

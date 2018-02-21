@@ -151,19 +151,20 @@ export default class {
             try {
                 const readUserConfig = await this.readUserConfig(contentPath);
                 userConfig.enabled = readUserConfig.enabled || false;
-                userConfig.config = readConfig.defaultConfig.map(config => {
-                    const userSet = readUserConfig.config.find(c => c.category === config.category);
+                userConfig.config = readConfig.defaultConfig.map(category => {
+                    let newCategory = readUserConfig.config.find(c => c.category === category.category);
                     // return userSet || config;
-                    if (!userSet) return config;
+                    if (!newCategory) newCategory = {settings: []};
 
-                    config.settings = config.settings.map(setting => {
-                        const userSetting = userSet.settings.find(s => s.id === setting.id);
-                        if (!userSetting) return setting;
+                    category.settings = category.settings.map(setting => {
+                        if (setting.type === 'array' || setting.type === 'custom') setting.path = contentPath;
+                        const newSetting = newCategory.settings.find(s => s.id === setting.id);
+                        if (!newSetting) return setting;
 
-                        setting.value = userSetting.value;
+                        setting.value = newSetting.value;
                         return setting;
                     });
-                    return config;
+                    return category;
                 });
                 userConfig.css = readUserConfig.css || null;
                 // userConfig.config = readUserConfig.config;
@@ -175,13 +176,13 @@ export default class {
                 defaultConfig: readConfig.defaultConfig,
                 schemes: readConfig.configSchemes,
                 userConfig
-            }
+            };
 
             const paths = {
                 contentPath,
                 dirName,
                 mainPath
-            }
+            };
 
             const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies);
             if (reload) this.localContent[index] = content;

@@ -1,0 +1,20 @@
+.bd-pre-wrap {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    color: #b9bbbe;
+    white-space: pre-wrap;
+    font-family: monospace;
+    overflow-y: auto;
+
+    &:focus {
+        color: #fff;
+        border-color: #040405;
+    }
+
+    @include scrollbar;
+}
+
+.bd-pre {
+    padding: 11px;
+}

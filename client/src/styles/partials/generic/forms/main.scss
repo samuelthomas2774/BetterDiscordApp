@@ -38,3 +38,13 @@
         }
     }
 }
+
+.bd-form-customsetting {
+    &.bd-form-customsetting-debug + .bd-form-divider {
+        margin-top: 0;
+    }
+
+    > .bd-drawer {
+        margin-bottom: 0;
+    }
+}

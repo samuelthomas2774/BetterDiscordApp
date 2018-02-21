@@ -1,10 +1,19 @@
+.bd-form-dropdown {
+    h3 + .bd-dropdown {
+        width: 180px;
+        margin-left: 15px;
+    }
+
+    .bd-form-item-fullwidth & {
+        .bd-dropdown {
+            margin-top: 10px;
+        }
+    }
+}
+
 .bd-dropdown {
     position: relative;
     width: 100%;
-
-    h3 + & {
-        width: 180px;
-    }
 
     .bd-dropdown-current {
         color: #f6f6f7;

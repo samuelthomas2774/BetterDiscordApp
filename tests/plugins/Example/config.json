@@ -128,7 +128,8 @@
                         {"id": "opt3", "value": "opt3", "text": "Option 3"},
                         {"id": "opt4", "value": "opt4", "text": "Option 4"},
                         {"id": "opt5", "value": "opt5", "text": "Option 5"}
-                    ]
+                    ],
+                    "fullwidth": true
                 },
                 {
                     "id": "default-6",

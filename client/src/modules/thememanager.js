@@ -64,12 +64,12 @@ export default class ThemeManager extends ContentManager {
         theme.recompile();
     }
 
-    static getConfigAsSCSS(config) {
+    static async getConfigAsSCSS(config) {
         const variables = [];
 
         for (let category of config) {
             for (let setting of category.settings) {
-                const setting_scss = this.parseSetting(setting);
+                const setting_scss = await this.parseSetting(setting);
                 if (setting_scss) variables.push(`$${setting_scss[0]}: ${setting_scss[1]};`);
             }
         }
@@ -77,12 +77,12 @@ export default class ThemeManager extends ContentManager {
         return variables.join('\n');
     }
 
-    static getConfigAsSCSSMap(config) {
+    static async getConfigAsSCSSMap(config) {
         const variables = [];
 
         for (let category of config) {
             for (let setting of category.settings) {
-                const setting_scss = this.parseSetting(setting);
+                const setting_scss = await this.parseSetting(setting);
                 if (setting_scss) variables.push(`${setting_scss[0]}: (${setting_scss[1]})`);
             }
         }
@@ -90,7 +90,7 @@ export default class ThemeManager extends ContentManager {
         return '(' + variables.join(', ') + ')';
     }
 
-    static parseSetting(setting) {
+    static async parseSetting(setting) {
         const { type, id, value } = setting;
         const name = id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
 
@@ -116,7 +116,9 @@ export default class ThemeManager extends ContentManager {
             console.log('items', items);
 
             // Final comma ensures the variable is a list
-            const maps = items.map(i => this.getConfigAsSCSSMap(i.settings));
+            const maps = [];
+            for (let item of items)
+                maps.push(await this.getConfigAsSCSSMap(item.settings));
             return [name, maps.length ? maps.join(', ') + ',' : '()'];
         }
 

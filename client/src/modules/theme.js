@@ -135,7 +135,7 @@ export default class Theme {
         let css = '';
         if (this.info.type === 'sass') {
             css = await ClientIPC.send('bd-compileSass', {
-                data: ThemeManager.getConfigAsSCSS(this.config),
+                data: await ThemeManager.getConfigAsSCSS(this.config),
                 path: this.paths.mainPath.replace(/\\/g, '/')
             });
             console.log(css);

@@ -1,5 +1,13 @@
 .bd-form-textinput,
 .bd-form-numberinput {
+    h3 {
+        + .bd-textinput-wrapper,
+        + .bd-textinput-wrapper input[type="text"],
+        + .bd-textinput-wrapper input[type="number"] {
+            width: 180px;
+        }
+    }
+
     input[type="text"],
     input[type="number"] {
         background: transparent;
@@ -10,13 +18,17 @@
         line-height: 24px;
         font-size: 100%;
         font-weight: 500;
-        width: 180px;
+        width: 100%;
 
         &:focus {
             color: #fff;
             border-color: $colbdblue;
         }
     }
+}
+
+.bd-textinput-wrapper {
+    width: 100%;
 }
 
 .bd-form-textarea {

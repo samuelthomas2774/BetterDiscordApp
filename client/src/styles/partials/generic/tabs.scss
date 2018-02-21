@@ -1,0 +1,98 @@
+.bd-tabbar {
+    flex: 0 0 auto;
+    margin-right: -15px;
+    display: flex;
+
+    .bd-button {
+        background: transparent;
+        border-bottom: 2px solid rgba(114, 118, 126, 0.3);
+        cursor: pointer;
+        margin-right: 15px;
+        padding: 15px 0;
+        color: #87909c;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s ease, border-bottom-color 0.2s ease;
+        flex: 0 0;
+        display: flex;
+
+        h3 {
+            flex: 0 0;
+        }
+
+        .bd-material-button {
+            margin: -1px 0 -1px 4px;
+        }
+
+        &:hover,
+        &.bd-active {
+            background: transparent;
+            border-bottom-color: $colbdblue;
+            color: #fff;
+
+            .bd-material-design-icon {
+                fill: #fff;
+            }
+        }
+
+        &.bd-active {
+            cursor: default;
+        }
+    }
+
+    .bd-material-button-wrap {
+        margin-right: 15px;
+        flex: 0 0;
+        padding: 17px 0 18px;
+
+        .bd-material-button {
+            margin: 0;
+        }
+    }
+
+    .bd-button,
+    .bd-material-button-wrap {
+        .bd-material-button {
+            width: 16px;
+            height: 16px;
+            flex: 0 0;
+            cursor: pointer;
+
+            .material-design-icon,
+            .bd-material-design-icon {
+                display: flex;
+                align-items: center;
+                fill: #87909c;
+                transition: fill 0.2s ease;
+
+                svg {
+                    width: 16px;
+                    height: 16px;
+                }
+            }
+
+            &:hover {
+                background-color: transparent;
+
+                .bd-material-design-icon {
+                    fill: #fff;
+                }
+            }
+        }
+    }
+
+    .bd-settingswrap-header & {
+        margin-top: -17px;
+        margin-bottom: -20px;
+
+        .bd-button {
+            font-size: 16px;
+            padding: 18px 0 17px;
+        }
+
+        .bd-material-button {
+            width: 18px;
+            height: 18px;
+        }
+    }
+}

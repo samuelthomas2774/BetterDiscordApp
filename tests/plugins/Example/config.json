@@ -18,6 +18,77 @@
             "category": "default",
             "settings": [
                 {
+                    "id": "array-1",
+                    "type": "array",
+                    "value": null,
+                    "text": "Test settings array",
+                    "hint": "Just a test. Inline should be left as false here in most cases. (Only set it to true if there's only one setting otherwise it takes up too much space. Or you could put it in a drawer.)",
+                    "inline": false,
+                    "min": 1,
+                    "max": 5,
+                    "settings": [
+                        {
+                            "category_default_comment": "default category has no header and is always displayed first",
+                            "category": "default",
+                            "settings": [
+                                {
+                                    "id": "default-0",
+                                    "type": "bool",
+                                    "value": false,
+                                    "text": "Bool Test Setting 3",
+                                    "hint": "Bool Test Setting Hint 3"
+                                },
+                                {
+                                    "id": "default-1",
+                                    "type": "text",
+                                    "value": "defaultValue",
+                                    "text": "Text Test Setting",
+                                    "hint": "Text Test Setting Hint"
+                                }
+                            ]
+                        }
+                    ],
+                    "schemes": [
+                        {
+                            "id": "scheme-1",
+                            "name": "Test scheme",
+                            "hint": "Can even use schemes here.",
+                            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "default-0",
+                                            "value": true
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "scheme-2",
+                            "name": "Another test scheme",
+                            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "default-0",
+                                            "value": false
+                                        },
+                                        {
+                                            "id": "default-1",
+                                            "value": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
                     "id": "default-0",
                     "type": "bool",
                     "value": false,

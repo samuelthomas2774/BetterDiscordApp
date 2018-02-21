@@ -17,8 +17,106 @@
                     "type": "text",
                     "value": "#00ff00",
                     "text": "Primary colour",
-                    "hint": "A colour setting type would be nice here",
-                    "scss_raw": true
+                    "hint": "A colour setting type would be nice here"
+                },
+                {
+                    "id": "additional-colours",
+                    "type": "array",
+                    "text": "Additional colours",
+                    "inline": true,
+                    "allow_external": false,
+                    "value": [
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#ff0000"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#ffff00"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#ffffff"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#00ffff"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#0000ff"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "colour",
+                                            "value": "#000000"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "settings": [
+                        {
+                            "category": "default",
+                            "settings": [
+                                {
+                                    "id": "colour",
+                                    "type": "text",
+                                    "value": "#ff0000"
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
                     "id": "spanOpacity",
@@ -34,8 +132,7 @@
                 },
                 {
                     "id": "avatar",
-                    "type": "text",
-                    "value": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+                    "type": "file",
                     "text": "Avatar replace",
                     "hint": "Replace all avatars"
                 },

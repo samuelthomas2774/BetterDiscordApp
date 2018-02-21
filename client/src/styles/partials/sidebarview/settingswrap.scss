@@ -1,0 +1,54 @@
+.bd-sidebar-region {
+    .bd-settingswrap {
+        display: flex;
+        height: 100%;
+        -webkit-box-flex: 1;
+        flex: 1;
+        min-height: 1px;
+        box-sizing: border-box;
+        padding: 90px 15px 0 15px;
+        margin-bottom: 5px;
+    }
+}
+
+.bd-content-region {
+    .bd-settingswrap {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        > .bd-scroller-wrap {
+            flex-grow: 1;
+
+            > .bd-scroller {
+                overflow-y: scroll;
+
+                .platform-darwin .bd-settings & {
+                    padding-top: 22px;
+                }
+            }
+        }
+
+        .bd-settingswrap-header {
+            outline: 0;
+            padding: 0;
+            margin: 30px 20px 20px;
+            vertical-align: baseline;
+            display: flex;
+            flex: 0 0 auto;
+
+            .bd-settingswrap-header-text {
+                color: $colbdblue;
+                text-transform: uppercase;
+                font-weight: 600;
+                font-size: 16px;
+                flex: 1 1 auto;
+            }
+        }
+
+        .bd-settingswrap-contents {
+            padding: 0 20px;
+            margin-bottom: 84px;
+        }
+    }
+}

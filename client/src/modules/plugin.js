@@ -11,6 +11,7 @@
 import { Utils, FileUtils } from 'common';
 import { Modals } from 'ui';
 import { EventEmitter } from 'events';
+import PluginManager from './pluginmanager';
 import ContentConfig from './contentconfig';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 

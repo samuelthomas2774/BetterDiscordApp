@@ -122,7 +122,7 @@ export default class {
                 } catch (err) {
                     this.errors.push(new ErrorEvent({
                         module: this.moduleName,
-                        message: `Failed to unload ${dir}`,
+                        message: `Failed to unload ${content.dirName}`,
                         err
                     }));
 
@@ -295,10 +295,10 @@ export default class {
     static findContent(wild, nonunique) {
         if (this.isThisContent(wild)) return wild;
         let content;
-        if (content = this.getContentById(wild)) return content;
-        if (content = this.getContentByDirName(wild)) return content;
-        if (content = this.getContentByPath(wild)) return content;
-        if (content = nonunique && this.getContentByName(wild)) return content;
+        content = this.getContentById(wild); if (content) return content;
+        content = this.getContentByDirName(wild); if (content) return content;
+        content = this.getContentByPath(wild); if (content) return content;
+        content = this.getContentByName(wild); if (content && nonunique) return content;
     }
 
     static getContentIndex(content) { return this.localContent.findIndex(c => c === content) }

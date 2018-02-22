@@ -53,7 +53,10 @@ export default class ThemeManager extends ContentManager {
     }
 
     static get unloadTheme() { return this.unloadContent }
-    static get reloadTheme() { return this.reloadContent }
+    static async reloadTheme(theme) {
+        theme = await this.reloadContent(theme);
+        theme.recompile();
+    }
 
     static enableTheme(theme) {
         theme.enable();
@@ -61,12 +64,6 @@ export default class ThemeManager extends ContentManager {
 
     static disableTheme(theme) {
         theme.disable();
-    }
-
-    static get unloadTheme() { return this.unloadContent }
-    static async reloadTheme(theme) {
-        theme = await this.reloadContent(theme);
-        theme.recompile();
     }
 
     static get isTheme() { return this.isThisContent }

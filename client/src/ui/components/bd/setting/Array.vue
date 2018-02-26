@@ -104,8 +104,10 @@
 
                 for (let newCategory of newSettings) {
                     const category = settings.find(c => c.category === newCategory.category);
+                    if (!category) continue;
                     for (let newSetting of newCategory.settings) {
                         const setting = category.settings.find(s => s.id === newSetting.id);
+                        if (!setting) continue;
                         setting.value = setting.old_value = newSetting.value;
                         setting.changed = false;
                     }

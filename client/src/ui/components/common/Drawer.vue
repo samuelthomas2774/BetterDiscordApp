@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div :class="['bd-drawer', {'bd-drawer-open': open}]">
+    <div :class="['bd-drawer', {'bd-drawer-open': open, 'bd-animating': animating}]">
         <div class="bd-form-header bd-drawer-header" @click="() => open = !open">
             <span class="bd-form-header-text">{{ label }}</span>
             <span class="bd-form-header-button bd-drawer-open-button">
@@ -18,8 +18,8 @@
             </span>
         </div>
         <div class="bd-drawer-contents-wrap">
-            <div class="bd-drawer-contents">
-                <slot />
+            <div class="bd-drawer-contents" ref="contents">
+                <slot v-if="open || animating" />
             </div>
         </div>
     </div>
@@ -37,7 +37,21 @@
         },
         data() {
             return {
-                open: false
+                open: false,
+                animating: false,
+                timeout: null
+            }
+        },
+        watch: {
+            async open(open) {
+                this.animating = true;
+                const contents = this.$refs.contents;
+                contents.style.marginTop = 0 - contents.offsetHeight + 'px';
+                if (this.timeout) clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => {
+                    contents.style.marginTop = null;
+                    this.animating = false;
+                }, 200);
             }
         }
     }

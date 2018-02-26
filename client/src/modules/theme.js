@@ -49,6 +49,7 @@ export default class Theme {
     get icon() { return this.info.icon }
     get paths() { return this.__themeInternals.paths }
     get main() { return this.__themeInternals.main }
+    get loaded() { return this.__themeInternals.loaded }
     get defaultConfig() { return this.configs.defaultConfig }
     get userConfig() { return this.configs.userConfig }
     get configSchemes() { return this.configs.schemes }
@@ -56,6 +57,7 @@ export default class Theme {
     get name() { return this.info.name }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
+    get contentPath() { return this.paths.contentPath }
     get themePath() { return this.paths.contentPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
@@ -115,17 +117,17 @@ export default class Theme {
         }
     }
 
-    enable() {
+    enable(save = true) {
         if (!this.enabled) {
             this.userConfig.enabled = true;
-            this.saveConfiguration();
+            if (save) this.saveConfiguration();
         }
         DOM.injectTheme(this.css, this.id);
     }
 
-    disable() {
+    disable(save = true) {
         this.userConfig.enabled = false;
-        this.saveConfiguration();
+        if (save) this.saveConfiguration();
         DOM.deleteTheme(this.id);
     }
 

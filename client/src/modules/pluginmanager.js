@@ -35,10 +35,12 @@ export default class extends ContentManager {
     }
 
     static async loadAllPlugins(suppressErrors) {
+        this.loaded = false;
         const loadAll = await this.loadAllContent(suppressErrors);
-        this.localPlugins.forEach(plugin => {
+        this.loaded = true;
+        for (let plugin of this.localPlugins) {
             if (plugin.enabled) plugin.start();
-        });
+        }
 
         return loadAll;
     }
@@ -46,7 +48,6 @@ export default class extends ContentManager {
 
     static get loadContent() { return this.loadPlugin }
     static async loadPlugin(paths, configs, info, main, dependencies) {
-
         const deps = [];
         if (dependencies) {
             for (const [key, value] of Object.entries(dependencies)) {
@@ -61,36 +62,21 @@ export default class extends ContentManager {
         }
 
         const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor, deps);
-        const instance = new plugin({ configs, info, main, paths: { contentPath: paths.contentPath, dirName: paths.dirName, mainPath: paths.mainPath } });
+        const instance = new plugin({
+            configs, info, main,
+            paths: {
+                contentPath: paths.contentPath,
+                dirName: paths.dirName,
+                mainPath: paths.mainPath
+            }
+        });
+
+        if (instance.enabled && this.loaded) instance.start();
         return instance;
     }
 
-    static get unloadContent() { return this.unloadPlugin }
-    static async unloadPlugin(plugin) {
-        try {
-            if (plugin.enabled) plugin.stop();
-            const { pluginPath } = plugin;
-            const index = this.getPluginIndex(plugin);
-
-            delete window.require.cache[window.require.resolve(pluginPath)];
-            this.localPlugins.splice(index, 1);
-        } catch (err) {
-            //This might fail but we don't have any other option at this point
-            Logger.err('PluginManager', err);
-        }
-    }
-
-    static async reloadPlugin(plugin) {
-        const _plugin = plugin instanceof Plugin ? plugin : this.findPlugin(plugin);
-        if (!_plugin) throw { 'message': 'Attempted to reload a plugin that is not loaded?' };
-        if (!_plugin.stop()) throw { 'message': 'Plugin failed to stop!' };
-        const index = this.getPluginIndex(_plugin);
-        const { pluginPath, dirName } = _plugin;
-
-        delete window.require.cache[window.require.resolve(pluginPath)];
-
-        return this.preloadContent(dirName, true, index);
-    }
+    static get unloadPlugin() { return this.unloadContent }
+    static get reloadPlugin() { return this.reloadContent }
 
     static stopPlugin(name) {
         const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
@@ -110,6 +96,11 @@ export default class extends ContentManager {
            // Logger.err('PluginManager', err);
         }
         return true; //Return true anyways since plugin doesn't exist
+    }
+
+    static get isPlugin() { return this.isThisContent }
+    static isThisContent(plugin) {
+        return plugin instanceof Plugin;
     }
 
     static get findPlugin() { return this.findContent }

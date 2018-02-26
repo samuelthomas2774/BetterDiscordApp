@@ -85,8 +85,9 @@ export default class {
 
     /**
      * Refresh locally stored content
+     * @param {bool} suppressErrors Suppress any errors that occur during loading of content
      */
-    static async refreshContent() {
+    static async refreshContent(suppressErrors = false) {
         if (!this.localContent.length) return this.loadAllContent();
 
         try {
@@ -101,19 +102,45 @@ export default class {
                     // Load if not
                     await this.preloadContent(dir);
                 } catch (err) {
-                    //We don't want every plugin/theme to fail loading when one does
+                    // We don't want every plugin/theme to fail loading when one does
+                    this.errors.push(new ErrorEvent({
+                        module: this.moduleName,
+                        message: `Failed to load ${dir}`,
+                        err
+                    }));
+
                     Logger.err(this.moduleName, err);
                 }
             }
 
             for (let content of this.localContent) {
                 if (directories.includes(content.dirName)) continue;
-                //Plugin/theme was deleted manually, stop it and remove any reference
-                this.unloadContent(content);
+
+                try {
+                    // Plugin/theme was deleted manually, stop it and remove any reference
+                    await this.unloadContent(content);
+                } catch (err) {
+                    this.errors.push(new ErrorEvent({
+                        module: this.moduleName,
+                        message: `Failed to unload ${content.dirName}`,
+                        err
+                    }));
+
+                    Logger.err(this.moduleName, err);
+                }
+            }
+
+            if (this.errors.length && !suppressErrors) {
+                Modals.error({
+                    header: `${this.moduleName} - ${this.errors.length} ${this.contentType}${this.errors.length !== 1 ? 's' : ''} failed to load`,
+                    module: this.moduleName,
+                    type: 'err',
+                    content: this.errors
+                });
+                this._errors = [];
             }
 
             return this.localContent;
-
         } catch (err) {
             throw err;
         }
@@ -151,19 +178,20 @@ export default class {
             try {
                 const readUserConfig = await this.readUserConfig(contentPath);
                 userConfig.enabled = readUserConfig.enabled || false;
-                userConfig.config = readConfig.defaultConfig.map(config => {
-                    const userSet = readUserConfig.config.find(c => c.category === config.category);
+                userConfig.config = readConfig.defaultConfig.map(category => {
+                    let newCategory = readUserConfig.config.find(c => c.category === category.category);
                     // return userSet || config;
-                    if (!userSet) return config;
+                    if (!newCategory) newCategory = {settings: []};
 
-                    config.settings = config.settings.map(setting => {
-                        const userSetting = userSet.settings.find(s => s.id === setting.id);
-                        if (!userSetting) return setting;
+                    category.settings = category.settings.map(setting => {
+                        if (setting.type === 'array' || setting.type === 'custom') setting.path = contentPath;
+                        const newSetting = newCategory.settings.find(s => s.id === setting.id);
+                        if (!newSetting) return setting;
 
-                        setting.value = userSetting.value;
+                        setting.value = newSetting.value;
                         return setting;
                     });
-                    return config;
+                    return category;
                 });
                 userConfig.css = readUserConfig.css || null;
                 // userConfig.config = readUserConfig.config;
@@ -175,15 +203,18 @@ export default class {
                 defaultConfig: readConfig.defaultConfig,
                 schemes: readConfig.configSchemes,
                 userConfig
-            }
+            };
 
             const paths = {
                 contentPath,
                 dirName,
                 mainPath
-            }
+            };
 
             const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies);
+            if (!reload && this.getContentById(content.id))
+                throw {message: `A ${this.contentType} with the ID ${content.id} already exists.`};
+
             if (reload) this.localContent[index] = content;
             else this.localContent.push(content);
             return content;
@@ -191,6 +222,43 @@ export default class {
         } catch (err) {
             throw err;
         }
+    }
+
+    /**
+     * Unload content
+     * @param {any} content Content to unload
+     * @param {bool} reload Whether to reload the content after
+     */
+    static async unloadContent(content, reload) {
+        content = this.findContent(content);
+        if (!content) throw {message: `Could not find a ${this.contentType} from ${content}.`};
+
+        try {
+            if (content.enabled && content.disable) content.disable(false);
+            if (content.enabled && content.stop) content.stop(false);
+            if (content.onunload) content.onunload(reload);
+            if (content.onUnload) content.onUnload(reload);
+            const index = this.getContentIndex(content);
+
+            delete window.require.cache[window.require.resolve(content.paths.mainPath)];
+
+            if (reload) {
+                const newcontent = await this.preloadContent(content.dirName, true, index);
+                if (newcontent.enabled && newcontent.start) newcontent.start(false);
+                return newcontent;
+            } else this.localContent.splice(index, 1);
+        } catch (err) {
+            Logger.err(this.moduleName, err);
+            throw err;
+        }
+    }
+
+    /**
+     * Reload content
+     * @param {any} content Content to reload
+     */
+    static async reloadContent(content) {
+        return this.unloadContent(content, true);
     }
 
     /**
@@ -212,18 +280,25 @@ export default class {
     }
 
     /**
+     * Checks if the passed object is an instance of this content type.
+     * @param {any} content Object to check
+     */
+    static isThisContent(content) {
+        return false;
+    }
+
+    /**
      * Wildcard content finder
      * @param {any} wild Content name | id | path | dirname
+     * @param {bool} nonunique Allow searching attributes that may not be unique
      */
-    //TODO make this nicer
-    static findContent(wild) {
-        let content = this.getContentByName(wild);
-        if (content) return content;
-        content = this.getContentById(wild);
-        if (content) return content;
-        content = this.getContentByPath(wild);
-        if (content) return content;
-        return this.getContentByDirName(wild);
+    static findContent(wild, nonunique) {
+        if (this.isThisContent(wild)) return wild;
+        let content;
+        content = this.getContentById(wild); if (content) return content;
+        content = this.getContentByDirName(wild); if (content) return content;
+        content = this.getContentByPath(wild); if (content) return content;
+        content = this.getContentByName(wild); if (content && nonunique) return content;
     }
 
     static getContentIndex(content) { return this.localContent.findIndex(c => c === content) }

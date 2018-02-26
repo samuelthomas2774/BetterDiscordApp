@@ -2,10 +2,14 @@
 .bd-form-numberinput {
     h3 {
         + .bd-textinput-wrapper,
-        + .bd-textinput-wrapper input[type="text"],
-        + .bd-textinput-wrapper input[type="number"] {
+        + .bd-number {
             width: 180px;
         }
+    }
+
+    .bd-textinput-wrapper,
+    .bd-number {
+        margin-left: 15px;
     }
 
     input[type="text"],
@@ -25,9 +29,27 @@
             border-color: $colbdblue;
         }
     }
+
+    .bd-form-item-fullwidth & {
+        .bd-title {
+            flex-direction: column;
+        }
+
+        .bd-textinput-wrapper,
+        .bd-number {
+            width: 100%;
+            margin-top: 10px;
+            margin-left: 0;
+        }
+
+        .bd-hint {
+            margin-top: 10px;
+        }
+    }
 }
 
-.bd-textinput-wrapper {
+.bd-textinput-wrapper,
+.bd-number {
     width: 100%;
 }
 

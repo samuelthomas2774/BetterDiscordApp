@@ -14,20 +14,19 @@
             <div class="bd-title">
                 <h3>{{setting.text}}</h3>
             </div>
+            <div class="bd-hint">{{setting.hint}}</div>
         </div>
-        <div class="bd-form-radio-group">
-            <label class="bd-radio" v-for="option in setting.options" :class="{'bd-radio-selected': setting.value === option.id}" @click="selectOption(option)">
-                <div class="bd-radio-control-wrap">
-                    <svg class="bd-radio-control" name="Checkmark" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><polyline stroke="#3e82e5" stroke-width="2" points="3.5 9.5 7 13 15 5"></polyline></g></svg>
-                </div>
-                <div class="bd-radio-text">{{option.text}}</div>
-            </label>
-        </div>
+        <RadioGroup :options="setting.options" :selected="setting.value" :disabled="setting.disabled" :change="change" />
     </div>
 </template>
 <script>
+    import RadioGroup from '../../common/RadioGroup.vue';
+
     export default {
         props: ['setting', 'change'],
+        components: {
+            RadioGroup
+        },
         methods: {
             selectOption(option) {
                 this.change(option.id);

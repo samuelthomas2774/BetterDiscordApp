@@ -44,11 +44,11 @@
             },
             hsva() {
                 if (!this.$refs.picker || !this.$refs.picker.val) return this.colors;
-                return this.$refs.picker.hsv;
+                return this.$refs.picker.val.hsv;
             },
             hsla() {
                 if (!this.$refs.picker || !this.$refs.picker.val) return this.colors;
-                return this.$refs.picker.hsl;
+                return this.$refs.picker.val.hsl;
             },
             rgbaString() {
                 const rgba = this.rgba;

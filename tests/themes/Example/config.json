@@ -311,7 +311,7 @@
             "id": "scheme-4",
             "name": "Reset to default background",
             "hint": "Better than editing user.config.json.",
-            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+            "icon_url": "https://rawgit.com/samuelthomas2774/BetterDiscordApp/cfdf3e0b4a6f853bc984c77bfbdf664592bd5e42/tests/themes/Example/background.jpg",
             "settings": [
                 {
                     "category": "default",

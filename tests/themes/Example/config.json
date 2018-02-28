@@ -13,6 +13,14 @@
             "category": "default",
             "settings": [
                 {
+                    "id": "colourTest",
+                    "type": "colour",
+                    "subtype": "hex", 
+                    "value": "#3e82e5",
+                    "text": "Colour Picker Test",
+                    "hint":  "Colour Picker Test Hint" 
+                },
+                {
                     "id": "divBg",
                     "type": "text",
                     "value": "#00ff00",

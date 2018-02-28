@@ -13,7 +13,7 @@
         <div class="bd-title">
             <h3 v-if="setting.text">{{setting.text}}</h3>
             <div class="bd-colourpicker-wrapper">
-                <button class="bd-colourpicker-swatch" :style="{backgroundColor: `rgba(${rgbaString})`}" @click="open = !open"/>
+                <button class="bd-colourpicker-swatch" :style="{backgroundColor: rgbaString}" @click="open = !open"/>
             </div>
         </div>
         <Picker ref="picker" v-model="colors" @input="pick" :class="{'bd-hidden': !open}"/>
@@ -25,14 +25,14 @@
     export default {
         data() {
             return {
-                colors: '#3e82e5',
-                open: false
+                open: false,
+                colors: '#FFF'
             }
         },
         components: {
             Picker
         },
-        props: ['setting'],
+        props: ['setting', 'change'],
         computed: {
             hex() {
                 if (!this.$refs.picker || !this.$refs.picker.val) return this.colors;
@@ -51,14 +51,24 @@
                 return this.$refs.picker.val.hsl;
             },
             rgbaString() {
-                const rgba = this.rgba;
-                if (!rgba.r) return this.colors;
-                return `${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a}`;
+                if ('string' === typeof this.colors) return this.colors;
+                const { rgba } = this.colors;
+                return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
             }
         },
         methods: {
             pick(c) {
-                
+                this.change(this.rgbaString);
+            }
+        },
+        beforeMount() {
+            this.colors = this.setting.value;
+        },
+        watch: {
+            setting(newVal, oldVal) {
+                if (newVal.value === oldVal.value) return;
+                this.colors = newVal.value;
+                this.open = false;
             }
         }
     }

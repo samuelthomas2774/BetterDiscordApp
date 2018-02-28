@@ -14,7 +14,8 @@ import Plugin from './plugin';
 import PluginApi from './pluginapi';
 import Vendor from './vendor';
 import { ClientLogger as Logger } from 'common';
-import { Events } from 'modules';
+import { Events, Permissions } from 'modules';
+import { Modals } from 'ui';
 
 export default class extends ContentManager {
 
@@ -47,7 +48,19 @@ export default class extends ContentManager {
     static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
-    static async loadPlugin(paths, configs, info, main, dependencies) {
+    static async loadPlugin(paths, configs, info, main, dependencies, permissions) {
+
+        if (permissions && permissions.length > 0) {
+            for (let perm of permissions) {
+                console.log(`Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
+            }
+            try {
+                const allowed = await Modals.permissions(`${info.name} wants to:`, info.name, permissions).promise;
+            } catch (err) {
+                return null;
+            }
+        }
+
         const deps = [];
         if (dependencies) {
             for (const [key, value] of Object.entries(dependencies)) {

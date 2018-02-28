@@ -11,3 +11,4 @@ export { default as ModuleManager } from './modulemanager';
 export { default as EventListener } from './eventlistener';
 export { default as SocketProxy } from './socketproxy';
 export { default as EventHook } from './eventhook';
+export { default as Permissions } from './permissionmanager';

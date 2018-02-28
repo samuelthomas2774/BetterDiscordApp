@@ -14,6 +14,7 @@ import BasicModal from './components/bd/modals/BasicModal.vue';
 import ConfirmModal from './components/bd/modals/ConfirmModal.vue';
 import ErrorModal from './components/bd/modals/ErrorModal.vue';
 import SettingsModal from './components/bd/modals/SettingsModal.vue';
+import PermissionModal from './components/bd/modals/PermissionModal.vue';
 
 export default class {
 
@@ -78,6 +79,16 @@ export default class {
             this.add(modal, ConfirmModal);
         });
         modal.promise = promise;
+        return modal;
+    }
+
+    static permissions(title, name, perms) {
+        const modal = { title,name, perms };
+        modal.promise = new Promise((resolve, reject) => {
+            modal.confirm = () => resolve(true);
+            modal.beforeClose = () => reject();
+            this.add(modal, PermissionModal);
+        });
         return modal;
     }
 

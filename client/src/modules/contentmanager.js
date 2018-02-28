@@ -208,7 +208,8 @@ export default class {
                 mainPath
             };
 
-            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies);
+            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies, readConfig.permissions);
+            if (!content) return null;
             if (!reload && this.getContentById(content.id))
                 throw {message: `A ${this.contentType} with the ID ${content.id} already exists.`};
 

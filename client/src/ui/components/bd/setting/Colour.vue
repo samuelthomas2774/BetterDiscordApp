@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-form-colourpicker">
+    <div ref="root" class="bd-form-colourpicker">
         <div class="bd-title">
             <h3 v-if="setting.text">{{setting.text}}</h3>
             <div class="bd-colourpicker-wrapper">
@@ -59,10 +59,17 @@
         methods: {
             pick(c) {
                 this.change(this.rgbaString);
+            },
+            closePopup(e) {
+                if (!this.$refs.root.contains(e.target)) this.open = false;
             }
         },
         beforeMount() {
             this.colors = this.setting.value;
+            window.addEventListener('click', this.closePopup);  
+        },
+        destroyed() {
+            window.removeEventListener('click', this.closePopup);
         },
         watch: {
             setting(newVal, oldVal) {

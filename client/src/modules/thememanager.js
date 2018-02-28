@@ -101,6 +101,10 @@ export default class ThemeManager extends ContentManager {
         const { type, id, value } = setting;
         const name = id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
 
+        if (type === 'colour' || type === 'color') {
+            return [name, value];
+        }
+
         if (type === 'array') {
             const items = JSON.parse(JSON.stringify(value)) || [];
             const settings_json = JSON.stringify(setting.settings);

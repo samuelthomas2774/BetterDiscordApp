@@ -67,21 +67,4 @@
     .bd-hidden {
         display: none;
     }
-    .bd-form-colourpicker .bd-title {
-        display: flex;
-    }
-    .bd-form-colourpicker .bd-title h3 {
-        font-weight: 500;
-        color: #f6f6f7;
-        flex: 1;
-        line-height: 24px;
-        margin-bottom: 0;
-        margin-top: 0;
-    }
-    .bd-colourpicker-swatch {
-        width: 50px;
-        height: 30px;
-        border-radius: 3px;
-        border: 1px solid hsla(0,0%,100%,.1);
-    }
 </style>

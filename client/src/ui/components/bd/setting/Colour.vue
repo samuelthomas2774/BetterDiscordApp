@@ -9,14 +9,14 @@
 */
 
 <template>
-    <div class="bd-form-colourpicker">
+    <div ref="root" class="bd-form-colourpicker">
         <div class="bd-title">
             <h3 v-if="setting.text">{{setting.text}}</h3>
             <div class="bd-colourpicker-wrapper">
-                <button class="bd-colourpicker-swatch" :style="{backgroundColor: rgbaString}" @click="open = !open"/>
+                <button class="bd-colourpicker-swatch" :style="{backgroundColor: rgbaString}" @click="show"/>
             </div>
         </div>
-        <Picker ref="picker" v-model="colors" @input="pick" :class="{'bd-hidden': !open}"/>
+        <Picker ref="picker" v-model="colors" @input="pick" :class="{'bd-hidden': !open}" :style="{top: topOffset}"/>
         <div class="bd-hint">{{setting.hint}}</div>
     </div>
 </template>
@@ -26,7 +26,8 @@
         data() {
             return {
                 open: false,
-                colors: '#FFF'
+                colors: '#FFF',
+                topOffset: '35px'
             }
         },
         components: {
@@ -57,12 +58,28 @@
             }
         },
         methods: {
+            show() {
+                const offset = window.innerHeight - this.$refs.root.getBoundingClientRect().top - 340;
+                if (offset >= 0) {
+                    this.topOffset = '35px';
+                } else {
+                    this.topOffset = 35 + offset > 35 ? '35px' : `${35 + offset}px`;
+                }
+                this.open = true;
+            },
             pick(c) {
                 this.change(this.rgbaString);
+            },
+            closePopup(e) {
+                if (!this.$refs.root.contains(e.target)) this.open = false;
             }
         },
         beforeMount() {
             this.colors = this.setting.value;
+            window.addEventListener('click', this.closePopup);  
+        },
+        destroyed() {
+            window.removeEventListener('click', this.closePopup);
         },
         watch: {
             setting(newVal, oldVal) {

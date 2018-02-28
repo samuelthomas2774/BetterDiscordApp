@@ -124,6 +124,16 @@
             openTwitter() {
                 shell.openExternal('https://twitter.com/Jiiksi');
             }
+        },
+        watch: {
+            active(newVal, oldVal) {
+                if (!newVal) {
+                    this.sidebarItems.find(item => item.id === this.activeIndex).active = false;
+                    this.activeIndex = this.lastActiveIndex = -1;
+                    this.animating = false;
+                    this.first = true;
+                }
+            }
         }
     }
 </script>

@@ -13,6 +13,15 @@
             "category": "default",
             "settings": [
                 {
+                    "id": "relative-file-test",
+                    "type": "file",
+                    "text": "Messages background image",
+                    "hint": "Add a background to the messages area for testing relative path resolution",
+                    "value": [
+                        "background.jpg"
+                    ]
+                },
+                {
                     "id": "colourTest",
                     "type": "colour",
                     "value": "#3e82e5",
@@ -293,6 +302,25 @@
                         {
                             "id": "spanOpacity",
                             "value": 50
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "scheme-4",
+            "name": "Reset to default background",
+            "hint": "Better than editing user.config.json.",
+            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+            "settings": [
+                {
+                    "category": "default",
+                    "settings": [
+                        {
+                            "id": "relative-file-test",
+                            "value": [
+                                "background.jpg"
+                            ]
                         }
                     ]
                 }

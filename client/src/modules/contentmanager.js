@@ -178,23 +178,20 @@ export default class {
             try {
                 const readUserConfig = await this.readUserConfig(contentPath);
                 userConfig.enabled = readUserConfig.enabled || false;
-                userConfig.config = readConfig.defaultConfig.map(category => {
-                    let newCategory = readUserConfig.config.find(c => c.category === category.category);
-                    // return userSet || config;
-                    if (!newCategory) newCategory = {settings: []};
+                for (let category of userConfig.config) {
+                    const newCategory = readUserConfig.config.find(c => c.category === category.category);
 
-                    category.settings = category.settings.map(setting => {
-                        if (setting.type === 'array' || setting.type === 'custom') setting.path = contentPath;
+                    for (let setting of category.settings) {
+                        setting.path = contentPath;
+
+                        if (!newCategory) continue;
                         const newSetting = newCategory.settings.find(s => s.id === setting.id);
-                        if (!newSetting) return setting;
+                        if (!newSetting) continue;
 
                         setting.value = newSetting.value;
-                        return setting;
-                    });
-                    return category;
-                });
+                    }
+                }
                 userConfig.css = readUserConfig.css || null;
-                // userConfig.config = readUserConfig.config;
             } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
 
             }

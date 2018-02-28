@@ -12,7 +12,7 @@ import ThemeManager from './thememanager';
 import { EventEmitter } from 'events';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { DOM, Modals } from 'ui';
-import { Utils, FileUtils, ClientIPC } from 'common';
+import { Utils, FileUtils, ClientIPC, ClientLogger as Logger } from 'common';
 import ContentConfig from './contentconfig';
 
 class ThemeEvents {
@@ -136,11 +136,17 @@ export default class Theme {
 
         let css = '';
         if (this.info.type === 'sass') {
+            const config = await ThemeManager.getConfigAsSCSS(this.config);
+
             css = await ClientIPC.send('bd-compileSass', {
-                data: await ThemeManager.getConfigAsSCSS(this.config),
+                data: config,
                 path: this.paths.mainPath.replace(/\\/g, '/')
             });
-            console.log(css);
+
+            Logger.log(this.name, ['Finished compiling theme', new class Info {
+                get SCSS_variables() { console.log(config); }
+                get Compiled_SCSS() { console.log(css); }
+            }]);
         } else {
             css = await FileUtils.readFile(this.paths.mainPath);
         }

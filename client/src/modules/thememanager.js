@@ -11,6 +11,7 @@
 import ContentManager from './contentmanager';
 import Theme from './theme';
 import { FileUtils } from 'common';
+import path from 'path';
 
 export default class ThemeManager extends ContentManager {
 
@@ -134,11 +135,11 @@ export default class ThemeManager extends ContentManager {
         }
 
         if (type === 'file' && Array.isArray(value)) {
-            if (!value || !value.length) return [name, '(),'];
+            if (!value || !value.length) return [name, '()'];
 
             const files = [];
             for (let filepath of value) {
-                const buffer = await FileUtils.readFileBuffer(filepath);
+                const buffer = await FileUtils.readFileBuffer(path.resolve(setting.path, filepath));
                 const type = await FileUtils.getFileType(buffer);
                 files.push(`(data: ${this.toSCSSString(buffer.toString('base64'))}, type: ${this.toSCSSString(type.mime)}, url: ${this.toSCSSString(await FileUtils.toDataURI(buffer, type.mime))})`);
             }

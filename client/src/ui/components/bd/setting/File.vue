@@ -31,6 +31,7 @@
     import { shell } from 'electron';
     import { ClientIPC } from 'common';
     import { MiOpenInNew, MiMinus } from '../../common';
+    import path from 'path';
 
     export default {
         props: ['setting', 'change'],
@@ -46,7 +47,7 @@
                     this.change(filenames);
             },
             openItem(file_path) {
-                shell.openItem(file_path);
+                shell.openItem(path.resolve(this.setting.path, file_path));
             },
             removeItem(file_path) {
                 this.change(this.setting.value.filter(f => f !== file_path));

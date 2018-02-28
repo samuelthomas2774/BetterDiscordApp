@@ -10,6 +10,13 @@ span {
     opacity: $spanOpacity2 !important;
 }
 
+.chat .messages-wrapper,
+#friends .friends-table {
+    background-image: url(map-get($relative-file-test, url));
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
 .avatar-large {
     background-image: url(map-get($avatar, url)) !important;
     border-radius: $avatarRadius !important;

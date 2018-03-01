@@ -103,13 +103,11 @@
             },
             activeContent(s) {
                 const item = this.sidebarItems.find(item => item.contentid === s);
-                if (!item) return false;
-                return item.id === this.activeIndex;
+                return item && item.id === this.activeIndex;
             },
             animatingContent(s) {
                 const item = this.sidebarItems.find(item => item.contentid === s);
-                if (!item) return false;
-                return item.id === this.lastActiveIndex;
+                return item && item.id === this.lastActiveIndex;
             },
             changeSetting(set_id, category_id, setting_id, value) {
                 Settings.setSetting(set_id, category_id, setting_id, value);

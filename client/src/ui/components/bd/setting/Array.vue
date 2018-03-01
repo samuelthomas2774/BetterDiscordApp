@@ -47,26 +47,15 @@
         components: {
             MiSettings, MiOpenInNew, MiMinus
         },
-        watch: {
-            setting(value) {
-                // this.setting was changed
-            }
-        },
         methods: {
             addItem(openModal) {
                 if (this.setting.disabled || this.setting.max && this.setting.items.length >= this.setting.max) return;
-                // const item = { settings: this.getItemSettings({}) };
                 const item = this.setting.addItem();
                 if (openModal) this.showModal(item, this.setting.items.length);
-                // this.update();
-                // this.$forceUpdate();
             },
             removeItem(item) {
                 if (this.setting.disabled || this.setting.min && this.setting.items.length <= this.setting.min) return;
-                // this.setting.items = this.setting.items.filter(i => i !== item);
                 this.setting.removeItem(item);
-                // this.update();
-                this.$forceUpdate();
             },
             changeInItem(item, category_id, setting_id, value) {
                 console.log('Setting', item, category_id, setting_id, 'to', value);
@@ -79,7 +68,6 @@
 
                 setting.value = value;
                 setting.changed = !Utils.compare(setting.value, setting.old_value);
-                // this.update();
             },
             showModal(item, index) {
                 Modals.settings(item, this.setting.headertext ? this.setting.headertext.replace(/%n/, index + 1) : this.setting.text + ` #${index + 1}`);

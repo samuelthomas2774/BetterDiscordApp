@@ -28,7 +28,7 @@
     import Vue from 'vue';
     import { Modal } from '../../common';
     import SettingsPanel from '../SettingsPanel.vue';
-    import { Utils } from 'common';
+    import { Utils, ClientLogger as Logger } from 'common';
 
     export default {
         props: ['modal'],
@@ -50,41 +50,23 @@
             }
         },
         methods: {
-            // settingChange(category_id, setting_id, value) {
-            //     console.log(`Setting ${category_id}/${setting_id} to ${value}`, this.configCache);
-            //
-            //     const category = this.configCache.find(c => c.category === category_id);
-            //     if (!category) return;
-            //
-            //     const setting = category.settings.find(s => s.id === setting_id);
-            //     if (!setting) return;
-            //
-            //     setting.value = value;
-            //
-            //     // this.changed = this.checkForChanges();
-            //     this.$forceUpdate();
-            // },
             async saveSettings() {
                 if (this.saving) return;
                 this.saving = true;
                 try {
                     if (this.modal.saveSettings) await this.modal.saveSettings(this.settings);
-                    // this.cloneSettings();
+                    else this.modal.settings.merge(this.settings);
                 } catch (err) {
                     // TODO Display error that settings failed to save
-                    console.log(err);
+                    Logger.err('SettingsModal', ['Failed to save settings:', err]);
                 }
                 this.saving = false;
             },
             resetSettings() {
                 if (this.saving) return;
-                // this.configCache = JSON.parse(JSON.stringify(this.modal.settings));
-                // this.changed = false;
                 this.cloneSettings();
-                this.$forceUpdate();
             },
             cloneSettings() {
-                console.log('Cloning settings');
                 this.settings = this.modal.dont_clone ? this.modal.settings : this.modal.settings.clone();
             }
         },
@@ -98,16 +80,10 @@
             };
 
             this.modal.settings.on('settings-updated', this.cloneSettings);
+            this.cloneSettings();
         },
         destroyed() {
             this.modal.settings.off('settings-updated', this.cloneSettings);
-        },
-        beforeMount() {
-            // this.configCache = JSON.parse(JSON.stringify(this.modal.settings));
-            // this.changed = this.checkForChanges();
-            console.log(this);
-            this.cloneSettings();
-            // this.settings = this.modal.dont_clone ? this.modal.settings : this.modal.settings.clone();
         }
     }
 </script>

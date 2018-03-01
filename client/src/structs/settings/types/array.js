@@ -97,7 +97,6 @@ export default class ArraySetting extends Setting {
 
     setValue(value, emit_multi = true, emit = true) {
         this.items = value;
-        // this.__proto__.__proto__.apply(this, arguments);
     }
 
     updateValue(emit_multi = true, emit = true) {
@@ -114,7 +113,7 @@ export default class ArraySetting extends Setting {
 
         for (let category of this.settings) {
             for (let setting of category.settings) {
-                if (setting.type === 'array' || setting.type === 'custom') setting.setContentPath(contentPath);
+                setting.setContentPath(contentPath);
             }
         }
     }

@@ -23,7 +23,10 @@ export default class {
             template: '<custom-modal :modal="modal" />',
             components: { 'custom-modal': component },
             data() { return { modal }; },
-            created() { modal.vue = this; }
+            created() {
+                modal.vueInstance = this;
+                modal.vue = this.$children[0];
+            }
         };
         modal.closing = false;
         modal.close = force => this.close(modal, force);
@@ -38,10 +41,7 @@ export default class {
         return new Promise(async (resolve, reject) => {
             if (modal.beforeClose) {
                 try {
-                    let beforeCloseResult = modal.beforeClose(force);
-                    if (beforeCloseResult instanceof Promise)
-                        beforeCloseResult = await beforeCloseResult;
-
+                    const beforeCloseResult = await modal.beforeClose(force);
                     if (beforeCloseResult && !force) return reject(beforeCloseResult);
                 } catch (err) {
                     if (!force) return reject(err);
@@ -73,17 +73,16 @@ export default class {
 
     static confirm(title, text) {
         const modal = { title, text };
-        const promise = new Promise((resolve, reject) => {
+        modal.promise = new Promise((resolve, reject) => {
             modal.confirm = () => resolve(true);
             modal.beforeClose = () => reject();
             this.add(modal, ConfirmModal);
         });
-        modal.promise = promise;
         return modal;
     }
 
     static permissions(title, name, perms) {
-        const modal = { title,name, perms };
+        const modal = { title, name, perms };
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = () => resolve(true);
             modal.beforeClose = () => reject();
@@ -135,7 +134,6 @@ export default class {
     static internalSettings(set_id) {
         const set = Settings.getSet(set_id);
         if (!set) return;
-        // return this.settings(set, set.headertext, newSettings => Settings.mergeSettings(set.id, newSettings));
         return this.settings(set, set.headertext);
     }
 

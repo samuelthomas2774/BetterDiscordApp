@@ -13,7 +13,6 @@ import { EventEmitter } from 'events';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { DOM, Modals } from 'ui';
 import { Utils, FileUtils, ClientIPC, ClientLogger as Logger } from 'common';
-import ContentConfig from './contentconfig';
 
 class ThemeEvents {
     constructor(theme) {

@@ -42,6 +42,10 @@ export default class Theme {
         this.saveSettings = this.saveSettings.bind(this);
         this.enable = this.enable.bind(this);
         this.disable = this.disable.bind(this);
+
+        this.settings.on('setting-updated', event => this.events.emit('setting-updated', event));
+        this.settings.on('settings-updated', event => this.events.emit('settings-updated', event));
+        this.settings.on('settings-updated', event => this.saveConfiguration());
     }
 
     get configs() { return this.__themeInternals.configs }
@@ -61,7 +65,8 @@ export default class Theme {
     get themePath() { return this.paths.contentPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
-    get config() { return this.userConfig.config || [] }
+    get settings() { return this.userConfig.config }
+    get config() { return this.settings.settings }
     get themeConfig() { return this.config }
     get css() { return this.userConfig.css }
     get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new ThemeEvents(this)) }
@@ -71,47 +76,24 @@ export default class Theme {
     }
 
     async saveSettings(newSettings) {
-        const updatedSettings = [];
-
-        for (let newCategory of newSettings) {
-            const category = this.config.find(c => c.category === newCategory.category);
-            for (let newSetting of newCategory.settings) {
-                const setting = category.settings.find(s => s.id === newSetting.id);
-                if (Utils.compare(setting.value, newSetting.value)) continue;
-
-                const old_value = setting.value;
-                setting.value = newSetting.value;
-                updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
-                this.settingUpdated(category.category, setting.id, setting.value, old_value);
-            }
-        }
+        const updatedSettings = this.settings.merge(newSettings);
 
         // As the theme's configuration has changed it needs recompiling
-        // When the compiled CSS has been save it will also save the configuration
+        // When the compiled CSS has been saved it will also save the configuration
         await this.recompile();
 
         return this.settingsUpdated(updatedSettings);
     }
 
-    settingUpdated(category_id, setting_id, value, old_value) {
-        const event = new SettingUpdatedEvent({ category_id, setting_id, value, old_value });
-        this.events.emit('setting-updated', event);
-        this.events.emit(`setting-updated_{$category_id}_${setting_id}`, event);
-    }
-
-    settingsUpdated(updatedSettings) {
-        const event = new SettingsUpdatedEvent({ settings: updatedSettings.map(s => new SettingUpdatedEvent(s)) });
-        this.events.emit('settings-updated', event);
-    }
-
     async saveConfiguration() {
         try {
-            const config = new ContentConfig(this.config).strip();
             await FileUtils.writeFile(`${this.themePath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
-                config,
+                config: this.settings.strip().settings,
                 css: this.css
             }));
+
+            this.settings.setSaved();
         } catch (err) {
             throw err;
         }

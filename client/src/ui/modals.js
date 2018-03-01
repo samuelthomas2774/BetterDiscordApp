@@ -123,27 +123,11 @@ export default class {
         }
     }
 
-    static settings(headertext, settings, schemes, settingsUpdated, settingUpdated, saveSettings) {
+    static settings(settings, headertext, saveSettings) {
         return this.add({
-            headertext, settings, schemes,
+            headertext, settings, schemes: settings.schemes,
             saveSettings: saveSettings ? saveSettings : newSettings => {
-                const updatedSettings = [];
-
-                for (let newCategory of newSettings) {
-                    let category = settings.find(c => c.category === newCategory.category);
-
-                    for (let newSetting of newCategory.settings) {
-                        let setting = category.settings.find(s => s.id === newSetting.id);
-                        if (Utils.compare(setting.value, newSetting.value)) continue;
-
-                        let old_value = setting.value;
-                        setting.value = newSetting.value;
-                        updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
-                        if (settingUpdated) settingUpdated(category.category, setting.id, setting.value, old_value);
-                    }
-                }
-
-                return settingsUpdated ? settingsUpdated(updatedSettings) : updatedSettings;
+                return settings.merge(newSettings);
             }
         }, SettingsModal);
     }
@@ -151,11 +135,12 @@ export default class {
     static internalSettings(set_id) {
         const set = Settings.getSet(set_id);
         if (!set) return;
-        return this.settings(set.headertext, set.settings, set.schemes, null, null, newSettings => Settings.mergeSettings(set.id, newSettings));
+        // return this.settings(set, set.headertext, newSettings => Settings.mergeSettings(set.id, newSettings));
+        return this.settings(set, set.headertext);
     }
 
     static contentSettings(content) {
-        return this.settings(content.name + ' Settings', content.config, content.configSchemes, null, null, content.saveSettings.bind(content));
+        return this.settings(content.settings, content.name + ' Settings');
     }
 
     static get stack() {

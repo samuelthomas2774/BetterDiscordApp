@@ -12,7 +12,7 @@
     <div class="bd-form-dropdown">
         <div class="bd-title">
             <h3 v-if="setting.text">{{setting.text}}</h3>
-            <Dropdown v-if="!setting.fullwidth" :options="setting.options" :selected="setting.value" :disabled="setting.disabled" :change="change" />
+            <Dropdown v-if="!setting.fullwidth" :options="setting.options" :selected="setting.args.value" :disabled="setting.disabled" :change="change" />
         </div>
         <div class="bd-hint">{{setting.hint}}</div>
         <Dropdown v-if="setting.fullwidth" :options="setting.options" :selected="setting.value" :disabled="setting.disabled" :change="change" />
@@ -25,6 +25,25 @@
         props: ['setting', 'change'],
         components: {
             Dropdown
+        },
+        data() {
+            return {
+                active: false
+            };
+        },
+        methods: {
+            selectOption(option) {
+                this.active = false;
+                this.change(option.id);
+            }
+        },
+        mounted() {
+            document.addEventListener("click", e => {
+                let options = this.$refs.options;
+                if (options && !options.contains(e.target) && options !== e.target) {
+                    this.active = false;
+                }
+            });
         }
     }
 </script>

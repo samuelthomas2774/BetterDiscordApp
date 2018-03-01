@@ -13,7 +13,7 @@ import Globals from './globals';
 import CssEditor from './csseditor';
 import Events from './events';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { SettingUpdatedEvent } from 'structs';
+import { SettingsSet, SettingUpdatedEvent } from 'structs';
 import path from 'path';
 
 export default class {
@@ -25,24 +25,22 @@ export default class {
             const user_config = await FileUtils.readJsonFromFile(settingsPath);
             const { settings, scss, css_editor_bounds } = user_config;
 
-            this.settings = defaultSettings;
-
-            for (let newSet of settings) {
-                let set = this.settings.find(s => s.id === newSet.id);
-                if (!set) continue;
-
-                for (let newCategory of newSet.settings) {
-                    let category = set.settings.find(c => c.category === newCategory.category);
-                    if (!category) continue;
-
-                    for (let newSetting of newCategory.settings) {
-                        let setting = category.settings.find(s => s.id === newSetting.id);
-                        if (!setting) continue;
-
-                        setting.value = newSetting.value;
-                    }
-                }
-            }
+            this.settings = defaultSettings.map(set => {
+                const newSet = new SettingsSet(set);
+                newSet.merge(settings.find(s => s.id === newSet.id));
+                newSet.setSaved();
+                newSet.on('setting-updated', event => {
+                    const { category, setting, value, old_value } = event;
+                    Logger.log('Settings', `${newSet.id}/${category.id}/${setting.id} was changed from ${old_value} to ${value}`);
+                    Events.emit('setting-updated', event);
+                    Events.emit(`setting-updated-${newSet.id}_${category.id}_${setting.id}`, event);
+                });
+                newSet.on('settings-updated', async (event) => {
+                    await this.saveSettings();
+                    Events.emit('settings-updated', event);
+                });
+                return newSet;
+            });
 
             CssEditor.updateScss(scss, true);
             CssEditor.editor_bounds = css_editor_bounds || {};
@@ -59,22 +57,7 @@ export default class {
 
             const settingsPath = path.resolve(this.dataPath, 'user.settings.json');
             await FileUtils.writeJsonToFile(settingsPath, {
-                settings: this.getSettings.map(set => {
-                    return {
-                        id: set.id,
-                        settings: set.settings.map(category => {
-                            return {
-                                category: category.category,
-                                settings: category.settings.map(setting => {
-                                    return {
-                                        id: setting.id,
-                                        value: setting.value
-                                    };
-                                })
-                            };
-                        })
-                    };
-                }),
+                settings: this.getSettings.map(set => set.strip()),
                 scss: CssEditor.scss,
                 css_editor_bounds: {
                     width: CssEditor.editor_bounds.width,
@@ -83,10 +66,14 @@ export default class {
                     y: CssEditor.editor_bounds.y
                 }
             });
+
+            for (let set of this.getSettings) {
+                set.setSaved();
+            }
         } catch (err) {
-            // There was an error loading settings
-            // This probably means that the user doesn't have any settings yet
+            // There was an error saving settings
             Logger.err('Settings', err);
+            throw err;
         }
     }
 
@@ -94,76 +81,37 @@ export default class {
         return this.getSettings.find(s => s.id === set_id);
     }
 
+    static get core() { return this.getSet('core') }
+    static get ui() { return this.getSet('ui') }
+    static get emotes() { return this.getSet('emotes') }
+    static get security() { return this.getSet('security') }
+
     static getCategory(set_id, category_id) {
         const set = this.getSet(set_id);
-        if (!set) return;
-
-        return set.settings.find(c => c.category === category_id);
+        return set ? set.getCategory(category_id) : undefined;
     }
 
     static getSetting(set_id, category_id, setting_id) {
-        const category = this.getCategory(set_id, category_id);
-        if (!category) return;
-
-        return category.settings.find(s => s.id === setting_id);
+        const set = this.getSet(set_id);
+        return set ? set.getSetting(category_id, setting_id) : undefined;
     }
 
     static get(set_id, category_id, setting_id) {
-        const setting = this.getSetting(set_id, category_id, setting_id);
-        return setting ? setting.value : undefined;
+        const set = this.getSet(set_id);
+        return set ? set.get(category_id, setting_id) : undefined;
     }
 
-    static mergeSettings(set_id, newSettings, settingsUpdated) {
+    static async mergeSettings(set_id, newSettings) {
         const set = this.getSet(set_id);
         if (!set) return;
-        const updatedSettings = [];
 
-        for (let newCategory of newSettings) {
-            let category = set.settings.find(c => c.category === newCategory.category);
-
-            for (let newSetting of newCategory.settings) {
-                let setting = category.settings.find(s => s.id === newSetting.id);
-                if (Utils.compare(setting.value, newSetting.value)) continue;
-
-                let old_value = setting.value;
-                setting.value = newSetting.value;
-                updatedSettings.push({ set_id: set.id, category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
-                this.settingUpdated(set.id, category.category, setting.id, setting.value, old_value);
-            }
-        }
-
-        this.saveSettings();
-        return settingsUpdated ? settingsUpdated(updatedSettings) : updatedSettings;
+        return await set.merge(newSettings);
     }
 
     static setSetting(set_id, category_id, setting_id, value) {
-        for (let set of this.getSettings) {
-            if (set.id !== set_id) continue;
-
-            for (let category of set.settings) {
-                if (category.category !== category_id) continue;
-
-                for (let setting of category.settings) {
-                    if (setting.id !== setting_id) continue;
-                    if (Utils.compare(setting.value, value)) return true;
-
-                    let old_value = setting.value;
-                    setting.value = value;
-                    this.settingUpdated(set_id, category_id, setting_id, value, old_value);
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    static settingUpdated(set_id, category_id, setting_id, value, old_value) {
-        Logger.log('Settings', `${set_id}/${category_id}/${setting_id} was changed from ${old_value} to ${value}`);
-
-        const event = new SettingUpdatedEvent({ set_id, category_id, setting_id, value, old_value });
-        Events.emit('setting-updated', event);
-        Events.emit(`setting-updated-${set_id}_{$category_id}_${setting_id}`, event);
+        const setting = this.getSetting(set_id, category_id, setting_id);
+        if (!setting) throw {message: `Tried to set ${set_id}/${category_id}/${setting_id}, which doesn't exist`};
+        setting.value = value;
     }
 
     static get getSettings() {

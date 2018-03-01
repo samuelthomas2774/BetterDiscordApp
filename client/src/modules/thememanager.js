@@ -101,67 +101,9 @@ export default class ThemeManager extends ContentManager {
     static async parseSetting(setting) {
         const { type, id, value } = setting;
         const name = id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
+        const scss = await setting.toSCSS();
 
-        if (type === 'colour' || type === 'color') {
-            return [name, value];
-        }
-
-        if (type === 'array') {
-            const items = JSON.parse(JSON.stringify(value)) || [];
-            const settings_json = JSON.stringify(setting.settings);
-
-            for (let item of items) {
-                const settings = JSON.parse(settings_json);
-
-                for (let category of settings) {
-                    const newCategory = item.settings.find(c => c.category === category.category);
-                    for (let setting of category.settings) {
-                        const newSetting = newCategory.settings.find(s => s.id === setting.id);
-                        setting.value = setting.old_value = newSetting.value;
-                        setting.changed = false;
-                    }
-                }
-
-                item.settings = settings;
-            }
-
-            console.log('items', items);
-
-            // Final comma ensures the variable is a list
-            const maps = [];
-            for (let item of items)
-                maps.push(await this.getConfigAsSCSSMap(item.settings));
-            return [name, maps.length ? maps.join(', ') + ',' : '()'];
-        }
-
-        if (type === 'file' && Array.isArray(value)) {
-            if (!value || !value.length) return [name, '()'];
-
-            const files = [];
-            for (let filepath of value) {
-                const buffer = await FileUtils.readFileBuffer(path.resolve(setting.path, filepath));
-                const type = await FileUtils.getFileType(buffer);
-                files.push(`(data: ${this.toSCSSString(buffer.toString('base64'))}, type: ${this.toSCSSString(type.mime)}, url: ${this.toSCSSString(await FileUtils.toDataURI(buffer, type.mime))})`);
-            }
-
-            return [name, files.length ? files.join(', ') : '()'];
-        }
-
-        if (type === 'slider') {
-            return [name, value * setting.multi || 1];
-        }
-
-        if (type === 'dropdown' || type === 'radio') {
-            return [name, setting.options.find(opt => opt.id === value).value];
-        }
-
-        if (typeof value === 'boolean' || typeof value === 'number') {
-            return [name, value];
-        }
-
-        if (typeof value === 'string') {
-            return [name, this.toSCSSString(value)];
-        }
+        if (scss) return [name, scss];
     }
 
     static toSCSSString(value) {

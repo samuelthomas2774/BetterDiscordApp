@@ -20,7 +20,7 @@
         <FileSetting v-if="setting.type === 'file'" :setting="setting" :change="change"/>
         <ArraySetting v-if="setting.type === 'array'" :setting="setting" :change="change" />
         <CustomSetting v-if="setting.type === 'custom'" :setting="setting" :change="change" />
-        <ColourSetting v-if="setting.type === 'colour' || setting.type === 'color'" :setting="setting" :change="change"/>
+        <ColourSetting v-if="setting.type === 'colour'" :setting="setting" :change="change"/>
         <div class="bd-form-divider"></div>
     </div>
 </template>

@@ -26,6 +26,8 @@ export default class Setting {
     constructor(args) {
         args = args.args || args;
 
+        if (args.type === 'color') args.type = 'colour';
+
         if (args.type === 'bool') return new BoolSetting(args);
         else if (args.type === 'text') return new StringSetting(args);
         else if (args.type === 'number') return new NumberSetting(args);

@@ -55,6 +55,7 @@ export default class Theme {
     get configSchemes() { return this.configs.schemes }
     get id() { return this.info.id || this.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/\s+/g, '-') }
     get name() { return this.info.name }
+    get description() { return this.info.description }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
     get contentPath() { return this.paths.contentPath }

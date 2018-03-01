@@ -45,8 +45,10 @@ export default class ExtModule {
     get main() { return this.__pluginInternals.main }
     get defaultConfig() { return this.configs.defaultConfig }
     get userConfig() { return this.configs.userConfig }
-    get id() { return this.info.id || this.info.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
+    get configSchemes() { return this.configs.schemes }
+    get id() { return this.info.id || this.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
     get name() { return this.info.name }
+    get description() { return this.info.description }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
     get contentPath() { return this.paths.contentPath }

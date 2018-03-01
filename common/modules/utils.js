@@ -67,6 +67,22 @@ export class Utils {
         // value1 and value2 contain the same data
         return true;
     }
+
+    static deepclone(value) {
+        if (typeof value === 'object') {
+            if (value instanceof Array) return value.map(i => this.deepclone(i));
+
+            const clone = Object.assign({}, value);
+
+            for (let key in clone) {
+                clone[key] = this.deepclone(clone[key]);
+            }
+
+            return clone;
+        }
+
+        return value;
+    }
 }
 
 export class FileUtils {

@@ -9,8 +9,8 @@
 */
 
 <template>
-    <div class="bd-settings" :class="{active: active}" @keyup="close">
-        <SidebarView :contentVisible="this.activeIndex >= 0" :animating="this.animating" :class="{'bd-stop': !first}">
+    <div class="bd-settings" :class="{active: active, 'bd-settings-out': this.activeIndex === -1 && this.lastActiveIndex >= 0}" @keyup="close">
+        <SidebarView :contentVisible="this.activeIndex >= 0 || this.lastActiveIndex >= 0" :animating="this.animating" :class="{'bd-stop': !first}">
             <Sidebar slot="sidebar">
                 <div class="bd-settings-x" @click="close">
                     <MiClose size="17"/>
@@ -20,7 +20,7 @@
             </Sidebar>
             <div slot="sidebarfooter" class="bd-info">
                 <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
-                <div @click="openGithub" v-tooltip="'Github'" class="bd-material-button">
+                <div @click="openGithub" v-tooltip="'GitHub'" class="bd-material-button">
                     <MiGithubCircle size="16" />
                 </div>
                 <div @click="openTwitter" v-tooltip="'@Jiiksi'" class="bd-material-button">
@@ -77,7 +77,8 @@
                 lastActiveIndex: -1,
                 animating: false,
                 first: true,
-                settings: Settings.getSettings
+                settings: Settings.getSettings,
+                timeout: null
             }
         },
         props: ['active', 'close'],
@@ -95,10 +96,12 @@
                 this.lastActiveIndex = this.activeIndex;
                 this.activeIndex = id;
 
-                setTimeout(() => {
+                if (this.timeout) clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => {
                     this.first = false;
                     this.animating = false;
                     this.lastActiveIndex = -1;
+                    this.timeout = null;
                 }, 400);
             },
             activeContent(s) {
@@ -110,6 +113,19 @@
                 const item = this.sidebarItems.find(item => item.contentid === s);
                 if (!item) return false;
                 return item.id === this.lastActiveIndex;
+            },
+            closeContent() {
+                if (this.activeIndex >= 0) this.sidebarItems.find(item => item.id === this.activeIndex).active = false;
+                this.first = true;
+                this.lastActiveIndex = this.activeIndex;
+                this.activeIndex = -1;
+
+                if (this.timeout) clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => {
+                    this.animating = false;
+                    this.lastActiveIndex = -1;
+					this.timeout = null;
+                }, 400);
             },
             changeSetting(set_id, category_id, setting_id, value) {
                 Settings.setSetting(set_id, category_id, setting_id, value);
@@ -126,13 +142,9 @@
             }
         },
         watch: {
-            active(newVal, oldVal) {
-                if (!newVal) {
-                    this.sidebarItems.find(item => item.id === this.activeIndex).active = false;
-                    this.activeIndex = this.lastActiveIndex = -1;
-                    this.animating = false;
-                    this.first = true;
-                }
+            active(active) {
+                if (active) return;
+                this.closeContent();
             }
         }
     }

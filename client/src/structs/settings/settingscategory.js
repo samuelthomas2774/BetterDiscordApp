@@ -10,6 +10,7 @@
 
 import Setting from './setting';
 import EventEmitter from 'events';
+import { ClientLogger as Logger } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
 export default class SettingsCategory {

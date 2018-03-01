@@ -237,6 +237,13 @@
                     "value": false,
                     "function": "getSettingsComponentHTMLElement",
                     "debug": true
+                },
+                {
+                    "id": "custom-6",
+                    "type": "custom",
+                    "value": false,
+                    "class_file": "component.js",
+                    "class": "CustomSetting"
                 }
             ]
         },

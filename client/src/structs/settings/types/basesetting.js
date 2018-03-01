@@ -47,16 +47,16 @@ export default class Setting {
         return undefined;
     }
 
-    // get changed() {
-    //     return this.args.changed;
-    // }
-
     get text() {
         return this.args.text;
     }
 
     get hint() {
         return this.args.hint;
+    }
+
+    get path() {
+        return this.args.path;
     }
 
     get disabled() {

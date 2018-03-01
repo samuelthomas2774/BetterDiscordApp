@@ -11,19 +11,15 @@
 import Setting from './basesetting';
 import SettingsCategory from '../settingscategory';
 import SettingsScheme from '../settingsscheme';
+import path from 'path';
 
 export default class CustomSetting extends Setting {
 
     constructor(args) {
         super(args);
 
-        if (this.args.class_file) {
-            const component = window.require(path.join(this.path, this.args.class_file));
-            const setting_class = this.args.class ? component[this.args.class](CustomSetting) : component.default ? component.default(CustomSetting) : component(CustomSetting);
-
-            const setting = new setting_class(this.args);
-            if (setting instanceof CustomSetting) return setting;
-        }
+        if (this.args.class_file && this.path)
+            this.setClass(this.args.class_file, this.args.class);
     }
 
     get file() {
@@ -38,12 +34,27 @@ export default class CustomSetting extends Setting {
         return this.args.component;
     }
 
-    get path() {
-        return this.args.path;
-    }
-
     get debug() {
         return this.args.debug || false;
+    }
+
+    setContentPath(_path) {
+        this.args.path = _path;
+
+        if (this.args.class_file)
+            this.setClass(this.args.class_file, this.args.class);
+
+        console.log(`Custom setting ${this.id}:`, this);
+    }
+
+    setClass(class_file, class_export) {
+        const component = window.require(path.join(this.path, this.args.class_file));
+        const setting_class = class_export ? component[class_export](CustomSetting) : component.default ? component.default(CustomSetting) : component(CustomSetting);
+
+        if (!(setting_class.prototype instanceof CustomSetting))
+            throw {message: 'Custom setting class function returned a class that doesn\'t extend from CustomSetting.'};
+
+        this.__proto__ = setting_class.prototype;
     }
 
 }

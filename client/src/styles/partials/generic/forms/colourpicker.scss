@@ -1,0 +1,38 @@
+.bd-colourpicker-swatch {
+    width: 50px;
+    height: 30px;
+    border-radius: 3px;
+    border: 1px solid hsla(0,0%,100%,.1);
+}
+
+.bd-form-colourpicker {
+    position: relative;
+
+    .vc-chrome {
+        position: absolute;
+        right: 60px;
+        top: 35px;
+        border-radius: 3px;
+        z-index: 9001;
+
+        .vc-chrome-body {
+            background: #36393e;
+
+            .vc-chrome-fields-wrap {
+                .vc-input__input {
+                    background: #1e2124;
+                    color: #FFF;
+                    box-shadow: inset 0 0 0 1px #000;
+                }
+
+                .vc-chrome-toggle-icon-highlight {
+                    background: #1e2124;
+                }
+
+                .vc-chrome-toggle-btn svg path {
+                    fill: #FFF;
+                }
+            }
+        }
+    }
+}

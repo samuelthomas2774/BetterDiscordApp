@@ -32,7 +32,7 @@ const { BrowserWindow, dialog } = require('electron');
 const Common = {};
 
 const dummyArgs = {
-    'version': '0.3.1',
+    'version': '2.0.0a',
     'paths': [
         { 'id': 'base', 'path': 'basePath' },
         { 'id': 'data', 'path': __dataPath },
@@ -47,7 +47,7 @@ console.log(dummyArgs);
 class Comms {
 
     constructor(bd) {
-		this.bd = bd;
+        this.bd = bd;
         this.initListeners();
     }
 
@@ -72,8 +72,8 @@ class Comms {
         });
 
         BDIpc.on('bd-compileSass', o => {
-            if (!o.args.data && !o.args.path) return;
-            if (o.args.path && o.args.data) {
+            if (!o.args.path && !o.args.data) return o.reply('');
+            if (typeof o.args.path === 'string' && typeof o.args.data === 'string') {
                 o.args.data = `${o.args.data} @import '${o.args.path}';`;
                 o.args.path = undefined;
             }

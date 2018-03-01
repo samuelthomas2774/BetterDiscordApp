@@ -5,7 +5,9 @@
 .bd-form-radio,
 .bd-form-numberinput,
 .bd-form-slider,
-.bd-setting-switch {
+.bd-form-colourpicker,
+.bd-setting-switch,
+.bd-form-settingsarray {
     .bd-title {
         display: flex;
 
@@ -35,5 +37,15 @@
         &, input {
             cursor: not-allowed !important;
         }
+    }
+}
+
+.bd-form-customsetting {
+    &.bd-form-customsetting-debug + .bd-form-divider {
+        margin-top: 0;
+    }
+
+    > .bd-drawer {
+        margin-bottom: 0;
     }
 }

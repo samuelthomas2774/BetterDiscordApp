@@ -9,6 +9,7 @@
 */
 
 import { ClientLogger as Logger } from 'common';
+import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
@@ -65,6 +66,15 @@ export default class PluginApi {
             unsubscribe: this.eventUnsubscribe.bind(this),
             unsubscribeAll: this.eventUnsubscribeAll.bind(this)
         }
+    }
+
+    getSetting(set, category, setting) {
+        return Settings.get(set, category, setting);
+    }
+    get Settings() {
+        return {
+            get: this.getSetting.bind(this)
+        };
     }
 
     async getPlugin(plugin_id) {

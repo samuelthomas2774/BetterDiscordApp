@@ -10,23 +10,20 @@
 
 <template>
     <SettingsWrapper headertext="Themes">
-        <div class="bd-flex bd-flex-col bd-themesView">
-            <div class="bd-flex bd-tabheader">
-                <div class="bd-flex-grow bd-button" :class="{'bd-active': local}" @click="showLocal">
-                    <h3>Local</h3>
-                    <div class="bd-material-button" @click="refreshLocal">
-                        <MiRefresh />
-                    </div>
-                </div>
-                <div class="bd-flex-grow bd-button" :class="{'bd-active': !local}" @click="showOnline">
-                    <h3>Online</h3>
-                    <div class="bd-material-button">
-                        <MiRefresh />
-                    </div>
-                </div>
+        <div class="bd-tabbar" slot="header">
+            <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
+                <h3>Local</h3>
+                <div class="bd-material-button" v-if="local" @click="refreshLocal"><MiRefresh /></div>
             </div>
+            <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
+                <h3>Online</h3>
+                <div class="bd-material-button" v-if="!local" @click="refreshOnline"><MiRefresh /></div>
+            </div>
+        </div>
+
+        <div class="bd-flex bd-flex-col bd-themesView">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">
-                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="toggleTheme" :reloadTheme="reloadTheme" :showSettings="showSettings" />
+                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="e => reloadTheme(theme, e.shiftKey)" :showSettings="() => showSettings(theme)" :deleteTheme="e => deleteTheme(theme, e.shiftKey)" />
             </div>
             <div v-if="!local" class="bd-spinner-container">
                 <div class="bd-spinner-2"></div>
@@ -61,35 +58,41 @@
             showOnline() {
                 this.local = false;
             },
-            refreshLocal() {
-                (async () => {
-                    await ThemeManager.refreshTheme();
-                })();
+            async refreshLocal() {
+                await ThemeManager.refreshThemes();
             },
-            toggleTheme(theme) {
+            async refreshOnline() {
+
+            },
+            async toggleTheme(theme) {
                 // TODO Display error if theme fails to enable/disable
                 try {
-                    if (theme.enabled) {
-                        ThemeManager.disableTheme(theme);
-                    } else {
-                        ThemeManager.enableTheme(theme);
-                    }
+                    await theme.enabled ? ThemeManager.disableTheme(theme) : ThemeManager.enableTheme(theme);
+                    this.$forceUpdate();
                 } catch (err) {
                     console.log(err);
                 }
             },
-            reloadTheme(theme) {
-                (async () => {
-                    try {
-                        await ThemeManager.reloadTheme(theme);
-                        this.$forceUpdate();
-                    } catch (err) {
-                        console.log(err);
-                    }
-                })();
+            async reloadTheme(theme, reload) {
+                try {
+                    if (reload) await ThemeManager.reloadTheme(theme);
+                    else await theme.recompile();
+                    this.$forceUpdate();
+                } catch (err) {
+                    console.log(err);
+                }
+            },
+            async deleteTheme(theme, unload) {
+                try {
+                    if (unload) await ThemeManager.unloadTheme(theme);
+                    else await ThemeManager.deleteTheme(theme);
+                    this.$forceUpdate();
+                } catch (err) {
+                    console.error(err);
+                }
             },
             showSettings(theme) {
-                return Modals.themeSettings(theme);
+                return Modals.contentSettings(theme);
             }
         }
     }

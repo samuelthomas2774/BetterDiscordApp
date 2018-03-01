@@ -85,12 +85,16 @@
         .bd-modal-tip {
             flex-grow: 1;
             line-height: 26px;
-            color: #FFF;
+            color: #fff;
         }
 
         .bd-button {
             padding: 5px 10px;
             border-radius: 3px;
+
+            + .bd-button {
+                margin-left: 15px;
+            }
         }
     }
 }

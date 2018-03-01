@@ -16,6 +16,7 @@ import { ClientLogger as Logger, ClientIPC } from 'common';
 class BetterDiscord {
 
     constructor() {
+        window.bdglobals = Globals;
         window.ClientIPC = ClientIPC;
         window.css = CssEditor;
         window.pm = PluginManager;
@@ -23,6 +24,8 @@ class BetterDiscord {
         window.wpm = WebpackModules;
         window.bdsettings = Settings;
         window.bdmodals = Modals;
+        window.bdlogs = Logger;
+
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }

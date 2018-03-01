@@ -9,10 +9,15 @@
 */
 
 <template>
-    <div class="bd-settingsWrap">
-        <div class="bd-settingsWrap-header">{{headertext}}</div>
+    <div class="bd-settingswrap">
         <ScrollerWrap>
-            <slot />
+            <div class="bd-settingswrap-header">
+                <span class="bd-settingswrap-header-text">{{ headertext }}</span>
+                <slot name="header" />
+            </div>
+            <div class="bd-settingswrap-contents">
+                <slot />
+            </div>
         </ScrollerWrap>
     </div>
 </template>

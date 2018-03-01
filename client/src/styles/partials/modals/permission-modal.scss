@@ -1,0 +1,52 @@
+.bd-perm-scope {
+    display: flex;
+
+    .bd-perm-allow {
+        display: flex;
+        flex: 1;
+
+        .bd-perm-check {
+            -webkit-box-sizing: border-box;
+            background: hsla(0,0%,100%,.2);
+            border-radius: 18px;
+            box-sizing: border-box;
+            height: 36px;
+            margin-right: 20px;
+            margin-top: 14px;
+            padding: 2px;
+            width: 36px;
+
+            .bd-perm-check-inner {
+                background-color: #43b581;
+                border: 2px solid #35383c;
+                border-radius: 16px;
+                box-sizing: border-box;
+                height: 32px;
+                width: 32px;
+            }
+        }
+
+        .bd-perm-inner {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 45px;
+            padding: 13px 0;
+            border-bottom: 1px solid hsla(0,0%,100%,.1);
+
+            .bd-perm-name {
+                color: #fff;
+                font-size: 17px;
+                font-weight: 500;
+                line-height: 22px;
+            }
+
+            .bd-perm-desc {
+                color: hsla(0,0%,100%,.2);
+                font-size: 12px;
+                line-height: 15px;
+            }
+        }
+    }
+}

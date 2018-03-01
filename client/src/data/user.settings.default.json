@@ -34,7 +34,8 @@
                 ]
             },
             {
-                "category": "Advanced",
+                "category": "advanced",
+                "category_name": "Advanced",
                 "type": "drawer",
                 "settings": [
                     {

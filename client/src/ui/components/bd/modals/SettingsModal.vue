@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Settings Modal Component
+ * BetterDiscord Settings Modal Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -9,10 +9,10 @@
 */
 
 <template>
-    <div class="bd-plugin-settings-modal" :class="{'bd-edited': changed}">
-        <Modal :headerText="plugin.name + ' Settings'" :close="attemptToClose" :class="{'bd-modal-out': modal.closing}">
-            <SettingsPanel :settings="configCache" :change="settingChange" slot="body" class="bd-plugin-settings-body" />
-            <div slot="footer" class="bd-footer-alert" :class ="{'bd-active': changed, 'bd-warn': warnclose}">
+    <div class="bd-settings-modal" :class="{'bd-edited': changed}">
+        <Modal :headerText="modal.headertext" :close="modal.close" :class="{'bd-modal-out': modal.closing}">
+            <SettingsPanel :settings="configCache" :schemes="modal.schemes" :change="settingChange" slot="body" class="bd-settings-modal-body" />
+            <div slot="footer" class="bd-footer-alert" :class="{'bd-active': changed, 'bd-warn': warnclose}" :style="{pointerEvents: changed ? 'all' : 'none'}">
                 <div class="bd-footer-alert-text">Unsaved changes</div>
                 <div class="bd-button bd-reset-button bd-tp" :class="{'bd-disabled': saving}" @click="resetSettings">Reset</div>
                 <div class="bd-button bd-ok" :class="{'bd-disabled': saving}" @click="saveSettings">
@@ -28,6 +28,7 @@
     import Vue from 'vue';
     import { Modal } from '../../common';
     import SettingsPanel from '../SettingsPanel.vue';
+    import { Utils } from 'common';
 
     export default {
         props: ['modal'],
@@ -44,16 +45,13 @@
             Modal,
             SettingsPanel
         },
-        computed: {
-            plugin() { return this.modal.plugin; }
-        },
         methods: {
             checkForChanges() {
                 let changed = false;
                 for (let category of this.configCache) {
-                    const cat = this.plugin.pluginConfig.find(c => c.category === category.category);
+                    const cat = this.modal.settings.find(c => c.category === category.category);
                     for (let setting of category.settings) {
-                        if (cat.settings.find(s => s.id === setting.id).value !== setting.value) {
+                        if (!Utils.compare(cat.settings.find(s => s.id === setting.id).value, setting.value)) {
                             changed = true;
                             Vue.set(setting, 'changed', true);
                         } else {
@@ -79,8 +77,8 @@
                 if (this.saving) return;
                 this.saving = true;
                 try {
-                    await this.plugin.saveSettings(this.configCache);
-                    this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+                    await this.modal.saveSettings(this.configCache);
+                    this.configCache = JSON.parse(JSON.stringify(this.modal.settings));
                     this.changed = false;
                 } catch (err) {
                     // TODO Display error that settings failed to save
@@ -90,27 +88,22 @@
             },
             resetSettings() {
                 if (this.saving) return;
-                this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
+                this.configCache = JSON.parse(JSON.stringify(this.modal.settings));
                 this.changed = false;
                 this.$forceUpdate();
-            },
-            attemptToClose(e) {
-                if (!this.changed) {
-                    this.closing = true;
-                    setTimeout(() => {
-                        this.modal.close();
-                    }, 200);
-                    return;
+            }
+        },
+        created() {
+            this.modal.beforeClose = force => {
+                if (this.changed && !force) {
+                    this.warnclose = true;
+                    setTimeout(() => this.warnclose = false, 400);
+                    throw {message: 'Settings have been changed'};
                 }
-                this.warnclose = true;
-                setTimeout(() => {
-                    this.warnclose = false;
-                }, 400);
             }
         },
         beforeMount() {
-            this.configCache = JSON.parse(JSON.stringify(this.plugin.pluginConfig));
-            console.log(this.configCache);
+            this.configCache = JSON.parse(JSON.stringify(this.modal.settings));
             this.changed = this.checkForChanges();
         }
     }

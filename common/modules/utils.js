@@ -13,7 +13,8 @@ const
     fs = require('fs'),
     _ = require('lodash');
 
-import  { Vendor } from 'modules';
+import { Vendor } from 'modules';
+import filetype from 'file-type';
 
 export class Utils {
     static overload(fn, cb) {
@@ -44,6 +45,27 @@ export class Utils {
             camelCased[_.camelCase(key)] = value;
         });
         return camelCased;
+    }
+
+    static compare(value1, value2) {
+        // Check to see if value1 and value2 contain the same data
+        if (typeof value1 !== typeof value2) return false;
+        if (value1 === null && value2 === null) return true;
+        if (value1 === null || value2 === null) return false;
+
+        if (typeof value1 === 'object' || typeof value1 === 'array') {
+            // Loop through the object and check if everything's the same
+            let value1array = typeof value1 === 'array' ? value1 : Object.keys(value1);
+            let value2array = typeof value2 === 'array' ? value2 : Object.keys(value2);
+            if (value1array.length !== value2array.length) return false;
+
+            for (let key in value1) {
+                if (!this.compare(value1[key], value2[key])) return false;
+            }
+        } else if (value1 !== value2) return false;
+
+        // value1 and value2 contain the same data
+        return true;
     }
 }
 
@@ -129,6 +151,15 @@ export class FileUtils {
         });
     }
 
+    static async readFileBuffer(path, options) {
+        return new Promise((resolve, reject) => {
+            fs.readFile(path, options || {}, (err, data) => {
+                if (err) return reject(err);
+                resolve(data);
+            });
+        });
+    }
+
     static async writeFile(path, data) {
         return new Promise((resolve, reject) => {
             fs.writeFile(path, data, err => {
@@ -175,49 +206,16 @@ export class FileUtils {
     static async readDir(path) {
         return this.listDirectory(path);
     }
-}
 
-const logs = [];
+    static async getFileType(buffer) {
+        if (typeof buffer === 'string') buffer = await this.readFileBuffer(buffer);
 
-export class ClientLogger {
-    static err(module, message) { this.log(module, message, 'err'); }
-    static warn(module, message) { this.log(module, message, 'warn'); }
-    static info(module, message) { this.log(module, message, 'info'); }
-    static dbg(module, message) { this.log(module, message, 'dbg'); }
-    static log(module, message, level = 'log') {
-        message = message.message || message;
-        if (typeof message === 'object') {
-            //TODO object handler for logs
-            console.log(message);
-            return;
-        }
-        level = this.parseLevel(level);
-        console[level]('[%cBetter%cDiscord:%s] %s', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, message);
-        logs.push(`${level.toUpperCase()} : [${Vendor.moment().format('DD/MM/YY hh:mm:ss')}|${module}] ${message}`);
-        window.bdlogs = logs;
+        return filetype(buffer);
     }
 
-    static logError(err) {
-        if (!err.module && !err.message) {
-            console.log(err);
-            return;
-        }
-        this.err(err.module, err.message);
-    }
-
-    static get levels() {
-        return {
-            'log': 'log',
-            'warn': 'warn',
-            'err': 'error',
-            'error': 'error',
-            'debug': 'debug',
-            'dbg': 'debug',
-            'info': 'info'
-        };
-    }
-
-    static parseLevel(level) {
-        return this.levels.hasOwnProperty(level) ? this.levels[level] : 'log';
+    static async toDataURI(buffer, type) {
+        if (typeof buffer === 'string') buffer = await this.readFileBuffer(buffer);
+        if (!type) type = this.getFileType(buffer).mime;
+        return `data:${type};base64,${buffer.toString('base64')}`;
     }
 }

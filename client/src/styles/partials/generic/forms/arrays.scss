@@ -1,0 +1,82 @@
+.bd-form-settingsarray {
+    .bd-button.bd-button-primary {
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    .bd-settingsarray-items {
+        margin-top: 15px;
+
+        .bd-settingsarray-item {
+            display: flex;
+            margin-top: 10px;
+
+            .bd-settingsarray-item-marker {
+                flex: 0 0 auto;
+                min-width: 15px;
+                margin-right: 5px;
+                color: #aaa;
+                font-size: 15px;
+            }
+
+            .bd-settingsarray-item-contents {
+                flex: 1 1;
+            }
+
+            .bd-settings-panel {
+                .bd-settings-categories:last-child .bd-form-item:last-child .bd-form-divider {
+                    margin-bottom: 0;
+                }
+
+                .bd-settings-category:only-child > div > .bd-form-item.bd-form-item-noheader:only-child {
+                    .bd-form-textinput,
+                    .bd-form-numberinput {
+                        + .bd-form-divider {
+                            display: none;
+                        }
+                    }
+                }
+            }
+
+            .bd-settingsarray-item-hint {
+                color: #aaa;
+                font-size: 15px;
+                font-style: italic;
+                word-wrap: break-word;
+
+                max-width: 385px;
+            }
+
+            .bd-settingsarray-item-controls {
+                flex: 0 0 auto;
+                margin-left: 5px;
+            }
+
+            .bd-settingsarray-open,
+            .bd-settingsarray-remove {
+                margin-left: 5px;
+
+                svg {
+                    width: 16px;
+                    height: 16px;
+                    cursor: pointer;
+                    fill: #ccc;
+
+                    &:hover {
+                        fill: #fff;
+                    }
+                }
+            }
+
+            &:last-child .bd-settings-categories:last-child .bd-form-item:last-child .bd-form-divider {
+                display: none;
+            }
+        }
+    }
+
+    &.bd-form-settingsarray-inline .bd-settingsarray-item {
+        margin-top: 10px;
+    }
+}

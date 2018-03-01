@@ -11,48 +11,20 @@
 <template>
     <div class="bd-form-dropdown">
         <div class="bd-title">
-            <h3>{{setting.text}}</h3>
-            <div class="bd-dropdown" :class="{'bd-active': active}">
-                <div class="bd-dropdown-current" @click="() => active = !active && !setting.disabled">
-                    <span class="bd-dropdown-text">{{getOptionText(setting.value)}}</span>
-                    <span class="bd-dropdown-arrow-wrap">
-                        <span class="bd-dropdown-arrow"></span>
-                    </span>
-                </div>
-                <div class="bd-dropdown-options bd-flex bd-flex-col" ref="options" v-if="active">
-                    <div class="bd-dropdown-option" v-for="option in setting.options" :class="{'bd-dropdown-option-selected': setting.value === option.id}" @click="selectOption(option)">{{option.text}}</div>
-                </div>
-            </div>
+            <h3 v-if="setting.text">{{setting.text}}</h3>
+            <Dropdown v-if="!setting.fullwidth" :options="setting.options" :selected="setting.value" :disabled="setting.disabled" :change="change" />
         </div>
         <div class="bd-hint">{{setting.hint}}</div>
+        <Dropdown v-if="setting.fullwidth" :options="setting.options" :selected="setting.value" :disabled="setting.disabled" :change="change" />
     </div>
 </template>
 <script>
+    import Dropdown from '../../common/Dropdown.vue';
+
     export default {
         props: ['setting', 'change'],
-        data() {
-            return {
-                active: false
-            };
-        },
-        methods: {
-            getOptionText(value) {
-                let matching = this.setting.options.filter(opt => opt.id === value);
-                if (matching.length == 0) return "";
-                else return matching[0].text;
-            },
-            selectOption(option) {
-                this.active = false;
-                this.change(option.id);
-            }
-        },
-        mounted() {
-            document.addEventListener("click", e => {
-                let options = this.$refs.options;
-                if (options && !options.contains(e.target) && options !== e.target) {
-                    this.active = false;
-                }
-            });
+        components: {
+            Dropdown
         }
     }
 </script>

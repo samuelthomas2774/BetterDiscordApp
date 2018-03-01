@@ -11,7 +11,9 @@
 import defaultSettings from '../data/user.settings.default';
 import Globals from './globals';
 import CssEditor from './csseditor';
-import { FileUtils, ClientLogger as Logger } from 'common';
+import Events from './events';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
+import { SettingUpdatedEvent } from 'structs';
 import path from 'path';
 
 export default class {
@@ -43,7 +45,7 @@ export default class {
             }
 
             CssEditor.updateScss(scss, true);
-            CssEditor.editor_bounds = css_editor_bounds;
+            CssEditor.editor_bounds = css_editor_bounds || {};
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
@@ -111,6 +113,29 @@ export default class {
         return setting ? setting.value : undefined;
     }
 
+    static mergeSettings(set_id, newSettings, settingsUpdated) {
+        const set = this.getSet(set_id);
+        if (!set) return;
+        const updatedSettings = [];
+
+        for (let newCategory of newSettings) {
+            let category = set.settings.find(c => c.category === newCategory.category);
+
+            for (let newSetting of newCategory.settings) {
+                let setting = category.settings.find(s => s.id === newSetting.id);
+                if (Utils.compare(setting.value, newSetting.value)) continue;
+
+                let old_value = setting.value;
+                setting.value = newSetting.value;
+                updatedSettings.push({ set_id: set.id, category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
+                this.settingUpdated(set.id, category.category, setting.id, setting.value, old_value);
+            }
+        }
+
+        this.saveSettings();
+        return settingsUpdated ? settingsUpdated(updatedSettings) : updatedSettings;
+    }
+
     static setSetting(set_id, category_id, setting_id, value) {
         for (let set of this.getSettings) {
             if (set.id !== set_id) continue;
@@ -120,10 +145,11 @@ export default class {
 
                 for (let setting of category.settings) {
                     if (setting.id !== setting_id) continue;
-                    if (setting.value === value) return true;
+                    if (Utils.compare(setting.value, value)) return true;
 
+                    let old_value = setting.value;
                     setting.value = value;
-                    this.settingUpdated(set_id, category_id, setting_id, value);
+                    this.settingUpdated(set_id, category_id, setting_id, value, old_value);
                     return true;
                 }
             }
@@ -132,8 +158,12 @@ export default class {
         return false;
     }
 
-    static settingUpdated(set_id, category_id, setting_id, value) {
-        Logger.log('Settings', `${set_id}/${category_id}/${setting_id} was set to ${value}`);
+    static settingUpdated(set_id, category_id, setting_id, value, old_value) {
+        Logger.log('Settings', `${set_id}/${category_id}/${setting_id} was changed from ${old_value} to ${value}`);
+
+        const event = new SettingUpdatedEvent({ set_id, category_id, setting_id, value, old_value });
+        Events.emit('setting-updated', event);
+        Events.emit(`setting-updated-${set_id}_{$category_id}_${setting_id}`, event);
     }
 
     static get getSettings() {

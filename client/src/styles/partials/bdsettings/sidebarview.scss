@@ -111,8 +111,7 @@
     .platform-darwin & {
         top: 0px;
 
-        .bd-sidebar-view .bd-sidebar-region,
-        .bd-sidebar-view .bd-content-region {
+        .bd-sidebar-view .bd-sidebar-region {
             padding-top: 22px;
         }
     }
@@ -123,16 +122,16 @@
 }
 
 .bd-settings .bd-sidebar-view.bd-stop .bd-content-region {
-	z-index: 3003;
+    z-index: 3003;
 }
 
 .bd-backdrop {
-	z-index: 3003;
+    z-index: 3003;
 }
 
 .bd-sidebar .bd-settings-button {
     position: absolute;
-	top: 0;
+    top: 0;
 
     .platform-darwin & {
         top: 22px;

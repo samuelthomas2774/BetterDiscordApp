@@ -10,12 +10,12 @@
 
 <template>
     <div class="bd-settings-wrapper" :class="[{active: active}, 'platform-' + this.platform]">
-        <div class="bd-settings-button" :class="{'bd-active': active}" @click="showSettings">
+        <div class="bd-settings-button" :class="{'bd-active': active, 'bd-animating': animating}" @click="showSettings">
             <div v-if="updating === 0" v-tooltip.right="'Checking for updates'" class="bd-settings-button-btn bd-loading"></div>
             <div v-else-if="updating === 2" v-tooltip.right="'Updates available!'" class="bd-settings-button-btn bd-updates"></div>
             <div v-else class="bd-settings-button-btn" :class="[{'bd-loading': !loaded}]"></div>
         </div>
-        <BdSettings :active="active" :close="hideSettings" />
+        <BdSettings ref="settings" :active="active" :close="hideSettings" />
     </div>
 </template>
 <script>
@@ -29,6 +29,8 @@
                 loaded: false,
                 updating: false,
                 active: false,
+                animating: false,
+                timeout: null,
                 platform: global.process.platform
             }
         },
@@ -44,10 +46,21 @@
             toggleSettings() { this.active = !this.active },
             keyupListener(e) {
                 if (document.getElementsByClassName('bd-backdrop').length) return;
+                if (this.$refs.settings.activeIndex !== -1 && e.which === 27) return this.$refs.settings.closeContent();
                 if (this.active && e.which === 27) return this.hideSettings();
                 if (!e.metaKey && !e.ctrlKey || e.key !== 'b') return;
                 this.toggleSettings();
                 e.stopImmediatePropagation();
+            }
+        },
+        watch: {
+            active(active) {
+                this.animating = true;
+                if (this.timeout) clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => {
+                    this.animating = false;
+                    this.timeout = null;
+                }, 400);
             }
         },
         created() {

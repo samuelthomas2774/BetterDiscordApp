@@ -119,14 +119,33 @@
     .platform-linux & {
         top: 0;
     }
-}
 
-.bd-settings .bd-sidebar-view.bd-stop .bd-content-region {
-    z-index: 3003;
-}
+    .bd-sidebar-view.bd-stop .bd-content-region {
+        z-index: 3003;
+    }
 
-.bd-backdrop {
-    z-index: 3003;
+    .bd-sidebar-view.active {
+        .bd-content-region {
+            transition: transform 0.4s ease-in-out, opacity 0.2s ease;
+            transform: none;
+            opacity: 1;
+        }
+    }
+
+    &:not(.active) .bd-sidebar-view.active,
+    &.bd-settings-out .bd-sidebar-view.active {
+        .bd-content-region {
+            transform: translate(-600px, 0%);
+            opacity: 0;
+            width: 590px;
+        }
+    }
+
+    &:not(.active) .bd-sidebar-view.active {
+        .bd-content-region {
+            transform: translate(-600px, 100%);
+        }
+    }
 }
 
 .bd-sidebar .bd-settings-button {

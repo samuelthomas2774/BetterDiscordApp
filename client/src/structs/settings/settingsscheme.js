@@ -21,7 +21,7 @@ export default class SettingsScheme {
             }))
         }));
 
-		Object.freeze(this);
+        Object.freeze(this);
     }
 
     get id() {
@@ -67,7 +67,7 @@ export default class SettingsScheme {
     }
 
     applyTo(set) {
-		return set.merge({ settings: this.settings });
+        return set.merge({ settings: this.settings });
     }
 
     clone() {

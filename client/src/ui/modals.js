@@ -122,13 +122,12 @@ export default class {
         }
     }
 
-    static settings(settings, headertext, saveSettings) {
-        return this.add({
-            headertext, settings, schemes: settings.schemes,
-            saveSettings: saveSettings ? saveSettings : newSettings => {
-                return settings.merge(newSettings);
-            }
-        }, SettingsModal);
+    static settings(settingsset, headertext, options) {
+        return this.add(Object.assign({
+            headertext: headertext ? headertext : settingsset.headertext,
+            settings: settingsset,
+            schemes: settings.schemes
+        }, options), SettingsModal);
     }
 
     static internalSettings(set_id) {

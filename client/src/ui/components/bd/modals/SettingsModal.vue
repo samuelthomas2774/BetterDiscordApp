@@ -55,7 +55,7 @@
                 this.saving = true;
                 try {
                     if (this.modal.saveSettings) await this.modal.saveSettings(this.settings);
-                    else this.modal.settings.merge(this.settings);
+                    else await this.modal.settings.merge(this.settings);
                 } catch (err) {
                     // TODO Display error that settings failed to save
                     Logger.err('SettingsModal', ['Failed to save settings:', err]);

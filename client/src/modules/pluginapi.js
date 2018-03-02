@@ -138,6 +138,34 @@ export default class PluginApi {
         };
     }
 
+    get modalStack() {
+        return this._modalStack || (this._modalStack = []);
+    }
+    addModal(modal, component) {
+        const modal = Modals.add(modal);
+        modal.close = force => this.closeModal(force);
+    }
+    async closeModal(modal, force) {
+        await Modals.close(modal, force);
+        this._modalStack = this.modalStack.filter(m => m !== modal);
+    }
+    closeAllModals() {
+        for (let modal of this.modalStack)
+            modal.close();
+    }
+    closeLastModal() {
+        if (!this.modalStack.length) return;
+        this.modalStack[this.modalStack.length - 1].close();
+    }
+    get Modals() {
+        return {
+            add: this.addModal.bind(this),
+            close: this.closeModal.bind(this),
+            closeAll: this.closeAllModals.bind(this),
+            closeLastModal: this.closeLastModal.bind(this)
+        };
+    }
+
     async getPlugin(plugin_id) {
         // This should require extra permissions
         return await PluginManager.waitForPlugin(plugin_id);

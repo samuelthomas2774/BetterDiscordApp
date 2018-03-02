@@ -16,6 +16,7 @@ import Vendor from './vendor';
 import { ClientLogger as Logger } from 'common';
 import { Events, Permissions } from 'modules';
 import { Modals } from 'ui';
+import { ErrorEvent } from 'structs';
 
 export default class extends ContentManager {
 
@@ -37,10 +38,32 @@ export default class extends ContentManager {
 
     static async loadAllPlugins(suppressErrors) {
         this.loaded = false;
-        const loadAll = await this.loadAllContent(suppressErrors);
+        const loadAll = await this.loadAllContent(true);
         this.loaded = true;
         for (let plugin of this.localPlugins) {
-            if (plugin.enabled) plugin.start();
+            try {
+                if (plugin.enabled) plugin.start();
+            } catch (err) {
+                // Disable the plugin but don't save it - the next time BetterDiscord is started the plugin will attempt to start again
+                plugin.userConfig.enabled = false;
+                this.errors.push(new ErrorEvent({
+                    module: this.moduleName,
+                    message: `Failed to start ${plugin.name}`,
+                    err
+                }));
+
+                Logger.err(this.moduleName, [`Failed to start plugin ${plugin.name}:`, err]);
+            }
+        }
+
+        if (this.errors.length && !suppressErrors) {
+            Modals.error({
+                header: `${this.moduleName} - ${this.errors.length} ${this.contentType}${this.errors.length !== 1 ? 's' : ''} failed to load`,
+                module: this.moduleName,
+                type: 'err',
+                content: this.errors
+            });
+            this._errors = [];
         }
 
         return loadAll;

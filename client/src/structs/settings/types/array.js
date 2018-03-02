@@ -20,8 +20,6 @@ export default class ArraySetting extends Setting {
     constructor(args) {
         super(args);
 
-        console.log(this);
-
         this.args.settings = this.settings.map(category => new SettingsCategory(category));
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
         this.args.items = this.value ? this.value.map(item => this.createItem(item.args || item)) : [];
@@ -101,7 +99,6 @@ export default class ArraySetting extends Setting {
 
     updateValue(emit_multi = true, emit = true) {
         return this.__proto__.__proto__.setValue.call(this, this.items.map(item => {
-            console.log('ArraySetting.updateValue:', item);
             if (!item) return;
             item.setSaved();
             return item.strip();
@@ -121,7 +118,7 @@ export default class ArraySetting extends Setting {
     async toSCSS() {
         const maps = [];
         for (let item of this.items)
-            maps.push(await ThemeManager.getConfigAsSCSSMap(item.settings));
+            maps.push(await ThemeManager.getConfigAsSCSSMap(item));
 
         // Final comma ensures the variable is a list
         return maps.length ? maps.join(', ') + ',' : '()';

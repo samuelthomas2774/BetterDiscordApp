@@ -72,9 +72,9 @@ export default class Plugin {
 
     getSetting(setting_id, category_id) {
         for (let category of this.config) {
-            if (category_id && category.category !== category_id) return;
+            if (category_id && category.category !== category_id) continue;
             for (let setting of category.settings) {
-                if (setting.id !== setting_id) return;
+                if (setting.id !== setting_id) continue;
                 return setting.value;
             }
         }

@@ -117,7 +117,7 @@ export default class Theme {
 
         let css = '';
         if (this.info.type === 'sass') {
-            const config = await ThemeManager.getConfigAsSCSS(this.config);
+            const config = await ThemeManager.getConfigAsSCSS(this.settings);
 
             css = await ClientIPC.send('bd-compileSass', {
                 data: config,

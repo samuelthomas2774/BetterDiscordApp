@@ -84,7 +84,7 @@ class DOMObserver {
 
 }
 
-class DOM {
+export default class DOM {
 
     static get observer() {
         return this._observer || (this._observer = new DOMObserver());
@@ -123,7 +123,7 @@ class DOM {
     static deleteStyle(id) {
         const exists = this.getElement(`bd-styles > #${id}`);
         if (exists) exists.remove();
-    }   
+    }
 
     static injectStyle(css, id) {
         this.deleteStyle(id);
@@ -153,5 +153,3 @@ class DOM {
         return style;
     }
 }
-
-export default DOM;

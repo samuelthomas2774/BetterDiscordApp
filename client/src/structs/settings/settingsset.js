@@ -71,6 +71,10 @@ export default class SettingsSet {
         return this.categories.find(f);
     }
 
+    findCategories(f) {
+        return this.categories.filter(f);
+    }
+
     getCategory(id) {
         return this.find(category => category.id === id);
     }
@@ -82,9 +86,23 @@ export default class SettingsSet {
         }
     }
 
+    findSettings(f) {
+        for (let category of this.categories) {
+            const setting = category.findSettings(f);
+            if (setting) return setting;
+        }
+    }
+
     findSettingInCategory(cf, f) {
         for (let category of this.categories.filter(cf)) {
             const setting = category.find(f);
+            if (setting) return setting;
+        }
+    }
+
+    findSettingsInCategory(cf, f) {
+        for (let category of this.categories.filter(cf)) {
+            const setting = category.findSettings(f);
             if (setting) return setting;
         }
     }

@@ -19,15 +19,15 @@
             <div class="bd-settingsarray-item" v-for="(item, index) in setting.items">
                 <div class="bd-settingsarray-item-marker">{{ index + 1 }}</div>
 
-                <SettingsPanel class="bd-settingsarray-item-contents" v-if="setting.inline" :settings="item.settings" :change="(c, s, v) => changeInItem(item, c, s, v)" />
+                <SettingsPanel class="bd-settingsarray-item-contents" v-if="setting.inline" :settings="item" />
                 <div class="bd-settingsarray-item-contents" v-else>
                     <div class="bd-settingsarray-item-hint">
-                        <span v-if="item.settings[0] && item.settings[0].settings[0]">{{ item.settings[0].settings[0].text }}: {{ item.settings[0].settings[0].value }}</span><span v-if="item.settings[0] && item.settings[0].settings[1]">, {{ item.settings[0].settings[1].text }}: {{ item.settings[0].settings[1].value }}</span><span v-if="item.settings[0] && item.settings[0].settings[2] || item.settings[1] && item.settings[1].settings[0]">, ...</span>
+                        <span v-if="getItemSettings(item)[0]">{{ getItemSettings(item)[0].text }}: {{ getItemSettings(item)[0].value }}</span><span v-if="getItemSettings(item)[1]">, {{ getItemSettings(item)[1].text }}: {{ getItemSettings(item)[1].value }}</span><span v-if="getItemSettings(item)[2]">, ...</span>
                     </div>
                 </div>
 
                 <div class="bd-settingsarray-item-controls">
-                    <span class="bd-settingsarray-open" v-if="typeof setting.allow_external !== 'undefined' ? setting.allow_external || !setting.inline : true" @click="() => showModal(item, index)"><MiOpenInNew v-if="setting.inline" /><MiSettings v-else /></span>
+                    <span class="bd-settingsarray-open" v-if="setting.allow_external" @click="() => showModal(item, index)"><MiOpenInNew v-if="setting.inline" /><MiSettings v-else /></span>
                     <span class="bd-settingsarray-remove" :class="{'bd-disabled': setting.disabled || setting.min && setting.items.length <= setting.min}" @click="() => removeItem(item)"><MiMinus /></span>
                 </div>
             </div>
@@ -71,6 +71,9 @@
             },
             showModal(item, index) {
                 Modals.settings(item, this.setting.headertext ? this.setting.headertext.replace(/%n/, index + 1) : this.setting.text + ` #${index + 1}`);
+            },
+            getItemSettings(item) {
+                return item.findSettings(() => true);
             }
         },
         beforeCreate() {

@@ -70,6 +70,10 @@ export default class SettingsCategory {
         return this.settings.find(f);
     }
 
+    findSettings(f) {
+        return this.settings.filter(f);
+    }
+
     getSetting(id) {
         return this.findSetting(setting => setting.id === id);
     }

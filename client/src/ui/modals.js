@@ -126,7 +126,7 @@ export default class {
         return this.add(Object.assign({
             headertext: headertext ? headertext : settingsset.headertext,
             settings: settingsset,
-            schemes: settings.schemes
+            schemes: settingsset.schemes
         }, options), SettingsModal);
     }
 

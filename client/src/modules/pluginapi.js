@@ -14,7 +14,8 @@ import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
-import { DOM } from 'ui';
+import { Modals, DOM } from 'ui';
+import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
 
 class EventsWrapper {
     constructor(eventemitter) {
@@ -141,9 +142,11 @@ export default class PluginApi {
     get modalStack() {
         return this._modalStack || (this._modalStack = []);
     }
-    addModal(modal, component) {
-        const modal = Modals.add(modal);
-        modal.close = force => this.closeModal(force);
+    addModal(_modal, component) {
+        const modal = Modals.add(_modal, component);
+        modal.close = force => this.closeModal(modal, force);
+        this.modalStack.push(modal);
+        return modal;
     }
     async closeModal(modal, force) {
         await Modals.close(modal, force);
@@ -157,13 +160,23 @@ export default class PluginApi {
         if (!this.modalStack.length) return;
         this.modalStack[this.modalStack.length - 1].close();
     }
+    settingsModal(settingsset, headertext, options) {
+        return this.addModal(Object.assign({
+            headertext: headertext ? headertext : settingsset.headertext,
+            settings: settingsset,
+            schemes: settingsset.schemes
+        }, options), SettingsModal);
+    }
     get Modals() {
-        return {
+        return Object.defineProperty({
             add: this.addModal.bind(this),
             close: this.closeModal.bind(this),
             closeAll: this.closeAllModals.bind(this),
-            closeLastModal: this.closeLastModal.bind(this)
-        };
+            closeLast: this.closeLastModal.bind(this),
+            settings: this.settingsModal.bind(this)
+        }, 'stack', {
+            get: () => this.modalStack
+        });
     }
 
     async getPlugin(plugin_id) {

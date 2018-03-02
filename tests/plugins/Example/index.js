@@ -4,6 +4,10 @@ module.exports = (Plugin, Api, Vendor, Dependencies) => {
     const { Events, Logger, InternalSettings, CssUtils } = Api;
 
     return class extends Plugin {
+        get api() {
+            return Api;
+        }
+
         async onStart() {
             await this.injectStyles();
 

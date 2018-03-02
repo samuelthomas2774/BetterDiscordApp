@@ -11,6 +11,7 @@
 import { ThemeManager } from 'modules';
 import { FileUtils, ClientIPC } from 'common';
 import Setting from './basesetting';
+import path from 'path';
 
 export default class FileSetting extends Setting {
 
@@ -35,7 +36,7 @@ export default class FileSetting extends Setting {
 
         const files = [];
         for (let filepath of this.value) {
-            const buffer = await FileUtils.readFileBuffer(filepath);
+            const buffer = await FileUtils.readFileBuffer(path.resolve(this.path, filepath));
             const type = await FileUtils.getFileType(buffer);
             files.push(`(data: ${ThemeManager.toSCSSString(buffer.toString('base64'))}, type: ${ThemeManager.toSCSSString(type.mime)}, url: ${ThemeManager.toSCSSString(await FileUtils.toDataURI(buffer, type.mime))})`);
         }

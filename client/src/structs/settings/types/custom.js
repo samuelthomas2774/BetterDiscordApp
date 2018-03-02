@@ -49,7 +49,7 @@ export default class CustomSetting extends Setting {
 
     setClass(class_file, class_export) {
         const component = window.require(path.join(this.path, this.args.class_file));
-        const setting_class = class_export ? component[class_export](CustomSetting) : component.default ? component.default(CustomSetting) : component.call(component, CustomSetting);
+        const setting_class = class_export ? component[class_export](CustomSetting) : component.default ? component.default(CustomSetting) : component(CustomSetting);
 
         if (!(setting_class.prototype instanceof CustomSetting))
             throw {message: 'Custom setting class function returned a class that doesn\'t extend from CustomSetting.'};

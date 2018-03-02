@@ -16,8 +16,12 @@ import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { SettingsSet, SettingUpdatedEvent } from 'structs';
 import path from 'path';
 
-export default class {
-    static async loadSettings() {
+export default new class Settings {
+    constructor() {
+        this.settings = [];
+    }
+
+    async loadSettings() {
         try {
             await FileUtils.ensureDirectory(this.dataPath);
 
@@ -51,13 +55,13 @@ export default class {
         }
     }
 
-    static async saveSettings() {
+    async saveSettings() {
         try {
             await FileUtils.ensureDirectory(this.dataPath);
 
             const settingsPath = path.resolve(this.dataPath, 'user.settings.json');
             await FileUtils.writeJsonToFile(settingsPath, {
-                settings: this.getSettings.map(set => set.strip()),
+                settings: this.settings.map(set => set.strip()),
                 scss: CssEditor.scss,
                 css_editor_bounds: {
                     width: CssEditor.editor_bounds.width,
@@ -77,48 +81,48 @@ export default class {
         }
     }
 
-    static getSet(set_id) {
+    getSet(set_id) {
         return this.getSettings.find(s => s.id === set_id);
     }
 
-    static get core() { return this.getSet('core') }
-    static get ui() { return this.getSet('ui') }
-    static get emotes() { return this.getSet('emotes') }
-    static get security() { return this.getSet('security') }
+    get core() { return this.getSet('core') }
+    get ui() { return this.getSet('ui') }
+    get emotes() { return this.getSet('emotes') }
+    get security() { return this.getSet('security') }
 
-    static getCategory(set_id, category_id) {
+    getCategory(set_id, category_id) {
         const set = this.getSet(set_id);
         return set ? set.getCategory(category_id) : undefined;
     }
 
-    static getSetting(set_id, category_id, setting_id) {
+    getSetting(set_id, category_id, setting_id) {
         const set = this.getSet(set_id);
         return set ? set.getSetting(category_id, setting_id) : undefined;
     }
 
-    static get(set_id, category_id, setting_id) {
+    get(set_id, category_id, setting_id) {
         const set = this.getSet(set_id);
         return set ? set.get(category_id, setting_id) : undefined;
     }
 
-    static async mergeSettings(set_id, newSettings) {
+    async mergeSettings(set_id, newSettings) {
         const set = this.getSet(set_id);
         if (!set) return;
 
         return await set.merge(newSettings);
     }
 
-    static setSetting(set_id, category_id, setting_id, value) {
+    setSetting(set_id, category_id, setting_id, value) {
         const setting = this.getSetting(set_id, category_id, setting_id);
         if (!setting) throw {message: `Tried to set ${set_id}/${category_id}/${setting_id}, which doesn't exist`};
         setting.value = value;
     }
 
-    static get getSettings() {
-        return this.settings ? this.settings : defaultSettings;
+    get getSettings() {
+        return this.settings;
     }
 
-    static get dataPath() {
+    get dataPath() {
         return this._dataPath ? this._dataPath : (this._dataPath = Globals.getObject('paths').find(p => p.id === 'data').path);
     }
 }

@@ -26,19 +26,19 @@
             <template v-for="category in settings.categories">
                 <div class="bd-settings-category">
                     <div v-if="category.category === 'default' || !category.type">
-                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" />
                     </div>
                     <div class="bd-settings-static" v-else-if="category.type === 'static'">
                         <div class="bd-form-header">
                             <span class="bd-form-header-text">{{ category.category_name }}</span>
                         </div>
-                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" />
                     </div>
                     <Drawer v-else-if="category.type === 'drawer'" :label="category.category_name">
-                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" />
                     </Drawer>
                     <div v-else>
-                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" />
                     </div>
                 </div>
             </template>
@@ -57,12 +57,6 @@
         components: {
             Setting,
             Drawer
-        },
-        methods: {
-            settingChange(category, setting, value) {
-                if (setting.disabled) return;
-                setting.value = value;
-            }
         }
     }
 </script>

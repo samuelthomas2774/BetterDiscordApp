@@ -10,7 +10,7 @@
 
 import SettingsCategory from './settingscategory';
 import SettingsScheme from './settingsscheme';
-import { AsyncEventEmitter } from 'common';
+import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { Modals } from 'ui';
 

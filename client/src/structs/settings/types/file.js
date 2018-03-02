@@ -9,7 +9,7 @@
  */
 
 import { ThemeManager } from 'modules';
-import { FileUtils } from 'common';
+import { FileUtils, ClientIPC } from 'common';
 import Setting from './basesetting';
 
 export default class FileSetting extends Setting {

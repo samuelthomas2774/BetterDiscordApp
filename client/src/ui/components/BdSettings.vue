@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-settings" :class="{active: active, 'bd-settings-out': this.activeIndex === -1 && this.lastActiveIndex >= 0}" @keyup="close">
+    <div class="bd-settings" :class="{active: active, 'bd-settings-out': activeIndex === -1 && lastActiveIndex >= 0}" @keyup="close">
         <SidebarView :contentVisible="this.activeIndex >= 0 || this.lastActiveIndex >= 0" :animating="this.animating" :class="{'bd-stop': !first}">
             <Sidebar slot="sidebar">
                 <div class="bd-settings-x" @click="close">

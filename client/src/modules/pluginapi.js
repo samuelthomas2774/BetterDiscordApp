@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { ClientLogger as Logger, ClientIPC } from 'common';
+import { Utils, ClientLogger as Logger, ClientIPC } from 'common';
 import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';

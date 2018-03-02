@@ -44,7 +44,7 @@ export default class Theme {
 
         this.settings.on('setting-updated', event => this.events.emit('setting-updated', event));
         this.settings.on('settings-updated', event => this.events.emit('settings-updated', event));
-        this.settings.on('settings-updated', event => this.saveConfiguration());
+        this.settings.on('settings-updated', event => this.recompile());
     }
 
     get configs() { return this.__themeInternals.configs }

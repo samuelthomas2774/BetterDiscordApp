@@ -17,7 +17,7 @@ export default class MultipleChoiceOption {
     }
 
     get id() {
-        return this.args.id;
+        return this.args.id || this.value;
     }
 
     get text() {

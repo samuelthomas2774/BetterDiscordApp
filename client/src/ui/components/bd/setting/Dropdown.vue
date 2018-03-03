@@ -12,10 +12,10 @@
     <div class="bd-form-dropdown">
         <div class="bd-title">
             <h3 v-if="setting.text">{{setting.text}}</h3>
-            <Dropdown v-if="!setting.fullwidth" :options="setting.options" :selected="setting.args.value" :disabled="setting.disabled" :change="change" />
+            <Dropdown v-if="!setting.fullwidth" :options="setting.options" :selected="setting.value" :disabled="setting.disabled" :change="change" />
         </div>
         <div class="bd-hint">{{setting.hint}}</div>
-        <Dropdown v-if="setting.fullwidth" :options="setting.options" :selected="setting.args.value" :disabled="setting.disabled" :change="change" />
+        <Dropdown v-if="setting.fullwidth" :options="setting.options" :selected="setting.value" :disabled="setting.disabled" :change="change" />
     </div>
 </template>
 <script>

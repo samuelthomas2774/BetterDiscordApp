@@ -26,7 +26,7 @@ export default class DropdownSetting extends Setting {
     }
 
     set value(value) {
-        const selected = this.options.find(option => option.id === value);
+        const selected = this.options.find(option => option.value === value);
         if (selected) this.setValue(selected.id);
         else this.setValue(value);
     }
@@ -40,7 +40,7 @@ export default class DropdownSetting extends Setting {
     }
 
     set selected_option(selected_option) {
-        this.args.value = this.options.find(option => option.id === selected_option.id).id;
+        this.args.value = selected_option.id;
     }
 
     toSCSS() {

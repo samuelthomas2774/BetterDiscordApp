@@ -68,7 +68,7 @@ export default class Setting {
     }
 
     merge(newSetting, emit_multi = true) {
-        return this.setValue(newSetting.value, emit_multi);
+        return this.setValue(newSetting.args ? newSetting.args.value : newSetting.value, emit_multi);
     }
 
     setValue(value, emit_multi = true, emit = true) {
@@ -105,7 +105,7 @@ export default class Setting {
     strip() {
         return {
             id: this.id,
-            value: this.value
+            value: this.args.value
         };
     }
 

@@ -11,6 +11,7 @@
 import { ClientIPC } from 'common';
 import Settings from './settings';
 import { DOM } from 'ui';
+import filewatcher from 'filewatcher';
 
 /**
  * Custom css editor communications
@@ -28,6 +29,12 @@ export default class {
         ClientIPC.on('bd-save-scss', async (e, scss) => {
             await this.updateScss(scss);
             await this.save();
+        });
+
+        this.filewatcher = filewatcher();
+        this.filewatcher.on('change', (file, stat) => {
+            // Recompile SCSS
+            this.updateScss(this.scss);
         });
     }
 
@@ -54,9 +61,10 @@ export default class {
         }
 
         return new Promise((resolve, reject) => {
-            this.compile(scss).then(css => {
-                this.css = css;
+            this.compile(scss).then(result => {
+                this.css = result.css.toString();
                 this._scss = scss;
+                this.files = result.stats.includedFiles;
                 this.sendToEditor('scss-error', null);
                 resolve();
             }).catch(err => {
@@ -87,7 +95,9 @@ export default class {
      * @param {String} scss scss string
      */
     static async compile(scss) {
-        return await ClientIPC.send('bd-compileSass', { data: scss });
+        const result = await ClientIPC.send('bd-compileSass', { data: scss });
+        console.log('Custom CSS SCSS compiler result:', result, '- CSS:', result.css.toString());
+        return result;
     }
 
     /**
@@ -119,6 +129,35 @@ export default class {
      */
     static set css(css) {
         DOM.injectStyle(css, 'bd-customcss');
+    }
+
+    /**
+     * An array of files that are being watched for changes.
+     * @returns {Array} Files being watched
+     */
+    static get files() {
+        return this._files || (this._files = []);
+    }
+
+    /**
+     * Sets all files to be watched.
+     * @param {Array} files Files to watch
+     */
+    static set files(files) {
+        for (let file of files) {
+            if (!this.files.includes(file)) {
+                this.filewatcher.add(file);
+                this.files.push(file);
+            }
+        }
+
+        for (let index in this.files) {
+            const file = this.files[index];
+            if (!files.includes(file)) {
+                this.filewatcher.remove(file);
+                this.files.splice(index, 1);
+            }
+        }
     }
 
 }

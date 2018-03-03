@@ -115,7 +115,7 @@ export default class PluginApi {
     async injectSass(id, scss, options) {
         // In most cases a plugin's styles should be precompiled instead of using this
         if (id && !scss && !options) scss = id, id = undefined;
-        const css = await this.compileSass(scss, options);
+        const css = (await this.compileSass(scss, options)).css.toString();
         this.injectStyle(id, css, options);
     }
     deleteStyle(id) {

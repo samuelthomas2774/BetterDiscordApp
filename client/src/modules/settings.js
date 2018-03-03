@@ -27,7 +27,7 @@ export default new class Settings {
 
             const settingsPath = path.resolve(this.dataPath, 'user.settings.json');
             const user_config = await FileUtils.readJsonFromFile(settingsPath);
-            const { settings, scss, css_editor_bounds } = user_config;
+            const { settings, scss, css_editor_bounds, css_editor_files } = user_config;
 
             this.settings = defaultSettings.map(set => {
                 const newSet = new SettingsSet(set);
@@ -48,6 +48,7 @@ export default new class Settings {
 
             CssEditor.updateScss(scss, true);
             CssEditor.editor_bounds = css_editor_bounds || {};
+            CssEditor.files = css_editor_files || [];
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
@@ -68,7 +69,8 @@ export default new class Settings {
                     height: CssEditor.editor_bounds.height,
                     x: CssEditor.editor_bounds.x,
                     y: CssEditor.editor_bounds.y
-                }
+                },
+                css_editor_files: CssEditor.files
             });
 
             for (let set of this.getSettings) {

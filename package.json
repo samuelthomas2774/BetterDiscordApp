@@ -28,6 +28,7 @@
     "eslint": "^4.16.0",
     "eslint-plugin-vue": "^4.3.0",
     "file-type": "^7.6.0",
+    "filewatcher": "^3.0.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.0",
     "gulp-plumber": "^1.2.0",

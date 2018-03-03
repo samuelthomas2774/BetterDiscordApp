@@ -68,6 +68,7 @@ export default class Plugin {
     get settings() { return this.userConfig.config }
     get config() { return this.settings.settings }
     get pluginConfig() { return this.config }
+    get data() { return this.userConfig.data }
     get exports() { return this._exports ? this._exports : (this._exports = this.getExports()) }
     get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new PluginEvents(this)) }
 
@@ -96,7 +97,8 @@ export default class Plugin {
         try {
             await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
-                config: this.settings.strip().settings
+                config: this.settings.strip().settings,
+                data: this.data
             }));
 
 			this.settings.setSaved();

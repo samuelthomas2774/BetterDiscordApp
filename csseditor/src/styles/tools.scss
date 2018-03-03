@@ -3,7 +3,7 @@
     background: #292b2f;
     border-top: 1px solid hsla(218,5%,47%,.3);
     color: #d84040;
-    font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+    font-family: monospace;
     white-space: pre-wrap;
     font-size: 12px;
 }
@@ -30,7 +30,7 @@
         background: #36393f;
         color: #bac9d2;
         font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
-        transition: background-color .2s ease;
+        transition: background-color .2s ease, color .2s ease;
         cursor: pointer;
         border: 0;
         margin-right: 4px;
@@ -47,6 +47,10 @@
         line-height: 22px;
         flex: 0 0 auto;
 
+        label {
+            cursor: pointer;
+        }
+
         input[type="checkbox"] {
             margin: 0 6px 0 0;
             cursor: pointer;
@@ -57,7 +61,6 @@
             font-weight: 500;
             color: #bac9d2;
             font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
-            cursor: default;
         }
     }
 }

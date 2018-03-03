@@ -31,7 +31,7 @@
                 </div>
             </div>
             <ContentColumn slot="content">
-                <div v-for="set in Settings.settings" v-if="activeContent(set.id) || animatingContent(set.id)" :class="{active: activeContent(set.id), animating: animatingContent(set.id)}">
+                <div v-for="set in Settings.settings" v-if="!set.hidden && activeContent(set.id) || animatingContent(set.id)" :class="{active: activeContent(set.id), animating: animatingContent(set.id)}">
                     <SettingsWrapper :headertext="set.headertext">
                         <SettingsPanel :settings="set" :schemes="set.schemes" />
                     </SettingsWrapper>

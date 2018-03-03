@@ -116,33 +116,39 @@ export default class DOM {
         return document.querySelector(e);
     }
 
+    static getElements(e) {
+        return document.querySelectorAll(e);
+    }
+
     static createElement(tag = 'div', className = null, id = null) {
         return new BdNode(tag, className, id);
     }
 
     static deleteStyle(id) {
-        const exists = this.getElement(`bd-styles > #${id}`);
+        const exists = Array.from(this.bdStyles.children).find(e => e.id === id);
         if (exists) exists.remove();
     }
 
     static injectStyle(css, id) {
-        this.deleteStyle(id);
-        this.bdStyles.append(this.createStyle(css, id));
+        const style = Array.from(this.bdStyles.children).find(e => e.id === id) || this.createElement('style', null, id).element;
+        style.textContent = css;
+        this.bdStyles.append(style);
     }
 
     static getStyleCss(id) {
-        const exists = this.getElement(`bd-styles > #${id}`);
+        const exists = this.bdStyles.children.find(e => e.id === id);
         return exists ? exists.textContent : '';
     }
 
     static deleteTheme(id) {
-        const exists = this.getElement(`bd-themes > #${id}`);
+        const exists = Array.from(this.bdThemes.children).find(e => e.id === id);
         if (exists) exists.remove();
     }
 
     static injectTheme(css, id) {
-        this.deleteTheme(id);
-        this.bdThemes.append(this.createStyle(css, id));
+        const style = Array.from(this.bdThemes.children).find(e => e.id === id) || this.createElement('style', null, id).element;
+        style.textContent = css;
+        this.bdThemes.append(style);
     }
 
     static createStyle(css, id) {

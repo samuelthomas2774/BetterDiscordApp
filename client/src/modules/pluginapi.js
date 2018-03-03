@@ -105,6 +105,9 @@ export default class PluginApi {
     getConfigAsSCSS(settingsset) {
         return ThemeManager.getConfigAsSCSS(settingsset ? settingsset : this.plugin.settings);
     }
+    getConfigAsSCSSMap(settingsset) {
+        return ThemeManager.getConfigAsSCSSMap(settingsset ? settingsset : this.plugin.settings);
+    }
     injectStyle(id, css) {
         if (id && !css) css = id, id = undefined;
         this.deleteStyle(id);
@@ -132,6 +135,7 @@ export default class PluginApi {
         return {
             compileSass: this.compileSass.bind(this),
             getConfigAsSCSS: this.getConfigAsSCSS.bind(this),
+            getConfigAsSCSSMap: this.getConfigAsSCSSMap.bind(this),
             injectStyle: this.injectStyle.bind(this),
             injectSass: this.injectSass.bind(this),
             deleteStyle: this.deleteStyle.bind(this),

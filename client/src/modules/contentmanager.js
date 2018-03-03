@@ -195,7 +195,7 @@ export default class {
                 userConfig.enabled = readUserConfig.enabled || false;
                 userConfig.config.merge({ settings: readUserConfig.config });
                 userConfig.config.setSaved();
-                userConfig.data = readUserConfig.data || undefined;
+                userConfig.data = readUserConfig.data || {};
             } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
                 console.info(`Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`);
                 console.error(err);

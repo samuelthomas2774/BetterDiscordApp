@@ -50,6 +50,10 @@ export default class SettingsSet {
         return this.args.headertext || `${this.text} Settings`;
     }
 
+    get hidden() {
+        return this.args.hidden || false;
+    }
+
     get categories() {
         return this.args.settings || [];
     }

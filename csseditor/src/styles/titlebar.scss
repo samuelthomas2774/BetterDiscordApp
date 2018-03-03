@@ -38,11 +38,10 @@
             width: 25px;
             font-size: 12px;
             font-weight: 600;
-            /*background: #263238;*/
             background: #36393f;
             color: #bac9d2;
             font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
-            transition: background-color .2s ease;
+            transition: background-color .2s ease, color .2s ease;
             cursor: default;
             border: 0;
             height: 25px;

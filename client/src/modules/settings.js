@@ -27,7 +27,7 @@ export default new class Settings {
 
             const settingsPath = path.resolve(this.dataPath, 'user.settings.json');
             const user_config = await FileUtils.readJsonFromFile(settingsPath);
-            const { settings, scss, css_editor_bounds, css_editor_files } = user_config;
+            const { settings, scss, css, css_editor_files, scss_error, css_editor_bounds } = user_config;
 
             this.settings = defaultSettings.map(set => {
                 const newSet = new SettingsSet(set);
@@ -46,9 +46,8 @@ export default new class Settings {
                 return newSet;
             });
 
-            CssEditor.updateScss(scss, true);
+            CssEditor.setState(scss, css, css_editor_files, scss_error);
             CssEditor.editor_bounds = css_editor_bounds || {};
-            CssEditor.files = css_editor_files || [];
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
@@ -64,13 +63,15 @@ export default new class Settings {
             await FileUtils.writeJsonToFile(settingsPath, {
                 settings: this.settings.map(set => set.strip()),
                 scss: CssEditor.scss,
+                css: CssEditor.css,
+                css_editor_files: CssEditor.files,
+                scss_error: CssEditor.error,
                 css_editor_bounds: {
                     width: CssEditor.editor_bounds.width,
                     height: CssEditor.editor_bounds.height,
                     x: CssEditor.editor_bounds.x,
                     y: CssEditor.editor_bounds.y
-                },
-                css_editor_files: CssEditor.files
+                }
             });
 
             for (let set of this.getSettings) {
@@ -90,6 +91,7 @@ export default new class Settings {
     get core() { return this.getSet('core') }
     get ui() { return this.getSet('ui') }
     get emotes() { return this.getSet('emotes') }
+    get css() { return this.getSet('css') }
     get security() { return this.getSet('security') }
 
     getCategory(set_id, category_id) {

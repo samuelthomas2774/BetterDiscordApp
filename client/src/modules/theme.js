@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import Settings from './settings';
 import ThemeManager from './thememanager';
 import { EventEmitter } from 'events';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
@@ -47,13 +48,11 @@ export default class Theme {
         this.settings.on('settings-updated', event => this.events.emit('settings-updated', event));
         this.settings.on('settings-updated', event => this.recompile());
 
-        this.filewatcher = filewatcher();
-        const files = this.files;
-        this.data.files = [];
-        this.files = files;
-        this.filewatcher.on('change', (file, stat) => {
-            // Recompile SCSS
-            this.recompile();
+        const watchfiles = Settings.getSetting('css', 'default', 'watch-files');
+        if (watchfiles.value) this.watchfiles = this.files;
+        watchfiles.on('setting-updated', event => {
+            if (event.value) this.watchfiles = this.files;
+            else this.watchfiles = [];
         });
     }
 
@@ -166,34 +165,64 @@ export default class Theme {
     }
 
     /**
-     * An array of files that are being watched for changes.
-     * @returns {Array} Files being watched
+     * An array of files that are imported in custom CSS.
+     * @return {Array} Files being watched
      */
     get files() {
         return this.data.files || (this.data.files = []);
     }
 
     /**
-     * Sets all files to be watched.
+     * Sets all files that are imported in custom CSS.
      * @param {Array} files Files to watch
      */
     set files(files) {
-        if (!files) files = [];
+        this.data.files = files;
+        if (Settings.get('css', 'default', 'watch-files'))
+            this.watchfiles = files;
+    }
 
+    /**
+     * A filewatcher instance.
+     */
+    get filewatcher() {
+        if (this._filewatcher) return this._filewatcher;
+        this._filewatcher = filewatcher();
+        this._filewatcher.on('change', (file, stat) => {
+            // Recompile SCSS
+            this.recompile();
+        });
+        return this._filewatcher;
+    }
+
+    /**
+     * An array of files that are being watched for changes.
+     * @return {Array} Files being watched
+     */
+    get watchfiles() {
+        return this._watchfiles || (this._watchfiles = []);
+    }
+
+    /**
+     * Sets all files to be watched.
+     * @param {Array} files Files to watch
+     */
+    set watchfiles(files) {
         for (let file of files) {
-            if (!this.files.includes(file)) {
+            if (!this.watchfiles.includes(file)) {
                 this.filewatcher.add(file);
-                this.files.push(file);
+                this.watchfiles.push(file);
                 Logger.log(this.name, `Watching file ${file} for changes`);
             }
         }
 
-        for (let index in this.files) {
-            const file = this.files[index];
-            if (!files.includes(file)) {
+        for (let index in this.watchfiles) {
+            let file = this.watchfiles[index];
+            while (file && !files.find(f => f === file)) {
                 this.filewatcher.remove(file);
-                this.files.splice(index, 1);
+                this.watchfiles.splice(index, 1);
                 Logger.log(this.name, `No longer watching file ${file} for changes`);
+                file = this.watchfiles[index];
             }
         }
     }

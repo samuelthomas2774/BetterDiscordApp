@@ -68,7 +68,7 @@ export default class Plugin {
     get settings() { return this.userConfig.config }
     get config() { return this.settings.settings }
     get pluginConfig() { return this.config }
-    get data() { return this.userConfig.data }
+    get data() { return this.userConfig.data || (this.userConfig.data = {}) }
     get exports() { return this._exports ? this._exports : (this._exports = this.getExports()) }
     get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new PluginEvents(this)) }
 

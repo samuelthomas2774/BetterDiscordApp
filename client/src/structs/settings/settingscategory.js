@@ -38,6 +38,9 @@ export default class SettingsCategory {
         }
     }
 
+    /**
+     * Category ID
+     */
     get id() {
         return this.args.id || this.args.category;
     }
@@ -46,6 +49,9 @@ export default class SettingsCategory {
         return this.id;
     }
 
+    /**
+     * Category name
+     */
     get name() {
         return this.args.category_name;
     }
@@ -54,34 +60,59 @@ export default class SettingsCategory {
         return this.name;
     }
 
+    /**
+     * Category type
+     * Currently either "drawer", "static", or undefined.
+     */
     get type() {
         return this.args.type;
     }
 
+    /**
+     * An array of settings in this category.
+     */
     get settings() {
         return this.args.settings || [];
     }
 
+    /**
+     * Whether any setting in this category has been changed.
+     */
     get changed() {
         if (this.settings.find(setting => setting.changed)) return true;
         return false;
     }
 
+    /**
+     * Returns the first setting where calling {function} returns true.
+     * @param {Function} function A function to call to filter setting
+     * @return {Setting}
+     */
     find(f) {
         return this.settings.find(f);
     }
 
+    /**
+     * Returns all settings where calling {function} returns true.
+     * @param {Function} function A function to call to filter settings
+     * @return {Array} An array of matching Setting objects
+     */
     findSettings(f) {
         return this.settings.filter(f);
     }
 
+    /**
+     * Returns the setting with the ID {id}.
+     * @param {String} id The ID of the setting to look for
+     * @return {Setting}
+     */
     getSetting(id) {
         return this.findSetting(setting => setting.id === id);
     }
 
     /**
      * Merges a category into this category without emitting events (and therefore synchronously).
-     * Only exists for use by SettingsSet.
+     * This only exists for use by SettingsSet.
      */
     _merge(newCategory) {
         let updatedSettings = [];
@@ -105,6 +136,11 @@ export default class SettingsCategory {
         return updatedSettings;
     }
 
+    /**
+     * Merges another category into this category.
+     * @param {SettingsCategory} newCategory The category to merge into this category
+     * @return {Promise}
+     */
     async merge(newCategory, emit_multi = true) {
         let updatedSettings = [];
 
@@ -132,12 +168,19 @@ export default class SettingsCategory {
         return updatedSettings;
     }
 
+    /**
+     * Marks all settings in this set as saved (not changed).
+     */
     setSaved() {
         for (let setting of this.settings) {
             setting.setSaved();
         }
     }
 
+    /**
+     * Returns an object that can be stored as JSON and later merged back into a category with settingscategory.merge.
+     * @return {Object}
+     */
     strip() {
         return {
             category: this.category,
@@ -145,6 +188,11 @@ export default class SettingsCategory {
         };
     }
 
+    /**
+     * Returns a copy of this category that can be changed and then merged back into a set with settingscategory.merge.
+     * @param {SettingsCategory} ...merge A set to merge into the new set
+     * @return {SettingsCategory}
+     */
     clone(...merge) {
         return new SettingsCategory({
             id: this.id,

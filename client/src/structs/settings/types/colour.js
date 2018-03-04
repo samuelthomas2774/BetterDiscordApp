@@ -12,10 +12,17 @@ import Setting from './basesetting';
 
 export default class ColourSetting extends Setting {
 
+    /**
+     * The value to use when the setting doesn't have a value.
+     */
     get defaultValue() {
         return 'rgba(0, 0, 0, 0)';
     }
 
+    /**
+     * Returns a representation of this setting's value in SCSS.
+     * @return {String|Promise}
+     */
     toSCSS() {
         return this.value;
     }

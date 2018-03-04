@@ -15,14 +15,24 @@ import path from 'path';
 
 export default class FileSetting extends Setting {
 
+    /**
+     * The value to use when the setting doesn't have a value.
+     */
     get defaultValue() {
         return [];
     }
 
+    /**
+     * An object that will be passed to electron.dialog.showOpenDialog.
+     */
     get dialogOptions() {
         return this.args.dialogOptions || {};
     }
 
+    /**
+     * Opens the file selection dialog and sets this file setting's value to an array of selected file paths.
+     * @return {Promise}
+     */
     async openDialog() {
         if (this.disabled) return;
 
@@ -31,6 +41,10 @@ export default class FileSetting extends Setting {
             this.value = filenames;
     }
 
+    /**
+     * Returns a representation of this setting's value in SCSS.
+     * @return {String|Promise}
+     */
     async toSCSS() {
         if (!this.value || !this.value.length) return '()';
 

@@ -30,14 +30,24 @@ export default class Setting {
         this.changed = !Utils.compare(this.args.value, this.args.saved_value);
     }
 
+    /**
+     * Setting ID
+     */
     get id() {
         return this.args.id;
     }
 
+    /**
+     * Setting type
+     * This defines how this class will be extended.
+     */
     get type() {
         return this.args.type;
     }
 
+    /**
+     * The current value.
+     */
     get value() {
         return this.args.value;
     }
@@ -46,33 +56,54 @@ export default class Setting {
         this.setValue(value);
     }
 
+    /**
+     * The value to use when the setting doesn't have a value.
+     */
     get defaultValue() {
         return undefined;
     }
 
+    /**
+     * Setting name
+     */
     get text() {
         return this.args.text;
     }
 
+    /**
+     * Text to be displayed with the setting.
+     */
     get hint() {
         return this.args.hint;
     }
 
+    /**
+     * The path of the plugin/theme this setting is part of.
+     * Used by settings of type "array", "custom" and "file".
+     */
     get path() {
         return this.args.path;
     }
 
+    /**
+     * Whether the user should be able to change the value of the setting.
+     * This does not prevent the setting being changed by a plugin.
+     */
     get disabled() {
         return this.args.disabled || false;
     }
 
+    /**
+     * Whether the setting should take the full width of the settings panel.
+     * This is only customisable in some setting types.
+     */
     get fullwidth() {
         return this.args.fullwidth || false;
     }
 
     /**
      * Merges a setting into this setting without emitting events (and therefore synchronously).
-     * Only exists for use by SettingsCategory.
+     * This only exists for use by SettingsCategory.
      */
     _merge(newSetting) {
         const value = newSetting.args ? newSetting.args.value : newSetting.value;
@@ -87,6 +118,11 @@ export default class Setting {
         }];
     }
 
+    /**
+     * Merges another setting into this setting.
+     * @param {SettingsSetting} newSetting The setting to merge into this setting
+     * @return {Promise}
+     */
     async merge(newSetting, emit_multi = true) {
         const value = newSetting.args ? newSetting.args.value : newSetting.value;
         const old_value = this.args.value;
@@ -110,6 +146,14 @@ export default class Setting {
         return [updatedSetting];
     }
 
+    /**
+     * Sets the value of this setting.
+     * This is only intended for use by settings.
+     * @param {Any} value The new value of this setting
+     * @param {Boolean} emit_multi Whether to emit a SettingsUpdatedEvent
+     * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
+     * @return {Promise}
+     */
     setValue(value, emit_multi = true, emit = true) {
         const old_value = this.args.value;
         if (Utils.compare(value, old_value)) return [];
@@ -132,15 +176,27 @@ export default class Setting {
         return [updatedSetting];
     }
 
+    /**
+     * Marks this setting as saved (not changed).
+     */
     setSaved() {
         this.args.saved_value = this.args.value;
         this.changed = false;
     }
 
+    /**
+     * Sets the path of the plugin/theme this setting is part of.
+     * Used by settings of type "array", "custom" and "file".
+     * @param {String} contentPath The plugin/theme's directory path
+     */
     setContentPath(contentPath) {
         this.args.path = contentPath;
     }
 
+    /**
+     * Returns an object that can be stored as JSON and later merged back into a setting with setting.merge.
+     * @return {Object}
+     */
     strip() {
         return {
             id: this.id,
@@ -148,10 +204,19 @@ export default class Setting {
         };
     }
 
+    /**
+     * Returns a copy of this setting that can be changed and then merged back into a set with setting.merge.
+     * @param {Setting} ...merge A setting to merge into the new setting
+     * @return {Setting}
+     */
     clone(...merge) {
         return new this.constructor(Utils.deepclone(this.args), ...merge);
     }
 
+    /**
+     * Returns a representation of this setting's value in SCSS.
+     * @return {String|Promise}
+     */
     toSCSS() {
         if (typeof this.value === 'boolean' || typeof this.value === 'number') {
             return this.value;

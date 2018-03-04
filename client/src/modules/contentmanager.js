@@ -196,8 +196,8 @@ export default class {
                 userConfig.config = readUserConfig.config;
                 userConfig.data = readUserConfig.data || {};
             } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
-                console.info(`Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`);
-                console.error(err);
+                Logger.info(this.moduleName, `Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`);
+                Logger.err(this.moduleName, err);
             }
 
             userConfig.config = defaultConfig.clone({ settings: userConfig.config });
@@ -222,7 +222,7 @@ export default class {
             };
 
             const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies, readConfig.permissions);
-            if (!content) return null;
+            if (!content) return undefined;
             if (!reload && this.getContentById(content.id))
                 throw {message: `A ${this.contentType} with the ID ${content.id} already exists.`};
 

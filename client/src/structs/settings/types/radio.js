@@ -19,6 +19,9 @@ export default class RadioSetting extends Setting {
         this.args.options = this.options.map(option => new MultipleChoiceOption(option));
     }
 
+    /**
+     * The current value.
+     */
     get value() {
         const selected = this.selected_option;
         if (selected) return selected.value;
@@ -31,10 +34,16 @@ export default class RadioSetting extends Setting {
         else this.setValue(value);
     }
 
+    /**
+     * An array of MultipleChoiceOption objects.
+     */
     get options() {
         return this.args.options || [];
     }
 
+    /**
+     * The currently selected option.
+     */
     get selected_option() {
         return this.options.find(option => option.id === this.args.value);
     }
@@ -43,6 +52,10 @@ export default class RadioSetting extends Setting {
         this.args.value = selected_option.id;
     }
 
+    /**
+     * Returns a representation of this setting's value in SCSS.
+     * @return {String}
+     */
     toSCSS() {
         return this.value;
     }

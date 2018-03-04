@@ -17,8 +17,8 @@ import SettingsScheme from '../settingsscheme';
 
 export default class ArraySetting extends Setting {
 
-    constructor(args) {
-        super(args);
+    constructor(args, ...merge) {
+        super(args, ...merge);
 
         this.args.settings = this.settings.map(category => new SettingsCategory(category));
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
@@ -85,9 +85,9 @@ export default class ArraySetting extends Setting {
         const set = new SettingsSet({
             settings: Utils.deepclone(this.settings),
             schemes: this.schemes
-        });
+        }, item ? item.args || item : undefined);
 
-        if (item) set.merge(item.args || item);
+        // if (item) set.merge(item.args || item);
         set.setSaved();
         set.on('settings-updated', () => this.updateValue());
         return set;
@@ -124,8 +124,8 @@ export default class ArraySetting extends Setting {
         return maps.length ? maps.join(', ') + ',' : '()';
     }
 
-    clone() {
-        return new ArraySetting(Utils.deepclone(this.args));
-    }
+    // clone() {
+    //     return new ArraySetting(Utils.deepclone(this.args));
+    // }
 
 }

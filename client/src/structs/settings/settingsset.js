@@ -16,14 +16,18 @@ import { Modals } from 'ui';
 
 export default class SettingsSet {
 
-    constructor(args) {
+    constructor(args, ...merge) {
         this.emitter = new AsyncEventEmitter();
         this.args = args.args || args;
 
-        this.args.settings = this.settings.map(category => new SettingsCategory(category));
+        this.args.categories = this.categories.map(category => new SettingsCategory(category));
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
 
-        for (let category of this.settings) {
+        for (let newSet of merge) {
+            this._merge(newSet);
+        }
+
+        for (let category of this.categories) {
             category.on('setting-updated', ({ setting, value, old_value }) => this.emit('setting-updated', new SettingUpdatedEvent({
                 set: this, set_id: this.id,
                 category, category_id: category.id,
@@ -31,9 +35,9 @@ export default class SettingsSet {
                 value, old_value
             })));
             category.on('settings-updated', ({ updatedSettings }) => this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings: updatedSettings.map(updatedSetting => Object.assign({
+                updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
                     set: this, set_id: this.id
-                }, updatedSetting))
+                }, updatedSetting)))
             })));
         }
     }
@@ -55,7 +59,7 @@ export default class SettingsSet {
     }
 
     get categories() {
-        return this.args.settings || [];
+        return this.args.categories || this.args.settings || [];
     }
 
     get settings() {
@@ -91,10 +95,7 @@ export default class SettingsSet {
     }
 
     findSettings(f) {
-        for (let category of this.categories) {
-            const setting = category.findSettings(f);
-            if (setting) return setting;
-        }
+        return this.findSettingsInCategory(() => true, f);
     }
 
     findSettingInCategory(cf, f) {
@@ -105,10 +106,11 @@ export default class SettingsSet {
     }
 
     findSettingsInCategory(cf, f) {
+        let settings = [];
         for (let category of this.categories.filter(cf)) {
-            const setting = category.findSettings(f);
-            if (setting) return setting;
+            settings = settings.concat(category.findSettings(f));
         }
+        return settings;
     }
 
     getSetting(id, sid) {
@@ -125,9 +127,14 @@ export default class SettingsSet {
         Modals.settings(this, headertext ? headertext : this.headertext);
     }
 
-    async merge(newSet, emit_multi = true) {
+    /**
+     * Merges a set into this set without emitting events (and therefore synchronously).
+     * Only exists for use by the constructor.
+     */
+    _merge(newSet, emit_multi = true) {
         let updatedSettings = [];
-        const categories = newSet instanceof Array ? newSet : newSet.settings;
+        // const categories = newSet instanceof Array ? newSet : newSet.settings;
+        const categories = newSet && newSet.args ? newSet.args.settings : newSet ? newSet.settings : newSet;
         if (!categories) return [];
 
         for (let newCategory of categories) {
@@ -137,7 +144,33 @@ export default class SettingsSet {
                 continue;
             }
 
-            const updatedSetting = category.merge(newCategory, false);
+            const updatedSetting = category._merge(newCategory, false);
+            if (!updatedSetting) continue;
+            updatedSettings = updatedSettings.concat(updatedSetting.map(({ category, setting, value, old_value }) => ({
+                set: this, set_id: this.id,
+                category, category_id: category.id,
+                setting, setting_id: setting.id,
+                value, old_value
+            })));
+        }
+
+        return updatedSettings;
+    }
+
+    async merge(newSet, emit_multi = true) {
+        let updatedSettings = [];
+        // const categories = newSet instanceof Array ? newSet : newSet.settings;
+        const categories = newSet && newSet.args ? newSet.args.settings : newSet ? newSet.settings : newSet;
+        if (!categories) return [];
+
+        for (let newCategory of categories) {
+            const category = this.find(category => category.category === newCategory.category);
+            if (!category) {
+                Logger.warn('SettingsCategory', `Trying to merge category ${newCategory.id}, which does not exist.`);
+                continue;
+            }
+
+            const updatedSetting = await category.merge(newCategory, false);
             if (!updatedSetting) continue;
             updatedSettings = updatedSettings.concat(updatedSetting.map(({ category, setting, value, old_value }) => ({
                 set: this, set_id: this.id,
@@ -168,14 +201,14 @@ export default class SettingsSet {
         return stripped;
     }
 
-    clone() {
+    clone(...merge) {
         return new SettingsSet({
             id: this.id,
             text: this.text,
             headertext: this.headertext,
             settings: this.categories.map(category => category.clone()),
             schemes: this.schemes.map(scheme => scheme.clone())
-        });
+        }, ...merge);
     }
 
     on(...args) { return this.emitter.on(...args); }

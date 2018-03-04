@@ -13,8 +13,8 @@ import MultipleChoiceOption from '../multiplechoiceoption';
 
 export default class RadioSetting extends Setting {
 
-    constructor(args) {
-        super(args);
+    constructor(args, ...merge) {
+        super(args, ...merge);
 
         this.args.options = this.options.map(option => new MultipleChoiceOption(option));
     }

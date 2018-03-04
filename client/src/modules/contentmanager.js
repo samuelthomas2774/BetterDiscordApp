@@ -9,7 +9,7 @@
 */
 
 import Globals from './globals';
-import { FileUtils, ClientLogger as Logger } from 'common';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import { Events } from 'modules';
 import { SettingsSet, ErrorEvent } from 'structs';
@@ -176,33 +176,41 @@ export default class {
             const readConfig = await this.readConfig(contentPath);
             const mainPath = path.join(contentPath, readConfig.main);
 
+            const defaultConfig = new SettingsSet({
+                settings: readConfig.defaultConfig,
+                schemes: readConfig.configSchemes
+            });
+
             const userConfig = {
                 enabled: false,
-                config: new SettingsSet({
-                    settings: readConfig.defaultConfig,
-                    schemes: readConfig.configSchemes
-                })
+                config: undefined,
+                data: {}
             };
-
-            for (let category of userConfig.config.settings) {
-                for (let setting of category.settings) {
-                    setting.setContentPath(contentPath);
-                }
-            }
 
             try {
                 const readUserConfig = await this.readUserConfig(contentPath);
                 userConfig.enabled = readUserConfig.enabled || false;
-                userConfig.config.merge({ settings: readUserConfig.config });
-                userConfig.config.setSaved();
+                // await userConfig.config.merge({ settings: readUserConfig.config });
+                // userConfig.config.setSaved();
+                // userConfig.config = userConfig.config.clone({ settings: readUserConfig.config });
+                userConfig.config = readUserConfig.config;
                 userConfig.data = readUserConfig.data || {};
             } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
                 console.info(`Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`);
                 console.error(err);
             }
 
+            userConfig.config = defaultConfig.clone({ settings: userConfig.config });
+            userConfig.config.setSaved();
+
+            for (let setting of userConfig.config.findSettings(() => true)) {
+                setting.setContentPath(contentPath);
+            }
+
+            Utils.deepfreeze(defaultConfig);
+
             const configs = {
-                defaultConfig: readConfig.defaultConfig,
+                defaultConfig,
                 schemes: userConfig.schemes,
                 userConfig
             };

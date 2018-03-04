@@ -9,30 +9,31 @@
  */
 
 import Setting from './setting';
-import EventEmitter from 'events';
-import { ClientLogger as Logger } from 'common';
+import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
 export default class SettingsCategory {
 
-    constructor(args) {
-        this.emitter = new EventEmitter();
+    constructor(args, ...merge) {
+        this.emitter = new AsyncEventEmitter();
         this.args = args.args || args;
 
         this.args.settings = this.settings.map(setting => new Setting(setting));
 
+        for (let newCategory of merge) {
+            this._merge(newCategory);
+        }
+
         for (let setting of this.settings) {
-            setting.on('setting-updated', ({ value, old_value }) => {
-                this.emit('setting-updated', new SettingUpdatedEvent({
-                    category: this, category_id: this.id,
-                    setting, setting_id: setting.id,
-                    value, old_value
-                }));
-            });
+            setting.on('setting-updated', ({ value, old_value }) => this.emit('setting-updated', new SettingUpdatedEvent({
+                category: this, category_id: this.id,
+                setting, setting_id: setting.id,
+                value, old_value
+            })));
             setting.on('settings-updated', ({ updatedSettings }) => this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings: updatedSettings.map(updatedSetting => Object.assign({
+                updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
                     category: this, category_id: this.id
-                }, updatedSetting))
+                }, updatedSetting)))
             })));
         }
     }
@@ -78,7 +79,11 @@ export default class SettingsCategory {
         return this.findSetting(setting => setting.id === id);
     }
 
-    merge(newCategory, emit_multi = true) {
+    /**
+     * Merges a category into this category without emitting events (and therefore synchronously).
+     * Only exists for use by SettingsSet.
+     */
+    _merge(newCategory) {
         let updatedSettings = [];
 
         for (let newSetting of newCategory.settings) {
@@ -88,7 +93,29 @@ export default class SettingsCategory {
                 continue;
             }
 
-            const updatedSetting = setting.merge(newSetting, false);
+            const updatedSetting = setting._merge(newSetting);
+            if (!updatedSetting) continue;
+            updatedSettings = updatedSettings.concat(updatedSetting.map(({ setting, value, old_value }) => ({
+                category: this, category_id: this.id,
+                setting, setting_id: setting.id,
+                value, old_value
+            })));
+        }
+
+        return updatedSettings;
+    }
+
+    async merge(newCategory, emit_multi = true) {
+        let updatedSettings = [];
+
+        for (let newSetting of newCategory.settings) {
+            const setting = this.settings.find(setting => setting.id === newSetting.id);
+            if (!setting) {
+                Logger.warn('SettingsCategory', `Trying to merge setting ${this.id}/${newSetting.id}, which does not exist.`);
+                continue;
+            }
+
+            const updatedSetting = await setting._merge(newSetting, false);
             if (!updatedSetting) continue;
             updatedSettings = updatedSettings.concat(updatedSetting.map(({ setting, value, old_value }) => ({
                 category: this, category_id: this.id,
@@ -98,9 +125,10 @@ export default class SettingsCategory {
         }
 
         if (emit_multi)
-            this.emit('settings-updated', new SettingsUpdatedEvent({
+            await this.emit('settings-updated', new SettingsUpdatedEvent({
                 updatedSettings
             }));
+
         return updatedSettings;
     }
 
@@ -117,7 +145,7 @@ export default class SettingsCategory {
         };
     }
 
-    clone() {
+    clone(...merge) {
         return new SettingsCategory({
             id: this.id,
             category: this.id,
@@ -125,7 +153,7 @@ export default class SettingsCategory {
             category_name: this.category_name,
             type: this.type,
             settings: this.settings.map(setting => setting.clone())
-        });
+        }, ...merge);
     }
 
     on(...args) { return this.emitter.on(...args); }

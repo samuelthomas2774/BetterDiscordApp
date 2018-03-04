@@ -83,7 +83,8 @@ export default class PluginApi {
             tryParseJson: () => Utils.tryParseJson.apply(Utils, arguments),
             toCamelCase: () => Utils.toCamelCase.apply(Utils, arguments),
             compare: () => Utils.compare.apply(Utils, arguments),
-            deepclone: () => Utils.deepclone.apply(Utils, arguments)
+            deepclone: () => Utils.deepclone.apply(Utils, arguments),
+            deepfreeze: () => Utils.deepfreeze.apply(Utils, arguments)
         };
     }
 

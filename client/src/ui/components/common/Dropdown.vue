@@ -17,7 +17,7 @@
             </span>
         </div>
         <div class="bd-dropdown-options bd-flex bd-flex-col" ref="options" v-if="active">
-            <div class="bd-dropdown-option" v-for="option in options" :class="{'bd-dropdown-option-selected': selected === option.value}" @click="change(option.value)">{{ option.text }}</div>
+            <div class="bd-dropdown-option" v-for="option in options" :class="{'bd-dropdown-option-selected': selected === option.value}" @click="change(option.value); active = false">{{ option.text }}</div>
         </div>
     </div>
 </template>

@@ -9,13 +9,12 @@
  */
 
 import { ThemeManager } from 'modules';
-import { Utils } from 'common';
+import { Utils, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
-import EventEmitter from 'events';
 
 export default class Setting {
 
-    constructor(args) {
+    constructor(args, ...merge) {
         this.args = args.args || args;
 
         if (!this.args.hasOwnProperty('value'))
@@ -23,7 +22,11 @@ export default class Setting {
         if (!this.args.hasOwnProperty('saved_value'))
             this.args.saved_value = this.args.value;
 
-        this.emitter = new EventEmitter();
+        for (let newSetting of merge) {
+            this._merge(newSetting);
+        }
+
+        this.emitter = new AsyncEventEmitter();
         this.changed = !Utils.compare(this.args.value, this.args.saved_value);
     }
 
@@ -67,8 +70,44 @@ export default class Setting {
         return this.args.fullwidth || false;
     }
 
-    merge(newSetting, emit_multi = true) {
-        return this.setValue(newSetting.args ? newSetting.args.value : newSetting.value, emit_multi);
+    /**
+     * Merges a setting into this setting without emitting events (and therefore synchronously).
+     * Only exists for use by SettingsCategory.
+     */
+    _merge(newSetting) {
+        const value = newSetting.args ? newSetting.args.value : newSetting.value;
+        const old_value = this.args.value;
+        if (Utils.compare(value, old_value)) return [];
+        this.args.value = value;
+        this.changed = !Utils.compare(this.args.value, this.args.saved_value);
+
+        return [{
+            setting: this, setting_id: this.id,
+            value, old_value
+        }];
+    }
+
+    async merge(newSetting, emit_multi = true) {
+        const value = newSetting.args ? newSetting.args.value : newSetting.value;
+        const old_value = this.args.value;
+        if (Utils.compare(value, old_value)) return [];
+        this.args.value = value;
+        this.changed = !Utils.compare(this.args.value, this.args.saved_value);
+
+        const updatedSetting = {
+            setting: this, setting_id: this.id,
+            value, old_value
+        };
+
+        if (emit)
+            await this.emit('setting-updated', new SettingUpdatedEvent(updatedSetting));
+
+        if (emit_multi)
+            await this.emit('settings-updated', new SettingsUpdatedEvent({
+                updatedSettings: [updatedSetting]
+            }));
+
+        return [updatedSetting];
     }
 
     setValue(value, emit_multi = true, emit = true) {
@@ -109,8 +148,8 @@ export default class Setting {
         };
     }
 
-    clone() {
-        return new this.constructor(Utils.deepclone(this.args));
+    clone(...merge) {
+        return new this.constructor(Utils.deepclone(this.args), ...merge);
     }
 
     toSCSS() {

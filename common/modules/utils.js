@@ -83,6 +83,20 @@ export class Utils {
 
         return value;
     }
+
+    static deepfreeze(object) {
+        if (typeof object === 'object' && object !== null) {
+            const properties = Object.getOwnPropertyNames(object);
+
+            for (let property of properties) {
+                this.deepfreeze(object[property]);
+            }
+
+            Object.freeze(object);
+        }
+
+        return object;
+    }
 }
 
 export class FileUtils {

@@ -15,8 +15,8 @@ import path from 'path';
 
 export default class CustomSetting extends Setting {
 
-    constructor(args) {
-        super(args);
+    constructor(args, ...merge) {
+        super(args, ...merge);
 
         if (this.args.class_file && this.path)
             this.setClass(this.args.class_file, this.args.class);

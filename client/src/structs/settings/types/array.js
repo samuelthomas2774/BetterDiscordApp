@@ -24,11 +24,7 @@ export default class ArraySetting extends Setting {
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
         this.args.items = this.value ? this.value.map(item => this.createItem(item.args || item)) : [];
 
-        this._setValue(this.items.map(item => {
-            if (!item) return;
-            item.setSaved();
-            return item.strip();
-        }));
+        this._setValue(this.getValue());
     }
 
     /**
@@ -135,12 +131,14 @@ export default class ArraySetting extends Setting {
      * @return {SettingsSet} The new set
      */
     createItem(item) {
+        if (item instanceof SettingsSet)
+            return item;
+
         const set = new SettingsSet({
             settings: Utils.deepclone(this.settings),
             schemes: this.schemes
         }, item ? item.args || item : undefined);
 
-        // if (item) set.merge(item.args || item);
         set.setSaved();
         set.on('settings-updated', () => this.updateValue());
         return set;
@@ -160,12 +158,21 @@ export default class ArraySetting extends Setting {
      * This only exists for use by array settings.
      * @return {Promise}
      */
-    updateValue(emit_multi = true, emit = true) {
-        return this.setValue.call(this, this.items.map(item => {
+    getValue() {
+        return this.items.map(item => {
             if (!item) return;
             item.setSaved();
             return item.strip();
-        }), emit_multi, emit);
+        });
+    }
+
+    /**
+     * Updates the value of this array setting.
+     * This only exists for use by array settings.
+     * @return {Promise}
+     */
+    updateValue(emit_multi = true, emit = true) {
+        return this.setValue(this.getValue(), emit_multi, emit);
     }
 
     /**

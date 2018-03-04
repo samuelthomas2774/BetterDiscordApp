@@ -147,12 +147,9 @@ export default class ArraySetting extends Setting {
     }
 
     /**
-     * Sets the value of this setting.
-     * This is only intended for use by settings.
-     * @param {SettingsSetting} value The new value of this setting
-     * @param {Boolean} emit_multi Whether to emit a SettingsUpdatedEvent
-     * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
-     * @return {Promise}
+     * Function to be called after the value changes.
+     * This can be overridden by other settings types.
+     * @param {SettingUpdatedEvent} updatedSetting
      */
     setValueHook(updatedSetting) {
         this.args.items = updatedSetting.value ? updatedSetting.value.map(item => this.createItem(item)) : [];

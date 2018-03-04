@@ -25,7 +25,7 @@
                 <button @click="update">Update</button>
                 <div class="flex-spacer"></div>
                 <div id="chkboxLiveUpdate">
-                    <input type="checkbox" @click="toggleLiveUpdate" :checked="liveUpdate" /><span>Live Update</span>
+                    <label><input type="checkbox" @click="toggleLiveUpdate" v-model="liveUpdate" /><span>Live Update</span></label>
                 </div>
             </div>
         </div>
@@ -130,8 +130,7 @@
                 return this.$refs.mycm;
             }
         },
-        mounted() {
-            this.codemirror.on('keyup', this.cmOnKeyUp);
+        created() {
             BDIpc.on('set-scss', (_, data) => {
                 if (data.error) {
                     console.log(data.error);
@@ -141,14 +140,24 @@
                 this.setScss(data.scss);
             });
 
-            BDIpc.sendToDiscord('get-scss');
-
             BDIpc.on('scss-error', (_, err) => {
                 this.error = err;
                 this.$forceUpdate();
                 if (err)
                     console.error('SCSS parse error:', err);
             });
+
+            BDIpc.on('set-liveupdate', (e, liveUpdate) => this.liveUpdate = liveUpdate);
+        },
+        mounted() {
+            this.codemirror.on('keyup', this.cmOnKeyUp);
+            BDIpc.sendToDiscord('get-scss');
+            BDIpc.sendToDiscord('get-liveupdate');
+        },
+        watch: {
+            liveUpdate(liveUpdate) {
+                BDIpc.sendToDiscord('set-liveupdate', liveUpdate);
+            }
         },
         methods: {
             save() {

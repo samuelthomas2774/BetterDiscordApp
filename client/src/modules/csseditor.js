@@ -8,19 +8,33 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { ClientIPC } from 'common';
+import { FileUtils, ClientLogger as Logger, ClientIPC } from 'common';
 import Settings from './settings';
 import { DOM } from 'ui';
+import filewatcher from 'filewatcher';
+import path from 'path';
+import electron from 'electron';
 
 /**
  * Custom css editor communications
  */
-export default class {
+export default new class {
+
+    constructor() {
+        this._scss = '';
+        this._css = '';
+        this._error = undefined;
+        this.editor_bounds = undefined;
+        this._files = undefined;
+        this._filewatcher = undefined;
+        this._watchfiles = undefined;
+        this.compiling = false;
+    }
 
     /**
      * Init css editor
      */
-    static init() {
+    init() {
         ClientIPC.on('bd-get-scss', () => this.sendToEditor('set-scss', { scss: this.scss }));
         ClientIPC.on('bd-update-scss', (e, scss) => this.updateScss(scss));
         ClientIPC.on('bd-save-csseditor-bounds', (e, bounds) => this.saveEditorBounds(bounds));
@@ -29,12 +43,26 @@ export default class {
             await this.updateScss(scss);
             await this.save();
         });
+
+        this.liveupdate = Settings.getSetting('css', 'default', 'live-update');
+        this.liveupdate.on('setting-updated', event => {
+            this.sendToEditor('set-liveupdate', event.value);
+        });
+
+        ClientIPC.on('bd-get-liveupdate', () => this.sendToEditor('set-liveupdate', this.liveupdate.value));
+        ClientIPC.on('bd-set-liveupdate', (e, value) => this.liveupdate.value = value);
+
+        this.watchfilessetting = Settings.getSetting('css', 'default', 'watch-files');
+        this.watchfilessetting.on('setting-updated', event => {
+            if (event.value) this.watchfiles = this.files;
+            else this.watchfiles = [];
+        });
     }
 
     /**
      * Show css editor, flashes if already visible
      */
-    static async show() {
+    async show() {
         await ClientIPC.send('openCssEditor', this.editor_bounds);
     }
 
@@ -43,33 +71,35 @@ export default class {
      * @param {String} scss scss to compile
      * @param {bool} sendSource send to css editor instance
      */
-    static updateScss(scss, sendSource) {
+    async updateScss(scss, sendSource) {
         if (sendSource)
             this.sendToEditor('set-scss', { scss });
 
         if (!scss) {
             this._scss = this.css = '';
             this.sendToEditor('scss-error', null);
-            return Promise.resolve();
+            return;
         }
 
-        return new Promise((resolve, reject) => {
-            this.compile(scss).then(css => {
-                this.css = css;
-                this._scss = scss;
-                this.sendToEditor('scss-error', null);
-                resolve();
-            }).catch(err => {
-                this.sendToEditor('scss-error', err);
-                reject(err);
-            });
-        });
+        try {
+            this.compiling = true;
+            const result = await this.compile(scss);
+            this.css = result.css.toString();
+            this._scss = scss;
+            this.files = result.stats.includedFiles;
+            this.error = null;
+            this.compiling = false;
+        } catch (err) {
+            this.compiling = false;
+            this.error = err;
+            throw err;
+        }
     }
 
     /**
      * Save css to file
      */
-    static async save() {
+    async save() {
         Settings.saveSettings();
     }
 
@@ -77,7 +107,7 @@ export default class {
      * Save current editor bounds
      * @param {Rectangle} bounds editor bounds
      */
-    static saveEditorBounds(bounds) {
+    saveEditorBounds(bounds) {
         this.editor_bounds = bounds;
         Settings.saveSettings();
     }
@@ -86,39 +116,192 @@ export default class {
      * Send scss to core for compilation
      * @param {String} scss scss string
      */
-    static async compile(scss) {
-        return await ClientIPC.send('bd-compileSass', { data: scss });
+    async compile(scss) {
+        return await ClientIPC.send('bd-compileSass', {
+            data: scss,
+            path: await this.fileExists() ? this.filePath : undefined
+        });
     }
 
     /**
-     * Send css to open editor
+     * Recompile the current SCSS
+     * @return {Promise}
+     */
+    async recompile() {
+        return await this.updateScss(this.scss);
+    }
+
+    /**
+     * Send data to open editor
      * @param {any} channel
      * @param {any} data
      */
-    static async sendToEditor(channel, data) {
+    async sendToEditor(channel, data) {
         return await ClientIPC.send('sendToCssEditor', { channel, data });
+    }
+
+    /**
+     * Opens an SCSS file in a system editor
+     */
+    async openSystemEditor() {
+        try {
+            await FileUtils.fileExists(this.filePath);
+        } catch (err) {
+            // File doesn't exist
+            // Create it
+            await FileUtils.writeFile(this.filePath, '');
+        }
+
+        Logger.log('CSS Editor', `Opening file ${this.filePath} in the user's default editor.`);
+
+        // For some reason this doesn't work
+        // if (!electron.shell.openItem(this.filePath))
+        if (!electron.shell.openExternal('file://' + this.filePath))
+            throw {message: 'Failed to open system editor.'};
+    }
+
+    /** Set current state
+     * @param {String} scss Current uncompiled SCSS
+     * @param {String} css Current compiled CSS
+     * @param {String} files Files imported in the SCSS
+     * @param {String} err Current compiler error
+     */
+    setState(scss, css, files, err) {
+        this._scss = scss;
+        this.sendToEditor('set-scss', { scss });
+        this.css = css;
+        this.files = files;
+        this.error = err;
     }
 
     /**
      * Current uncompiled scss
      */
-    static get scss() {
+    get scss() {
         return this._scss || '';
     }
 
     /**
      * Set current scss
      */
-    static set scss(scss) {
+    set scss(scss) {
         this.updateScss(scss, true);
+    }
+
+    /**
+     * Current compiled css
+     */
+    get css() {
+        return this._css || '';
     }
 
     /**
      * Inject compiled css to head
      * {DOM}
      */
-    static set css(css) {
+    set css(css) {
+        this._css = css;
         DOM.injectStyle(css, 'bd-customcss');
+    }
+
+    /**
+     * Current error
+     */
+    get error() {
+        return this._error || undefined;
+    }
+
+    /**
+     * Set current error
+     * {DOM}
+     */
+    set error(err) {
+        this._error = err;
+        this.sendToEditor('scss-error', err);
+    }
+
+    /**
+     * An array of files that are imported in custom CSS.
+     * @return {Array} Files being watched
+     */
+    get files() {
+        return this._files || (this._files = []);
+    }
+
+    /**
+     * Sets all files that are imported in custom CSS.
+     * @param {Array} files Files to watch
+     */
+    set files(files) {
+        this._files = files;
+        if (Settings.get('css', 'default', 'watch-files'))
+            this.watchfiles = files;
+    }
+
+    /**
+     * A filewatcher instance.
+     */
+    get filewatcher() {
+        if (this._filewatcher) return this._filewatcher;
+        this._filewatcher = filewatcher();
+        this._filewatcher.on('change', (file, stat) => {
+            // Recompile SCSS
+            this.recompile();
+        });
+        return this._filewatcher;
+    }
+
+    /**
+     * An array of files that are being watched for changes.
+     * @return {Array} Files being watched
+     */
+    get watchfiles() {
+        return this._watchfiles || (this._watchfiles = []);
+    }
+
+    /**
+     * Sets all files to be watched.
+     * @param {Array} files Files to watch
+     */
+    set watchfiles(files) {
+        for (let file of files) {
+            if (!this.watchfiles.includes(file)) {
+                this.filewatcher.add(file);
+                this.watchfiles.push(file);
+                Logger.log('CSS Editor', `Watching file ${file} for changes`);
+            }
+        }
+
+        for (let index in this.watchfiles) {
+            let file = this.watchfiles[index];
+            while (file && !files.find(f => f === file)) {
+                this.filewatcher.remove(file);
+                this.watchfiles.splice(index, 1);
+                Logger.log('CSS Editor', `No longer watching file ${file} for changes`);
+                file = this.watchfiles[index];
+            }
+        }
+    }
+
+    /**
+     * The path of the file the system editor should save to.
+     * @return {String}
+     */
+    get filePath() {
+        return path.join(Settings.dataPath, 'user.scss');
+    }
+
+    /**
+     * Checks if the system editor's file exists.
+     * @return {Boolean}
+     */
+    async fileExists() {
+        try {
+            await FileUtils.fileExists(this.filePath);
+            return true;
+        } catch (err) {
+            return false;
+        }
     }
 
 }

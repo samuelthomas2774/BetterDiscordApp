@@ -13,6 +13,7 @@ const
     fs = require('fs'),
     _ = require('lodash');
 
+import { PatchedFunction, Patch } from './monkeypatch';
 import { Vendor } from 'modules';
 import filetype from 'file-type';
 
@@ -23,6 +24,67 @@ export class Utils {
             orig(...args);
             cb(...args);
         }
+    }
+
+    /**
+     * Monkey-patches an object's method.
+     */
+    static monkeyPatch(object, methodName, options, f) {
+        const patchedFunction = new PatchedFunction(object, methodName);
+        const patch = new Patch(patchedFunction, options, f);
+        patchedFunction.addPatch(patch);
+        return patch;
+    }
+
+    /**
+     * Monkey-patches an object's method and returns a promise that will be resolved with the data object when the method is called.
+     * You will have to call data.callOriginalMethod() if it wants the original method to be called.
+     */
+    static monkeyPatchOnce(object, methodName) {
+        return new Promise((resolve, reject) => {
+            this.monkeyPatch(object, methodName, data => {
+                data.patch.cancel();
+                resolve(data);
+            });
+        });
+    }
+
+    /**
+     * Monkeypatch function that is compatible with samogot's Lib Discord Internals.
+     * Don't use this for writing new plugins as it will eventually be removed!
+     */
+    static compatibleMonkeyPatch(what, methodName, options) {
+        const { before, instead, after, once = false, silent = false } = options;
+        const cancelPatch = () => patch.cancel();
+
+        const compatible_function = _function => data => {
+            const compatible_data = {
+                thisObject: data.this,
+                methodArguments: data.arguments,
+                returnValue: data.return,
+                cancelPatch,
+                originalMethod: data.originalMethod,
+                callOriginalMethod: () => data.callOriginalMethod()
+            };
+            try {
+                _function(compatible_data);
+                data.arguments = compatible_data.methodArguments;
+                data.return = compatible_data.returnValue;
+            } catch (err) {
+                data.arguments = compatible_data.methodArguments;
+                data.return = compatible_data.returnValue;
+                throw err;
+            }
+        };
+
+        const patch = this.monkeyPatch(what, methodName, {
+            before: before ? compatible_function(before) : undefined,
+            instead: instead ? compatible_function(instead) : undefined,
+            after: after ? compatible_function(after) : undefined,
+            once
+        });
+
+        return cancelPatch;
     }
 
     static async tryParseJson(jsonString) {
@@ -66,6 +128,36 @@ export class Utils {
 
         // value1 and value2 contain the same data
         return true;
+    }
+
+    static deepclone(value) {
+        if (typeof value === 'object') {
+            if (value instanceof Array) return value.map(i => this.deepclone(i));
+
+            const clone = Object.assign({}, value);
+
+            for (let key in clone) {
+                clone[key] = this.deepclone(clone[key]);
+            }
+
+            return clone;
+        }
+
+        return value;
+    }
+
+    static deepfreeze(object) {
+        if (typeof object === 'object' && object !== null) {
+            const properties = Object.getOwnPropertyNames(object);
+
+            for (let property of properties) {
+                this.deepfreeze(object[property]);
+            }
+
+            Object.freeze(object);
+        }
+
+        return object;
     }
 }
 

@@ -1,10 +1,16 @@
 module.exports = (Plugin, Api, Vendor, Dependencies) => {
 
     const { $, moment, _ } = Vendor;
-    const { Events, Logger } = Api;
+    const { Events, Logger, InternalSettings, CssUtils } = Api;
 
     return class extends Plugin {
-        onStart() {
+        get api() {
+            return Api;
+        }
+
+        async onStart() {
+            await this.injectStyles();
+
             Events.subscribe('TEST_EVENT', this.eventTest);
             Logger.log('onStart');
 
@@ -16,7 +22,24 @@ module.exports = (Plugin, Api, Vendor, Dependencies) => {
                 console.log('Received plugin settings update:', event);
             });
 
-            Logger.log(`Internal setting "core/default/test-setting" value: ${Api.Settings.get('core', 'default', 'test-setting')}`);
+            this.settings.on('setting-updated', event => {
+                Logger.log(`Setting ${event.category.id}/${event.setting.id} changed from ${event.old_value} to ${event.value}:`, event);
+            });
+
+            // this.settings.categories.find(c => c.id === 'default').settings.find(s => s.id === 'default-5')
+            this.settings.getSetting('default', 'default-0').on('setting-updated', async event => {
+                Logger.log(`Some feature ${event.value ? 'enabled' : 'disabled'}`);
+            });
+
+            this.settings.on('settings-updated', async event => {
+                await this.injectStyles();
+
+                Logger.log('Settings updated:', event, 'Waiting before saving complete...');
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                Logger.log('Done');
+            });
+
+            Logger.log(`Internal setting "core/default/test-setting" value: ${InternalSettings.get('core', 'default', 'test-setting')}`);
             Events.subscribe('setting-updated', event => {
                 console.log('Received internal setting update:', event);
             });
@@ -26,7 +49,24 @@ module.exports = (Plugin, Api, Vendor, Dependencies) => {
             return true;
         }
 
+        async injectStyles() {
+            const scss = await CssUtils.getConfigAsSCSS() + `.layer-kosS71 .guilds-wrapper + * {
+                &::before {
+                    content: 'Example plugin stuff (test radio setting #{$default-5} selected)';
+                    display: block;
+                    padding: 10px 40px;
+                    color: #eee;
+                    background-color: #202225;
+                    text-align: center;
+                    font-size: 14px;
+                }
+            }`;
+            Logger.log('Plugin SCSS:', scss);
+            await CssUtils.injectSass(scss);
+        }
+
         onStop() {
+            CssUtils.deleteAllStyles();
             Events.unsubscribeAll();
             Logger.log('onStop');
             console.log(this.showSettingsModal());

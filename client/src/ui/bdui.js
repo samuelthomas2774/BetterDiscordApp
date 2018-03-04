@@ -21,12 +21,11 @@ export default class {
         const defer = setInterval(() => {
             if (!this.profilePopupModule) return;
             clearInterval(defer);
-            this.profilePopupModule.open = Utils.overload(this.profilePopupModule.open, userid => {
-                Events.emit('ui-event', {
-                    event: 'profile-popup-open',
-                    data: { userid }
-                });
-            });
+
+            Utils.monkeyPatch(this.profilePopupModule, 'open', 'after', (data, userid) => Events.emit('ui-event', {
+                event: 'profile-popup-open',
+                data: { userid }
+            }));
         }, 100);
     }
 

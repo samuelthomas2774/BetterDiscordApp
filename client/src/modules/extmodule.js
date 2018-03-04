@@ -56,6 +56,7 @@ export default class ExtModule {
     get dirName() { return this.paths.dirName }
     get enabled() { return true }
     get config() { return this.userConfig.config || [] }
+    get data() { return this.userConfig.data || (this.userConfig.data = {}) }
     get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new ExtModuleEvents(this)) }
 
 }

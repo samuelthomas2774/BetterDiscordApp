@@ -11,58 +11,97 @@
 <template>
     <SettingsWrapper headertext="CSS Editor">
         <div class="bd-css-editor">
+            <div v-if="CssEditor.error" class="bd-form-item">
+                <h5 style="margin-bottom: 10px;">Compiler error</h5>
+                <div class="bd-err bd-pre-wrap"><div class="bd-pre">{{ CssEditor.error.formatted }}</div></div>
+                <div class="bd-form-divider"></div>
+            </div>
+
             <div class="bd-form-item">
                 <h5>Custom Editor</h5>
-                <div class="bd-form-warning">
-                    <div class="bd-text">Custom Editor is not installed!</div>
-                    <FormButton>Install</FormButton>
-                </div>
-                <span style="color: #FFF; font-size: 12px; font-weight: 700;">*This is displayed if editor is not installed</span>
-                <FormButton :onClick="openInternalEditor">Open</FormButton>
+                <FormButton v-if="internalEditorIsInstalled" :onClick="openInternalEditor">Open</FormButton>
+                <template v-else>
+                    <div class="bd-form-warning">
+                        <div class="bd-text">Custom Editor is not installed!</div>
+                        <FormButton>Install</FormButton>
+                    </div>
+                    <span style="color: #fff; font-size: 12px; font-weight: 700;">* This is displayed if editor is not installed</span>
+                </template>
             </div>
             <div class="bd-form-divider"></div>
-            <Setting :setting="liveUpdateSetting" :change="enabled => liveUpdateSetting.value = enabled" />
+
             <div class="bd-form-item">
                 <h5>System Editor</h5>
-                <FormButton>
-                    Open
-                </FormButton>
+                <FormButton :onClick="openSystemEditor">Open</FormButton>
+                <p class="bd-hint">This will open {{ systemEditorPath }} in your system's default editor.</p>
             </div>
             <div class="bd-form-divider"></div>
-            <FormButton :onClick="() => {}">Enabled</FormButton>
-            <FormButton :disabled="true"><span>Disabled</span></FormButton>
-            <FormButton :loading="true" />
+
+            <div class="bd-form-item">
+                <h5 style="margin-bottom: 10px;">Settings</h5>
+            </div>
+            <SettingsPanel :settings="settingsset" />
+
+            <!-- <Setting :setting="liveUpdateSetting" />
+            <Setting :setting="watchFilesSetting" /> -->
+
+            <FormButton :onClick="recompile" :loading="compiling">Recompile</FormButton>
         </div>
     </SettingsWrapper>
 </template>
 
 <script>
     // Imports
-    import { CssEditor } from 'modules';
+    import { Settings, CssEditor } from 'modules';
     import { SettingsWrapper } from './';
     import { FormButton } from '../common';
+    import SettingsPanel from './SettingsPanel.vue';
     import Setting from './setting/Setting.vue';
 
     export default {
         components: {
             SettingsWrapper,
+            SettingsPanel,
             Setting,
             FormButton
         },
         data() {
             return {
-                liveUpdateSetting: {
-                    id: "live-update",
-                    type: "bool",
-                    text: "Live Update",
-                    hint: "Automatically update client css when saved.",
-                    value: true
-                }
+                CssEditor
+            };
+        },
+        computed: {
+            error() {
+                return this.CssEditor.error;
+            },
+            compiling() {
+                return this.CssEditor.compiling;
+            },
+            systemEditorPath() {
+                return this.CssEditor.filePath;
+            },
+            liveUpdateSetting() {
+                return Settings.getSetting('css', 'default', 'live-update');
+            },
+            watchFilesSetting() {
+                return Settings.getSetting('css', 'default', 'watch-files');
+            },
+            settingsset() {
+                return Settings.css;
+            },
+            internalEditorIsInstalled() {
+                return true;
             }
         },
         methods: {
             openInternalEditor() {
-                CssEditor.show();
+                this.CssEditor.show();
+            },
+            openSystemEditor() {
+                this.CssEditor.openSystemEditor();
+            },
+            recompile() {
+                this.CssEditor.recompile();
             }
         }
     }

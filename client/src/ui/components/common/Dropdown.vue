@@ -11,13 +11,13 @@
 <template>
     <div class="bd-dropdown" :class="{'bd-active': active, 'bd-disabled': disabled}">
         <div class="bd-dropdown-current" @click="() => active = !active && !disabled">
-            <span class="bd-dropdown-text">{{ getOptionText(selected) }}</span>
+            <span class="bd-dropdown-text">{{ getSelectedText() }}</span>
             <span class="bd-dropdown-arrow-wrap">
                 <span class="bd-dropdown-arrow"></span>
             </span>
         </div>
         <div class="bd-dropdown-options bd-flex bd-flex-col" ref="options" v-if="active">
-            <div class="bd-dropdown-option" v-for="option in options" :class="{'bd-dropdown-option-selected': selected === option.id}" @click="selectOption(option)">{{ option.text }}</div>
+            <div class="bd-dropdown-option" v-for="option in options" :class="{'bd-dropdown-option-selected': selected === option.value}" @click="change(option.value); active = false">{{ option.text }}</div>
         </div>
     </div>
 </template>
@@ -30,14 +30,9 @@
             };
         },
         methods: {
-            getOptionText(value) {
-                let matching = this.options.filter(opt => opt.id === value);
-                if (matching.length == 0) return "";
-                else return matching[0].text;
-            },
-            selectOption(option) {
-                this.active = false;
-                this.change(option.id);
+            getSelectedText() {
+                const selected_option = this.options.find(option => option.value === this.selected);
+                return selected_option ? selected_option.text : this.selected;
             }
         },
         mounted() {

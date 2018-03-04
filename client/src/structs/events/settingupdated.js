@@ -13,15 +13,27 @@ import Event from './event';
 export default class SettingUpdatedEvent extends Event {
 
     get set() {
-        return this.args.set_id;
+        return this.args.set;
+    }
+
+    get set_id() {
+        return this.args.set.id;
     }
 
     get category() {
-        return this.args.category_id;
+        return this.args.category;
+    }
+
+    get category_id() {
+        return this.args.category.id;
     }
 
     get setting() {
-        return this.args.setting_id;
+        return this.args.setting;
+    }
+
+    get setting_id() {
+        return this.args.setting.id;
     }
 
     get value() {

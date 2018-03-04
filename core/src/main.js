@@ -84,7 +84,7 @@ class Comms {
                     o.reply({ err });
                     return;
                 }
-                o.reply(result.css.toString());
+                o.reply(result);
             });
         });
     }

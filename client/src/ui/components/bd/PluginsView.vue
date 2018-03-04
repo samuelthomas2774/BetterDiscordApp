@@ -21,7 +21,7 @@
             </div>
         </div>
 
-        <div class="bd-flex bd-flex-col bd-pluginsView">
+        <div class="bd-flex bd-flex-col bd-pluginsview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
                 <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :deletePlugin="e => deletePlugin(plugin, e.shiftKey)" :showSettings="() => showSettings(plugin)" />
             </div>

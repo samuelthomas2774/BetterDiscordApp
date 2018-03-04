@@ -121,9 +121,11 @@ export default class Setting {
     /**
      * Merges another setting into this setting.
      * @param {SettingsSetting} newSetting The setting to merge into this setting
+     * @param {Boolean} emit_multi Whether to emit a SettingsUpdatedEvent
+     * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
      * @return {Promise}
      */
-    async merge(newSetting, emit_multi = true) {
+    async merge(newSetting, emit_multi = true, emit = true) {
         const value = newSetting.args ? newSetting.args.value : newSetting.value;
         const old_value = this.args.value;
         if (Utils.compare(value, old_value)) return [];

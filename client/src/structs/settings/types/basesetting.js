@@ -156,7 +156,7 @@ export default class Setting {
      * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
      * @return {Promise}
      */
-    setValue(value, emit_multi = true, emit = true) {
+    async setValue(value, emit_multi = true, emit = true) {
         const old_value = this.args.value;
         if (Utils.compare(value, old_value)) return [];
         this.args.value = value;
@@ -168,10 +168,10 @@ export default class Setting {
         };
 
         if (emit)
-            this.emit('setting-updated', new SettingUpdatedEvent(updatedSetting));
+            await this.emit('setting-updated', new SettingUpdatedEvent(updatedSetting));
 
         if (emit_multi)
-            this.emit('settings-updated', new SettingsUpdatedEvent({
+            await this.emit('settings-updated', new SettingsUpdatedEvent({
                 updatedSettings: [updatedSetting]
             }));
 

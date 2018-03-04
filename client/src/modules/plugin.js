@@ -8,36 +8,17 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, FileUtils } from 'common';
+import { Utils, FileUtils, AsyncEventEmitter } from 'common';
 import { Modals } from 'ui';
 import { EventEmitter } from 'events';
 import PluginManager from './pluginmanager';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
-class PluginEvents {
-    constructor(plugin) {
-        this.plugin = plugin;
-        this.emitter = new EventEmitter();
-    }
-
-    on(eventname, callback) {
-        this.emitter.on(eventname, callback);
-    }
-
-    off(eventname, callback) {
-        this.emitter.removeListener(eventname, callback);
-    }
-
-    emit(...args) {
-        this.emitter.emit(...args);
-    }
-}
-
 export default class Plugin {
 
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;
-        this.saveSettings = this.saveSettings.bind(this);
+        this.saveConfiguration = this.saveConfiguration.bind(this);
         this.hasSettings = this.config && this.config.length > 0;
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
@@ -70,27 +51,10 @@ export default class Plugin {
     get pluginConfig() { return this.config }
     get data() { return this.userConfig.data || (this.userConfig.data = {}) }
     get exports() { return this._exports ? this._exports : (this._exports = this.getExports()) }
-    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new PluginEvents(this)) }
-
-    getSetting(setting_id, category_id) {
-        for (let category of this.config) {
-            if (category_id && category.category !== category_id) continue;
-            for (let setting of category.settings) {
-                if (setting.id !== setting_id) continue;
-                return setting.value;
-            }
-        }
-    }
+    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new AsyncEventEmitter()) }
 
     showSettingsModal() {
         return Modals.contentSettings(this);
-    }
-
-    async saveSettings(newSettings) {
-        const updatedSettings = this.settings.merge(newSettings);
-
-        await this.saveConfiguration();
-        return updatedSettings;
     }
 
     async saveConfiguration() {

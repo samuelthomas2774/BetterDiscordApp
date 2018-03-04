@@ -24,7 +24,12 @@ export default class ArraySetting extends Setting {
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
         this.args.items = this.value ? this.value.map(item => this.createItem(item.args || item)) : [];
 
-        this.updateValue(false, false);
+        this.args.value = this.items.map(item => {
+            if (!item) return;
+            item.setSaved();
+            return item.strip();
+        });
+        this.changed = !Utils.compare(this.args.value, this.args.saved_value);
     }
 
     /**
@@ -140,6 +145,24 @@ export default class ArraySetting extends Setting {
         set.setSaved();
         set.on('settings-updated', () => this.updateValue());
         return set;
+    }
+
+    /**
+     * Merges a setting into this setting without emitting events (and therefore synchronously).
+     * This only exists for use by the constructor and SettingsCategory.
+     */
+    _merge(newSetting) {
+        const value = newSetting.args ? newSetting.args.value : newSetting.value;
+        const old_value = this.args.value;
+        if (Utils.compare(value, old_value)) return [];
+        this.args.value = value;
+        this.args.items = this.value ? this.value.map(item => this.createItem(item.args || item)) : [];
+        this.changed = !Utils.compare(this.args.value, this.args.saved_value);
+
+        return [{
+            setting: this, setting_id: this.id,
+            value, old_value
+        }];
     }
 
     /**

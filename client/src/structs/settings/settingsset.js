@@ -102,17 +102,6 @@ export default class SettingsSet {
     }
 
     /**
-     * Return the first setting that matches the id in any category
-     */
-    findFirst(settingId) {
-        for (let cat of this.categories) {
-            const found = cat.settings.find(s => s.id === settingId);
-            if (found) return found;
-        }
-        return null;
-    }
-
-    /**
      * Returns the first category where calling {function} returns true.
      * @param {Function} function A function to call to filter categories
      * @return {SettingsCategory}
@@ -146,7 +135,7 @@ export default class SettingsSet {
      */
     findSetting(f) {
         for (let category of this.categories) {
-            const setting = category.findSetting(f);
+            const setting = category.find(f);
             if (setting) return setting;
         }
     }

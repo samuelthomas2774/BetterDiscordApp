@@ -24,12 +24,11 @@ export default class ArraySetting extends Setting {
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
         this.args.items = this.value ? this.value.map(item => this.createItem(item.args || item)) : [];
 
-        this.args.value = this.items.map(item => {
+        this._setValue(this.items.map(item => {
             if (!item) return;
             item.setSaved();
             return item.strip();
-        });
-        this.changed = !Utils.compare(this.args.value, this.args.saved_value);
+        }));
     }
 
     /**
@@ -148,24 +147,6 @@ export default class ArraySetting extends Setting {
     }
 
     /**
-     * Merges a setting into this setting without emitting events (and therefore synchronously).
-     * This only exists for use by the constructor and SettingsCategory.
-     */
-    _merge(newSetting) {
-        const value = newSetting.args ? newSetting.args.value : newSetting.value;
-        const old_value = this.args.value;
-        if (Utils.compare(value, old_value)) return [];
-        this.args.value = value;
-        this.args.items = this.value ? this.value.map(item => this.createItem(item.args || item)) : [];
-        this.changed = !Utils.compare(this.args.value, this.args.saved_value);
-
-        return [{
-            setting: this, setting_id: this.id,
-            value, old_value
-        }];
-    }
-
-    /**
      * Sets the value of this setting.
      * This is only intended for use by settings.
      * @param {SettingsSetting} value The new value of this setting
@@ -173,20 +154,17 @@ export default class ArraySetting extends Setting {
      * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
      * @return {Promise}
      */
-    setValue(value, emit_multi = true, emit = true) {
-        this.args.items = value ? value.map(item => this.createItem(item)) : [];
-        this.updateValue(emit_multi, emit);
+    setValueHook(updatedSetting) {
+        this.args.items = updatedSetting.value ? updatedSetting.value.map(item => this.createItem(item)) : [];
     }
 
     /**
      * Updates the value of this array setting.
      * This only exists for use by array settings.
-     * @param {Boolean} emit_multi Whether to emit a SettingsUpdatedEvent
-     * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
      * @return {Promise}
      */
     updateValue(emit_multi = true, emit = true) {
-        return this.__proto__.__proto__.setValue.call(this, this.items.map(item => {
+        return this.setValue.call(this, this.items.map(item => {
             if (!item) return;
             item.setSaved();
             return item.strip();

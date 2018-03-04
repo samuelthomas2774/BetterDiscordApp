@@ -107,75 +107,75 @@ export default class Setting {
      */
     _merge(newSetting) {
         const value = newSetting.args ? newSetting.args.value : newSetting.value;
-        const old_value = this.args.value;
-        if (Utils.compare(value, old_value)) return [];
-        this.args.value = value;
-        this.changed = !Utils.compare(this.args.value, this.args.saved_value);
-
-        return [{
-            setting: this, setting_id: this.id,
-            value, old_value
-        }];
+        return this._setValue(value);
     }
 
     /**
      * Merges another setting into this setting.
      * @param {SettingsSetting} newSetting The setting to merge into this setting
-     * @param {Boolean} emit_multi Whether to emit a SettingsUpdatedEvent
-     * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
      * @return {Promise}
      */
     async merge(newSetting, emit_multi = true, emit = true) {
-        const value = newSetting.args ? newSetting.args.value : newSetting.value;
+        const updatedSettings = this._merge(newSetting);
+        if (!updatedSettings.length) return [];
+        const updatedSetting = updatedSettings[0];
+
+        if (emit)
+            await this.emit('setting-updated', updatedSetting);
+
+        if (emit_multi)
+            await this.emit('settings-updated', new SettingsUpdatedEvent({
+                updatedSettings
+            }));
+
+        return updatedSettings;
+    }
+
+    /**
+     * Sets the value of this setting.
+     * This only exists for use by the constructor and SettingsCategory.
+     */
+    _setValue(value) {
         const old_value = this.args.value;
         if (Utils.compare(value, old_value)) return [];
         this.args.value = value;
         this.changed = !Utils.compare(this.args.value, this.args.saved_value);
 
-        const updatedSetting = {
+        const updatedSetting = new SettingUpdatedEvent({
             setting: this, setting_id: this.id,
             value, old_value
-        };
+        });
 
-        if (emit)
-            await this.emit('setting-updated', new SettingUpdatedEvent(updatedSetting));
-
-        if (emit_multi)
-            await this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings: [updatedSetting]
-            }));
+        this.setValueHook(updatedSetting);
 
         return [updatedSetting];
     }
 
     /**
+     * Function to be called after the value changes.
+     * This can be overridden by other settings types.
+     * @param {SettingUpdatedEvent} updatedSetting
+     */
+    setValueHook(updatedSetting) {}
+
+    /**
      * Sets the value of this setting.
-     * This is only intended for use by settings.
      * @param {Any} value The new value of this setting
-     * @param {Boolean} emit_multi Whether to emit a SettingsUpdatedEvent
-     * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
      * @return {Promise}
      */
     async setValue(value, emit_multi = true, emit = true) {
-        const old_value = this.args.value;
-        if (Utils.compare(value, old_value)) return [];
-        this.args.value = value;
-        this.changed = !Utils.compare(this.args.value, this.args.saved_value);
-
-        const updatedSetting = {
-            setting: this, setting_id: this.id,
-            value, old_value
-        };
+        const updatedSettings = this._setValue(value);
+        if (!updatedSettings.length) return [];
 
         if (emit)
-            await this.emit('setting-updated', new SettingUpdatedEvent(updatedSetting));
+            await this.emit('setting-updated', updatedSettings[0]);
 
         if (emit_multi)
             await this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings: [updatedSetting]
+                updatedSettings
             }));
 
-        return [updatedSetting];
+        return updatedSettings;
     }
 
     /**

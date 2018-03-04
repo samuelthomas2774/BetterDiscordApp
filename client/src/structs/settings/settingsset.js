@@ -191,7 +191,7 @@ export default class SettingsSet {
      * Returns the value of the setting with the ID {id}.
      * @param {String} categoryid The ID of the category to look in (optional)
      * @param {String} id The ID of the setting to look for
-     * @return {SettingsCategory}
+     * @return {Any}
      */
     get(cid, sid) {
         const setting = this.getSetting(cid, sid);

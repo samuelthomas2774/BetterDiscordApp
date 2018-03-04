@@ -103,7 +103,7 @@ export default class Setting {
 
     /**
      * Merges a setting into this setting without emitting events (and therefore synchronously).
-     * This only exists for use by SettingsCategory.
+     * This only exists for use by the constructor and SettingsCategory.
      */
     _merge(newSetting) {
         const value = newSetting.args ? newSetting.args.value : newSetting.value;

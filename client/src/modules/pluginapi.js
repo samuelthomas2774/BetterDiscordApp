@@ -14,6 +14,7 @@ import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
+import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { Modals, DOM } from 'ui';
 import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
 
@@ -80,11 +81,35 @@ export default class PluginApi {
     get Utils() {
         return {
             overload: () => Utils.overload.apply(Utils, arguments),
+            monkeyPatch: () => Utils.monkeyPatch.apply(Utils, arguments),
+            monkeyPatchOnce: () => Utils.monkeyPatchOnce.apply(Utils, arguments),
+            compatibleMonkeyPatch: () => Utils.monkeyPatchOnce.apply(Utils, arguments),
             tryParseJson: () => Utils.tryParseJson.apply(Utils, arguments),
             toCamelCase: () => Utils.toCamelCase.apply(Utils, arguments),
             compare: () => Utils.compare.apply(Utils, arguments),
             deepclone: () => Utils.deepclone.apply(Utils, arguments),
             deepfreeze: () => Utils.deepfreeze.apply(Utils, arguments)
+        };
+    }
+
+    createSettingsSet(args, ...merge) {
+        return new SettingsSet(args, ...merge);
+    }
+    createSettingsCategory(args, ...merge) {
+        return new SettingsCategory(args, ...merge);
+    }
+    createSetting(args, ...merge) {
+        return new Setting(args, ...merge);
+    }
+    createSettingsScheme(args) {
+        return new SettingsScheme(args);
+    }
+    get Settings() {
+        return {
+            createSet: this.createSet.bind(this),
+            createCategory: this.createSettingsCategory.bind(this),
+            createSetting: this.createSetting.bind(this),
+            createScheme: this.createSettingsScheme.bind(this)
         };
     }
 

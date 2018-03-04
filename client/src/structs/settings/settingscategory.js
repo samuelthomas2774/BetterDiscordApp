@@ -85,7 +85,7 @@ export default class SettingsCategory {
 
     /**
      * Returns the first setting where calling {function} returns true.
-     * @param {Function} function A function to call to filter setting
+     * @param {Function} function A function to call to filter settings
      * @return {Setting}
      */
     find(f) {
@@ -112,7 +112,7 @@ export default class SettingsCategory {
 
     /**
      * Merges a category into this category without emitting events (and therefore synchronously).
-     * This only exists for use by SettingsSet.
+     * This only exists for use by the constructor and SettingsSet.
      */
     _merge(newCategory) {
         let updatedSettings = [];
@@ -151,7 +151,7 @@ export default class SettingsCategory {
                 continue;
             }
 
-            const updatedSetting = await setting._merge(newSetting, false);
+            const updatedSetting = await setting.merge(newSetting, false);
             if (!updatedSetting) continue;
             updatedSettings = updatedSettings.concat(updatedSetting.map(({ setting, value, old_value }) => ({
                 category: this, category_id: this.id,

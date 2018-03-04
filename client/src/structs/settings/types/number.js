@@ -12,22 +12,4 @@ import Setting from './basesetting';
 
 export default class NumberSetting extends Setting {
 
-    /**
-     * The current value.
-     */
-    get value() {
-        return this.args.value * this.multi;
-    }
-
-    set value(value) {
-        this.setValue(value / this.multi);
-    }
-
-    /**
-     * A number to multiply the value by.
-     */
-    get multi() {
-        return this.args.multi || 1;
-    }
-
 }

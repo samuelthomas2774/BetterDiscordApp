@@ -38,6 +38,11 @@
         &.bd-active {
             cursor: default;
         }
+
+        .bd-settingswrap & {
+            min-width: 150px;
+            padding: 0;
+        }
     }
 
     .bd-material-button-wrap {
@@ -82,12 +87,12 @@
     }
 
     .bd-settingswrap-header & {
-        margin-top: -17px;
+        // margin-top: -17px;
         margin-bottom: -20px;
 
         .bd-button {
             font-size: 16px;
-            padding: 18px 0 17px;
+           // padding: 18px 0 17px;
         }
 
         .bd-material-button {

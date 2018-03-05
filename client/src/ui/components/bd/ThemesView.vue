@@ -25,8 +25,9 @@
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">
                 <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="e => reloadTheme(theme, e.shiftKey)" :showSettings="() => showSettings(theme)" :deleteTheme="e => deleteTheme(theme, e.shiftKey)" />
             </div>
-            <div v-if="!local" class="bd-spinner-container">
-                <div class="bd-spinner-2"></div>
+            <div v-if="!local" class="bd-online-ph">
+                <h3>Coming Soon</h3>
+                <a href="https://v2.betterdiscord.net/themes" target="_new">Website Browser</a>
             </div>
         </div>
     </SettingsWrapper>
@@ -97,3 +98,21 @@
         }
     }
 </script>
+
+<style>
+.bd-online-ph {
+    display: flex;
+    flex-direction: column;
+}
+.bd-online-ph h3 {
+    color: #FFF;
+    font-weight: 700;
+    font-size: 20px;
+    text-align: center;
+    padding: 20px;
+}
+.bd-online-ph a {
+    padding: 20px;
+    text-align: center;
+}
+</style>

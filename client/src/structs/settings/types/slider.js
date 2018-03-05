@@ -13,6 +13,17 @@ import Setting from './basesetting';
 export default class SliderSetting extends Setting {
 
     /**
+     * The current value.
+     */
+    get value() {
+        return this.args.value * this.multi;
+    }
+
+    set value(value) {
+        this.setValue(value / this.multi);
+    }
+
+    /**
      * The value to use when the setting doesn't have a value.
      */
     get defaultValue() {
@@ -45,6 +56,13 @@ export default class SliderSetting extends Setting {
      */
     get unit() {
         return this.args.unit || '';
+    }
+
+    /**
+     * A number to multiply the value by.
+     */
+    get multi() {
+        return this.args.multi || 1;
     }
 
     /**

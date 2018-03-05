@@ -24,7 +24,7 @@ export default class ArraySetting extends Setting {
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
         this.args.items = this.value ? this.value.map(item => this.createItem(item.args || item)) : [];
 
-        this.updateValue(false, false);
+        this._setValue(this.getValue());
     }
 
     /**
@@ -131,43 +131,48 @@ export default class ArraySetting extends Setting {
      * @return {SettingsSet} The new set
      */
     createItem(item) {
+        if (item instanceof SettingsSet)
+            return item;
+
         const set = new SettingsSet({
             settings: Utils.deepclone(this.settings),
             schemes: this.schemes
         }, item ? item.args || item : undefined);
 
-        // if (item) set.merge(item.args || item);
         set.setSaved();
         set.on('settings-updated', () => this.updateValue());
         return set;
     }
 
     /**
-     * Sets the value of this setting.
-     * This is only intended for use by settings.
-     * @param {SettingsSetting} value The new value of this setting
-     * @param {Boolean} emit_multi Whether to emit a SettingsUpdatedEvent
-     * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
-     * @return {Promise}
+     * Function to be called after the value changes.
+     * This can be overridden by other settings types.
+     * @param {SettingUpdatedEvent} updatedSetting
      */
-    setValue(value, emit_multi = true, emit = true) {
-        this.args.items = value ? value.map(item => this.createItem(item)) : [];
-        this.updateValue(emit_multi, emit);
+    setValueHook(updatedSetting) {
+        this.args.items = updatedSetting.value ? updatedSetting.value.map(item => this.createItem(item)) : [];
     }
 
     /**
      * Updates the value of this array setting.
      * This only exists for use by array settings.
-     * @param {Boolean} emit_multi Whether to emit a SettingsUpdatedEvent
-     * @param {Boolean} emit Whether to emit a SettingUpdatedEvent
      * @return {Promise}
      */
-    updateValue(emit_multi = true, emit = true) {
-        return this.__proto__.__proto__.setValue.call(this, this.items.map(item => {
+    getValue() {
+        return this.items.map(item => {
             if (!item) return;
             item.setSaved();
             return item.strip();
-        }), emit_multi, emit);
+        });
+    }
+
+    /**
+     * Updates the value of this array setting.
+     * This only exists for use by array settings.
+     * @return {Promise}
+     */
+    updateValue(emit_multi = true, emit = true) {
+        return this.setValue(this.getValue(), emit_multi, emit);
     }
 
     /**

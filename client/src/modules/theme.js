@@ -13,34 +13,15 @@ import ThemeManager from './thememanager';
 import { EventEmitter } from 'events';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { DOM, Modals } from 'ui';
-import { Utils, FileUtils, ClientIPC, ClientLogger as Logger } from 'common';
+import { Utils, FileUtils, ClientIPC, ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import filewatcher from 'filewatcher';
-
-class ThemeEvents {
-    constructor(theme) {
-        this.theme = theme;
-        this.emitter = new EventEmitter();
-    }
-
-    on(eventname, callback) {
-        this.emitter.on(eventname, callback);
-    }
-
-    off(eventname, callback) {
-        this.emitter.removeListener(eventname, callback);
-    }
-
-    emit(...args) {
-        this.emitter.emit(...args);
-    }
-}
 
 export default class Theme {
 
     constructor(themeInternals) {
         this.__themeInternals = themeInternals;
         this.hasSettings = this.config && this.config.length > 0;
-        this.saveSettings = this.saveSettings.bind(this);
+        this.saveConfiguration = this.saveConfiguration.bind(this);
         this.enable = this.enable.bind(this);
         this.disable = this.disable.bind(this);
 
@@ -79,20 +60,10 @@ export default class Theme {
     get themeConfig() { return this.config }
     get data() { return this.userConfig.data || (this.userConfig.data = {}) }
     get css() { return this.data.css }
-    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new ThemeEvents(this)) }
+    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new AsyncEventEmitter()) }
 
     showSettingsModal() {
         return Modals.contentSettings(this);
-    }
-
-    async saveSettings(newSettings) {
-        const updatedSettings = this.settings.merge(newSettings);
-
-        // As the theme's configuration has changed it needs recompiling
-        // When the compiled CSS has been saved it will also save the configuration
-        await this.recompile();
-
-        return this.settingsUpdated(updatedSettings);
     }
 
     async saveConfiguration() {

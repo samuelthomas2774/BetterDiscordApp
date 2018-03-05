@@ -8,26 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { AsyncEventEmitter } from 'common';
 import { EventEmitter } from 'events';
-
-class ExtModuleEvents {
-    constructor(extmodule) {
-        this.extmodule = extmodule;
-        this.emitter = new EventEmitter();
-    }
-
-    on(eventname, callback) {
-        this.emitter.on(eventname, callback);
-    }
-
-    off(eventname, callback) {
-        this.emitter.removeListener(eventname, callback);
-    }
-
-    emit(...args) {
-        this.emitter.emit(...args);
-    }
-}
 
 export default class ExtModule {
 
@@ -57,6 +39,6 @@ export default class ExtModule {
     get enabled() { return true }
     get config() { return this.userConfig.config || [] }
     get data() { return this.userConfig.data || (this.userConfig.data = {}) }
-    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new ExtModuleEvents(this)) }
+    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new AsyncEventEmitter()) }
 
 }

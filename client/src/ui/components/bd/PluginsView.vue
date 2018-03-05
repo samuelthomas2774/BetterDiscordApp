@@ -12,11 +12,11 @@
     <SettingsWrapper headertext="Plugins">
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
-                <h3>Local</h3>
+                <h3>Installed</h3>
                 <div class="bd-material-button" v-if="local" @click="refreshLocal"><MiRefresh /></div>
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
-                <h3>Online</h3>
+                <h3>Browse</h3>
                 <div class="bd-material-button" v-if="!local" @click="refreshOnline"><MiRefresh /></div>
             </div>
         </div>

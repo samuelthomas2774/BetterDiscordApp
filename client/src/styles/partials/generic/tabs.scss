@@ -38,6 +38,10 @@
         &.bd-active {
             cursor: default;
         }
+
+        .bd-settingswrap & {
+            min-width: 150px;
+        }
     }
 
     .bd-material-button-wrap {

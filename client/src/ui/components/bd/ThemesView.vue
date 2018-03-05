@@ -13,11 +13,11 @@
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Installed</h3>
-                <div class="bd-material-button" v-if="local" @click="refreshLocal"><MiRefresh /></div>
+                <RefreshBtn v-if="local" :onClick="refreshLocal"/>
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
                 <h3>Browse</h3>
-                <div class="bd-material-button" v-if="!local" @click="refreshOnline"><MiRefresh /></div>
+                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
             </div>
         </div>
 
@@ -40,6 +40,7 @@
     import { SettingsWrapper } from './';
     import { MiRefresh } from '../common';
     import ThemeCard from './ThemeCard.vue';
+    import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
@@ -50,7 +51,8 @@
         },
         components: {
             SettingsWrapper, ThemeCard,
-            MiRefresh
+            MiRefresh,
+            RefreshBtn
         },
         methods: {
             showLocal() {

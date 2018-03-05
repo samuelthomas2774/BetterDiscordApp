@@ -67,6 +67,7 @@
 
     .bd-dropdown-options {
         position: absolute;
+        z-index: 5;
         top: calc(100% - 2.5px);
         width: 100%;
         max-height: 180px;

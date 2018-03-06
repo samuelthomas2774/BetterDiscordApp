@@ -14,6 +14,8 @@ import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { Modals } from 'ui';
 
+let instances = 0;
+
 export default class SettingsSet {
 
     constructor(args, ...merge) {
@@ -27,18 +29,10 @@ export default class SettingsSet {
             this._merge(newSet);
         }
 
+        this._eventsKey = instances++;
+
         for (let category of this.categories) {
-            category.on('setting-updated', ({ setting, value, old_value }) => this.emit('setting-updated', new SettingUpdatedEvent({
-                set: this, set_id: this.id,
-                category, category_id: category.id,
-                setting, setting_id: setting.id,
-                value, old_value
-            })));
-            category.on('settings-updated', ({ updatedSettings }) => this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
-                    set: this, set_id: this.id
-                }, updatedSetting)))
-            })));
+            this._bindCategoryEvents(category);
         }
     }
 
@@ -99,6 +93,92 @@ export default class SettingsSet {
     get changed() {
         if (this.categories.find(category => category.changed)) return true;
         return false;
+    }
+
+    /**
+     * Binds events to a category.
+     * This only exists for use by the constructor and settingsset.addCategory.
+     */
+    _bindCategoryEvents(category) {
+        category.on('setting-updated', category[this._eventsKey + '_settingsset_event_setting-updated'] = ({ setting, value, old_value }) => this.emit('setting-updated', new SettingUpdatedEvent({
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            setting, setting_id: setting.id,
+            value, old_value
+        })));
+        category.on('settings-updated', category[this._eventsKey + '_settingsset_event_settings-updated'] = ({ updatedSettings }) => this.emit('settings-updated', new SettingsUpdatedEvent({
+            updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
+                set: this, set_id: this.id
+            }, updatedSetting)))
+        })));
+        category.on('added-setting', category[this._eventsKey + '_settingsset_event_added-setting'] = ({ setting, at_index }) => this.emit('added-setting', {
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            setting, setting_id: setting.id,
+            at_index
+        }));
+        category.on('removed-setting', category[this._eventsKey + '_settingsset_event_removed-setting'] = ({ setting, from_index }) => this.emit('removed-setting', {
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            setting, setting_id: setting.id,
+            from_index
+        }));
+    }
+
+    /**
+     * Dynamically adds a category to this set.
+     * @param {SettingsCategory} category The category to add to this set
+     * @param {Number} index The index to add the category at (optional)
+     * @return {Promise}
+     */
+    async addCategory(category, index) {
+        if (this.categories.find(c => c === category)) return;
+
+        if (!(category instanceof SettingsCategory))
+            category = new SettingsCategory(category);
+
+        if (this.getCategory(category.id))
+            throw {message: 'A category with this ID already exists.'};
+
+        this._bindCategoryEvents(category);
+        if (index === undefined) index = this.categories.length;
+        this.categories.splice(index, 0, category);
+
+        const event = {
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            at_index: index
+        };
+
+        await category.emit('added-to', event);
+        await this.emit('added-category', event);
+        return category;
+    }
+
+    /**
+     * Dynamically removes a category from this set.
+     * @param {SettingsCategory} category The category to remove from this set
+     * @return {Promise}
+     */
+    async removeCategory(category) {
+        category.off('setting-updated', category[this._eventsKey + '_settingsset_event_setting-updated']);
+        category.off('settings-updated', category[this._eventsKey + '_settingsset_event_settings-updated']);
+        category.off('added-setting', category[this._eventsKey + '_settingsset_event_added-setting']);
+        category.off('removed-setting', category[this._eventsKey + '_settingsset_event_removed-setting']);
+
+        let index;
+        while ((index = this.categories.findIndex(c => c === category)) > -1) {
+            this.categories.splice(index, 0);
+        }
+
+        const event = {
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            from_index: index
+        };
+
+        await category.emit('removed-from', event);
+        await this.emit('removed-category', event);
     }
 
     /**

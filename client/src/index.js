@@ -12,6 +12,7 @@ import { DOM, BdUI, Modals } from 'ui';
 import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
+import { EmoteModule } from 'builtin';
 
 class BetterDiscord {
 
@@ -26,6 +27,7 @@ class BetterDiscord {
         window.bdsettings = Settings;
         window.bdmodals = Modals;
         window.bdlogs = Logger;
+        window.emotes = EmoteModule;
 
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));

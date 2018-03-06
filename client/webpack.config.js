@@ -46,7 +46,8 @@ module.exports = {
             path.resolve('src', 'modules'),
             path.resolve('src', 'ui'),
             path.resolve('src', 'plugins'),
-            path.resolve('src', 'structs')
+            path.resolve('src', 'structs'),
+            path.resolve('src', 'builtin')
         ]
     }
    /* resolve: {

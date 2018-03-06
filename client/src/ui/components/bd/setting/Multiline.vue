@@ -16,7 +16,7 @@
             </div>
             <div class="bd-hint">{{ setting.hint }}</div>
         </div>
-        <textarea class="bd-textarea" ref="textarea" @keyup.stop @input="recalculateHeight" v-model="setting.value" :disabled="setting.disabled"></textarea>
+        <textarea class="bd-textarea" ref="textarea" @keyup.stop v-model="setting.value" :disabled="setting.disabled"></textarea>
     </div>
 </template>
 <script>
@@ -30,6 +30,7 @@
             }
         },
         mounted() {
+            this.$watch('setting.value', this.recalculateHeight);
             this.recalculateHeight();
         }
     }

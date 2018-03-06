@@ -26,11 +26,6 @@
         props: ['setting', 'change'],
         components: {
             RadioGroup
-        },
-        methods: {
-            selectOption(option) {
-                this.change(option.id);
-            }
         }
     }
 </script>

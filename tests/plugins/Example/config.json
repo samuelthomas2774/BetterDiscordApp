@@ -24,7 +24,7 @@
                     "text": "Test settings array",
                     "hint": "Just a test. Inline should be left as false here in most cases. (Only set it to true if there's only one setting otherwise it takes up too much space. Or you could put it in a drawer.)",
                     "inline": false,
-                    "min": 1,
+                    "min": 0,
                     "max": 5,
                     "settings": [
                         {
@@ -237,6 +237,13 @@
                     "value": false,
                     "function": "getSettingsComponentHTMLElement",
                     "debug": true
+                },
+                {
+                    "id": "custom-6",
+                    "type": "custom",
+                    "value": false,
+                    "class_file": "component.js",
+                    "class": "CustomSetting"
                 }
             ]
         },

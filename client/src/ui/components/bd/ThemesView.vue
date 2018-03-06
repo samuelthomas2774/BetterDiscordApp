@@ -12,21 +12,22 @@
     <SettingsWrapper headertext="Themes">
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
-                <h3>Local</h3>
-                <div class="bd-material-button" v-if="local" @click="refreshLocal"><MiRefresh /></div>
+                <h3>Installed</h3>
+                <RefreshBtn v-if="local" :onClick="refreshLocal"/>
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
-                <h3>Online</h3>
-                <div class="bd-material-button" v-if="!local" @click="refreshOnline"><MiRefresh /></div>
+                <h3>Browse</h3>
+                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
             </div>
         </div>
 
-        <div class="bd-flex bd-flex-col bd-themesView">
+        <div class="bd-flex bd-flex-col bd-themesview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">
                 <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="e => reloadTheme(theme, e.shiftKey)" :showSettings="() => showSettings(theme)" :deleteTheme="e => deleteTheme(theme, e.shiftKey)" />
             </div>
-            <div v-if="!local" class="bd-spinner-container">
-                <div class="bd-spinner-2"></div>
+            <div v-if="!local" class="bd-online-ph">
+                <h3>Coming Soon</h3>
+                <a href="https://v2.betterdiscord.net/themes" target="_new">Website Browser</a>
             </div>
         </div>
     </SettingsWrapper>
@@ -39,6 +40,7 @@
     import { SettingsWrapper } from './';
     import { MiRefresh } from '../common';
     import ThemeCard from './ThemeCard.vue';
+    import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
@@ -49,7 +51,8 @@
         },
         components: {
             SettingsWrapper, ThemeCard,
-            MiRefresh
+            MiRefresh,
+            RefreshBtn
         },
         methods: {
             showLocal() {
@@ -97,3 +100,21 @@
         }
     }
 </script>
+
+<style>
+.bd-online-ph {
+    display: flex;
+    flex-direction: column;
+}
+.bd-online-ph h3 {
+    color: #FFF;
+    font-weight: 700;
+    font-size: 20px;
+    text-align: center;
+    padding: 20px;
+}
+.bd-online-ph a {
+    padding: 20px;
+    text-align: center;
+}
+</style>

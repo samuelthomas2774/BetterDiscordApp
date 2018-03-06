@@ -8,40 +8,24 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, FileUtils } from 'common';
+import { Utils, FileUtils, AsyncEventEmitter } from 'common';
 import { Modals } from 'ui';
 import { EventEmitter } from 'events';
 import PluginManager from './pluginmanager';
-import ContentConfig from './contentconfig';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
-
-class PluginEvents {
-    constructor(plugin) {
-        this.plugin = plugin;
-        this.emitter = new EventEmitter();
-    }
-
-    on(eventname, callback) {
-        this.emitter.on(eventname, callback);
-    }
-
-    off(eventname, callback) {
-        this.emitter.removeListener(eventname, callback);
-    }
-
-    emit(...args) {
-        this.emitter.emit(...args);
-    }
-}
 
 export default class Plugin {
 
     constructor(pluginInternals) {
         this.__pluginInternals = pluginInternals;
-        this.saveSettings = this.saveSettings.bind(this);
+        this.saveConfiguration = this.saveConfiguration.bind(this);
         this.hasSettings = this.config && this.config.length > 0;
         this.start = this.start.bind(this);
         this.stop = this.stop.bind(this);
+
+        this.settings.on('setting-updated', event => this.events.emit('setting-updated', event));
+        this.settings.on('settings-updated', event => this.events.emit('settings-updated', event));
+        this.settings.on('settings-updated', event => this.saveConfiguration());
     }
 
     get type() { return 'plugin' }
@@ -55,71 +39,35 @@ export default class Plugin {
     get configSchemes() { return this.configs.schemes }
     get id() { return this.info.id || this.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
     get name() { return this.info.name }
+    get description() { return this.info.description }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
     get contentPath() { return this.paths.contentPath }
     get pluginPath() { return this.paths.contentPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
-    get config() { return this.userConfig.config || [] }
+    get settings() { return this.userConfig.config }
+    get config() { return this.settings.settings }
     get pluginConfig() { return this.config }
+    get data() { return this.userConfig.data || (this.userConfig.data = {}) }
     get exports() { return this._exports ? this._exports : (this._exports = this.getExports()) }
-    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new PluginEvents(this)) }
-
-    getSetting(setting_id, category_id) {
-        for (let category of this.config) {
-            if (category_id && category.category !== category_id) return;
-            for (let setting of category.settings) {
-                if (setting.id !== setting_id) return;
-                return setting.value;
-            }
-        }
-    }
+    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new AsyncEventEmitter()) }
 
     showSettingsModal() {
         return Modals.contentSettings(this);
     }
 
-    async saveSettings(newSettings) {
-        const updatedSettings = [];
-
-        for (let newCategory of newSettings) {
-            const category = this.config.find(c => c.category === newCategory.category);
-            for (let newSetting of newCategory.settings) {
-                const setting = category.settings.find(s => s.id === newSetting.id);
-                if (Utils.compare(setting.value, newSetting.value)) continue;
-
-                const old_value = setting.value;
-                setting.value = newSetting.value;
-                updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
-                this.settingUpdated(category.category, setting.id, setting.value, old_value);
-            }
-        }
-
-        this.saveConfiguration();
-        return this.settingsUpdated(updatedSettings);
-    }
-
-    settingUpdated(category_id, setting_id, value, old_value) {
-        const event = new SettingUpdatedEvent({ category_id, setting_id, value, old_value });
-        this.events.emit('setting-updated', event);
-        this.events.emit(`setting-updated_{$category_id}_${setting_id}`, event);
-    }
-
-    settingsUpdated(updatedSettings) {
-        const event = new SettingsUpdatedEvent({ settings: updatedSettings.map(s => new SettingUpdatedEvent(s)) });
-        this.events.emit('settings-updated', event);
-    }
-
     async saveConfiguration() {
-        window.testConfig = new ContentConfig(this.config);
         try {
-            const config = new ContentConfig(this.config).strip();
             await FileUtils.writeFile(`${this.pluginPath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
-                config
+                config: this.settings.strip().settings,
+                data: this.data
             }));
+
+			this.settings.setSaved();
         } catch (err) {
+			console.error(`Plugin ${this.id} configuration failed to save`, err);
             throw err;
         }
     }

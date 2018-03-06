@@ -12,21 +12,22 @@
     <SettingsWrapper headertext="Plugins">
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
-                <h3>Local</h3>
-                <div class="bd-material-button" v-if="local" @click="refreshLocal"><MiRefresh /></div>
+                <h3>Installed</h3>
+                <RefreshBtn v-if="local" :onClick="refreshLocal" />
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
-                <h3>Online</h3>
-                <div class="bd-material-button" v-if="!local" @click="refreshOnline"><MiRefresh /></div>
+                <h3>Browse</h3>
+                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
             </div>
         </div>
 
-        <div class="bd-flex bd-flex-col bd-pluginsView">
+        <div class="bd-flex bd-flex-col bd-pluginsview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
                 <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :deletePlugin="e => deletePlugin(plugin, e.shiftKey)" :showSettings="() => showSettings(plugin)" />
             </div>
-            <div v-if="!local" class="bd-spinner-container">
-                <div class="bd-spinner-2"></div>
+            <div v-if="!local" class="bd-online-ph">
+                <h3>Coming Soon</h3>
+                <a href="https://v2.betterdiscord.net/plugins" target="_new">Website Browser</a>
             </div>
         </div>
     </SettingsWrapper>
@@ -39,6 +40,7 @@
     import { SettingsWrapper } from './';
     import PluginCard from './PluginCard.vue';
     import { MiRefresh } from '../common';
+    import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
@@ -49,7 +51,8 @@
         },
         components: {
             SettingsWrapper, PluginCard,
-            MiRefresh
+            MiRefresh,
+            RefreshBtn
         },
         methods: {
             showLocal() {

@@ -8,26 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { AsyncEventEmitter } from 'common';
 import { EventEmitter } from 'events';
-
-class ExtModuleEvents {
-    constructor(extmodule) {
-        this.extmodule = extmodule;
-        this.emitter = new EventEmitter();
-    }
-
-    on(eventname, callback) {
-        this.emitter.on(eventname, callback);
-    }
-
-    off(eventname, callback) {
-        this.emitter.removeListener(eventname, callback);
-    }
-
-    emit(...args) {
-        this.emitter.emit(...args);
-    }
-}
 
 export default class ExtModule {
 
@@ -45,8 +27,10 @@ export default class ExtModule {
     get main() { return this.__pluginInternals.main }
     get defaultConfig() { return this.configs.defaultConfig }
     get userConfig() { return this.configs.userConfig }
-    get id() { return this.info.id || this.info.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
+    get configSchemes() { return this.configs.schemes }
+    get id() { return this.info.id || this.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-') }
     get name() { return this.info.name }
+    get description() { return this.info.description }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
     get contentPath() { return this.paths.contentPath }
@@ -54,6 +38,7 @@ export default class ExtModule {
     get dirName() { return this.paths.dirName }
     get enabled() { return true }
     get config() { return this.userConfig.config || [] }
-    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new ExtModuleEvents(this)) }
+    get data() { return this.userConfig.data || (this.userConfig.data = {}) }
+    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new AsyncEventEmitter()) }
 
 }

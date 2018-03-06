@@ -11,8 +11,8 @@
 <template>
     <div class="bd-settings-modal" :class="{'bd-edited': changed}">
         <Modal :headerText="modal.headertext" :close="modal.close" :class="{'bd-modal-out': modal.closing}">
-            <SettingsPanel :settings="configCache" :schemes="modal.schemes" :change="settingChange" slot="body" class="bd-settings-modal-body" />
-            <div slot="footer" class="bd-footer-alert" :class="{'bd-active': changed, 'bd-warn': warnclose}" :style="{pointerEvents: changed ? 'all' : 'none'}">
+            <SettingsPanel :settings="settings" :schemes="modal.schemes" slot="body" class="bd-settings-modal-body" />
+            <div slot="footer" class="bd-footer-alert" :class="{'bd-active': changed || saving, 'bd-warn': warnclose}" :style="{pointerEvents: changed ? 'all' : 'none'}">
                 <div class="bd-footer-alert-text">Unsaved changes</div>
                 <div class="bd-button bd-reset-button bd-tp" :class="{'bd-disabled': saving}" @click="resetSettings">Reset</div>
                 <div class="bd-button bd-ok" :class="{'bd-disabled': saving}" @click="saveSettings">
@@ -28,15 +28,14 @@
     import Vue from 'vue';
     import { Modal } from '../../common';
     import SettingsPanel from '../SettingsPanel.vue';
-    import { Utils } from 'common';
+    import { Utils, ClientLogger as Logger } from 'common';
 
     export default {
         props: ['modal'],
         data() {
             return {
-                changed: false,
                 warnclose: false,
-                configCache: [],
+                settings: null,
                 closing: false,
                 saving: false
             }
@@ -45,52 +44,30 @@
             Modal,
             SettingsPanel
         },
+        computed: {
+            changed() {
+                return this.settings.categories.find(category => category.changed);
+            }
+        },
         methods: {
-            checkForChanges() {
-                let changed = false;
-                for (let category of this.configCache) {
-                    const cat = this.modal.settings.find(c => c.category === category.category);
-                    for (let setting of category.settings) {
-                        if (!Utils.compare(cat.settings.find(s => s.id === setting.id).value, setting.value)) {
-                            changed = true;
-                            Vue.set(setting, 'changed', true);
-                        } else {
-                            Vue.set(setting, 'changed', false);
-                        }
-                    }
-                }
-                return changed;
-            },
-            settingChange(category_id, setting_id, value) {
-                const category = this.configCache.find(c => c.category === category_id);
-                if (!category) return;
-
-                const setting = category.settings.find(s => s.id === setting_id);
-                if (!setting) return;
-
-                setting.value = value;
-
-                this.changed = this.checkForChanges();
-                this.$forceUpdate();
-            },
             async saveSettings() {
                 if (this.saving) return;
                 this.saving = true;
                 try {
-                    await this.modal.saveSettings(this.configCache);
-                    this.configCache = JSON.parse(JSON.stringify(this.modal.settings));
-                    this.changed = false;
+                    if (this.modal.saveSettings) await this.modal.saveSettings(this.settings);
+                    else await this.modal.settings.merge(this.settings);
                 } catch (err) {
                     // TODO Display error that settings failed to save
-                    console.log(err);
+                    Logger.err('SettingsModal', ['Failed to save settings:', err]);
                 }
                 this.saving = false;
             },
             resetSettings() {
                 if (this.saving) return;
-                this.configCache = JSON.parse(JSON.stringify(this.modal.settings));
-                this.changed = false;
-                this.$forceUpdate();
+                this.cloneSettings();
+            },
+            cloneSettings() {
+                this.settings = this.modal.dont_clone ? this.modal.settings : this.modal.settings.clone();
             }
         },
         created() {
@@ -100,11 +77,13 @@
                     setTimeout(() => this.warnclose = false, 400);
                     throw {message: 'Settings have been changed'};
                 }
-            }
+            };
+
+            this.modal.settings.on('settings-updated', this.cloneSettings);
+            this.cloneSettings();
         },
-        beforeMount() {
-            this.configCache = JSON.parse(JSON.stringify(this.modal.settings));
-            this.changed = this.checkForChanges();
+        destroyed() {
+            this.modal.settings.off('settings-updated', this.cloneSettings);
         }
     }
 </script>

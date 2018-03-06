@@ -77,6 +77,32 @@
         "settings": []
     },
     {
+        "id": "css",
+        "text": "CSS Editor",
+        "hidden": true,
+        "settings": [
+            {
+                "category": "default",
+                "settings": [
+                    {
+                        "id": "live-update",
+                        "type": "bool",
+                        "text": "Live update",
+                        "hint": "Automatically recompile custom CSS when typing in the custom CSS editor.",
+                        "value": true
+                    },
+                    {
+                        "id": "watch-files",
+                        "type": "bool",
+                        "text": "Watch included files",
+                        "hint": "Automatically recompile theme and custom CSS when a file it imports is changed.",
+                        "value": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "id": "security",
         "text": "Security",
         "headertext": "Security Settings",

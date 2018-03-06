@@ -20,6 +20,7 @@ class BetterDiscord {
         window.ClientIPC = ClientIPC;
         window.css = CssEditor;
         window.pm = PluginManager;
+        window.tm = ThemeManager;
         window.events = Events;
         window.wpm = WebpackModules;
         window.bdsettings = Settings;

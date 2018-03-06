@@ -40,7 +40,7 @@ export default class extends EventListener {
 
         setTimeout(() => {
             let hasBadges = false;
-            let root = document.querySelector('[class*=profileBadges]');
+            let root = document.querySelector('[class*="profileBadges"]');
             if (root) {
                 hasBadges = true;
             } else {

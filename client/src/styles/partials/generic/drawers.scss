@@ -51,6 +51,10 @@
     }
 
     &.bd-drawer-open {
+        > .bd-drawer-contents-wrap {
+            overflow: visible;
+        }
+
         > .bd-drawer-header .bd-drawer-open-button {
             .bd-chevron-1 {
                 svg {

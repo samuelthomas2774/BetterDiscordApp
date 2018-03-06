@@ -16,8 +16,8 @@
                     <slot name="icon" />
                 </div>
                 <span class="bd-modal-headertext">{{headerText}}</span>
-                <div class="bd-modal-x" @click="close">
-                    <MiClose size="18"/>
+                <div class="bd-modal-x" @click="e => close(e.shiftKey, e)">
+                    <MiClose size="18" />
                 </div>
             </div>
             <div class="bd-modal-body">

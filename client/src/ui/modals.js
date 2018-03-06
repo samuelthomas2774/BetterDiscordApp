@@ -23,7 +23,10 @@ export default class {
             template: '<custom-modal :modal="modal" />',
             components: { 'custom-modal': component },
             data() { return { modal }; },
-            created() { modal.vue = this; }
+            created() {
+                modal.vueInstance = this;
+                modal.vue = this.$children[0];
+            }
         };
         modal.closing = false;
         modal.close = force => this.close(modal, force);
@@ -38,10 +41,7 @@ export default class {
         return new Promise(async (resolve, reject) => {
             if (modal.beforeClose) {
                 try {
-                    let beforeCloseResult = modal.beforeClose(force);
-                    if (beforeCloseResult instanceof Promise)
-                        beforeCloseResult = await beforeCloseResult;
-
+                    const beforeCloseResult = await modal.beforeClose(force);
                     if (beforeCloseResult && !force) return reject(beforeCloseResult);
                 } catch (err) {
                     if (!force) return reject(err);
@@ -73,17 +73,16 @@ export default class {
 
     static confirm(title, text) {
         const modal = { title, text };
-        const promise = new Promise((resolve, reject) => {
+        modal.promise = new Promise((resolve, reject) => {
             modal.confirm = () => resolve(true);
             modal.beforeClose = () => reject();
             this.add(modal, ConfirmModal);
         });
-        modal.promise = promise;
         return modal;
     }
 
     static permissions(title, name, perms) {
-        const modal = { title,name, perms };
+        const modal = { title, name, perms };
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = () => resolve(true);
             modal.beforeClose = () => reject();
@@ -123,39 +122,22 @@ export default class {
         }
     }
 
-    static settings(headertext, settings, schemes, settingsUpdated, settingUpdated, saveSettings) {
-        return this.add({
-            headertext, settings, schemes,
-            saveSettings: saveSettings ? saveSettings : newSettings => {
-                const updatedSettings = [];
-
-                for (let newCategory of newSettings) {
-                    let category = settings.find(c => c.category === newCategory.category);
-
-                    for (let newSetting of newCategory.settings) {
-                        let setting = category.settings.find(s => s.id === newSetting.id);
-                        if (Utils.compare(setting.value, newSetting.value)) continue;
-
-                        let old_value = setting.value;
-                        setting.value = newSetting.value;
-                        updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
-                        if (settingUpdated) settingUpdated(category.category, setting.id, setting.value, old_value);
-                    }
-                }
-
-                return settingsUpdated ? settingsUpdated(updatedSettings) : updatedSettings;
-            }
-        }, SettingsModal);
+    static settings(settingsset, headertext, options) {
+        return this.add(Object.assign({
+            headertext: headertext ? headertext : settingsset.headertext,
+            settings: settingsset,
+            schemes: settingsset.schemes
+        }, options), SettingsModal);
     }
 
     static internalSettings(set_id) {
         const set = Settings.getSet(set_id);
         if (!set) return;
-        return this.settings(set.headertext, set.settings, set.schemes, null, null, newSettings => Settings.mergeSettings(set.id, newSettings));
+        return this.settings(set, set.headertext);
     }
 
     static contentSettings(content) {
-        return this.settings(content.name + ' Settings', content.config, content.configSchemes, null, null, content.saveSettings.bind(content));
+        return this.settings(content.settings, content.name + ' Settings');
     }
 
     static get stack() {

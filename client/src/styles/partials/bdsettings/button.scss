@@ -49,7 +49,6 @@
         background: transparent;
         opacity: 1;
         box-shadow: none;
-        z-index: 3001;
 
         .bd-settings-button-btn {
             background-image: $logoBigBw;
@@ -61,6 +60,11 @@
             margin-left: 20px;
             cursor: default;
         }
+    }
+
+    &.bd-active,
+    &.bd-animating {
+        z-index: 3001;
     }
 }
 

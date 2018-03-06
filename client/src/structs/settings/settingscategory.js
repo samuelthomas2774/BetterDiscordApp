@@ -13,8 +13,6 @@ import BaseSetting from './types/basesetting';
 import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
-let instances = 0;
-
 export default class SettingsCategory {
 
     constructor(args, ...merge) {
@@ -27,10 +25,12 @@ export default class SettingsCategory {
             this._merge(newCategory);
         }
 
-        this._eventsKey = instances++;
+        this.__settingUpdated = this.__settingUpdated.bind(this);
+        this.__settingsUpdated = this.__settingsUpdated.bind(this);
 
         for (let setting of this.settings) {
-            this._bindSettingEvents(setting);
+            setting.on('setting-updated', this.__settingUpdated);
+            setting.on('settings-updated', this.__settingsUpdated);
         }
     }
 
@@ -80,20 +80,23 @@ export default class SettingsCategory {
     }
 
     /**
-     * Binds events to a category.
-     * This only exists for use by the constructor and settingsset.addCategory.
+     * Setting event listeners.
+     * This only exists for use by the constructor and settingscategory.addSetting.
      */
-    _bindSettingEvents(setting) {
-        setting.on('setting-updated', setting[this._eventsKey + '_settingscategory_event_setting-updated'] = ({ value, old_value }) => this.emit('setting-updated', new SettingUpdatedEvent({
+    __settingUpdated({ setting, value, old_value }) {
+        return this.emit('setting-updated', new SettingUpdatedEvent({
             category: this, category_id: this.id,
             setting, setting_id: setting.id,
             value, old_value
-        })));
-        setting.on('settings-updated', setting[this._eventsKey + '_settingscategory_event_settings-updated'] = ({ updatedSettings }) => this.emit('settings-updated', new SettingsUpdatedEvent({
+        }));
+    }
+
+    __settingsUpdated({ updatedSettings }) {
+        return this.emit('settings-updated', new SettingsUpdatedEvent({
             updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
                 category: this, category_id: this.id
             }, updatedSetting)))
-        })));
+        }));
     }
 
     /**
@@ -111,7 +114,9 @@ export default class SettingsCategory {
         if (this.getSetting(setting.id))
             throw {message: 'A setting with this ID already exists.'};
 
-        this._bindSettingEvents(setting);
+        setting.on('setting-updated', this.__settingUpdated);
+        setting.on('settings-updated', this.__settingsUpdated);
+
         if (index === undefined) index = this.settings.length;
         this.settings.splice(index, 0, setting);
 
@@ -132,8 +137,8 @@ export default class SettingsCategory {
      * @return {Promise}
      */
     async removeSetting(setting) {
-        setting.off('setting-updated', setting[this._eventsKey + '_settingscategory_event_setting-updated']);
-        setting.off('settings-updated', setting[this._eventsKey + '_settingscategory_event_settings-updated']);
+        setting.off('setting-updated', this.__settingUpdated);
+        setting.off('settings-updated', this.__settingsUpdated);
 
         let index;
         while ((index = this.settings.findIndex(s => s === setting)) > -1) {

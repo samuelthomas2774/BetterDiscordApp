@@ -136,17 +136,17 @@ export default class SettingsCategory {
         setting.off('settings-updated', setting[this._eventsKey + '_settingscategory_event_settings-updated']);
 
         let index;
-        while ((index = this.settings.findIndex(c => c === category)) > -1) {
+        while ((index = this.settings.findIndex(s => s === setting)) > -1) {
             this.settings.splice(index, 0);
         }
 
         const event = {
             set: this, set_id: this.id,
-            category, category_id: category.id,
+            category: this, category_id: this.id,
             from_index: index
         };
 
-        await category.emit('removed-from', event);
+        await setting.emit('removed-from', event);
         await this.emit('removed-category', event);
     }
 

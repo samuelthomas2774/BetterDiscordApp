@@ -106,7 +106,7 @@ export default class PluginApi {
     }
     get Settings() {
         return {
-            createSet: this.createSet.bind(this),
+            createSet: this.createSettingsSet.bind(this),
             createCategory: this.createSettingsCategory.bind(this),
             createSetting: this.createSetting.bind(this),
             createScheme: this.createSettingsScheme.bind(this)

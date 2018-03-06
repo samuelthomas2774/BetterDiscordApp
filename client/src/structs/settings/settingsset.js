@@ -182,6 +182,50 @@ export default class SettingsSet {
     }
 
     /**
+     * Dynamically adds a scheme to this set.
+     * @param {SettingsScheme} scheme The scheme to add to this set
+     * @param {Number} index The index to add the scheme at (optional)
+     * @return {Promise}
+     */
+    async addScheme(scheme, index) {
+        if (this.schemes.find(c => c === scheme)) return;
+
+        if (!(scheme instanceof SettingsScheme))
+            scheme = new SettingsScheme(scheme);
+
+        if (this.schemes.find(s => s.id === scheme.id))
+            throw {message: 'A scheme with this ID already exists.'};
+
+        if (index === undefined) index = this.schemes.length;
+        this.schemes.splice(index, 0, scheme);
+
+        await this.emit('added-scheme', {
+            set: this, set_id: this.id,
+            scheme, scheme_id: scheme.id,
+            at_index: index
+        });
+        return scheme;
+    }
+
+    /**
+     * Dynamically removes a scheme from this set.
+     * @param {SettingsScheme} scheme The scheme to remove from this set
+     * @return {Promise}
+     */
+    async removeScheme(scheme) {
+        let index;
+        while ((index = this.schemes.findIndex(s => s === scheme)) > -1) {
+            this.schemes.splice(index, 0);
+        }
+
+        await this.emit('removed-scheme', {
+            set: this, set_id: this.id,
+            scheme, scheme_id: scheme.id,
+            from_index: index
+        });
+    }
+
+    /**
      * Returns the first category where calling {function} returns true.
      * @param {Function} function A function to call to filter categories
      * @return {SettingsCategory}

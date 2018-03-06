@@ -14,6 +14,7 @@ import Setting from './basesetting';
 import SettingsSet from '../settingsset';
 import SettingsCategory from '../settingscategory';
 import SettingsScheme from '../settingsscheme';
+import { SettingsUpdatedEvent } from 'structs';
 
 export default class ArraySetting extends Setting {
 
@@ -108,21 +109,27 @@ export default class ArraySetting extends Setting {
      * @param {SettingsSet} item Values to merge into the new set (optional)
      * @return {SettingsSet} The new set
      */
-    addItem(item) {
-        const newItem = this.createItem(item);
-        this.args.items.push(newItem);
-        this.updateValue();
-        return newItem;
+    async addItem(_item) {
+        const item = this.createItem(_item);
+        this.args.items.push(item);
+        await this.updateValue();
+
+        await this.emit('item-added', { item });
+
+        return item;
     }
 
     /**
      * Removes a set from this array setting.
      * This ignores the minimum value.
      * @param {SettingsSet} item The set to remove
+     * @return {Promise}
      */
-    removeItem(item) {
+    async removeItem(item) {
         this.args.items = this.items.filter(i => i !== item);
-        this.updateValue();
+        await this.updateValue();
+
+        await this.emit('item-removed', { item });
     }
 
     /**
@@ -135,13 +142,27 @@ export default class ArraySetting extends Setting {
             return item;
 
         const set = new SettingsSet({
+            id: item ? item.args ? item.args.id : item.id : Math.random(),
             settings: Utils.deepclone(this.settings),
             schemes: this.schemes
         }, item ? item.args || item : undefined);
 
         set.setSaved();
-        set.on('settings-updated', () => this.updateValue());
+        set.on('settings-updated', async event => {
+            await this.emit('item-updated', { item: set, event, updatedSettings: event.updatedSettings });
+            if (event.args.updating_array !== this) await this.updateValue();
+        });
         return set;
+    }
+
+    /**
+     * Function to be called after the value changes.
+     * This can be overridden by other settings types.
+     * This function is used when the value needs to be updated synchronously (basically just in the constructor - so there won't be any events to emit anyway).
+     * @param {SettingUpdatedEvent} updatedSetting
+     */
+    setValueHookSync(updatedSetting) {
+        this.args.items = updatedSetting.value ? updatedSetting.value.map(item => this.createItem(item)) : [];
     }
 
     /**
@@ -149,9 +170,55 @@ export default class ArraySetting extends Setting {
      * This can be overridden by other settings types.
      * @param {SettingUpdatedEvent} updatedSetting
      */
-    setValueHook(updatedSetting) {
-        this.args.items = updatedSetting.value ? updatedSetting.value.map(item => this.createItem(item)) : [];
+    async setValueHook(updatedSetting) {
+        const newItems = [];
+        let error;
+
+        for (let newItem of updatedSetting.value) {
+            try {
+                const item = this.items.find(i => i.id && i.id === newItem.id);
+
+                if (item) {
+                    // Merge the new item into the original item
+                    newItems.push(item);
+                    const updatedSettings = await item.merge(newItem, false);
+                    if (!updatedSettings.length) continue;
+
+                    const event = new SettingsUpdatedEvent({
+                        updatedSettings,
+                        updating_array: this
+                    });
+
+                    await item.emit('settings-updated', event);
+                    // await this.emit('item-updated', { item, event, updatedSettings });
+                } else {
+                    // Add a new item
+                    const item = this.createItem(newItem);
+                    newItems.push(item);
+                    await this.emit('item-added', { item });
+                }
+            } catch (e) { error = e; }
+        }
+
+        for (let item of this.items) {
+            if (newItems.includes(item)) continue;
+
+            try {
+                // Item removed
+                await this.emit('item-removed', { item });
+            } catch (e) { error = e; }
+        }
+
+        this.args.items = newItems;
+
+        // We can't throw anything before the items array is updated, otherwise the array setting would be in an inconsistent state where the values in this.items wouldn't match the values in this.value
+        if (error) throw error;
     }
+
+    // emit(...args) {
+    //     console.log('Emitting event', args[0], 'with data', args[1]);
+    //     return this.emitter.emit(...args);
+    // }
 
     /**
      * Updates the value of this array setting.

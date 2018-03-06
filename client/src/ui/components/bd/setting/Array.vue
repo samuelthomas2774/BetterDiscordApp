@@ -48,14 +48,14 @@
             MiSettings, MiOpenInNew, MiMinus
         },
         methods: {
-            addItem(openModal) {
+            async addItem(openModal) {
                 if (this.setting.disabled || this.setting.max && this.setting.items.length >= this.setting.max) return;
-                const item = this.setting.addItem();
-                if (openModal) this.showModal(item, this.setting.items.length);
+                const item = await this.setting.addItem();
+                if (openModal) this.showModal(item, this.setting.items.length - 1);
             },
-            removeItem(item) {
+            async removeItem(item) {
                 if (this.setting.disabled || this.setting.min && this.setting.items.length <= this.setting.min) return;
-                this.setting.removeItem(item);
+                await this.setting.removeItem(item);
             },
             showModal(item, index) {
                 Modals.settings(item, this.setting.headertext ? this.setting.headertext.replace(/%n/, index + 1) : this.setting.text + ` #${index + 1}`);

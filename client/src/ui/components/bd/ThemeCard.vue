@@ -12,7 +12,7 @@
     <Card :item="theme">
         <SettingSwitch slot="toggle" :checked="theme.enabled" :change="toggleTheme" />
         <ButtonGroup slot="controls">
-            <Button v-tooltip="'Settings'" v-if="theme.hasSettings" :onClick="showSettings"><MiSettings size="18" /></Button>
+            <Button v-tooltip="'Settings (shift + click to open settings without cloning the set)'" v-if="theme.hasSettings" :onClick="e => showSettings(theme, e.shiftKey)"><MiSettings size="18" /></Button>
             <Button v-tooltip="'Recompile (shift + click to reload)'" :onClick="reloadTheme"><MiRefresh size="18" /></Button>
             <Button v-tooltip="'Edit'" :onClick="editTheme"><MiPencil size="18" /></Button>
             <Button v-tooltip="'Uninstall (shift + click to unload)'" :onClick="deleteTheme" type="err"><MiDelete size="18" /></Button>

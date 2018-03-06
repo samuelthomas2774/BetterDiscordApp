@@ -12,7 +12,7 @@
     <Card :item="plugin">
         <SettingSwitch v-if="plugin.type === 'plugin'" slot="toggle" :checked="plugin.enabled" :change="togglePlugin" />
         <ButtonGroup slot="controls">
-            <Button v-tooltip="'Settings'" v-if="plugin.hasSettings" :onClick="() => showSettings(plugin)"><MiSettings size="18" /></Button>
+            <Button v-tooltip="'Settings (shift + click to open settings without cloning the set)'" v-if="plugin.hasSettings" :onClick="showSettings"><MiSettings size="18" /></Button>
             <Button v-tooltip="'Reload'" :onClick="reloadPlugin"><MiRefresh size="18" /></Button>
             <Button v-tooltip="'Edit'" :onClick="editPlugin"><MiPencil size="18" /></Button>
             <Button v-tooltip="'Uninstall (shift + click to unload)'" :onClick="deletePlugin" type="err"><MiDelete size="18" /></Button>

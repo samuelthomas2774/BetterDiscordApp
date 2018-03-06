@@ -41,11 +41,13 @@ export default class extends ContentManager {
         const loadAll = await this.loadAllContent(true);
         this.loaded = true;
         for (let plugin of this.localPlugins) {
+            if (!plugin.enabled) continue;
+            plugin.userConfig.enabled = false;
+
             try {
-                if (plugin.enabled) plugin.start();
+                plugin.start(false);
             } catch (err) {
                 // Disable the plugin but don't save it - the next time BetterDiscord is started the plugin will attempt to start again
-                plugin.userConfig.enabled = false;
                 this.errors.push(new ErrorEvent({
                     module: this.moduleName,
                     message: `Failed to start ${plugin.name}`,
@@ -72,7 +74,6 @@ export default class extends ContentManager {
 
     static get loadContent() { return this.loadPlugin }
     static async loadPlugin(paths, configs, info, main, dependencies, permissions) {
-
         if (permissions && permissions.length > 0) {
             for (let perm of permissions) {
                 console.log(`Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
@@ -107,7 +108,10 @@ export default class extends ContentManager {
             }
         });
 
-        if (instance.enabled && this.loaded) instance.start();
+        if (instance.enabled && this.loaded) {
+            instance.userConfig.enabled = false;
+            instance.start(false);
+        }
         return instance;
     }
 

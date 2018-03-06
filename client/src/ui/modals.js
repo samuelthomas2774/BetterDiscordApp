@@ -240,8 +240,8 @@ export default class Modals {
      * @param {String} headertext A string that will be displayed in the modal header
      * @return {Modal}
      */
-    static contentSettings(content, headertext) {
-        return this.settings(content.settings, headertext ? headertext : content.name + ' Settings');
+    static contentSettings(content, headertext, options) {
+        return this.settings(content.settings, headertext ? headertext : content.name + ' Settings', options);
     }
 
     /**

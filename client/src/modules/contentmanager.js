@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import Content from './content';
 import Globals from './globals';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
@@ -245,17 +246,19 @@ export default class {
         if (!content) throw {message: `Could not find a ${this.contentType} from ${content}.`};
 
         try {
-            if (content.enabled && content.disable) content.disable(false);
-            if (content.enabled && content.stop) content.stop(false);
-            if (content.onunload) content.onunload(reload);
-            if (content.onUnload) content.onUnload(reload);
+            await content.disable(false);
+            await content.emit('unload', reload);
+
             const index = this.getContentIndex(content);
 
             delete window.require.cache[window.require.resolve(content.paths.mainPath)];
 
             if (reload) {
                 const newcontent = await this.preloadContent(content.dirName, true, index);
-                if (newcontent.enabled && newcontent.start) newcontent.start(false);
+                if (newcontent.enabled) {
+                    newcontent.userConfig.enabled = false;
+                    newcontent.start(false);
+                }
                 return newcontent;
             } else this.localContent.splice(index, 1);
         } catch (err) {
@@ -268,7 +271,7 @@ export default class {
      * Reload content
      * @param {any} content Content to reload
      */
-    static async reloadContent(content) {
+    static reloadContent(content) {
         return this.unloadContent(content, true);
     }
 
@@ -295,12 +298,20 @@ export default class {
      * @param {any} content Object to check
      */
     static isThisContent(content) {
-        return false;
+        return content instanceof Content;
+    }
+
+    /**
+     * Returns the first content where calling {function} returns true.
+     * @param {Function} function A function to call to filter content
+     */
+    static find(f) {
+        return this.localContent.find(f);
     }
 
     /**
      * Wildcard content finder
-     * @param {any} wild Content name | id | path | dirname
+     * @param {any} wild Content ID / directory name / path / name
      * @param {bool} nonunique Allow searching attributes that may not be unique
      */
     static findContent(wild, nonunique) {
@@ -313,10 +324,10 @@ export default class {
     }
 
     static getContentIndex(content) { return this.localContent.findIndex(c => c === content) }
-    static getContentByName(name) { return this.localContent.find(c => c.name === name) }
     static getContentById(id) { return this.localContent.find(c => c.id === id) }
-    static getContentByPath(path) { return this.localContent.find(c => c.contentPath === path) }
     static getContentByDirName(dirName) { return this.localContent.find(c => c.dirName === dirName) }
+    static getContentByPath(path) { return this.localContent.find(c => c.contentPath === path) }
+    static getContentByName(name) { return this.localContent.find(c => c.name === name) }
 
     /**
      * Wait for content to load

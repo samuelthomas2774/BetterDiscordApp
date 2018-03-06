@@ -57,18 +57,6 @@
                 if (this.setting.disabled || this.setting.min && this.setting.items.length <= this.setting.min) return;
                 this.setting.removeItem(item);
             },
-            changeInItem(item, category_id, setting_id, value) {
-                console.log('Setting', item, category_id, setting_id, 'to', value);
-
-                const category = item.settings.find(c => c.category === category_id);
-                if (!category) return;
-
-                const setting = category.settings.find(s => s.id === setting_id);
-                if (!setting || Utils.compare(setting.value, value)) return;
-
-                setting.value = value;
-                setting.changed = !Utils.compare(setting.value, setting.old_value);
-            },
             showModal(item, index) {
                 Modals.settings(item, this.setting.headertext ? this.setting.headertext.replace(/%n/, index + 1) : this.setting.text + ` #${index + 1}`);
             },

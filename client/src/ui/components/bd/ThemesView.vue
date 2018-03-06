@@ -23,7 +23,7 @@
 
         <div class="bd-flex bd-flex-col bd-themesview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">
-                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="e => reloadTheme(theme, e.shiftKey)" :showSettings="() => showSettings(theme)" :deleteTheme="e => deleteTheme(theme, e.shiftKey)" />
+                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="e => reloadTheme(theme, e.shiftKey)" :showSettings="e => showSettings(theme, e.shiftKey)" :deleteTheme="e => deleteTheme(theme, e.shiftKey)" />
             </div>
             <div v-if="!local" class="bd-online-ph">
                 <h3>Coming Soon</h3>
@@ -94,8 +94,10 @@
                     console.error(err);
                 }
             },
-            showSettings(theme) {
-                return Modals.contentSettings(theme);
+            showSettings(theme, dont_clone) {
+                return Modals.contentSettings(theme, null, {
+                    dont_clone
+                });
             }
         }
     }

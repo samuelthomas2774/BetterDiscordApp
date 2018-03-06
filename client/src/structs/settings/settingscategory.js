@@ -49,7 +49,7 @@ export default class SettingsCategory {
      * Category name
      */
     get name() {
-        return this.args.category_name;
+        return this.args.name || this.args.category_name;
     }
 
     get category_name() {

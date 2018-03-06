@@ -63,6 +63,24 @@ export default class PluginApi {
         return PluginManager.getPluginById(this.pluginInfo.id || this.pluginInfo.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-'));
     }
 
+    async bridge(plugin_id) {
+        const plugin = await PluginManager.waitForPlugin(plugin_id);
+        return plugin.bridge;
+    }
+
+    get require() { return this.import }
+    import(m) {
+        const module = ExtModuleManager.findModule(m);
+        if (module && module.__require) return module.__require;
+        return null;
+    }
+
+    get Api() { return this }
+
+    /**
+     * Logger
+     */
+
     loggerLog(...message) { Logger.log(this.pluginInfo.name, message) }
     loggerErr(...message) { Logger.err(this.pluginInfo.name, message) }
     loggerWarn(...message) { Logger.warn(this.pluginInfo.name, message) }
@@ -78,6 +96,10 @@ export default class PluginApi {
         };
     }
 
+    /**
+     * Utils
+     */
+
     get Utils() {
         return {
             overload: () => Utils.overload.apply(Utils, arguments),
@@ -92,8 +114,12 @@ export default class PluginApi {
         };
     }
 
+    /**
+     * Settings
+     */
+
     createSettingsSet(args, ...merge) {
-        return new SettingsSet(args, ...merge);
+        return new SettingsSet(args || {}, ...merge);
     }
     createSettingsCategory(args, ...merge) {
         return new SettingsCategory(args, ...merge);
@@ -113,6 +139,10 @@ export default class PluginApi {
         };
     }
 
+    /**
+     * InternalSettings
+     */
+
     getInternalSetting(set, category, setting) {
         return Settings.get(set, category, setting);
     }
@@ -121,6 +151,10 @@ export default class PluginApi {
             get: this.getInternalSetting.bind(this)
         };
     }
+
+    /**
+     * CssUtils
+     */
 
     get injectedStyles() {
         return this._injectedStyles || (this._injectedStyles = []);
@@ -169,6 +203,10 @@ export default class PluginApi {
         };
     }
 
+    /**
+     * Modals
+     */
+
     get modalStack() {
         return this._modalStack || (this._modalStack = []);
     }
@@ -209,11 +247,15 @@ export default class PluginApi {
         });
     }
 
+    /**
+     * Plugins
+     */
+
     async getPlugin(plugin_id) {
         // This should require extra permissions
         return await PluginManager.waitForPlugin(plugin_id);
     }
-    listPlugins(plugin_id) {
+    listPlugins() {
         return PluginManager.localContent.map(plugin => plugin.id);
     }
     get Plugins() {
@@ -223,30 +265,22 @@ export default class PluginApi {
         };
     }
 
+    /**
+     * Themes
+     */
+
     async getTheme(theme_id) {
         // This should require extra permissions
         return await ThemeManager.waitForContent(theme_id);
     }
-    listThemes(plugin_id) {
+    listThemes() {
         return ThemeManager.localContent.map(theme => theme.id);
     }
     get Themes() {
         return {
             getTheme: this.getTheme.bind(this),
-            getThemes: this.listThemes.bind(this)
+            listThemes: this.listThemes.bind(this)
         };
-    }
-
-    async bridge(plugin_id) {
-        const plugin = await PluginManager.waitForPlugin(plugin_id);
-        return plugin.bridge;
-    }
-
-    get require() { return this.import }
-    import(m) {
-        const module = ExtModuleManager.findModule(m);
-        if (module && module.__require) return module.__require;
-        return null;
     }
 
 }

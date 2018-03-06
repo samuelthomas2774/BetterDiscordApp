@@ -116,7 +116,7 @@ export default class SettingsCategory {
         this.settings.splice(index, 0, setting);
 
         const event = {
-            category, category_id: category.id,
+            category: this, category_id: this.id,
             setting, setting_id: setting.id,
             at_index: index
         };

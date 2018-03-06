@@ -20,14 +20,16 @@ import PermissionModal from './components/bd/modals/PermissionModal.vue';
 class Modal extends AsyncEventEmitter {
     constructor(_modal, component) {
         super();
-        Object.assign(this, _modal);
+
+        for (let key in _modal)
+            this[key] = _modal[key];
 
         const modal = this;
         this.component = this.component || {
             template: '<custom-modal :modal="modal" />',
             components: { 'custom-modal': component },
             data() { return { modal }; },
-            created() {
+            mounted() {
                 modal.vueInstance = this;
                 modal.vue = this.$children[0];
             }

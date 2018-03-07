@@ -15,6 +15,7 @@ import path from 'path';
 import { Events } from 'modules';
 import { SettingsSet, ErrorEvent } from 'structs';
 import { Modals } from 'ui';
+import Database from './database';
 
 /**
  * Base class for external content managing
@@ -189,13 +190,16 @@ export default class {
             };
 
             try {
-                const readUserConfig = await this.readUserConfig(contentPath);
-                userConfig.enabled = readUserConfig.enabled || false;
-                // await userConfig.config.merge({ settings: readUserConfig.config });
-                // userConfig.config.setSaved();
-                // userConfig.config = userConfig.config.clone({ settings: readUserConfig.config });
-                userConfig.config = readUserConfig.config;
-                userConfig.data = readUserConfig.data || {};
+                //const readUserConfig = await this.readUserConfig(contentPath);
+                const readUserConfig = await Database.find({ type: 'contentconfig', name: readConfig.info.name });
+                if (readUserConfig.length) {
+                    userConfig.enabled = readUserConfig[0].enabled || false;
+                    // await userConfig.config.merge({ settings: readUserConfig.config });
+                    // userConfig.config.setSaved();
+                    // userConfig.config = userConfig.config.clone({ settings: readUserConfig.config });
+                    userConfig.config = readUserConfig[0].config;
+                    userConfig.data = readUserConfig[0].data || {};
+                }
             } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
                 Logger.info(this.moduleName, `Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`);
                 Logger.err(this.moduleName, err);

@@ -26,7 +26,7 @@ const __pluginPath = path.resolve(__dirname, '..', '..', 'tests', 'plugins');
 const __themePath = path.resolve(__dirname, '..', '..', 'tests', 'themes');
 const __modulePath = path.resolve(__dirname, '..', '..', 'tests', 'modules');
 
-const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor } = require('./modules');
+const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
 const { BrowserWindow, dialog } = require('electron');
 
 const Common = {};
@@ -41,6 +41,8 @@ const dummyArgs = {
         { 'id': 'modules', 'path': __modulePath }
     ]
 };
+
+const dbInstance = new Database(dummyArgs.paths.find(path => path.id === 'data').path + '/storage');
 
 console.log(dummyArgs);
 
@@ -86,6 +88,17 @@ class Comms {
                 }
                 o.reply(result);
             });
+        });
+
+        BDIpc.on('bd-dba', o => {
+            (async () => {
+                try {
+                    const ret = await dbInstance.exec(o.args);
+                    o.reply(ret);
+                } catch (err) {
+                    o.reply({err});
+                }
+            })();
         });
     }
 

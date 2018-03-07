@@ -10,6 +10,7 @@
 
 import { Utils, FileUtils, ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { Modals } from 'ui';
+import Database from './database';
 
 export default class Content {
 
@@ -72,12 +73,21 @@ export default class Content {
      */
     async saveConfiguration() {
         try {
+            /*
             await FileUtils.writeFile(`${this.contentPath}/user.config.json`, JSON.stringify({
                 enabled: this.enabled,
                 config: this.settings.strip().settings,
                 data: this.data
             }));
-
+            */
+            Database.insertOrUpdate({ type: 'contentconfig', $or: [{ id: this.id }, { name: this.name }] }, {
+                type: 'contentconfig',
+                id: this.id,
+                name: this.name,
+                enabled: this.enabled,
+                config: this.settings.strip().settings,
+                data: this.data
+            });
 			this.settings.setSaved();
         } catch (err) {
 			Logger.err(this.name, ['Failed to save configuration', err]);

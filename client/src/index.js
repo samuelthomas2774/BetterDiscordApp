@@ -10,12 +10,13 @@
 
 import { DOM, BdUI, Modals } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings } from 'modules';
+import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 
 class BetterDiscord {
 
     constructor() {
+        window.bddb = Database;
         window.bdglobals = Globals;
         window.ClientIPC = ClientIPC;
         window.css = CssEditor;
@@ -32,14 +33,19 @@ class BetterDiscord {
     }
 
     async init() {
-        await Settings.loadSettings();
-        await ModuleManager.initModules();
-        await ExtModuleManager.loadAllModules(true);
-        await PluginManager.loadAllPlugins(true);
-        await ThemeManager.loadAllThemes(true);
-        Modals.showContentManagerErrors();
-        Events.emit('ready');
-        Events.emit('discord-ready');
+        try {
+            await Database.init();
+            await Settings.loadSettings();
+            await ModuleManager.initModules();
+            await ExtModuleManager.loadAllModules(true);
+            await PluginManager.loadAllPlugins(true);
+            await ThemeManager.loadAllThemes(true);
+            Modals.showContentManagerErrors();
+            Events.emit('ready');
+            Events.emit('discord-ready');
+        } catch (err) {
+            console.log('FAILED TO LOAD!', err);
+        }
     }
 
     globalReady() {

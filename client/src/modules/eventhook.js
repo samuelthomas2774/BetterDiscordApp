@@ -72,7 +72,7 @@ export default class extends EventListener {
     dispatch(e, d) {
         Events.emit('raw-event', { type: e, data: d });
         if (e === this.actions.READY || e === this.actions.RESUMED) {
-            Events.emit(e);
+            Events.emit(e, d);
             return;
         }
         if (!Object.keys(SocketStructs).includes(e)) return;

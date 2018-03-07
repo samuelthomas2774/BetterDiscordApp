@@ -96,7 +96,7 @@ class Comms {
                     const ret = await dbInstance.exec(o.args);
                     o.reply(ret);
                 } catch (err) {
-                    o.reply(err);
+                    o.reply({err});
                 }
             })();
         });

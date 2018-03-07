@@ -13,9 +13,7 @@ import { Utils } from 'common';
 import Events from './events';
 import WebpackModules from './webpackmodules';
 
-import {
-    MESSAGE_CREATE
-} from '../structs/socketstructs';
+import * as SocketStructs from '../structs/socketstructs';
 
 
 /**
@@ -25,6 +23,7 @@ import {
 export default class extends EventListener {
 
     init() {
+        console.log(SocketStructs);
         this.hook();
     }
 
@@ -71,37 +70,14 @@ export default class extends EventListener {
      * @param {any} d Event Args
      */
     dispatch(e, d) {
-
         Events.emit('raw-event', { type: e, data: d });
-        let evt = null;
-        switch (e) {
-            case this.actions.READ:
-                Events.emit('discord-ready');
-                break;
-            case this.actions.RESUMED:
-                Events.emit('discord-resumed');
-                break;
-            case this.actions.TYPING_START:
-                Events.emit('discord-event', {
-                    type: e,
-                    channelId: d.channel_id,
-                    userId: d.user_id
-                });
-                break;
-            case this.actions.MESSAGE_CREATE:
-                evt = { type: e, data: new MESSAGE_CREATE(d) };
-                break;
-            case 'k':
-                Events.emit('discord-event', {
-
-                });
-                break;
-            case this.actions.ACTIVITY_START:
-                Events.emit('discord-event', this.construct(e, d));
-                break;
-
+        if (e === this.actions.READY || e === this.actions.RESUMED) {
+            Events.emit(e);
+            return;
         }
-        if (evt !== null) Events.emit(`discord:${evt.type}`, evt);
+        if (!Object.keys(SocketStructs).includes(e)) return;
+        const evt = new SocketStructs[e](d);
+        Events.emit(`discord:${e}`, evt);
     }
 
     /**

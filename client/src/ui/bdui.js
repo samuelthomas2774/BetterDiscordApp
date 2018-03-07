@@ -27,6 +27,40 @@ export default class {
                 data: { userid }
             }));
         }, 100);
+        // This is temporary
+        const locationInterval = setInterval(() => {
+            try {
+                const path = window.location.pathname.match(/\d+/g);
+                if (!path) {
+                    this.prevLocation = null;
+                    Events.emit('server-switch');
+                    return;
+                }
+                const ids = path.reduce((obj, el, index) => {
+                        obj[index === 0 ? 'guildId' : 'channelId'] = el;
+                        return obj;
+                    },
+                    {});
+
+                if (Object.keys(ids).length === 1) {
+                    ids.isDm = true;
+                    ids.dmId = ids.guildId
+                }
+
+                if (!this.prevLocation) {
+                    Events.emit('server-switch');
+                } else {
+                    if (this.prevLocation.channelId !== ids.channelId) {
+                        Events.emit('channel-switch');
+                    } else if (this.prevLocation.guildId !== ids.guildId) {
+                        Events.emit('server-switch');
+                    }
+                }
+                this.prevLocation = ids;
+            } catch (err) {
+                console.log(err);
+            }
+        }, 100);
     }
 
     static get profilePopupModule() {

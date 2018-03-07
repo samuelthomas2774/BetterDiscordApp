@@ -11,6 +11,7 @@
 import EventListener from './eventlistener';
 import { Utils } from 'common';
 import Events from './events';
+import WebpackModules from './webpackmodules';
 
 import {
     MESSAGE_CREATE
@@ -23,6 +24,10 @@ import {
  */
 export default class extends EventListener {
 
+    init() {
+        this.hook();
+    }
+
     bindings() {
         this.hook = this.hook.bind(this);
     }
@@ -33,9 +38,19 @@ export default class extends EventListener {
         ];
     }
 
-    hook() {}
+    hook() {
+        const self = this;
+        const orig = this.eventsModule.prototype.emit;
+        this.eventsModule.prototype.emit = function (...args) {
+            orig.call(this, ...args);
+            self.wsc = this;
+            self.emit(...args);
+        }
+    }
 
-    get eventsModule() {}
+    get eventsModule() {
+        return WebpackModules.getModuleByPrototypes(['setMaxListeners', 'emit']);
+    }
 
     /**
      * Discord emit overload
@@ -58,7 +73,7 @@ export default class extends EventListener {
     dispatch(e, d) {
 
         Events.emit('raw-event', { type: e, data: d });
-
+        let evt = null;
         switch (e) {
             case this.actions.READ:
                 Events.emit('discord-ready');
@@ -74,7 +89,7 @@ export default class extends EventListener {
                 });
                 break;
             case this.actions.MESSAGE_CREATE:
-                Events.emit('discord-event', { type: e, data: new MESSAGE_CREATE(d) });
+                evt = { type: e, data: new MESSAGE_CREATE(d) };
                 break;
             case 'k':
                 Events.emit('discord-event', {
@@ -86,6 +101,7 @@ export default class extends EventListener {
                 break;
 
         }
+        if (evt !== null) Events.emit(`discord:${evt.type}`, evt);
     }
 
     /**

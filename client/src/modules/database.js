@@ -12,6 +12,10 @@ import { ClientIPC } from 'bdipc';
 
 export default class {
 
+    static async init() {
+        return true;
+    }
+
     static async insertOrUpdate(args, data) {
         try {
             return ClientIPC.send('bd-dba', { action: 'update', args, data });

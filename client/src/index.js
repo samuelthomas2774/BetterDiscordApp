@@ -29,7 +29,9 @@ class BetterDiscord {
         window.bdmodals = Modals;
         window.bdlogs = Logger;
         window.emotes = EmoteModule;
+
         EmoteModule.observe();
+
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }
@@ -42,20 +44,21 @@ class BetterDiscord {
             await ExtModuleManager.loadAllModules(true);
             await PluginManager.loadAllPlugins(true);
             await ThemeManager.loadAllThemes(true);
-            Modals.showContentManagerErrors();
+
+            if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
+                Modals.showContentManagerErrors();
+
             Events.emit('ready');
             Events.emit('discord-ready');
         } catch (err) {
-            console.log('FAILED TO LOAD!', err);
+            Logger.err('main', ['FAILED TO LOAD!', err]);
         }
     }
 
     globalReady() {
         BdUI.initUiEvents();
         this.vueInstance = BdUI.injectUi();
-        (async () => {
-            this.init();
-        })();
+        this.init();
     }
 }
 

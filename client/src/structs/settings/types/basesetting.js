@@ -105,9 +105,9 @@ export default class Setting {
      * Merges a setting into this setting without emitting events (and therefore synchronously).
      * This only exists for use by the constructor and SettingsCategory.
      */
-    _merge(newSetting) {
+    _merge(newSetting, hook = true) {
         const value = newSetting.args ? newSetting.args.value : newSetting.value;
-        return this._setValue(value);
+        return this._setValue(value, hook);
     }
 
     /**
@@ -116,12 +116,13 @@ export default class Setting {
      * @return {Promise}
      */
     async merge(newSetting, emit_multi = true, emit = true) {
-        const updatedSettings = this._merge(newSetting);
+        const updatedSettings = this._merge(newSetting, false);
         if (!updatedSettings.length) return [];
-        const updatedSetting = updatedSettings[0];
+
+        await this.setValueHook(updatedSettings[0]);
 
         if (emit)
-            await this.emit('setting-updated', updatedSetting);
+            await this.emit('setting-updated', updatedSettings[0]);
 
         if (emit_multi)
             await this.emit('settings-updated', new SettingsUpdatedEvent({
@@ -135,7 +136,7 @@ export default class Setting {
      * Sets the value of this setting.
      * This only exists for use by the constructor and SettingsCategory.
      */
-    _setValue(value) {
+    _setValue(value, hook = true) {
         const old_value = this.args.value;
         if (Utils.compare(value, old_value)) return [];
         this.args.value = value;
@@ -146,7 +147,8 @@ export default class Setting {
             value, old_value
         });
 
-        this.setValueHook(updatedSetting);
+        if (hook)
+            this.setValueHookSync(updatedSetting);
 
         return [updatedSetting];
     }
@@ -156,7 +158,8 @@ export default class Setting {
      * This can be overridden by other settings types.
      * @param {SettingUpdatedEvent} updatedSetting
      */
-    setValueHook(updatedSetting) {}
+    async setValueHook(updatedSetting) {}
+    setValueHookSync(updatedSetting) {}
 
     /**
      * Sets the value of this setting.
@@ -164,8 +167,10 @@ export default class Setting {
      * @return {Promise}
      */
     async setValue(value, emit_multi = true, emit = true) {
-        const updatedSettings = this._setValue(value);
+        const updatedSettings = this._setValue(value, false);
         if (!updatedSettings.length) return [];
+
+        await this.setValueHook(updatedSettings[0]);
 
         if (emit)
             await this.emit('setting-updated', updatedSettings[0]);

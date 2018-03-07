@@ -27,18 +27,16 @@ export default class SettingsSet {
             this._merge(newSet);
         }
 
+        this.__settingUpdated = this.__settingUpdated.bind(this);
+        this.__settingsUpdated = this.__settingsUpdated.bind(this);
+        this.__addedSetting = this.__addedSetting.bind(this);
+        this.__removedSetting = this.__removedSetting.bind(this);
+
         for (let category of this.categories) {
-            category.on('setting-updated', ({ setting, value, old_value }) => this.emit('setting-updated', new SettingUpdatedEvent({
-                set: this, set_id: this.id,
-                category, category_id: category.id,
-                setting, setting_id: setting.id,
-                value, old_value
-            })));
-            category.on('settings-updated', ({ updatedSettings }) => this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
-                    set: this, set_id: this.id
-                }, updatedSetting)))
-            })));
+            category.on('setting-updated', this.__settingUpdated);
+            category.on('settings-updated', this.__settingsUpdated);
+            category.on('added-setting', this.__addedSetting);
+            category.on('removed-setting', this.__removedSetting);
         }
     }
 
@@ -99,6 +97,149 @@ export default class SettingsSet {
     get changed() {
         if (this.categories.find(category => category.changed)) return true;
         return false;
+    }
+
+    /**
+     * Category event listeners.
+     * These only exists for use by the constructor and settingsset.addCategory.
+     */
+    __settingUpdated({ category, setting, value, old_value }) {
+        return this.emit('setting-updated', new SettingUpdatedEvent({
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            setting, setting_id: setting.id,
+            value, old_value
+        }));
+    }
+
+    __settingsUpdated({ updatedSettings }) {
+        return this.emit('settings-updated', new SettingsUpdatedEvent({
+            updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
+                set: this, set_id: this.id
+            }, updatedSetting)))
+        }));
+    }
+
+    __addedSetting({ category, setting, at_index }) {
+        return this.emit('added-setting', {
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            setting, setting_id: setting.id,
+            at_index
+        });
+    }
+
+    __removedSetting({ category, setting, from_index }) {
+        return this.emit('removed-setting', {
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            setting, setting_id: setting.id,
+            from_index
+        });
+    }
+
+    /**
+     * Dynamically adds a category to this set.
+     * @param {SettingsCategory} category The category to add to this set
+     * @param {Number} index The index to add the category at (optional)
+     * @return {Promise}
+     */
+    async addCategory(category, index) {
+        if (this.categories.find(c => c === category)) return;
+
+        if (!(category instanceof SettingsCategory))
+            category = new SettingsCategory(category);
+
+        if (this.getCategory(category.id))
+            throw {message: 'A category with this ID already exists.'};
+
+        category.on('setting-updated', this.__settingUpdated);
+        category.on('settings-updated', this.__settingsUpdated);
+        category.on('added-setting', this.__addedSetting);
+        category.on('removed-setting', this.__removedSetting);
+
+        if (index === undefined) index = this.categories.length;
+        this.categories.splice(index, 0, category);
+
+        const event = {
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            at_index: index
+        };
+
+        await category.emit('added-to', event);
+        await this.emit('added-category', event);
+        return category;
+    }
+
+    /**
+     * Dynamically removes a category from this set.
+     * @param {SettingsCategory} category The category to remove from this set
+     * @return {Promise}
+     */
+    async removeCategory(category) {
+        category.off('setting-updated', this.__settingUpdated);
+        category.off('settings-updated', this.__settingsUpdated);
+        category.off('added-setting', this.__addedSetting);
+        category.off('removed-setting', this.__removedSetting);
+
+        let index;
+        while ((index = this.categories.findIndex(c => c === category)) > -1) {
+            this.categories.splice(index, 0);
+        }
+
+        const event = {
+            set: this, set_id: this.id,
+            category, category_id: category.id,
+            from_index: index
+        };
+
+        await category.emit('removed-from', event);
+        await this.emit('removed-category', event);
+    }
+
+    /**
+     * Dynamically adds a scheme to this set.
+     * @param {SettingsScheme} scheme The scheme to add to this set
+     * @param {Number} index The index to add the scheme at (optional)
+     * @return {Promise}
+     */
+    async addScheme(scheme, index) {
+        if (this.schemes.find(c => c === scheme)) return;
+
+        if (!(scheme instanceof SettingsScheme))
+            scheme = new SettingsScheme(scheme);
+
+        if (this.schemes.find(s => s.id === scheme.id))
+            throw {message: 'A scheme with this ID already exists.'};
+
+        if (index === undefined) index = this.schemes.length;
+        this.schemes.splice(index, 0, scheme);
+
+        await this.emit('added-scheme', {
+            set: this, set_id: this.id,
+            scheme, scheme_id: scheme.id,
+            at_index: index
+        });
+        return scheme;
+    }
+
+    /**
+     * Dynamically removes a scheme from this set.
+     * @param {SettingsScheme} scheme The scheme to remove from this set
+     * @return {Promise}
+     */
+    async removeScheme(scheme) {
+        let index;
+        while ((index = this.schemes.findIndex(s => s === scheme)) > -1) {
+            this.schemes.splice(index, 0);
+        }
+
+        await this.emit('removed-scheme', {
+            set: this, set_id: this.id,
+            scheme, scheme_id: scheme.id,
+            from_index: index
+        });
     }
 
     /**

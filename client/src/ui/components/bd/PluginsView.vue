@@ -23,7 +23,7 @@
 
         <div class="bd-flex bd-flex-col bd-pluginsview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
-                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :deletePlugin="e => deletePlugin(plugin, e.shiftKey)" :showSettings="() => showSettings(plugin)" />
+                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :deletePlugin="unload => deletePlugin(plugin, unload)" :showSettings="dont_clone => showSettings(plugin, dont_clone)" />
             </div>
             <div v-if="!local" class="bd-online-ph">
                 <h3>Coming Soon</h3>
@@ -93,8 +93,10 @@
                     console.error(err);
                 }
             },
-            showSettings(plugin) {
-                return Modals.contentSettings(plugin);
+            showSettings(plugin, dont_clone) {
+                return Modals.contentSettings(plugin, null, {
+                    dont_clone
+                });
             }
         }
     }

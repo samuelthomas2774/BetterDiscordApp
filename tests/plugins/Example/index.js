@@ -14,7 +14,7 @@ module.exports = (Plugin, Api, Vendor, Dependencies) => {
             Events.subscribe('TEST_EVENT', this.eventTest);
             Logger.log('onStart');
 
-            Logger.log(`Plugin setting "default-0" value: ${this.getSetting('default-0')}`);
+            Logger.log(`Plugin setting "default-0" value: ${this.settings.get('default-0')}`);
             this.events.on('setting-updated', event => {
                 console.log('Received plugin setting update:', event);
             });
@@ -92,14 +92,14 @@ module.exports = (Plugin, Api, Vendor, Dependencies) => {
         test1() { return 'It works!'; }
         test2() { return 'This works too!'; }
 
-        settingChanged(category, setting_id, value) {
+        settingChanged(event) {
             if (!this.enabled) return;
-            Logger.log(`${category}/${setting_id} changed to ${value}`);
+            Logger.log(`${event.category_id}/${event.setting_id} changed to ${event.value}`);
         }
 
-        settingsChanged(settings) {
+        settingsChanged(event) {
             if (!this.enabled) return;
-            Logger.log([ 'Settings updated', settings ]);
+            Logger.log([ 'Settings updated', event.updatedSettings ]);
         }
 
         get settingscomponent() {

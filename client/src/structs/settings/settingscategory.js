@@ -9,6 +9,7 @@
  */
 
 import Setting from './setting';
+import BaseSetting from './types/basesetting';
 import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
@@ -24,17 +25,12 @@ export default class SettingsCategory {
             this._merge(newCategory);
         }
 
+        this.__settingUpdated = this.__settingUpdated.bind(this);
+        this.__settingsUpdated = this.__settingsUpdated.bind(this);
+
         for (let setting of this.settings) {
-            setting.on('setting-updated', ({ value, old_value }) => this.emit('setting-updated', new SettingUpdatedEvent({
-                category: this, category_id: this.id,
-                setting, setting_id: setting.id,
-                value, old_value
-            })));
-            setting.on('settings-updated', ({ updatedSettings }) => this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
-                    category: this, category_id: this.id
-                }, updatedSetting)))
-            })));
+            setting.on('setting-updated', this.__settingUpdated);
+            setting.on('settings-updated', this.__settingsUpdated);
         }
     }
 
@@ -53,7 +49,7 @@ export default class SettingsCategory {
      * Category name
      */
     get name() {
-        return this.args.category_name;
+        return this.args.name || this.args.category_name;
     }
 
     get category_name() {
@@ -84,6 +80,82 @@ export default class SettingsCategory {
     }
 
     /**
+     * Setting event listeners.
+     * This only exists for use by the constructor and settingscategory.addSetting.
+     */
+    __settingUpdated({ setting, value, old_value }) {
+        return this.emit('setting-updated', new SettingUpdatedEvent({
+            category: this, category_id: this.id,
+            setting, setting_id: setting.id,
+            value, old_value
+        }));
+    }
+
+    __settingsUpdated({ updatedSettings }) {
+        return this.emit('settings-updated', new SettingsUpdatedEvent({
+            updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
+                category: this, category_id: this.id
+            }, updatedSetting)))
+        }));
+    }
+
+    /**
+     * Dynamically adds a setting to this category.
+     * @param {Setting} category The setting to add to this category
+     * @param {Number} index The index to add the setting at (optional)
+     * @return {Promise}
+     */
+    async addSetting(setting, index) {
+        if (this.settings.find(s => s === setting)) return;
+
+        if (!(setting instanceof BaseSetting))
+            setting = new Setting(setting);
+
+        if (this.getSetting(setting.id))
+            throw {message: 'A setting with this ID already exists.'};
+
+        setting.on('setting-updated', this.__settingUpdated);
+        setting.on('settings-updated', this.__settingsUpdated);
+
+        if (index === undefined) index = this.settings.length;
+        this.settings.splice(index, 0, setting);
+
+        const event = {
+            category: this, category_id: this.id,
+            setting, setting_id: setting.id,
+            at_index: index
+        };
+
+        await setting.emit('added-to', event);
+        await this.emit('added-setting', event);
+        return setting;
+    }
+
+    /**
+     * Dynamically removes a setting from this category.
+     * @param {Setting} setting The setting to remove from this category
+     * @return {Promise}
+     */
+    async removeSetting(setting) {
+        setting.off('setting-updated', this.__settingUpdated);
+        setting.off('settings-updated', this.__settingsUpdated);
+
+        let index;
+        while ((index = this.settings.findIndex(s => s === setting)) > -1) {
+            this.settings.splice(index, 0);
+        }
+
+        const event = {
+            set: this, set_id: this.id,
+            category: this, category_id: this.id,
+            from_index: index
+        };
+
+        await setting.emit('removed-from', event);
+        await this.emit('removed-category', event);
+    }
+
+    /**
      * Returns the first setting where calling {function} returns true.
      * @param {Function} function A function to call to filter settings
      * @return {Setting}
@@ -107,7 +179,7 @@ export default class SettingsCategory {
      * @return {Setting}
      */
     getSetting(id) {
-        return this.findSetting(setting => setting.id === id);
+        return this.find(setting => setting.id === id);
     }
 
     /**

@@ -14,6 +14,7 @@ import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
+import WebpackModules from './webpackmodules';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { Modals, DOM } from 'ui';
 import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
@@ -63,6 +64,24 @@ export default class PluginApi {
         return PluginManager.getPluginById(this.pluginInfo.id || this.pluginInfo.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-'));
     }
 
+    async bridge(plugin_id) {
+        const plugin = await PluginManager.waitForPlugin(plugin_id);
+        return plugin.bridge;
+    }
+
+    get require() { return this.import }
+    import(m) {
+        const module = ExtModuleManager.findModule(m);
+        if (module && module.__require) return module.__require;
+        return null;
+    }
+
+    get Api() { return this }
+
+    /**
+     * Logger
+     */
+
     loggerLog(...message) { Logger.log(this.pluginInfo.name, message) }
     loggerErr(...message) { Logger.err(this.pluginInfo.name, message) }
     loggerWarn(...message) { Logger.warn(this.pluginInfo.name, message) }
@@ -78,6 +97,10 @@ export default class PluginApi {
         };
     }
 
+    /**
+     * Utils
+     */
+
     get Utils() {
         return {
             overload: () => Utils.overload.apply(Utils, arguments),
@@ -92,8 +115,12 @@ export default class PluginApi {
         };
     }
 
+    /**
+     * Settings
+     */
+
     createSettingsSet(args, ...merge) {
-        return new SettingsSet(args, ...merge);
+        return new SettingsSet(args || {}, ...merge);
     }
     createSettingsCategory(args, ...merge) {
         return new SettingsCategory(args, ...merge);
@@ -106,12 +133,16 @@ export default class PluginApi {
     }
     get Settings() {
         return {
-            createSet: this.createSet.bind(this),
+            createSet: this.createSettingsSet.bind(this),
             createCategory: this.createSettingsCategory.bind(this),
             createSetting: this.createSetting.bind(this),
             createScheme: this.createSettingsScheme.bind(this)
         };
     }
+
+    /**
+     * InternalSettings
+     */
 
     getInternalSetting(set, category, setting) {
         return Settings.get(set, category, setting);
@@ -121,6 +152,10 @@ export default class PluginApi {
             get: this.getInternalSetting.bind(this)
         };
     }
+
+    /**
+     * CssUtils
+     */
 
     get injectedStyles() {
         return this._injectedStyles || (this._injectedStyles = []);
@@ -169,36 +204,48 @@ export default class PluginApi {
         };
     }
 
+    /**
+     * Modals
+     */
+
     get modalStack() {
         return this._modalStack || (this._modalStack = []);
+    }
+    get baseModalComponent() {
+        return Modals.baseComponent;
     }
     addModal(_modal, component) {
         const modal = Modals.add(_modal, component);
         modal.close = force => this.closeModal(modal, force);
+        modal.on('close', () => {
+            let index;
+            while ((index = this.modalStack.findIndex(m => m === modal)) > -1)
+                this.modalStack.splice(index, 1);
+        });
         this.modalStack.push(modal);
         return modal;
     }
-    async closeModal(modal, force) {
-        await Modals.close(modal, force);
-        this._modalStack = this.modalStack.filter(m => m !== modal);
+    closeModal(modal, force) {
+        return Modals.close(modal, force);
     }
-    closeAllModals() {
+    closeAllModals(force) {
+        const promises = [];
         for (let modal of this.modalStack)
-            modal.close();
+            promises.push(modal.close(force));
+        return Promise.all(promises);
     }
-    closeLastModal() {
+    closeLastModal(force) {
         if (!this.modalStack.length) return;
-        this.modalStack[this.modalStack.length - 1].close();
+        return this.modalStack[this.modalStack.length - 1].close(force);
+    }
+    basicModal(title, text) {
+        return this.addModal(Modals.basic(title, text));
     }
     settingsModal(settingsset, headertext, options) {
-        return this.addModal(Object.assign({
-            headertext: headertext ? headertext : settingsset.headertext,
-            settings: settingsset,
-            schemes: settingsset.schemes
-        }, options), SettingsModal);
+        return this.addModal(Modals.settings(settingsset, headertext, options));
     }
     get Modals() {
-        return Object.defineProperty({
+        return Object.defineProperty(Object.defineProperty({
             add: this.addModal.bind(this),
             close: this.closeModal.bind(this),
             closeAll: this.closeAllModals.bind(this),
@@ -206,14 +253,20 @@ export default class PluginApi {
             settings: this.settingsModal.bind(this)
         }, 'stack', {
             get: () => this.modalStack
+        }), 'baseComponent', {
+            get: () => this.baseModalComponent
         });
     }
+
+    /**
+     * Plugins
+     */
 
     async getPlugin(plugin_id) {
         // This should require extra permissions
         return await PluginManager.waitForPlugin(plugin_id);
     }
-    listPlugins(plugin_id) {
+    listPlugins() {
         return PluginManager.localContent.map(plugin => plugin.id);
     }
     get Plugins() {
@@ -223,30 +276,75 @@ export default class PluginApi {
         };
     }
 
+    /**
+     * Themes
+     */
+
     async getTheme(theme_id) {
         // This should require extra permissions
         return await ThemeManager.waitForContent(theme_id);
     }
-    listThemes(plugin_id) {
+    listThemes() {
         return ThemeManager.localContent.map(theme => theme.id);
     }
     get Themes() {
         return {
             getTheme: this.getTheme.bind(this),
-            getThemes: this.listThemes.bind(this)
+            listThemes: this.listThemes.bind(this)
         };
     }
 
-    async bridge(plugin_id) {
-        const plugin = await PluginManager.waitForPlugin(plugin_id);
-        return plugin.bridge;
+    /**
+     * ExtModules
+     */
+
+    async getModule(module_id) {
+        // This should require extra permissions
+        return await ExtModuleManager.waitForContent(module_id);
+    }
+    listModules() {
+        return ExtModuleManager.localContent.map(module => module.id);
+    }
+    get ExtModules() {
+        return {
+            getModule: this.getModule.bind(this),
+            listModules: this.listModules.bind(this)
+        };
     }
 
-    get require() { return this.import }
-    import(m) {
-        const module = ExtModuleManager.findModule(m);
-        if (module && module.__require) return module.__require;
-        return null;
+    /**
+     * WebpackModules
+     */
+
+    get webpackRequire() {
+        return WebpackModules.require;
+    }
+    getWebpackModule(filter, first = true) {
+        return WebpackModules.getModule(filter, first);
+    }
+    getWebpackModuleByName(name, fallback) {
+        return WebpackModules.getModuleByName(name, fallback);
+    }
+    getWebpackModuleByRegex(regex, first = true) {
+        return WebpackModules.getModuleByRegex(regex, first);
+    }
+    getWebpackModuleByProperties(props, first = true) {
+        return WebpackModules.getModuleByProps(props, first);
+    }
+    getWebpackModuleByPrototypeFields(props, first = true) {
+        return WebpackModules.getModuleByPrototypes(props, first);
+    }
+    get WebpackModules() {
+        return Object.defineProperty({
+            getModule: this.getWebpackModule.bind(this),
+            getModuleByName: this.getWebpackModuleByName.bind(this),
+            getModuleByDisplayName: this.getWebpackModuleByName.bind(this),
+            getModuleByRegex: this.getWebpackModuleByRegex.bind(this),
+            getModuleByProperties: this.getWebpackModuleByProperties.bind(this),
+            getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this)
+        }, 'require', {
+            get: () => this.webpackRequire
+        });
     }
 
 }

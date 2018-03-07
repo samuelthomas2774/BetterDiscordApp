@@ -54,7 +54,8 @@
 }
 
 .bd-form-textarea {
-    .bd-form-textarea-wrap {
+    .bd-form-textarea-wrap,
+    textarea.bd-textarea {
         margin-top: 15px;
         background: rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(0, 0, 0, 0.3);
@@ -62,6 +63,7 @@
         color: #b9bbbe;
         overflow-y: scroll;
         max-height: 140px;
+        transition: border-color .2s ease, color .2s ease;
 
         &:focus {
             color: #fff;
@@ -71,9 +73,24 @@
         @include scrollbar;
     }
 
-    div[contenteditable] {
+    div[contenteditable],
+    textarea {
         padding: 11px;
         cursor: text;
+        min-height: 45px;
+    }
+
+    textarea {
+        background: transparent;
+        border: none;
+        resize: none;
+        outline: none;
+        width: 100%;
+        color: inherit;
+        font-size: inherit;
+        box-sizing: border-box;
+        overflow-y: visible;
+        max-height: 140px;
     }
 }
 

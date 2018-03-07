@@ -1,4 +1,4 @@
-module.exports = (Plugin, { Logger, Settings }) => class extends Plugin {
+module.exports = (Plugin, { Logger, Settings, BdMenu: { BdMenuItems }, Api }) => class extends Plugin {
 	async onstart() {
 		// Some array event examples
 		const arraySetting = this.settings.getSetting('default', 'array-1');
@@ -7,8 +7,10 @@ module.exports = (Plugin, { Logger, Settings }) => class extends Plugin {
 		arraySetting.on('item-updated', event => Logger.log('Item', event.item, 'of the array setting was updated', event));
 		arraySetting.on('item-removed', event => Logger.log('Item', event.item, 'removed from the array setting'));
 
-        // Create a new settings set and show it in a modal
-        const set = Settings.createSet({});
+        // Create a new settings set and add it to the menu
+        const set = Settings.createSet({
+            text: this.name
+        });
         const category = await set.addCategory({ id: 'default' });
 
         const setting = await category.addSetting({
@@ -33,6 +35,29 @@ module.exports = (Plugin, { Logger, Settings }) => class extends Plugin {
             set.setSaved();
         })
 
-        set.showModal('Custom settings panel');
+        const setting2 = await category.addSetting({
+            id: 'setting-2',
+            type: 'text',
+            text: 'Enter some text',
+            fullwidth: true
+        });
+
+        setting2.on('setting-updated', event => Logger.log('Setting 2 was changed to', event.value));
+
+        this.menuItem = BdMenuItems.addSettingsSet('Plugins', set, 'Plugin 4');
+
+        this.menuItem2 = BdMenuItems.addVueComponent('Plugins', 'Also Plugin 4', {
+            template: `<component :is="SettingsWrapper" :headertext="plugin.name + ' custom menu panel'">
+                <p style="margin-top: 0; color: #f6f6f7;">Test</p>
+            </component>`,
+            props: ['SettingsWrapper'],
+            data() { return {
+                Api, plugin: Api.plugin
+            }; }
+        });
+	}
+
+	onstop() {
+        BdMenuItems.removeAll();
 	}
 };

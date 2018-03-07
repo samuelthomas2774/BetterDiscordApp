@@ -16,7 +16,7 @@ import ThemeManager from './thememanager';
 import Events from './events';
 import WebpackModules from './webpackmodules';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { Modals, DOM } from 'ui';
+import { BdMenuItems, Modals, DOM } from 'ui';
 import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
 
 class EventsWrapper {
@@ -151,6 +151,54 @@ export default class PluginApi {
         return {
             get: this.getInternalSetting.bind(this)
         };
+    }
+
+    /**
+     * BdMenu
+     */
+
+    get BdMenu() {
+        return {
+            BdMenuItems: this.BdMenuItems
+        };
+    }
+
+    /**
+     * BdMenuItems
+     */
+
+    get menuItems() {
+        return this._menuItems || (this._menuItems = []);
+    }
+    addMenuItem(item) {
+        return BdMenuItems.add(item);
+    }
+    addMenuSettingsSet(category, set, text) {
+        const item = BdMenuItems.addSettingsSet(category, set, text);
+        return this.menuItems.push(item);
+    }
+    addMenuVueComponent(category, text, component) {
+        const item = BdMenuItems.addVueComponent(category, text, component);
+        return this.menuItems.push(item);
+    }
+    removeMenuItem(item) {
+        BdMenuItems.remove(item);
+        Utils.removeFromArray(this.menuItems, item);
+    }
+    removeAllMenuItems() {
+        for (let item of this.menuItems)
+            BdMenuItems.remove(item);
+    }
+    get BdMenuItems() {
+        return Object.defineProperty({
+            add: this.addMenuItem.bind(this),
+            addSettingsSet: this.addMenuSettingsSet.bind(this),
+            addVueComponent: this.addMenuVueComponent.bind(this),
+            remove: this.removeMenuItem.bind(this),
+            removeAll: this.removeAllMenuItems.bind(this)
+        }, 'items', {
+            get: () => this.menuItems
+        });
     }
 
     /**

@@ -14,6 +14,7 @@ import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
+import WebpackModules from './webpackmodules';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { Modals, DOM } from 'ui';
 import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
@@ -291,6 +292,59 @@ export default class PluginApi {
             getTheme: this.getTheme.bind(this),
             listThemes: this.listThemes.bind(this)
         };
+    }
+
+    /**
+     * ExtModules
+     */
+
+    async getModule(module_id) {
+        // This should require extra permissions
+        return await ExtModuleManager.waitForContent(module_id);
+    }
+    listModules() {
+        return ExtModuleManager.localContent.map(module => module.id);
+    }
+    get ExtModules() {
+        return {
+            getModule: this.getModule.bind(this),
+            listModules: this.listModules.bind(this)
+        };
+    }
+
+    /**
+     * WebpackModules
+     */
+
+    get webpackRequire() {
+        return WebpackModules.require;
+    }
+    getWebpackModule(filter, first = true) {
+        return WebpackModules.getModule(filter, first);
+    }
+    getWebpackModuleByName(name, fallback) {
+        return WebpackModules.getModuleByName(name, fallback);
+    }
+    getWebpackModuleByRegex(regex, first = true) {
+        return WebpackModules.getModuleByRegex(regex, first);
+    }
+    getWebpackModuleByProperties(props, first = true) {
+        return WebpackModules.getModuleByProps(props, first);
+    }
+    getWebpackModuleByPrototypeFields(props, first = true) {
+        return WebpackModules.getModuleByPrototypes(props, first);
+    }
+    get WebpackModules() {
+        return Object.defineProperty({
+            getModule: this.getWebpackModule.bind(this),
+            getModuleByName: this.getWebpackModuleByName.bind(this),
+            getModuleByDisplayName: this.getWebpackModuleByName.bind(this),
+            getModuleByRegex: this.getWebpackModuleByRegex.bind(this),
+            getModuleByProperties: this.getWebpackModuleByProperties.bind(this),
+            getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this)
+        }, 'require', {
+            get: () => this.webpackRequire
+        });
     }
 
 }

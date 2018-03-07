@@ -28,7 +28,7 @@ class BetterDiscord {
         window.bdmodals = Modals;
         window.bdlogs = Logger;
         window.emotes = EmoteModule;
-
+        EmoteModule.observe();
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }

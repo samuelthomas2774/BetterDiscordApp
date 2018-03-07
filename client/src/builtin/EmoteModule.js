@@ -21,7 +21,12 @@ export default class {
     static observe() {
         Events.on('server-switch', this.injectAll.bind(this));
         Events.on('channel-switch', this.injectAll.bind(this));
-        Events.on('new-message', e => console.log(e)); // TODO
+        Events.on('discord:MESSAGE_CREATE', e => {
+            // Assume that it's the last one for now since the event doesn't give the element
+            const query = document.querySelectorAll('.markup:not(.mutable)');
+            if (!query) return;
+            this.injectMarkup(query[query.length - 1], true);
+        }); // TODO
     }
 
     static injectAll() {
@@ -60,6 +65,7 @@ export default class {
              if (cn.className && cn.className.includes('mutable')) cc = cn;
         }
         if (cc) sibling.parentElement.removeChild(cc);
+        if (markup === true) markup = this.cloneMarkup(sibling);
         markup.clone = this.injectEmotes(markup.clone);
         sibling.parentElement.insertBefore(markup.clone, sibling);
         sibling.classList.add('shadow');

@@ -210,33 +210,41 @@ export default class PluginApi {
     get modalStack() {
         return this._modalStack || (this._modalStack = []);
     }
+    get baseModalComponent() {
+        return Modals.baseComponent;
+    }
     addModal(_modal, component) {
         const modal = Modals.add(_modal, component);
         modal.close = force => this.closeModal(modal, force);
+        modal.on('close', () => {
+            let index;
+            while ((index = this.modalStack.findIndex(m => m === modal)) > -1)
+                this.modalStack.splice(index, 1);
+        });
         this.modalStack.push(modal);
         return modal;
     }
-    async closeModal(modal, force) {
-        await Modals.close(modal, force);
-        this._modalStack = this.modalStack.filter(m => m !== modal);
+    closeModal(modal, force) {
+        return Modals.close(modal, force);
     }
-    closeAllModals() {
+    closeAllModals(force) {
+        const promises = [];
         for (let modal of this.modalStack)
-            modal.close();
+            promises.push(modal.close(force));
+        return Promise.all(promises);
     }
-    closeLastModal() {
+    closeLastModal(force) {
         if (!this.modalStack.length) return;
-        this.modalStack[this.modalStack.length - 1].close();
+        return this.modalStack[this.modalStack.length - 1].close(force);
+    }
+    basicModal(title, text) {
+        return this.addModal(Modals.basic(title, text));
     }
     settingsModal(settingsset, headertext, options) {
-        return this.addModal(Object.assign({
-            headertext: headertext ? headertext : settingsset.headertext,
-            settings: settingsset,
-            schemes: settingsset.schemes
-        }, options), SettingsModal);
+        return this.addModal(Modals.settings(settingsset, headertext, options));
     }
     get Modals() {
-        return Object.defineProperty({
+        return Object.defineProperty(Object.defineProperty({
             add: this.addModal.bind(this),
             close: this.closeModal.bind(this),
             closeAll: this.closeAllModals.bind(this),
@@ -244,6 +252,8 @@ export default class PluginApi {
             settings: this.settingsModal.bind(this)
         }, 'stack', {
             get: () => this.modalStack
+        }), 'baseComponent', {
+            get: () => this.baseModalComponent
         });
     }
 

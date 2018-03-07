@@ -40,6 +40,7 @@ class Modal extends AsyncEventEmitter {
         this.vueInstance = undefined;
         this.vue = undefined;
 
+        this.close = this.close.bind(this);
         this.closed = this.once('closed');
     }
 
@@ -90,7 +91,10 @@ export default class Modals {
         modal.closing = true;
         await new Promise(resolve => setTimeout(resolve, 200));
 
-        this._stack = this.stack.filter(m => m !== modal);
+        let index;
+        while ((index = this.stack.findIndex(m => m === modal)) > -1)
+            this.stack.splice(index, 1);
+
         Events.emit('bd-refresh-modals');
 
         try {
@@ -250,7 +254,7 @@ export default class Modals {
      * An array of open modals.
      */
     static get stack() {
-        return this._stack ? this._stack : (this._stack = []);
+        return this._stack || (this._stack = []);
     }
 
     /**

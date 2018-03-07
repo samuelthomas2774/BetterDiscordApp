@@ -86,4 +86,5 @@ export default class {
 
         return vueInstance;
     }
+
 }

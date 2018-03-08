@@ -115,7 +115,6 @@ export default class extends EventListener {
     get contributors() {
         return [
             { 'id': '81388395867156480', 'webdev': true, 'developer': true, 'contributor': true }, // Jiiks
-            { 'id': '418494039050944513', 'webdev': true, 'developer': true, 'contributor': true }, // Mioni
             { 'id': '98003542823944192', 'webdev': false, 'developer': true, 'contributor': true }, // Pohky
             { 'id': '138850472541814784', 'webdev': true, 'developer': false, 'contributor': true }, // Hammock
             { 'id': '249746236008169473', 'webdev': false, 'developer': true, 'contributor': true }, // Zerebos

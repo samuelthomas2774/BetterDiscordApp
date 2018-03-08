@@ -26,9 +26,11 @@ class Reflection {
     static findInReturn(internalInstance, prop) {
         const r = internalInstance.return;
         if (!r) return null;
-        const find = this.findMemoizedProp(r, prop);
+        let find = this.findMemoizedProp(r, prop);
         if (find) return find;
-        return this.findMemoizedState(r, prop);
+        find = this.findMemoizedState(r, prop);
+        if (find) return find;
+        return this.findInReturn(r, prop);
     }
 
     static findMemoizedProp(obj, prop) {

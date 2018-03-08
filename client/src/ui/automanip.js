@@ -137,6 +137,7 @@ export default class {
             this.setId(msg);
         }
     }
+
     setId(msg) {
         if (msg.hasAttribute('message-id')) return;
         const r = Reflection(msg);
@@ -145,10 +146,11 @@ export default class {
         const { id, author } = message;
         if (!id || !author) return;
         const currentUser = author.id === TempApi.currentUserId;
-        DOM.setAttributes(msg, [{ name: 'message-id', value: message.id }]);
+        msg.setAttribute('message-id', message.id);
         const msgGroup = msg.closest('.message-group');
         if (!msgGroup) return;
-        DOM.setAttributes(msgGroup, [{ name: 'author-id', value: author.id }, { name: 'author-is-currentuser', value: currentUser }]);
+        msgGroup.setAttribute('author-id', author.id);
+        if (currentUser) msgGroup.setAttribute('author-is-currentuser', true);
     }
 
     get appMount() {

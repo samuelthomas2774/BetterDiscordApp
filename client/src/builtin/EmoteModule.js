@@ -19,7 +19,7 @@ import TwitchEmotes from '../data/twitch_emotes.json';
 export default class {
 
     static observe() {
-        Events.on('mutable:.markup', markup => {
+        Events.on('ui:mutable:.markup', markup => {
             this.injectEmotes(markup);
         });
     }

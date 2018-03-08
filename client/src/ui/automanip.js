@@ -117,7 +117,7 @@ export default class {
             );
         }
 
-        Events.emit('mutable:.markup', markup.clone);
+        Events.emit('ui:mutable:.markup', markup.clone);
 
         if (reinject) return;
         new MutationObserver(() => {

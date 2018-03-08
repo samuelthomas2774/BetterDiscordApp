@@ -14,50 +14,20 @@ import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
+import EventsWrapper from './eventswrapper';
 import WebpackModules from './webpackmodules';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { BdMenuItems, Modals, DOM } from 'ui';
 import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
-
-class EventsWrapper {
-    constructor(eventemitter) {
-        this.__eventemitter = eventemitter;
-    }
-
-    get eventSubs() {
-        return this._eventSubs || (this._eventSubs = []);
-    }
-
-    subscribe(event, callback) {
-        if (this.eventSubs.find(e => e.event === event && e.callback === callback)) return;
-        this.eventSubs.push({
-            event,
-            callback
-        });
-        this.__eventemitter.on(event, callback);
-    }
-
-    unsubscribe(event, callback) {
-        for (let index of this.eventSubs) {
-            if (this.eventSubs[index].event !== event || (callback && this.eventSubs[index].callback === callback)) return;
-            this.__eventemitter.off(event, this.eventSubs[index].callback);
-            this.eventSubs.splice(index, 1);
-        }
-    }
-
-    unsubscribeAll() {
-        for (let event of this.eventSubs) {
-            this.__eventemitter.off(event.event, event.callback);
-        }
-        this._eventSubs = [];
-    }
-}
 
 export default class PluginApi {
 
     constructor(pluginInfo) {
         this.pluginInfo = pluginInfo;
         this.Events = new EventsWrapper(Events);
+        this._menuItems = undefined;
+        this._injectedStyles = undefined;
+        this._modalStack = undefined;
     }
 
     get plugin() {
@@ -292,17 +262,20 @@ export default class PluginApi {
         return this.addModal(Modals.settings(settingsset, headertext, options));
     }
     get Modals() {
-        return Object.defineProperty(Object.defineProperty({
+        return Object.defineProperties({
             add: this.addModal.bind(this),
             close: this.closeModal.bind(this),
             closeAll: this.closeAllModals.bind(this),
             closeLast: this.closeLastModal.bind(this),
             basic: this.basicModal.bind(this),
             settings: this.settingsModal.bind(this)
-        }, 'stack', {
-            get: () => this.modalStack
-        }), 'baseComponent', {
-            get: () => this.baseModalComponent
+        }, {
+            stack: {
+                get: () => this.modalStack
+            },
+            baseComponent: {
+                get: () => this.baseModalComponent
+            }
         });
     }
 
@@ -396,3 +369,8 @@ export default class PluginApi {
     }
 
 }
+
+// Stop plugins from modifying the plugin API for all plugins
+// Plugins can still modify their own plugin API object
+Object.freeze(PluginApi);
+Object.freeze(PluginApi.prototype);

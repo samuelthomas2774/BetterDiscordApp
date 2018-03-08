@@ -99,6 +99,9 @@ export default class extends ContentManager {
         }
 
         const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor, deps);
+        if (!(plugin.prototype instanceof Plugin))
+            throw {message: `Plugin ${info.name} did not return a class that extends Plugin.`};
+
         const instance = new plugin({
             configs, info, main,
             paths: {

@@ -15,7 +15,17 @@ import Database from './database';
 export default class Content {
 
     constructor(internals) {
-        this.__internals = internals;
+        Object.freeze(internals);
+        Utils.deepfreeze(internals.info);
+        Object.freeze(internals.paths);
+        Object.freeze(internals.configs);
+
+        Object.defineProperty(this, '__internals', {
+            value: internals,
+            configurable: false,
+            enumerable: false,
+            writable: false
+        });
 
         this.settings.on('setting-updated', event => this.events.emit('setting-updated', event));
         this.settings.on('settings-updated', event => this.events.emit('settings-updated', event));
@@ -170,3 +180,5 @@ export default class Content {
     }
 
 }
+
+Object.freeze(Content.prototype);

@@ -30,6 +30,12 @@
                         "hint": "Disconnect from voice server when Discord closes",
                         "value": false,
                         "disabled": true
+                    },
+                    {
+                        "id": "menu-keybind",
+                        "type": "keybind",
+                        "text": "Menu keybind",
+                        "value": "mod+b"
                     }
                 ]
             },

@@ -20,7 +20,8 @@
 </template>
 <script>
     // Imports
-    import { Events } from 'modules';
+    import { Events, Settings } from 'modules';
+    import { Modals } from 'ui';
     import BdSettings from './BdSettings.vue';
 
     export default {
@@ -45,11 +46,9 @@
             hideSettings() { this.active = false },
             toggleSettings() { this.active = !this.active },
             keyupListener(e) {
-                if (document.getElementsByClassName('bd-backdrop').length) return;
-                if (this.$refs.settings.activeIndex !== -1 && e.which === 27) return this.$refs.settings.closeContent();
-                if (this.active && e.which === 27) return this.hideSettings();
-                if (!e.metaKey && !e.ctrlKey || e.key !== 'b') return;
-                this.toggleSettings();
+                if (Modals.stack.length || !this.active || e.which !== 27) return;
+                if (this.$refs.settings.activeIndex !== -1) this.$refs.settings.closeContent();
+                else this.hideSettings();
                 e.stopImmediatePropagation();
             }
         },
@@ -69,6 +68,9 @@
             Events.on('update-check-end', e => this.updating = 1);
             Events.on('updates-available', e => this.updating = 2);
             window.addEventListener('keyup', this.keyupListener);
+
+            const menuKeybind = Settings.getSetting('core', 'default', 'menu-keybind');
+            menuKeybind.on('keybind-activated', () => this.active = !this.active);
         },
         destroyed() {
             window.removeEventListener('keyup', this.keyupListener);

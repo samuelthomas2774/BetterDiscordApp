@@ -19,89 +19,17 @@ import TwitchEmotes from '../data/twitch_emotes.json';
 export default class {
 
     static observe() {
-        Events.on('server-switch', this.injectAll.bind(this));
-        Events.on('channel-switch', this.injectAll.bind(this));
-        Events.on('discord:MESSAGE_CREATE', e => {
-            // Assume that it's the last one for now since the event doesn't give the element
-            const query = document.querySelectorAll('.markup:not(.mutable)');
-            if (!query) return;
-            this.injectMarkup(query[query.length - 1], true);
-        }); // TODO
-    }
-
-    static injectAll() {
-        for (const el of document.querySelectorAll('.markup:not(.mutable)')) {
-            this.injectMarkup(el, this.cloneMarkup(el), false);
-        }
-    }
-
-    static cloneMarkup(node) {
-        const childNodes = [...node.childNodes];
-        const clone = document.createElement('div');
-        clone.className = 'markup mutable';
-        const ets = this.getEts(node);
-        for (const [cni, cn] of childNodes.entries()) {
-            if (cn.nodeType !== Node.TEXT_NODE) {
-                if (cn.className.includes('edited')) continue;
-            }
-            clone.appendChild(cn.cloneNode(true));
-        }
-        return { clone, ets }
-    }
-
-    static getEts(node) {
-        try {
-            const reh = Object.keys(node).find(k => k.startsWith('__reactInternalInstance'));
-            return node[reh].memoizedProps.children[node[reh].memoizedProps.children.length - 1].props.text;
-        } catch (err) {
-            return null;
-        }
-    }
-
-    static injectMarkup(sibling, markup, reinject) {
-        if (sibling.className && sibling.className.includes('mutable')) return; // Ignore trying to make mutable mutable again
-        let cc = null;
-        for (const cn of sibling.parentElement.childNodes) {
-             if (cn.className && cn.className.includes('mutable')) cc = cn;
-        }
-        if (cc) sibling.parentElement.removeChild(cc);
-        if (markup === true) markup = this.cloneMarkup(sibling);
-        markup.clone = this.injectEmotes(markup.clone);
-        sibling.parentElement.insertBefore(markup.clone, sibling);
-        sibling.classList.add('shadow');
-        sibling.style.display = 'none';
-        if (markup.ets) {
-            const etsRoot = document.createElement('span');
-            markup.clone.appendChild(etsRoot);
-            VueInjector.inject(
-                etsRoot,
-                DOM.createElement('span', null, 'test'),
-                { EditedTimeStamp },
-                `<EditedTimeStamp ets="${markup.ets}"/>`,
-                true
-            );
-        }
-
-        if (reinject) return;
-        new MutationObserver(() => {
-            this.injectMarkup(sibling, this.cloneMarkup(sibling), true);
-        }).observe(sibling, { characterData: false, attributes: false, childList: true, subtree: false });
-
-        new MutationObserver(() => {
-            this.injectMarkup(sibling, this.cloneMarkup(sibling), true);
-        }).observe(sibling, { characterData: true, attributes: false, childList: false, subtree: true });
-    }
-
-    static makeMutable(node) {
-        if (node.classList && node.classList.contains('shadow')) return;
-        this.injectMarkup(node, this.cloneMarkup(node));
+        Events.on('mutable:.markup', markup => {
+            this.injectEmotes(markup);
+        });
     }
 
     static injectEmotes(node) {
         if (!/:[\w]+:/gmi.test(node.textContent)) return node;
         const childNodes = [...node.childNodes];
         const newNode = document.createElement('div');
-        newNode.className = 'markup mutable hasEmotes';
+        newNode.className = node.className;
+        newNode.classList.add('hasEmotes');
 
         for (const [cni, cn] of childNodes.entries()) {
             if (cn.nodeType !== Node.TEXT_NODE) {
@@ -152,7 +80,7 @@ export default class {
                 }
             }
         }
-        return newNode;
+        node.replaceWith(newNode);
     }
 
     static isEmote(word) {

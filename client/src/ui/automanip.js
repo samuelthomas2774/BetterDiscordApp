@@ -153,17 +153,14 @@ export default class {
 
     setId(msg) {
         if (msg.hasAttribute('message-id')) return;
-        const r = Reflection(msg);
-        const message = r.prop('message');
-        if (!message) return;
-        const { id, author } = message;
-        if (!id || !author) return;
-        const currentUser = author.id === TempApi.currentUserId;
-        msg.setAttribute('message-id', message.id);
+        const messageid = Reflection(msg).prop('message');
+        const authorid = Reflection(msg).prop('message.author.id');
+        if (!messageid || !authorid) return;
+        msg.setAttribute('message-id', messageid);
         const msgGroup = msg.closest('.message-group');
         if (!msgGroup) return;
-        msgGroup.setAttribute('author-id', author.id);
-        if (currentUser) msgGroup.setAttribute('author-is-currentuser', true);
+        msgGroup.setAttribute('author-id', authorid);
+        if (authorid === TempApi.currentUserId) msgGroup.setAttribute('author-is-currentuser', true);
     }
 
     setUserId(user) {

@@ -37,6 +37,7 @@ class DOMObserver {
         this.subscribe = this.subscribe.bind(this);
         this.observerCallback = this.observerCallback.bind(this);
         this.observer = new MutationObserver(this.observerCallback);
+        this.observe();
     }
 
     observerCallback(mutations) {

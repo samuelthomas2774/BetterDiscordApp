@@ -74,6 +74,16 @@ export default class {
             const markup = e.element.querySelector('.markup:not(.mutable)');
             if (markup) this.injectMarkup(markup, this.cloneMarkup(markup), false);
         });
+
+        const filter = function (mutation) {
+            return mutation.removedNodes && mutation.removedNodes.length && mutation.removedNodes[0].className && mutation.removedNodes[0].className.includes('loading-more');
+        }
+
+        DOM.observer.subscribe('loading-more-manip', filter, mutation => {
+            Events.emit('ui:loadedmore');
+            this.setIds();
+            this.makeMutable();
+        });
     }
 
     getEts(node) {

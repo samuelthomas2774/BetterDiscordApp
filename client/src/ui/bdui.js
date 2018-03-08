@@ -14,10 +14,12 @@ import { BdSettingsWrapper } from './components';
 import BdModals from './components/bd/BdModals.vue';
 import { Events, WebpackModules } from 'modules';
 import { Utils } from 'common';
+import AutoManip from './automanip';
 
 export default class {
 
     static initUiEvents() {
+        this.autoManip = new AutoManip();
         const defer = setInterval(() => {
             if (!this.profilePopupModule) return;
             clearInterval(defer);

@@ -158,4 +158,10 @@ export default class DOM {
         style.appendChild(document.createTextNode(css));
         return style;
     }
+
+    static setAttributes(node, attributes) {
+        for (let attribute of attributes) {
+            node.setAttribute(attribute.name, attribute.value);
+        }
+    }
 }

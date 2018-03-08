@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-export default class {
+class Reflection {
     static reactInternalInstance(node) {
         if (!Object.keys(node) || !Object.keys(node).length) return null;
         const riiKey = Object.keys(node).find(k => k.startsWith('__reactInternalInstance'));
@@ -53,4 +53,22 @@ export default class {
         }
         return null;
     }
+}
+
+export default function (node) {
+    return new class Reflect {
+        constructor(node) {
+            if ('string' === typeof node) node = document.querySelector(node);
+            this.node = this.el = this.element = node;
+        }
+        get props() {
+            return 'not yet implemented';
+        }
+        get reactInternalInstance() {
+            return Reflection.reactInternalInstance(this.node);
+        }
+        prop(propName) {
+            return Reflection.findProp(this.node, propName);
+        }
+    }(node);
 }

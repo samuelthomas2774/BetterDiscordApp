@@ -39,6 +39,7 @@ class TempApi {
 export default class {
 
     constructor() {
+        window.Reflection = Reflection;
         Events.on('server-switch', e => {
             try {
                 this.appMount.setAttribute('guild-id', TempApi.currentGuildId);
@@ -62,7 +63,8 @@ export default class {
     setIds() {
         for (let msg of document.querySelectorAll('.message')) {
             if (msg.hasAttribute('message-id')) continue;
-            const message = Reflection.findProp(msg, 'message');
+            const r = Reflection(msg);
+            const message = r.prop('message');
             if (!message) continue;
             const { id, author } = message;
             if (!id || !author) continue;

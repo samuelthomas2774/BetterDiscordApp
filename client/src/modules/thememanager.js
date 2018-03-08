@@ -45,8 +45,11 @@ export default class ThemeManager extends ContentManager {
                     mainPath: paths.mainPath
                 }
             });
-            if (!instance.css) instance.recompile();
-            else if (instance.enabled) instance.enable();
+            if (instance.enabled) {
+                instance.userConfig.enabled = false;
+                instance.enable();
+                if (!instance.css) instance.recompile();
+            }
             return instance;
         } catch (err) {
             throw err;

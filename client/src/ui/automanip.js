@@ -130,17 +130,6 @@ export default class {
         }
 
         Events.emit('ui:mutable:.markup', markup.clone);
-
-        if (reinject) return;
-        /*
-        new MutationObserver(() => {
-            this.injectMarkup(sibling, this.cloneMarkup(sibling), true);
-        }).observe(sibling, { characterData: false, attributes: false, childList: true, subtree: false });
-
-        new MutationObserver(() => {
-            this.injectMarkup(sibling, this.cloneMarkup(sibling), true);
-        }).observe(sibling, { characterData: true, attributes: false, childList: false, subtree: true });
-        */
     }
 
     setIds() {

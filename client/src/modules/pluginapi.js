@@ -264,7 +264,6 @@ export default class PluginApi {
     }
     addModal(_modal, component) {
         const modal = Modals.add(_modal, component);
-        modal.close = force => this.closeModal(modal, force);
         modal.on('close', () => {
             let index;
             while ((index = this.modalStack.findIndex(m => m === modal)) > -1)
@@ -298,6 +297,7 @@ export default class PluginApi {
             close: this.closeModal.bind(this),
             closeAll: this.closeAllModals.bind(this),
             closeLast: this.closeLastModal.bind(this),
+            basic: this.basicModal.bind(this),
             settings: this.settingsModal.bind(this)
         }, 'stack', {
             get: () => this.modalStack

@@ -48,7 +48,6 @@ export default class ThemeManager extends ContentManager {
             if (instance.enabled) {
                 instance.userConfig.enabled = false;
                 instance.enable();
-                if (!instance.css) instance.recompile();
             }
             return instance;
         } catch (err) {

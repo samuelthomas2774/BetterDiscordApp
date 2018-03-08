@@ -1,4 +1,4 @@
-module.exports = (Plugin, { Logger, Settings, BdMenu: { BdMenuItems }, Api }) => class extends Plugin {
+module.exports = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Api }) => class extends Plugin {
 	async onstart() {
 		// Some array event examples
 		const arraySetting = this.settings.getSetting('default', 'array-1');

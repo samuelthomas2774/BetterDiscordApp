@@ -61,7 +61,7 @@ export default class {
                     newNode.appendChild(emoteRoot);
                     VueInjector.inject(
                         emoteRoot,
-                        DOM.createElement('span', null, 'emotetest'),
+                        DOM.createElement('span'),
                         { EmoteComponent },
                         `<EmoteComponent src="${isEmote.src}" name="${isEmote.name}"/>`,
                         true

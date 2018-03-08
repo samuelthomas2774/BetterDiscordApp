@@ -67,7 +67,7 @@ class Reflection {
 }
 
 export default function (node) {
-    return new class Reflect {
+    return new class {
         constructor(node) {
             if ('string' === typeof node) node = document.querySelector(node);
             this.node = this.el = this.element = node;

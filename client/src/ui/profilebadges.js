@@ -10,18 +10,20 @@
 
 import { EventListener } from 'modules';
 import DOM from './dom';
-import { BdBadge } from './components/bd';
+import { BdBadge, BdMessageBadge } from './components/bd';
 import VueInjector from './vueinjector';
 
 export default class extends EventListener {
 
     bindings() {
         this.uiEvent = this.uiEvent.bind(this);
+        this.messageBadges = this.messageBadges.bind(this);
     }
 
     get eventBindings() {
         return [
-            { id: 'ui-event', callback:  this.uiEvent }
+            { id: 'discord:MESSAGE_CREATE', callback: this.messageBadges },
+            { id: 'ui-event', callback: this.uiEvent }
         ];
     }
 
@@ -32,6 +34,28 @@ export default class extends EventListener {
         if (!userid) return;
 
         this.inject(userid);
+    }
+
+    messageBadges(e) {
+        if (!e.element) return;
+        const msgGroup = e.element.closest('.message-group');
+        if (msgGroup.dataset.hasBadges) return;
+        msgGroup.setAttribute('data-has-badges', true);
+        if (!msgGroup.dataset.authorId) return;
+        const c = this.contributors.find(c => c.id === msgGroup.dataset.authorId);
+        if (!c) return;
+        const root = document.createElement('span');
+        const wrapperParent = msgGroup.querySelector('.username-wrapper').parentElement;
+        if (!wrapperParent || wrapperParent.children.length < 2) return;
+        wrapperParent.insertBefore(root, wrapperParent.children[1]);
+        const { developer, contributor, webdev } = c;
+        VueInjector.inject(
+            root,
+            DOM.createElement('div', null, 'bdmessagebadges'),
+            { BdMessageBadge },
+            `<BdMessageBadge developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`,
+            true
+        );
     }
 
     inject(userid) {
@@ -61,6 +85,7 @@ export default class extends EventListener {
     get contributors() {
         return [
             { 'id': '81388395867156480', 'webdev': true, 'developer': true, 'contributor': true }, // Jiiks
+            { 'id': '418494039050944513', 'webdev': true, 'developer': true, 'contributor': true }, // Mioni
             { 'id': '98003542823944192', 'webdev': false, 'developer': true, 'contributor': true }, // Pohky
             { 'id': '138850472541814784', 'webdev': true, 'developer': false, 'contributor': true }, // Hammock
             { 'id': '249746236008169473', 'webdev': false, 'developer': true, 'contributor': true }, // Zerebos

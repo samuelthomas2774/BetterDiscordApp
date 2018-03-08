@@ -53,6 +53,17 @@ class Reflection {
         }
         return null;
     }
+
+    static propIterator(obj, propNames) {
+        if (obj === null || obj === undefined) return null;
+        const curPropName = propNames.shift(1);
+        if (!obj.hasOwnProperty(curPropName)) return null;
+        const curProp = obj[curPropName];
+        if (propNames.length === 0) {
+            return curProp;
+        }
+        return this.propIterator(curProp, propNames);
+    }
 }
 
 export default function (node) {
@@ -68,7 +79,10 @@ export default function (node) {
             return Reflection.reactInternalInstance(this.node);
         }
         prop(propName) {
-            return Reflection.findProp(this.node, propName);
+            const split = propName.split('.');
+            const first = Reflection.findProp(this.node, split[0]);
+            if (split.length === 1) return first;
+            return Reflection.propIterator(first, split.slice(1));
         }
     }(node);
 }

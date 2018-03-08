@@ -17,27 +17,29 @@ import DropdownSetting from './types/dropdown';
 import RadioSetting from './types/radio';
 import SliderSetting from './types/slider';
 import ColourSetting from './types/colour';
+import KeybindSetting from './types/keybind';
 import FileSetting from './types/file';
 import ArraySetting from './types/array';
 import CustomSetting from './types/custom';
 
 export default class Setting {
 
-    constructor(args) {
+    constructor(args, ...merge) {
         args = args.args || args;
 
         if (args.type === 'color') args.type = 'colour';
 
-        if (args.type === 'bool') return new BoolSetting(args);
-        else if (args.type === 'text') return new StringSetting(args);
-        else if (args.type === 'number') return new NumberSetting(args);
-        else if (args.type === 'dropdown') return new DropdownSetting(args);
-        else if (args.type === 'radio') return new RadioSetting(args);
-        else if (args.type === 'slider') return new SliderSetting(args);
-        else if (args.type === 'colour') return new ColourSetting(args);
-        else if (args.type === 'file') return new FileSetting(args);
-        else if (args.type === 'array') return new ArraySetting(args);
-        else if (args.type === 'custom') return new CustomSetting(args);
+        if (args.type === 'bool') return new BoolSetting(args, ...merge);
+        else if (args.type === 'text') return new StringSetting(args, ...merge);
+        else if (args.type === 'number') return new NumberSetting(args, ...merge);
+        else if (args.type === 'dropdown') return new DropdownSetting(args, ...merge);
+        else if (args.type === 'radio') return new RadioSetting(args, ...merge);
+        else if (args.type === 'slider') return new SliderSetting(args, ...merge);
+        else if (args.type === 'colour') return new ColourSetting(args, ...merge);
+        else if (args.type === 'keybind') return new KeybindSetting(args, ...merge);
+        else if (args.type === 'file') return new FileSetting(args, ...merge);
+        else if (args.type === 'array') return new ArraySetting(args, ...merge);
+        else if (args.type === 'custom') return new CustomSetting(args, ...merge);
         else throw {message: `Setting type ${args.type} unknown`};
     }
 

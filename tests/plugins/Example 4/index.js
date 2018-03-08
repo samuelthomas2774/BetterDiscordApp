@@ -7,6 +7,14 @@ module.exports = (Plugin, { Logger, Settings, BdMenu: { BdMenuItems }, Api }) =>
 		arraySetting.on('item-updated', event => Logger.log('Item', event.item, 'of the array setting was updated', event));
 		arraySetting.on('item-removed', event => Logger.log('Item', event.item, 'removed from the array setting'));
 
+        // Keybind setting examples
+        const keybindSetting = this.settings.getSetting('default', 'keybind-1');
+        Logger.log('Keybind setting', keybindSetting);
+        keybindSetting.on('keybind-activated', event => {
+            Logger.log('Keybind pressed', event);
+            Modals.basic('Example Plugin 4', 'Test keybind activated.');
+        });
+
         // Create a new settings set and add it to the menu
         const set = Settings.createSet({
             text: this.name

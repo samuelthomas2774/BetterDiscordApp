@@ -27,6 +27,7 @@ export default class extends EventListener {
             { id: 'discord:MESSAGE_UPDATE', callback: this.messageBadge },
             { id: 'server-switch', callback: this.messageBadges },
             { id: 'channel-switch', callback: this.messageBadges },
+            { id: 'ui:loadedmore', callback: this.messageBadges },
             { id: 'ui-event', callback: this.uiEvent }
         ];
     }

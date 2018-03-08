@@ -153,14 +153,14 @@ export default class {
 
     setId(msg) {
         if (msg.hasAttribute('message-id')) return;
-        const messageid = Reflection(msg).prop('message');
+        const messageid = Reflection(msg).prop('message.id');
         const authorid = Reflection(msg).prop('message.author.id');
         if (!messageid || !authorid) return;
-        msg.setAttribute('message-id', messageid);
+        msg.setAttribute('data-message-id', messageid);
         const msgGroup = msg.closest('.message-group');
         if (!msgGroup) return;
-        msgGroup.setAttribute('author-id', authorid);
-        if (authorid === TempApi.currentUserId) msgGroup.setAttribute('author-is-currentuser', true);
+        msgGroup.setAttribute('data-author-id', authorid);
+        if (authorid === TempApi.currentUserId) msgGroup.setAttribute('data-currentuser', true);
     }
 
     setUserId(user) {
@@ -169,7 +169,7 @@ export default class {
         if (!userid) return;
         user.setAttribute('user-id', userid);
         const currentUser = userid === TempApi.currentUserId;
-        if (currentUser) user.setAttribute('is-currentuser', true);
+        if (currentUser) user.setAttribute('data-currentuser', true);
     }
 
     get appMount() {

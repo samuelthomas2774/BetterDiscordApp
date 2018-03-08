@@ -146,6 +146,9 @@ export default class {
         for (let msg of document.querySelectorAll('.message')) {
             this.setId(msg);
         }
+        for (let user of document.querySelectorAll('.channel-members-wrap .member')) {
+            this.setUserId(user);
+        }
     }
 
     setId(msg) {
@@ -161,6 +164,15 @@ export default class {
         if (!msgGroup) return;
         msgGroup.setAttribute('author-id', author.id);
         if (currentUser) msgGroup.setAttribute('author-is-currentuser', true);
+    }
+
+    setUserId(user) {
+        if (user.hasAttribute('user-id')) return;
+        const userid = Reflection(user).prop('user.id');
+        if (!userid) return;
+        user.setAttribute('user-id', userid);
+        const currentUser = userid === TempApi.currentUserId;
+        if (currentUser) user.setAttribute('is-currentuser', true);
     }
 
     get appMount() {

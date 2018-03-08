@@ -18,16 +18,18 @@ export default class extends EventListener {
     bindings() {
         this.uiEvent = this.uiEvent.bind(this);
         this.messageBadge = this.messageBadge.bind(this);
-        this.messageBadges = this.messageBadges.bind(this);
+        this.badges = this.badges.bind(this);
+        this.userlistBadge = this.userlistBadge.bind(this);
     }
 
     get eventBindings() {
         return [
             { id: 'discord:MESSAGE_CREATE', callback: this.messageBadge },
             { id: 'discord:MESSAGE_UPDATE', callback: this.messageBadge },
-            { id: 'server-switch', callback: this.messageBadges },
-            { id: 'channel-switch', callback: this.messageBadges },
-            { id: 'ui:loadedmore', callback: this.messageBadges },
+            { id: 'server-switch', callback: this.badges },
+            { id: 'channel-switch', callback: this.badges },
+            { id: 'ui:loadedmore', callback: this.badges },
+            { id: 'ui:useridset', callback: this.userlistBadge },
             { id: 'ui-event', callback: this.uiEvent }
         ];
     }
@@ -41,7 +43,7 @@ export default class extends EventListener {
         this.inject(userid);
     }
 
-    messageBadges() {
+    badges() {
         for (const messageGroup of document.querySelectorAll('.message-group')) {
             this.messageBadge({ element: messageGroup });
         }
@@ -59,6 +61,23 @@ export default class extends EventListener {
         const wrapperParent = msgGroup.querySelector('.username-wrapper').parentElement;
         if (!wrapperParent || wrapperParent.children.length < 2) return;
         wrapperParent.insertBefore(root, wrapperParent.children[1]);
+        const { developer, contributor, webdev } = c;
+        VueInjector.inject(
+            root,
+            DOM.createElement('div', null, 'bdmessagebadges'),
+            { BdMessageBadge },
+            `<BdMessageBadge developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`,
+            true
+        );
+    }
+
+    userlistBadge(e) {
+        const c = this.contributors.find(c => c.id === e.dataset.userId);
+        if (!c) return;
+        const memberUsername = e.querySelector('.member-username');
+        if (!memberUsername) return;
+        const root = document.createElement('span');
+        memberUsername.append(root);
         const { developer, contributor, webdev } = c;
         VueInjector.inject(
             root,

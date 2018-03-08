@@ -41,3 +41,18 @@
         height: 12px;
     }
 }
+
+.member-username .bd-message-badges-wrap {
+    display: inline-block;
+    height: 17px;
+    width: 14px;
+
+    .bd-message-badge-developer,
+    .bd-message-badge-contributor {
+        width: 14px;
+        height: 16px;
+        background-position: center;
+        background-size: 12px 12px;
+        background-repeat: no-repeat;
+    }
+}

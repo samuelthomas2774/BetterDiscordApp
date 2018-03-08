@@ -163,12 +163,13 @@ export default class extends EventListener {
     }
 
     setUserId(user) {
-        if (user.hasAttribute('user-id')) return;
+        if (user.hasAttribute('data-user-id')) return;
         const userid = Reflection(user).prop('user.id');
         if (!userid) return;
-        user.setAttribute('user-id', userid);
+        user.setAttribute('data-user-id', userid);
         const currentUser = userid === TempApi.currentUserId;
         if (currentUser) user.setAttribute('data-currentuser', true);
+        Events.emit('ui:useridset', user);
     }
 
     get appMount() {

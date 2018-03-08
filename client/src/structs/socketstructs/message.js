@@ -9,6 +9,7 @@
 */
 
 import DiscordEvent from './discordevent';
+import { Reflection } from 'ui';
 
 export class MESSAGE_CREATE extends DiscordEvent {
     get author() { return this.args.author }
@@ -26,6 +27,14 @@ export class MESSAGE_CREATE extends DiscordEvent {
     get timestamp() { return this.args.timestamp }
     get tts() { return this.args.tts }
     get type() { return this.args.type }
+    get element() {
+        const find = document.querySelector(`[message-id="${this.id}"]`);
+        if (find) return find;
+        const messages = document.querySelectorAll('.message');
+        const lastMessage = messages[messages.length - 1];
+        if (Reflection(lastMessage).prop('message.id') === this.id) return lastMessage;
+        return null;
+    }
 }
 export class MESSAGE_UPDATE extends MESSAGE_CREATE { }
 

@@ -62,6 +62,18 @@ export default class {
                 console.log(err);
             }
         });
+        Events.on('discord:MESSAGE_CREATE', e => {
+            if (!e.element) return;
+            this.setId(e.element);
+            const markup = e.element.querySelector('.markup:not(.mutable)');
+            if (markup) this.injectMarkup(markup, this.cloneMarkup(markup), false);
+        });
+        Events.on('discord:MESSAGE_UPDATE', e => {
+            if (!e.element) return;
+            this.setId(e.element);
+            const markup = e.element.querySelector('.markup:not(.mutable)');
+            if (markup) this.injectMarkup(markup, this.cloneMarkup(markup), false);
+        });
     }
 
     getEts(node) {
@@ -120,6 +132,7 @@ export default class {
         Events.emit('ui:mutable:.markup', markup.clone);
 
         if (reinject) return;
+        /*
         new MutationObserver(() => {
             this.injectMarkup(sibling, this.cloneMarkup(sibling), true);
         }).observe(sibling, { characterData: false, attributes: false, childList: true, subtree: false });
@@ -127,22 +140,26 @@ export default class {
         new MutationObserver(() => {
             this.injectMarkup(sibling, this.cloneMarkup(sibling), true);
         }).observe(sibling, { characterData: true, attributes: false, childList: false, subtree: true });
+        */
     }
 
     setIds() {
         for (let msg of document.querySelectorAll('.message')) {
-            if (msg.hasAttribute('message-id')) continue;
-            const r = Reflection(msg);
-            const message = r.prop('message');
-            if (!message) continue;
-            const { id, author } = message;
-            if (!id || !author) continue;
-            const currentUser = author.id === TempApi.currentUserId;
-            DOM.setAttributes(msg, [{ name: 'message-id', value: message.id }]);
-            const msgGroup = msg.closest('.message-group');
-            if (!msgGroup) continue;
-            DOM.setAttributes(msgGroup, [{ name: 'author-id', value: author.id }, { name: 'author-is-currentuser', value: currentUser }]);
+            this.setId(msg);
         }
+    }
+    setId(msg) {
+        if (msg.hasAttribute('message-id')) return;
+        const r = Reflection(msg);
+        const message = r.prop('message');
+        if (!message) return;
+        const { id, author } = message;
+        if (!id || !author) return;
+        const currentUser = author.id === TempApi.currentUserId;
+        DOM.setAttributes(msg, [{ name: 'message-id', value: message.id }]);
+        const msgGroup = msg.closest('.message-group');
+        if (!msgGroup) return;
+        DOM.setAttributes(msgGroup, [{ name: 'author-id', value: author.id }, { name: 'author-is-currentuser', value: currentUser }]);
     }
 
     get appMount() {

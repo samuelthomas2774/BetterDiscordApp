@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, WebpackModules } from 'modules';
+import { Events, WebpackModules, EventListener } from 'modules';
 import Reflection from './reflection';
 import DOM from './dom';
 import VueInjector from './vueinjector';
@@ -38,43 +38,10 @@ class TempApi {
     }
 }
 
-export default class {
+export default class extends EventListener {
 
     constructor() {
-        window.Reflection = Reflection;
-        Events.on('server-switch', e => {
-            try {
-                this.appMount.setAttribute('guild-id', TempApi.currentGuildId);
-                this.appMount.setAttribute('channel-id', TempApi.currentChannelId);
-                this.setIds();
-                this.makeMutable();
-            } catch (err) {
-                console.log(err);
-            }
-        });
-        Events.on('channel-switch', e => {
-            try {
-                this.appMount.setAttribute('guild-id', TempApi.currentGuildId);
-                this.appMount.setAttribute('channel-id', TempApi.currentChannelId);
-                this.setIds();
-                this.makeMutable();
-            } catch (err) {
-                console.log(err);
-            }
-        });
-        Events.on('discord:MESSAGE_CREATE', e => {
-            if (!e.element) return;
-            this.setId(e.element);
-            const markup = e.element.querySelector('.markup:not(.mutable)');
-            if (markup) this.injectMarkup(markup, this.cloneMarkup(markup), false);
-        });
-        Events.on('discord:MESSAGE_UPDATE', e => {
-            if (!e.element) return;
-            this.setId(e.element);
-            const markup = e.element.querySelector('.markup:not(.mutable)');
-            if (markup) this.injectMarkup(markup, this.cloneMarkup(markup), false);
-        });
-
+        super();
         const filter = function (mutation) {
             return mutation.removedNodes && mutation.removedNodes.length && mutation.removedNodes[0].className && mutation.removedNodes[0].className.includes('loading-more');
         }
@@ -84,6 +51,38 @@ export default class {
             this.setIds();
             this.makeMutable();
         });
+    }
+
+    bindings() {
+        this.manipAll = this.manipAll.bind(this);
+        this.markupInjector = this.markupInjector.bind(this);
+    }
+
+    get eventBindings() {
+        return [
+            { id: 'server-switch', callback: this.manipAll },
+            { id: 'channel-switch', callback: this.manipAll },
+            { id: 'discord:MESSAGE_CREATE', callback: this.markupInjector },
+            { id: 'discord:MESSAGE_UPDATE', callback: this.markupInjector }
+        ];
+    }
+
+    manipAll() {
+        try {
+            this.appMount.setAttribute('guild-id', TempApi.currentGuildId);
+            this.appMount.setAttribute('channel-id', TempApi.currentChannelId);
+            this.setIds();
+            this.makeMutable();
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    markupInjector(e) {
+        if (!e.element) return;
+        this.setId(e.element);
+        const markup = e.element.querySelector('.markup:not(.mutable)');
+        if (markup) this.injectMarkup(markup, this.cloneMarkup(markup), false);
     }
 
     getEts(node) {

@@ -17,12 +17,16 @@ export default class extends EventListener {
 
     bindings() {
         this.uiEvent = this.uiEvent.bind(this);
+        this.messageBadge = this.messageBadge.bind(this);
         this.messageBadges = this.messageBadges.bind(this);
     }
 
     get eventBindings() {
         return [
-            { id: 'discord:MESSAGE_CREATE', callback: this.messageBadges },
+            { id: 'discord:MESSAGE_CREATE', callback: this.messageBadge },
+            { id: 'discord:MESSAGE_UPDATE', callback: this.messageBadge },
+            { id: 'server-switch', callback: this.messageBadges },
+            { id: 'channel-switch', callback: this.messageBadges },
             { id: 'ui-event', callback: this.uiEvent }
         ];
     }
@@ -36,7 +40,13 @@ export default class extends EventListener {
         this.inject(userid);
     }
 
-    messageBadges(e) {
+    messageBadges() {
+        for (const messageGroup of document.querySelectorAll('.message-group')) {
+            this.messageBadge({ element: messageGroup });
+        }
+    }
+
+    messageBadge(e) {
         if (!e.element) return;
         const msgGroup = e.element.closest('.message-group');
         if (msgGroup.dataset.hasBadges) return;

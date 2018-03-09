@@ -10,18 +10,27 @@
 
 import { EventListener } from 'modules';
 import DOM from './dom';
-import { BdBadge } from './components/bd';
+import { BdBadge, BdMessageBadge } from './components/bd';
 import VueInjector from './vueinjector';
 
 export default class extends EventListener {
 
     bindings() {
         this.uiEvent = this.uiEvent.bind(this);
+        this.messageBadge = this.messageBadge.bind(this);
+        this.badges = this.badges.bind(this);
+        this.userlistBadge = this.userlistBadge.bind(this);
     }
 
     get eventBindings() {
         return [
-            { id: 'ui-event', callback:  this.uiEvent }
+            { id: 'discord:MESSAGE_CREATE', callback: this.messageBadge },
+            { id: 'discord:MESSAGE_UPDATE', callback: this.messageBadge },
+            { id: 'server-switch', callback: this.badges },
+            { id: 'channel-switch', callback: this.badges },
+            { id: 'ui:loadedmore', callback: this.badges },
+            { id: 'ui:useridset', callback: this.userlistBadge },
+            { id: 'ui-event', callback: this.uiEvent }
         ];
     }
 
@@ -32,6 +41,51 @@ export default class extends EventListener {
         if (!userid) return;
 
         this.inject(userid);
+    }
+
+    badges() {
+        for (const messageGroup of document.querySelectorAll('.message-group')) {
+            this.messageBadge({ element: messageGroup });
+        }
+    }
+
+    messageBadge(e) {
+        if (!e.element) return;
+        const msgGroup = e.element.closest('.message-group');
+        if (msgGroup.dataset.hasBadges) return;
+        msgGroup.setAttribute('data-has-badges', true);
+        if (!msgGroup.dataset.authorId) return;
+        const c = this.contributors.find(c => c.id === msgGroup.dataset.authorId);
+        if (!c) return;
+        const root = document.createElement('span');
+        const wrapperParent = msgGroup.querySelector('.username-wrapper').parentElement;
+        if (!wrapperParent || wrapperParent.children.length < 2) return;
+        wrapperParent.insertBefore(root, wrapperParent.children[1]);
+        const { developer, contributor, webdev } = c;
+        VueInjector.inject(
+            root,
+            DOM.createElement('div', null, 'bdmessagebadges'),
+            { BdMessageBadge },
+            `<BdMessageBadge developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`,
+            true
+        );
+    }
+
+    userlistBadge(e) {
+        const c = this.contributors.find(c => c.id === e.dataset.userId);
+        if (!c) return;
+        const memberUsername = e.querySelector('.member-username');
+        if (!memberUsername) return;
+        const root = document.createElement('span');
+        memberUsername.append(root);
+        const { developer, contributor, webdev } = c;
+        VueInjector.inject(
+            root,
+            DOM.createElement('div', null, 'bdmessagebadges'),
+            { BdMessageBadge },
+            `<BdMessageBadge developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`,
+            true
+        );
     }
 
     inject(userid) {

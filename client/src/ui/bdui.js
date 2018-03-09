@@ -14,10 +14,44 @@ import { BdSettingsWrapper } from './components';
 import BdModals from './components/bd/BdModals.vue';
 import { Events, WebpackModules } from 'modules';
 import { Utils } from 'common';
+import AutoManip from './automanip';
+import { remote } from 'electron';
+
+class TempApi {
+    static get currentGuild() {
+        try {
+            const currentGuildId = WebpackModules.getModuleByName('SelectedGuildStore').getGuildId();
+            return WebpackModules.getModuleByName('GuildStore').getGuild(currentGuildId);
+        } catch (err) {
+            return null;
+        }
+    }
+    static get currentChannel() {
+        try {
+            const currentChannelId = WebpackModules.getModuleByName('SelectedChannelStore').getChannelId();
+            return WebpackModules.getModuleByName('ChannelStore').getChannel(currentChannelId);
+        } catch (err) {
+            return 0;
+        }
+    }
+    static get currentUserId() {
+        try {
+            return WebpackModules.getModuleByName('UserStore').getCurrentUser().id;
+        } catch (err) {
+            return 0;
+        }
+    }
+}
 
 export default class {
 
     static initUiEvents() {
+        this.pathCache = {
+            isDm: null,
+            server: TempApi.currentGuild,
+            channel: TempApi.currentChannel
+        };
+        this.autoManip = new AutoManip();
         const defer = setInterval(() => {
             if (!this.profilePopupModule) return;
             clearInterval(defer);
@@ -27,39 +61,42 @@ export default class {
                 data: { userid }
             }));
         }, 100);
-        // This is temporary
-        const locationInterval = setInterval(() => {
-            try {
-                const path = window.location.pathname.match(/\d+/g);
-                if (!path) {
-                    this.prevLocation = null;
-                    Events.emit('server-switch');
+
+        const ehookInterval = setInterval(() => {
+            if (!remote.BrowserWindow.getFocusedWindow()) return;
+            clearInterval(ehookInterval);
+            remote.BrowserWindow.getFocusedWindow().webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
+                const { currentGuild, currentChannel } = TempApi;
+                if (!this.pathCache.server) {
+                    Events.emit('server-switch', { 'server': currentGuild, 'channel': currentChannel });
+                    this.pathCache.server = currentGuild;
+                    this.pathCache.channel = currentChannel;
                     return;
                 }
-                const ids = path.reduce((obj, el, index) => {
-                        obj[index === 0 ? 'guildId' : 'channelId'] = el;
-                        return obj;
-                    },
-                    {});
-
-                if (Object.keys(ids).length === 1) {
-                    ids.isDm = true;
-                    ids.dmId = ids.guildId
+                if (!this.pathCache.channel) {
+                    Events.emit('channel-switch', currentChannel);
+                    this.pathCache.server = currentGuild;
+                    this.pathCache.channel = currentChannel;
+                    return;
                 }
-
-                if (!this.prevLocation) {
-                    Events.emit('server-switch');
-                } else {
-                    if (this.prevLocation.channelId !== ids.channelId) {
-                        Events.emit('channel-switch');
-                    } else if (this.prevLocation.guildId !== ids.guildId) {
-                        Events.emit('server-switch');
-                    }
+                if (currentGuild &&
+                    currentGuild.id &&
+                    this.pathCache.server &&
+                    this.pathCache.server.id !== currentGuild.id) {
+                    Events.emit('server-switch', { 'server': currentGuild, 'channel': currentChannel });
+                    this.pathCache.server = currentGuild;
+                    this.pathCache.channel = currentChannel;
+                    return;
                 }
-                this.prevLocation = ids;
-            } catch (err) {
-                console.log(err);
-            }
+                if (currentChannel &&
+                    currentChannel.id &&
+                    this.pathCache.channel &&
+                    this.pathCache.channel.id !== currentChannel.id) Events.emit('channel-switch', currentChannel);
+
+
+                this.pathCache.server = currentGuild;
+                this.pathCache.channel = currentChannel;
+            });
         }, 100);
     }
 

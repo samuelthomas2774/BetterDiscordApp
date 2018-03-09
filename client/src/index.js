@@ -13,6 +13,7 @@ import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
+const ignoreExternal = false;
 
 class BetterDiscord {
 
@@ -29,7 +30,7 @@ class BetterDiscord {
         window.bdmodals = Modals;
         window.bdlogs = Logger;
         window.emotes = EmoteModule;
-
+        window.dom = DOM;
         EmoteModule.observe();
 
         DOM.injectStyle(BdCss, 'bdmain');
@@ -41,13 +42,14 @@ class BetterDiscord {
             await Database.init();
             await Settings.loadSettings();
             await ModuleManager.initModules();
-            await ExtModuleManager.loadAllModules(true);
-            await PluginManager.loadAllPlugins(true);
-            await ThemeManager.loadAllThemes(true);
-
+            Modals.showContentManagerErrors();
+            if (!ignoreExternal) {
+                await ExtModuleManager.loadAllModules(true);
+                await PluginManager.loadAllPlugins(true);
+                await ThemeManager.loadAllThemes(true);
+            }
             if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
                 Modals.showContentManagerErrors();
-
             Events.emit('ready');
             Events.emit('discord-ready');
         } catch (err) {

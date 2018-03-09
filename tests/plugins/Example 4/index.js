@@ -1,5 +1,7 @@
 module.exports = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Api }) => class extends Plugin {
 	async onstart() {
+        this.keybindEvent = this.keybindEvent.bind(this);
+
 		// Some array event examples
 		const arraySetting = this.settings.getSetting('default', 'array-1');
 		Logger.log('Array setting', arraySetting);
@@ -10,10 +12,7 @@ module.exports = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, A
         // Keybind setting examples
         const keybindSetting = this.settings.getSetting('default', 'keybind-1');
         Logger.log('Keybind setting', keybindSetting);
-        keybindSetting.on('keybind-activated', event => {
-            Logger.log('Keybind pressed', event);
-            Modals.basic('Example Plugin 4', 'Test keybind activated.');
-        });
+        keybindSetting.on('keybind-activated', this.keybindEvent);
 
         // Create a new settings set and add it to the menu
         const set = Settings.createSet({
@@ -66,6 +65,14 @@ module.exports = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, A
 	}
 
 	onstop() {
+        const keybindSetting = this.settings.getSetting('default', 'keybind-1');
+        keybindSetting.off('keybind-activated', this.keybindEvent);
+
         BdMenuItems.removeAll();
 	}
+
+    keybindEvent(event) {
+        Logger.log('Keybind pressed', event);
+        Modals.basic('Example Plugin 4', 'Test keybind activated.');
+    }
 };

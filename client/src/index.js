@@ -13,7 +13,7 @@ import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
-const ignoreExternal = true;
+const ignoreExternal = false;
 
 class BetterDiscord {
 
@@ -32,6 +32,7 @@ class BetterDiscord {
         window.emotes = EmoteModule;
         window.dom = DOM;
         EmoteModule.observe();
+
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }
@@ -41,25 +42,25 @@ class BetterDiscord {
             await Database.init();
             await Settings.loadSettings();
             await ModuleManager.initModules();
+            Modals.showContentManagerErrors();
             if (!ignoreExternal) {
                 await ExtModuleManager.loadAllModules(true);
                 await PluginManager.loadAllPlugins(true);
                 await ThemeManager.loadAllThemes(true);
             }
-            Modals.showContentManagerErrors();
+            if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
+                Modals.showContentManagerErrors();
             Events.emit('ready');
             Events.emit('discord-ready');
         } catch (err) {
-            console.log('FAILED TO LOAD!', err);
+            Logger.err('main', ['FAILED TO LOAD!', err]);
         }
     }
 
     globalReady() {
         BdUI.initUiEvents();
         this.vueInstance = BdUI.injectUi();
-        (async () => {
-            this.init();
-        })();
+        this.init();
     }
 }
 

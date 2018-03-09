@@ -30,6 +30,12 @@
                         "hint": "Disconnect from voice server when Discord closes",
                         "value": false,
                         "disabled": true
+                    },
+                    {
+                        "id": "menu-keybind",
+                        "type": "keybind",
+                        "text": "Menu keybind",
+                        "value": "mod+b"
                     }
                 ]
             },
@@ -45,6 +51,13 @@
                         "hint": "BetterDiscord developer mode",
                         "value": false,
                         "disabled": true
+                    },
+                    {
+                        "id": "ignore-content-manager-errors",
+                        "type": "bool",
+                        "text": "Ignore content manager errors",
+                        "hint": "Only when starting Discord. It gets annoying when you're reloading Discord often and have plugins that are meant to fail.",
+                        "value": false
                     }
                 ]
             }

@@ -190,8 +190,8 @@ export default class PluginApi {
     injectStyle(id, css) {
         if (id && !css) css = id, id = undefined;
         this.deleteStyle(id);
-        const styleid = `plugin-${this.getPlugin().id}-${id}`;
-        this.injectedStyles.push(styleid);
+        const styleid = `plugin-${this.plugin.id}-${id}`;
+        this.injectedStyles.push(id);
         DOM.injectStyle(css, styleid);
     }
     async injectSass(id, scss, options) {
@@ -201,7 +201,7 @@ export default class PluginApi {
         this.injectStyle(id, css, options);
     }
     deleteStyle(id) {
-        const styleid = `plugin-${this.getPlugin().id}-${id}`;
+        const styleid = `plugin-${this.plugin.id}-${id}`;
         this.injectedStyles.splice(this.injectedStyles.indexOf(styleid), 1);
         DOM.deleteStyle(styleid);
     }

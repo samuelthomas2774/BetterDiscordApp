@@ -46,7 +46,8 @@ export default class Theme extends Content {
     /**
      * This is called when the theme is enabled.
      */
-    onstart() {
+    async onstart() {
+        if (!this.css) await this.recompile();
         DOM.injectTheme(this.css, this.id);
     }
 

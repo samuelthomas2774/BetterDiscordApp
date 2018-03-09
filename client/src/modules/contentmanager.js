@@ -10,15 +10,16 @@
 
 import Content from './content';
 import Globals from './globals';
+import Database from './database';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import path from 'path';
 import { Events } from 'modules';
 import { SettingsSet, ErrorEvent } from 'structs';
 import { Modals } from 'ui';
-import Database from './database';
+import path from 'path';
+import Combokeys from 'combokeys';
 
 /**
- * Base class for external content managing
+ * Base class for managing external content
  */
 export default class {
 
@@ -209,10 +210,12 @@ export default class {
             userConfig.config.setSaved();
 
             for (let setting of userConfig.config.findSettings(() => true)) {
+                // This will load custom settings
+                // Setting the content's path on only the live config (and not the default config) ensures that custom settings will not be loaded on the default settings
                 setting.setContentPath(contentPath);
             }
 
-            Utils.deepfreeze(defaultConfig);
+            Utils.deepfreeze(defaultConfig, object => object instanceof Combokeys);
 
             const configs = {
                 defaultConfig,

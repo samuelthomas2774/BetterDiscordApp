@@ -18,7 +18,23 @@ import path from 'path';
 
 export default new class Settings {
     constructor() {
-        this.settings = [];
+        this.settings = defaultSettings.map(_set => {
+            const set = new SettingsSet(_set);
+
+            set.on('setting-updated', event => {
+                const { category, setting, value, old_value } = event;
+                Logger.log('Settings', `${set.id}/${category.id}/${setting.id} was changed from ${old_value} to ${value}`);
+                Events.emit('setting-updated', event);
+                Events.emit(`setting-updated-${set.id}_${category.id}_${setting.id}`, event);
+            });
+
+            set.on('settings-updated', async (event) => {
+                await this.saveSettings();
+                Events.emit('settings-updated', event);
+            });
+
+            return set;
+        });
     }
 
     async loadSettings() {
@@ -29,22 +45,12 @@ export default new class Settings {
             const user_config = await FileUtils.readJsonFromFile(settingsPath);
             const { settings, scss, css, css_editor_files, scss_error, css_editor_bounds } = user_config;
 
-            this.settings = defaultSettings.map(set => {
-                const newSet = new SettingsSet(set);
-                newSet.merge(settings.find(s => s.id === newSet.id));
-                newSet.setSaved();
-                newSet.on('setting-updated', event => {
-                    const { category, setting, value, old_value } = event;
-                    Logger.log('Settings', `${newSet.id}/${category.id}/${setting.id} was changed from ${old_value} to ${value}`);
-                    Events.emit('setting-updated', event);
-                    Events.emit(`setting-updated-${newSet.id}_${category.id}_${setting.id}`, event);
-                });
-                newSet.on('settings-updated', async (event) => {
-                    await this.saveSettings();
-                    Events.emit('settings-updated', event);
-                });
-                return newSet;
-            });
+            for (let set of this.settings) {
+                const newSet = settings.find(s => s.id === set.id);
+                if (!newSet) continue;
+                set.merge(newSet);
+                set.setSaved();
+            }
 
             CssEditor.setState(scss, css, css_editor_files, scss_error);
             CssEditor.editor_bounds = css_editor_bounds || {};

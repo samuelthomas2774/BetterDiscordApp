@@ -77,6 +77,13 @@
                             ]
                         }
                     ]
+                },
+                {
+                    "id": "keybind-1",
+                    "type": "keybind",
+                    "value": "mod+.",
+                    "text": "Test Keybind Setting 1",
+                    "hint": "Test Keybind Setting Hint 1"
                 }
             ]
         }

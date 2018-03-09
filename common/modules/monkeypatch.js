@@ -10,10 +10,15 @@
 
 import { ClientLogger as Logger } from './logger';
 
+const patchedFunctions = new WeakMap();
+
 export class PatchedFunction {
     constructor(object, methodName, replaceOriginal = true) {
-        if (object[methodName].__monkeyPatch)
-            return object[methodName].__monkeyPatch;
+        if (patchedFunctions.has(object[methodName])) {
+            const patchedFunction = patchedFunctions.get(object[methodName]);
+            if (replaceOriginal) patchedFunction.replaceOriginal();
+            return patchedFunction;
+        }
 
         this.object = object;
         this.methodName = methodName;
@@ -25,7 +30,9 @@ export class PatchedFunction {
         this.replace = function(...args) {
             patchedFunction.call(this, arguments);
         };
-        this.replace.__monkeyPatch = this;
+
+        patchedFunctions.set(object[methodName], this);
+        patchedFunctions.set(this.replace, this);
 
         if (replaceOriginal)
             this.replaceOriginal();

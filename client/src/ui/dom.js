@@ -44,7 +44,8 @@ class DOMObserver {
         for (let sub of this.subscriptions) {
             try {
                 const f = sub.type && sub.type === 'filter' ? mutations.filter(sub.filter) : mutations.find(sub.filter);
-                if (!f || !f.length) continue;
+                if (!f) continue;
+                if (sub.type && sub.type === 'filter' && !f.length) continue;
                 sub.callback(f);
             } catch(err) {}
         }

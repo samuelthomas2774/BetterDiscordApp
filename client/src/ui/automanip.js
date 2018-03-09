@@ -12,7 +12,7 @@ import { Events, WebpackModules, EventListener } from 'modules';
 import Reflection from './reflection';
 import DOM from './dom';
 import VueInjector from './vueinjector';
-import EditedTimeStamp from './components/common/EditedTimeStamp.vue';
+import EditedTimeStamp from './components/common/EditedTimestamp.vue';
 
 class TempApi {
     static get currentGuildId() {

@@ -42,20 +42,32 @@ export default class extends EventListener {
 
     constructor() {
         super();
-        const filter = function (mutation) {
-            return mutation.removedNodes && mutation.removedNodes.length && mutation.removedNodes[0].className && mutation.removedNodes[0].className.includes('loading-more');
+        const messageFilter = function (m) {
+            return m.addedNodes && m.addedNodes.length && m.addedNodes[0].classList && m.addedNodes[0].classList.contains('message-group');
         }
 
-        DOM.observer.subscribe('loading-more-manip', filter, mutation => {
-            Events.emit('ui:loadedmore');
+        DOM.observer.subscribe('loading-more-manip', messageFilter, mutations => {
             this.setIds();
             this.makeMutable();
-        });
+            Events.emit('ui:laodedmore', mutations.map(m => m.addedNodes[0]));
+        }, 'filter');
+
+        const userFilter = function (m) {
+            return m.addedNodes && m.addedNodes.length && m.addedNodes[0].classList && m.addedNodes[0].classList.contains('member');
+        }
+
+        DOM.observer.subscribe('loading-more-users-manip', userFilter, mutations => {
+            this.setUserIds();
+            Events.emit('ui:loadedmoreusers', mutations.map(m => m.addedNodes[0]));
+        }, 'filter');
     }
 
     bindings() {
         this.manipAll = this.manipAll.bind(this);
         this.markupInjector = this.markupInjector.bind(this);
+        this.setIds = this.setIds.bind(this);
+        this.setMessageIds = this.setMessageIds.bind(this);
+        this.setUserIds = this.setUserIds.bind(this);
     }
 
     get eventBindings() {
@@ -142,9 +154,17 @@ export default class extends EventListener {
     }
 
     setIds() {
+        this.setMessageIds();
+        this.setUserIds();
+    }
+
+    setMessageIds() {
         for (let msg of document.querySelectorAll('.message')) {
             this.setId(msg);
         }
+    }
+
+    setUserIds() {
         for (let user of document.querySelectorAll('.channel-members-wrap .member')) {
             this.setUserId(user);
         }

@@ -43,11 +43,9 @@ class DOMObserver {
     observerCallback(mutations) {
         for (let sub of this.subscriptions) {
             try {
-                const f = mutations.find(sub.filter);
-                if (f) {
-                    sub.callback(f);
-                    continue;
-                }
+                const f = sub.type && sub.type === 'filter' ? mutations.filter(sub.filter) : mutations.find(sub.filter);
+                if (!f || !f.length) continue;
+                sub.callback(f);
             } catch(err) {}
         }
     }
@@ -68,12 +66,13 @@ class DOMObserver {
         return this._subscriptions || (this._subscriptions = []);
     }
 
-    subscribe(id, filter, callback) {
+    subscribe(id, filter, callback, type) {
         if (this.subscriptions.find(sub => sub.id === id)) return;
         this.subscriptions.push({
             id,
             filter,
-            callback
+            callback,
+            type
         });
     }
 

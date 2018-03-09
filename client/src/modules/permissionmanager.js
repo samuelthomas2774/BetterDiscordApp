@@ -11,27 +11,27 @@
 const PermissionMap = {
     IDENTIFY: {
         HEADER: 'Access your account information',
-        BODY: 'Allows :NAME: to read your account information(excluding user token)'
+        BODY: 'Allows :NAME: to read your account information (excluding user token).'
     },
     READ_MESSAGES: {
         HEADER: 'Read all messages',
-        BODY: 'Allows :NAME: to read all messages accessible through your Discord account'
+        BODY: 'Allows :NAME: to read all messages accessible through your Discord account.'
     },
     SEND_MESSAGES: {
         HEADER: 'Send messages',
-        BODY: 'Allows :NAME: to send messages on your behalf'
+        BODY: 'Allows :NAME: to send messages on your behalf.'
     },
     DELETE_MESSAGES: {
         HEADER: 'Delete messages',
-        BODY: 'Allows :NAME: to delete messages on your behalf'
+        BODY: 'Allows :NAME: to delete messages on your behalf.'
     },
     EDIT_MESSAGES: {
         HEADER: 'Edit messages',
-        BODY: 'Allows :NAME: to edit messages on your behalf'
+        BODY: 'Allows :NAME: to edit messages on your behalf.'
     },
     JOIN_SERVERS: {
         HEADER: 'Join servers for you',
-        BODY: 'Allows :NAME: to join servers on your behalf'
+        BODY: 'Allows :NAME: to join servers on your behalf.'
     }
 }
 

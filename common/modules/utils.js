@@ -146,18 +146,27 @@ export class Utils {
         return value;
     }
 
-    static deepfreeze(object) {
+    static deepfreeze(object, exclude) {
+        if (exclude && exclude(object)) return;
+
         if (typeof object === 'object' && object !== null) {
             const properties = Object.getOwnPropertyNames(object);
 
             for (let property of properties) {
-                this.deepfreeze(object[property]);
+                this.deepfreeze(object[property], exclude);
             }
 
             Object.freeze(object);
         }
 
         return object;
+    }
+
+    static removeFromArray(array, item) {
+        let index;
+        while ((index = array.indexOf(item)) > -1)
+            array.splice(index, 1);
+        return array;
     }
 }
 

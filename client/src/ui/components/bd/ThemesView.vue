@@ -71,7 +71,6 @@
                 // TODO Display error if theme fails to enable/disable
                 try {
                     await theme.enabled ? ThemeManager.disableTheme(theme) : ThemeManager.enableTheme(theme);
-                    this.$forceUpdate();
                 } catch (err) {
                     console.log(err);
                 }
@@ -80,7 +79,6 @@
                 try {
                     if (reload) await ThemeManager.reloadTheme(theme);
                     else await theme.recompile();
-                    this.$forceUpdate();
                 } catch (err) {
                     console.log(err);
                 }
@@ -89,7 +87,6 @@
                 try {
                     if (unload) await ThemeManager.unloadTheme(theme);
                     else await ThemeManager.deleteTheme(theme);
-                    this.$forceUpdate();
                 } catch (err) {
                     console.error(err);
                 }

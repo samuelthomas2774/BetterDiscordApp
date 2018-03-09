@@ -10,17 +10,18 @@
 
 <template>
     <div class="bd-form-item" :class="{'bd-form-item-changed': setting.changed, 'bd-disabled': disabled, 'bd-form-item-noheader': !setting.text, 'bd-form-item-fullwidth': setting.fullwidth}">
-        <BoolSetting v-if="setting.type === 'bool'" :setting="setting" :change="change"/>
-        <DropdownSetting v-if="setting.type === 'dropdown'" :setting="setting" :change="change"/>
-        <NumberSetting v-if="setting.type === 'number'" :setting="setting" :change="change"/>
-        <RadioSetting v-if="setting.type === 'radio'" :setting="setting" :change="change"/>
-        <StringSetting v-if="setting.type === 'text' && !setting.multiline" :setting="setting" :change="change"/>
-        <MultilineTextSetting v-if="setting.type === 'text' && setting.multiline" :setting="setting" :change="change"/>
-        <SliderSetting v-if="setting.type === 'slider'" :setting="setting" :change="change"/>
-        <FileSetting v-if="setting.type === 'file'" :setting="setting" :change="change"/>
+        <BoolSetting v-if="setting.type === 'bool'" :setting="setting" :change="change" />
+        <DropdownSetting v-if="setting.type === 'dropdown'" :setting="setting" :change="change" />
+        <NumberSetting v-if="setting.type === 'number'" :setting="setting" :change="change" />
+        <RadioSetting v-if="setting.type === 'radio'" :setting="setting" :change="change" />
+        <StringSetting v-if="setting.type === 'text' && !setting.multiline" :setting="setting" :change="change" />
+        <MultilineTextSetting v-if="setting.type === 'text' && setting.multiline" :setting="setting" />
+        <SliderSetting v-if="setting.type === 'slider'" :setting="setting" :change="change" />
+        <ColourSetting v-if="setting.type === 'colour'" :setting="setting" :change="change" />
+        <KeybindSetting v-if="setting.type === 'keybind'" :setting="setting" />
+        <FileSetting v-if="setting.type === 'file'" :setting="setting" :change="change" />
         <ArraySetting v-if="setting.type === 'array'" :setting="setting" :change="change" />
         <CustomSetting v-if="setting.type === 'custom'" :setting="setting" :change="change" />
-        <ColourSetting v-if="setting.type === 'colour'" :setting="setting" :change="change"/>
         <div class="bd-form-divider"></div>
     </div>
 </template>
@@ -33,10 +34,11 @@
     import StringSetting from './String.vue';
     import MultilineTextSetting from './Multiline.vue';
     import SliderSetting from './Slider.vue';
+    import ColourSetting from './Colour.vue';
+    import KeybindSetting from './Keybind.vue';
     import FileSetting from './File.vue';
     import ArraySetting from './Array.vue';
     import CustomSetting from './Custom.vue';
-    import ColourSetting from './Colour.vue';
 
     export default {
         props: [
@@ -50,10 +52,11 @@
             StringSetting,
             MultilineTextSetting,
             SliderSetting,
+            ColourSetting,
+            KeybindSetting,
             FileSetting,
             ArraySetting,
-            CustomSetting,
-            ColourSetting
+            CustomSetting
         },
         computed: {
             changed() {

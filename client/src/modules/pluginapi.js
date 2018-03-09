@@ -14,50 +14,20 @@ import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
+import EventsWrapper from './eventswrapper';
 import WebpackModules from './webpackmodules';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { Modals, DOM } from 'ui';
+import { BdMenuItems, Modals, DOM } from 'ui';
 import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
-
-class EventsWrapper {
-    constructor(eventemitter) {
-        this.__eventemitter = eventemitter;
-    }
-
-    get eventSubs() {
-        return this._eventSubs || (this._eventSubs = []);
-    }
-
-    subscribe(event, callback) {
-        if (this.eventSubs.find(e => e.event === event && e.callback === callback)) return;
-        this.eventSubs.push({
-            event,
-            callback
-        });
-        this.__eventemitter.on(event, callback);
-    }
-
-    unsubscribe(event, callback) {
-        for (let index of this.eventSubs) {
-            if (this.eventSubs[index].event !== event || (callback && this.eventSubs[index].callback === callback)) return;
-            this.__eventemitter.off(event, this.eventSubs[index].callback);
-            this.eventSubs.splice(index, 1);
-        }
-    }
-
-    unsubscribeAll() {
-        for (let event of this.eventSubs) {
-            this.__eventemitter.off(event.event, event.callback);
-        }
-        this._eventSubs = [];
-    }
-}
 
 export default class PluginApi {
 
     constructor(pluginInfo) {
         this.pluginInfo = pluginInfo;
         this.Events = new EventsWrapper(Events);
+        this._menuItems = undefined;
+        this._injectedStyles = undefined;
+        this._modalStack = undefined;
     }
 
     get plugin() {
@@ -154,6 +124,54 @@ export default class PluginApi {
     }
 
     /**
+     * BdMenu
+     */
+
+    get BdMenu() {
+        return {
+            BdMenuItems: this.BdMenuItems
+        };
+    }
+
+    /**
+     * BdMenuItems
+     */
+
+    get menuItems() {
+        return this._menuItems || (this._menuItems = []);
+    }
+    addMenuItem(item) {
+        return BdMenuItems.add(item);
+    }
+    addMenuSettingsSet(category, set, text) {
+        const item = BdMenuItems.addSettingsSet(category, set, text);
+        return this.menuItems.push(item);
+    }
+    addMenuVueComponent(category, text, component) {
+        const item = BdMenuItems.addVueComponent(category, text, component);
+        return this.menuItems.push(item);
+    }
+    removeMenuItem(item) {
+        BdMenuItems.remove(item);
+        Utils.removeFromArray(this.menuItems, item);
+    }
+    removeAllMenuItems() {
+        for (let item of this.menuItems)
+            BdMenuItems.remove(item);
+    }
+    get BdMenuItems() {
+        return Object.defineProperty({
+            add: this.addMenuItem.bind(this),
+            addSettingsSet: this.addMenuSettingsSet.bind(this),
+            addVueComponent: this.addMenuVueComponent.bind(this),
+            remove: this.removeMenuItem.bind(this),
+            removeAll: this.removeAllMenuItems.bind(this)
+        }, 'items', {
+            get: () => this.menuItems
+        });
+    }
+
+    /**
      * CssUtils
      */
 
@@ -172,8 +190,8 @@ export default class PluginApi {
     injectStyle(id, css) {
         if (id && !css) css = id, id = undefined;
         this.deleteStyle(id);
-        const styleid = `plugin-${this.getPlugin().id}-${id}`;
-        this.injectedStyles.push(styleid);
+        const styleid = `plugin-${this.plugin.id}-${id}`;
+        this.injectedStyles.push(id);
         DOM.injectStyle(css, styleid);
     }
     async injectSass(id, scss, options) {
@@ -183,7 +201,7 @@ export default class PluginApi {
         this.injectStyle(id, css, options);
     }
     deleteStyle(id) {
-        const styleid = `plugin-${this.getPlugin().id}-${id}`;
+        const styleid = `plugin-${this.plugin.id}-${id}`;
         this.injectedStyles.splice(this.injectedStyles.indexOf(styleid), 1);
         DOM.deleteStyle(styleid);
     }
@@ -216,7 +234,6 @@ export default class PluginApi {
     }
     addModal(_modal, component) {
         const modal = Modals.add(_modal, component);
-        modal.close = force => this.closeModal(modal, force);
         modal.on('close', () => {
             let index;
             while ((index = this.modalStack.findIndex(m => m === modal)) > -1)
@@ -245,16 +262,20 @@ export default class PluginApi {
         return this.addModal(Modals.settings(settingsset, headertext, options));
     }
     get Modals() {
-        return Object.defineProperty(Object.defineProperty({
+        return Object.defineProperties({
             add: this.addModal.bind(this),
             close: this.closeModal.bind(this),
             closeAll: this.closeAllModals.bind(this),
             closeLast: this.closeLastModal.bind(this),
+            basic: this.basicModal.bind(this),
             settings: this.settingsModal.bind(this)
-        }, 'stack', {
-            get: () => this.modalStack
-        }), 'baseComponent', {
-            get: () => this.baseModalComponent
+        }, {
+            stack: {
+                get: () => this.modalStack
+            },
+            baseComponent: {
+                get: () => this.baseModalComponent
+            }
         });
     }
 
@@ -348,3 +369,8 @@ export default class PluginApi {
     }
 
 }
+
+// Stop plugins from modifying the plugin API for all plugins
+// Plugins can still modify their own plugin API object
+Object.freeze(PluginApi);
+Object.freeze(PluginApi.prototype);

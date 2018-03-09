@@ -71,7 +71,6 @@
                 // TODO Display error if plugin fails to start/stop
                 try {
                     await plugin.enabled ? PluginManager.stopPlugin(plugin) : PluginManager.startPlugin(plugin);
-                    this.$forceUpdate();
                 } catch (err) {
                     console.log(err);
                 }
@@ -79,7 +78,6 @@
             async reloadPlugin(plugin) {
                 try {
                     await PluginManager.reloadPlugin(plugin);
-                    this.$forceUpdate();
                 } catch (err) {
                     console.log(err);
                 }
@@ -88,7 +86,6 @@
                 try {
                     if (unload) await PluginManager.unloadPlugin(plugin);
                     else await PluginManager.deletePlugin(plugin);
-                    this.$forceUpdate();
                 } catch (err) {
                     console.error(err);
                 }

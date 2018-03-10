@@ -17,11 +17,16 @@ export default class {
 
     static async observe() {
         const dataPath = Globals.getObject('paths').find(path => path.id === 'data').path;
-        emotes =  await FileUtils.readJsonFromFile(dataPath + '/emotes.json');
-        window.emotee = emotes;
-        Events.on('ui:mutable:.markup', markup => {
-            this.injectEmotes(markup);
-        });
+        try {
+            emotes = await FileUtils.readJsonFromFile(dataPath + '/emotes.json');
+            Events.on('ui:mutable:.markup',
+                markup => {
+                    if (!emotes) return;
+                    this.injectEmotes(markup);
+                });
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     static injectEmotes(node) {

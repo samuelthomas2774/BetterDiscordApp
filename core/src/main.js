@@ -41,9 +41,7 @@ const dummyArgs = {
         { 'id': 'modules', 'path': __modulePath }
     ]
 };
-
-const dbInstance = new Database(dummyArgs.paths.find(path => path.id === 'data').path + '/storage');
-
+const dbInstance = new Database(dummyArgs.paths.find(path => path.id === 'data').path);
 console.log(dummyArgs);
 
 

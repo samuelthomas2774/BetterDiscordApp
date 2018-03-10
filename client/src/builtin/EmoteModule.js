@@ -7,18 +7,18 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
 */
-
-import { Events } from 'modules';
+import { FileUtils } from 'common';
+import { Events, Globals } from 'modules';
 import { DOM, VueInjector } from 'ui';
-import EditedTimeStamp from './EditedTimeStamp.vue';
 import EmoteComponent from './EmoteComponent.vue';
-
-import TwitchEmotes from '../data/twitch_emotes.json';
-
+let emotes = null;
 
 export default class {
 
-    static observe() {
+    static async observe() {
+        const dataPath = Globals.getObject('paths').find(path => path.id === 'data').path;
+        emotes =  await FileUtils.readJsonFromFile(dataPath + '/emotes.json');
+        window.emotee = emotes;
         Events.on('ui:mutable:.markup', markup => {
             this.injectEmotes(markup);
         });
@@ -84,11 +84,19 @@ export default class {
     }
 
     static isEmote(word) {
+        if (!emotes) return null;
         const name = word.replace(/:/g, '');
-        if (TwitchEmotes.hasOwnProperty(name)) {
-            const src = `https://static-cdn.jtvnw.net/emoticons/v1/${TwitchEmotes[name]}/1.0`;
-            return { name, src };
-        }
-        return null;
+        const emote = emotes.find(emote => emote.id === name);
+        if (!emote) return null;
+        let { id, value } = emote;
+        if (value.id) value = value.id;
+        const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
+        return { name, src: uri.replace(':id', value) };
+    }
+
+    static filterTest() {
+        const re = new RegExp('Kappa', 'i');
+        const filtered = emotes.filter(emote => re.test(emote.id));
+        return filtered.slice(0, 10);
     }
 }

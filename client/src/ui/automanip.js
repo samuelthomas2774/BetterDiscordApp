@@ -62,6 +62,18 @@ export default class extends EventListener {
             this.setUserIds();
             Events.emit('ui:loadedmoreusers', mutations.map(m => m.addedNodes[0]));
         }, 'filter');
+
+        const channelFilter = function(m) {
+            return m.addedNodes &&
+                m.addedNodes.length &&
+                m.addedNodes[0].className &&
+                m.addedNodes[0].className.includes('container');
+        }
+
+        DOM.observer.subscribe('loading-more-channels-manip', channelFilter, mutations => {
+            this.setChannelIds();
+            Events.emit('ui:loadedmorechannels', mutations.map(m => m.addedNodes[0]));
+        }, 'filter');
     }
 
     bindings() {
@@ -159,6 +171,7 @@ export default class extends EventListener {
     setIds() {
         this.setMessageIds();
         this.setUserIds();
+        this.setChannelIds();
     }
 
     setMessageIds() {
@@ -173,11 +186,25 @@ export default class extends EventListener {
         }
     }
 
+    setChannelIds() {
+        for (let channel of document.querySelectorAll('[class*=channels] [class*=containerDefault]')) {
+            this.setChannelId(channel);
+        }
+    }
+
     setId(msg) {
         if (msg.hasAttribute('message-id')) return;
         const messageid = Reflection(msg).prop('message.id');
         const authorid = Reflection(msg).prop('message.author.id');
-        if (!messageid || !authorid) return;
+        if (!messageid || !authorid) {
+            const msgGroup = msg.closest('.message-group');
+            if (!msgGroup) return;
+            const userTest = Reflection(msgGroup).prop('user');
+            if (!userTest) return;
+            msgGroup.setAttribute('data-author-id', userTest.id);
+            if (userTest.id === TempApi.currentUserId) msgGroup.setAttribute('data-currentuser', true);
+            return;
+        }
         msg.setAttribute('data-message-id', messageid);
         const msgGroup = msg.closest('.message-group');
         if (!msgGroup) return;
@@ -193,6 +220,15 @@ export default class extends EventListener {
         const currentUser = userid === TempApi.currentUserId;
         if (currentUser) user.setAttribute('data-currentuser', true);
         Events.emit('ui:useridset', user);
+    }
+
+    setChannelId(channel) {
+        if (channel.hasAttribute('data-channel-id')) return;
+        const channelObj = Reflection(channel).prop('channel');
+        if (!channelObj) return;
+        channel.setAttribute('data-channel-id', channelObj.id);
+        if (channelObj.nsfw) channel.setAttribute('data-channel-nsfw', true);
+        if (channelObj.type && channelObj.type === 2) channel.setAttribute('data-channel-voice', true);
     }
 
     get appMount() {

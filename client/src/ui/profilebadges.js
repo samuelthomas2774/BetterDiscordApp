@@ -91,7 +91,7 @@ export default class extends EventListener {
     inject(userid) {
         const c = this.contributors.find(c => c.id === userid);
         if (!c) return;
-
+ 
         setTimeout(() => {
             let hasBadges = false;
             let root = document.querySelector('[class*="profileBadges"]');

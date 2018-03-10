@@ -43,7 +43,7 @@ export default class extends EventListener {
 
     constructor() {
         super();
-        window.injectAc = this.injectAutocomplete;
+        window.r = Reflection;
         const messageFilter = function (m) {
             return m.addedNodes && m.addedNodes.length && m.addedNodes[0].classList && m.addedNodes[0].classList.contains('message-group');
         }
@@ -74,6 +74,40 @@ export default class extends EventListener {
             this.setChannelIds();
             Events.emit('ui:loadedmorechannels', mutations.map(m => m.addedNodes[0]));
         }, 'filter');
+
+        const popoutFilter = function(m) {
+            return m.addedNodes &&
+                m.addedNodes.length &&
+                m.addedNodes[0].className &&
+                m.addedNodes[0].className.includes('popout');
+        }
+
+        DOM.observer.subscribe('userpopout-manip', popoutFilter, mutations => {
+            const userPopout = document.querySelector('[class*=userPopout]');
+            if (!userPopout) return;
+            const user = Reflection(userPopout).prop('user');
+            if (!user) return;
+            userPopout.setAttribute('data-user-id', user.id);
+            if (user.id === TempApi.currentUserId) userPopout.setAttribute('data-currentuser', true);
+        }, 'filter');
+
+        const modalFilter = function(m) {
+            return m.addedNodes &&
+                m.addedNodes.length &&
+                m.addedNodes[0].className &&
+                m.addedNodes[0].className.includes('modal');
+        }
+
+        DOM.observer.subscribe('modal-manip', modalFilter, mutations => {
+            const userModal = document.querySelector('[class*=modal] > [class*=inner]');
+            if (!userModal) return;
+            const user = Reflection(userModal).prop('user');
+            if (!user) return;
+            const modal = userModal.closest('[class*=modal]');
+            if (!modal) return;
+            modal.setAttribute('data-user-id', user.id);
+            if (user.id === TempApi.currentUserId) modal.setAttribute('data-currentuser', true);
+        });
     }
 
     bindings() {

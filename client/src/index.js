@@ -13,7 +13,7 @@ import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
-const ignoreExternal = false;
+const ignoreExternal = true;
 
 class BetterDiscord {
 
@@ -31,7 +31,6 @@ class BetterDiscord {
         window.bdlogs = Logger;
         window.emotes = EmoteModule;
         window.dom = DOM;
-        EmoteModule.observe();
 
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
@@ -52,6 +51,7 @@ class BetterDiscord {
                 Modals.showContentManagerErrors();
             Events.emit('ready');
             Events.emit('discord-ready');
+            EmoteModule.observe();
         } catch (err) {
             Logger.err('main', ['FAILED TO LOAD!', err]);
         }

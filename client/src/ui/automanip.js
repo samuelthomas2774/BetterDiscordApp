@@ -13,6 +13,7 @@ import Reflection from './reflection';
 import DOM from './dom';
 import VueInjector from './vueinjector';
 import EditedTimeStamp from './components/common/EditedTimestamp.vue';
+import Autocomplete from './components/common/Autocomplete.vue';
 
 class TempApi {
     static get currentGuildId() {
@@ -42,6 +43,7 @@ export default class extends EventListener {
 
     constructor() {
         super();
+        window.injectAc = this.injectAutocomplete;
         const messageFilter = function (m) {
             return m.addedNodes && m.addedNodes.length && m.addedNodes[0].classList && m.addedNodes[0].classList.contains('message-group');
         }
@@ -75,7 +77,8 @@ export default class extends EventListener {
             { id: 'server-switch', callback: this.manipAll },
             { id: 'channel-switch', callback: this.manipAll },
             { id: 'discord:MESSAGE_CREATE', callback: this.markupInjector },
-            { id: 'discord:MESSAGE_UPDATE', callback: this.markupInjector }
+            { id: 'discord:MESSAGE_UPDATE', callback: this.markupInjector },
+            { id: 'gkh:keyup', callback: this.injectAutocomplete }
         ];
     }
 
@@ -194,5 +197,21 @@ export default class extends EventListener {
 
     get appMount() {
         return document.getElementById('app-mount');
+    }
+
+    injectAutocomplete(e) {
+        if (document.querySelector('.bd-autocomplete')) return;
+        if (!e.target.closest('[class*=channelTextArea]')) return;
+        const root = document.createElement('span');
+        const parent = document.querySelector('[class*="channelTextArea"] > [class*="inner"]');
+        if (!parent) return;
+        parent.append(root);
+        VueInjector.inject(
+            root,
+            DOM.createElement('span'),
+            { Autocomplete },
+           `<Autocomplete initial="${e.target.value}"/>`,
+            true
+        );
     }
 }

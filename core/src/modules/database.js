@@ -15,23 +15,41 @@ class Database  {
     constructor(dbPath) {
         this.exec = this.exec.bind(this);
         this.update = this.update.bind(this);
-        this.db = new Datastore({ filename: dbPath, autoload: true });
+        this.init(dbPath);
+        //this.db.emotes.loadDatabase();
+        //this.db = new Datastore({ filename: dbPath, autoload: true });
+    }
+
+    async init(dbPath) {
+        this.db = {
+            storage: new Datastore({ filename: `${dbPath}/storage`, autoload: true })
+        };
     }
 
     async update(cmd) {
+        const db = cmd.db ? this.db[cmd.db] : this.db.storage;
         return new Promise((resolve, reject) => {
-            this.db.update(cmd.args, cmd.data, { upsert: true }, (err, docs) => {
+            db.update(cmd.args, cmd.data, { upsert: true }, (err, docs) => {
                 if (err) return reject(err);
-                this.db.persistence.compactDatafile();
+                db.persistence.compactDatafile();
                 resolve(docs);
             });
         });
     }
 
-    async find(cmd) {
-        console.log('FIND', cmd);
+    async loadDatabase(db) {
         return new Promise((resolve, reject) => {
-            this.db.find(cmd.args, (err, docs) => {
+            db.loadDatabase();
+            resolve();
+        });
+    }
+
+    async find(cmd) {
+        const db = cmd.db ? this.db[cmd.db] : this.db.storage;
+        let args = cmd.args;
+        if (cmd.regex) args = { [cmd.regex.param]: new RegExp(cmd.regex.source, cmd.regex.flags) };
+        return new Promise((resolve, reject) => {
+            db.find(args, (err, docs) => {
                 if (err) return reject(err);
                 resolve(docs);
             });

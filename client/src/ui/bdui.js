@@ -51,6 +51,7 @@ export default class {
             server: TempApi.currentGuild,
             channel: TempApi.currentChannel
         };
+        window.addEventListener('keyup', e => Events.emit('gkh:keyup', e));
         this.autoManip = new AutoManip();
         const defer = setInterval(() => {
             if (!this.profilePopupModule) return;

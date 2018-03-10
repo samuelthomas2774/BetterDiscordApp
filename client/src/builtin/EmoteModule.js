@@ -99,4 +99,15 @@ export default class {
         const filtered = emotes.filter(emote => re.test(emote.id));
         return filtered.slice(0, 10);
     }
+
+    static filter(regex, limit) {
+        let index = 0;
+        return emotes.filter(emote => {
+            if (index >= limit) return false;
+            if (regex.test(emote.id)) {
+                index++;
+                return true;
+            }
+        });
+    }
 }

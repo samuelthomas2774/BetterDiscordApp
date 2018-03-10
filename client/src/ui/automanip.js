@@ -77,7 +77,8 @@ export default class extends EventListener {
             { id: 'server-switch', callback: this.manipAll },
             { id: 'channel-switch', callback: this.manipAll },
             { id: 'discord:MESSAGE_CREATE', callback: this.markupInjector },
-            { id: 'discord:MESSAGE_UPDATE', callback: this.markupInjector }
+            { id: 'discord:MESSAGE_UPDATE', callback: this.markupInjector },
+            { id: 'gkh:keyup', callback: this.injectAutocomplete }
         ];
     }
 
@@ -198,7 +199,9 @@ export default class extends EventListener {
         return document.getElementById('app-mount');
     }
 
-    injectAutocomplete() {
+    injectAutocomplete(e) {
+        if (document.querySelector('.bd-autocomplete')) return;
+        if (!e.target.closest('[class*=channelTextArea]')) return;
         const root = document.createElement('span');
         const parent = document.querySelector('[class*="channelTextArea"] > [class*="inner"]');
         if (!parent) return;
@@ -207,7 +210,7 @@ export default class extends EventListener {
             root,
             DOM.createElement('span'),
             { Autocomplete },
-            `<Autocomplete/>`,
+           `<Autocomplete initial="${e.target.value}"/>`,
             true
         );
     }

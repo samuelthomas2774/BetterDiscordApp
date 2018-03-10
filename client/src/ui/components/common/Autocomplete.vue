@@ -15,7 +15,7 @@
                 <div class="bd-autocompleteSelector">
                     <div class="bd-autocompleteTitle">
                         Emotes Matching:
-                        <strong>Kappa</strong>
+                        <strong>{{title || initial}}</strong>
                     </div>
                 </div>
             </div>
@@ -32,14 +32,23 @@
 </template>
 <script>
     import { EmoteModule } from 'builtin';
+    import { Events } from 'modules';
     export default {
         data() {
             return {
-                emotes: []
+                emotes: [],
+                title: null
             }
         },
+        props: ['initial'],
         beforeMount() {
-            this.emotes = EmoteModule.filterTest();
+            this.emotes = EmoteModule.filter(new RegExp(this.initial, 'i'), 10);
+        },
+        created() {
+            document.querySelector('.chat textarea').addEventListener('keyup', this.searchEmotes);
+        },
+        destroyed() {
+            document.querySelector('.chat textarea').removeEventListener('keyup', this.searchEmotes);
         },
         methods: {
             getEmoteSrc(emote) {
@@ -47,6 +56,15 @@
                 if (value.id) value = value.id;
                 const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
                 return uri.replace(':id', value);
+            },
+            searchEmotes(e) {
+                const sterm = e.target.value.split(' ').slice(-1).pop();
+                if (sterm.length < 3) {
+                    this.emotes = null;
+                    return;
+                }
+                this.title = sterm;
+                this.emotes = EmoteModule.filter(new RegExp(sterm, 'i'), 10);
             }
         }
     }

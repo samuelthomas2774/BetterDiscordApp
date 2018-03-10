@@ -85,7 +85,28 @@ class DOMObserver {
 
 }
 
+class Manip {
+    static setText(text, refocus) {
+        const activeElement = document.activeElement;
+        const txt = document.querySelector('.chat form textarea');
+        if (!txt) return;
+        txt.focus();
+        txt.select();
+        document.execCommand('insertText', false, text);
+        if (activeElement && refocus) activeElement.focus();
+    }
+    static getText() {
+        const txt = document.querySelector('.chat form textarea');
+        if (!txt) return '';
+        return txt.value;
+    }
+}
+
 export default class DOM {
+
+    static get manip() {
+        return Manip;
+    }
 
     static get observer() {
         return this._observer || (this._observer = new DOMObserver());

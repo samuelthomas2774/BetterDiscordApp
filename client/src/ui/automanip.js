@@ -43,7 +43,6 @@ export default class extends EventListener {
 
     constructor() {
         super();
-        window.r = Reflection;
         const messageFilter = function (m) {
             return m.addedNodes && m.addedNodes.length && m.addedNodes[0].classList && m.addedNodes[0].classList.contains('message-group');
         }

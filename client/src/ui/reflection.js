@@ -21,6 +21,8 @@ class Reflection {
         if (!ii) return null;
         const fir = this.findInReturn(ii, prop);
         if (fir) return fir;
+        const fim = this.findInChildProps(ii, prop);
+        if (fim) return fim;
         return null;
     }
 
@@ -44,6 +46,17 @@ class Reflection {
         if (!obj.hasOwnProperty('memoizedState')) return null;
         obj = obj.memoizedState;
         return this.findPropIn(obj, prop);
+    }
+
+    static findInChildProps(obj, prop) {
+        try {
+            const f = obj.children || obj.memoizedProps.children;
+            if (!f.props) return null;
+            if (!f.props.hasOwnProperty(prop)) return null;
+            return f.props[prop];
+        } catch (err) {
+            return null;
+        }
     }
 
     static findPropIn(obj, prop) {

@@ -43,7 +43,6 @@ export default class extends EventListener {
 
     constructor() {
         super();
-        window.injectAc = this.injectAutocomplete;
         const messageFilter = function (m) {
             return m.addedNodes && m.addedNodes.length && m.addedNodes[0].classList && m.addedNodes[0].classList.contains('message-group');
         }
@@ -62,6 +61,52 @@ export default class extends EventListener {
             this.setUserIds();
             Events.emit('ui:loadedmoreusers', mutations.map(m => m.addedNodes[0]));
         }, 'filter');
+
+        const channelFilter = function(m) {
+            return m.addedNodes &&
+                m.addedNodes.length &&
+                m.addedNodes[0].className &&
+                m.addedNodes[0].className.includes('container');
+        }
+
+        DOM.observer.subscribe('loading-more-channels-manip', channelFilter, mutations => {
+            this.setChannelIds();
+            Events.emit('ui:loadedmorechannels', mutations.map(m => m.addedNodes[0]));
+        }, 'filter');
+
+        const popoutFilter = function(m) {
+            return m.addedNodes &&
+                m.addedNodes.length &&
+                m.addedNodes[0].className &&
+                m.addedNodes[0].className.includes('popout');
+        }
+
+        DOM.observer.subscribe('userpopout-manip', popoutFilter, mutations => {
+            const userPopout = document.querySelector('[class*=userPopout]');
+            if (!userPopout) return;
+            const user = Reflection(userPopout).prop('user');
+            if (!user) return;
+            userPopout.setAttribute('data-user-id', user.id);
+            if (user.id === TempApi.currentUserId) userPopout.setAttribute('data-currentuser', true);
+        }, 'filter');
+
+        const modalFilter = function(m) {
+            return m.addedNodes &&
+                m.addedNodes.length &&
+                m.addedNodes[0].className &&
+                m.addedNodes[0].className.includes('modal');
+        }
+
+        DOM.observer.subscribe('modal-manip', modalFilter, mutations => {
+            const userModal = document.querySelector('[class*=modal] > [class*=inner]');
+            if (!userModal) return;
+            const user = Reflection(userModal).prop('user');
+            if (!user) return;
+            const modal = userModal.closest('[class*=modal]');
+            if (!modal) return;
+            modal.setAttribute('data-user-id', user.id);
+            if (user.id === TempApi.currentUserId) modal.setAttribute('data-currentuser', true);
+        });
     }
 
     bindings() {
@@ -159,6 +204,7 @@ export default class extends EventListener {
     setIds() {
         this.setMessageIds();
         this.setUserIds();
+        this.setChannelIds();
     }
 
     setMessageIds() {
@@ -173,11 +219,25 @@ export default class extends EventListener {
         }
     }
 
+    setChannelIds() {
+        for (let channel of document.querySelectorAll('[class*=channels] [class*=containerDefault]')) {
+            this.setChannelId(channel);
+        }
+    }
+
     setId(msg) {
         if (msg.hasAttribute('message-id')) return;
         const messageid = Reflection(msg).prop('message.id');
         const authorid = Reflection(msg).prop('message.author.id');
-        if (!messageid || !authorid) return;
+        if (!messageid || !authorid) {
+            const msgGroup = msg.closest('.message-group');
+            if (!msgGroup) return;
+            const userTest = Reflection(msgGroup).prop('user');
+            if (!userTest) return;
+            msgGroup.setAttribute('data-author-id', userTest.id);
+            if (userTest.id === TempApi.currentUserId) msgGroup.setAttribute('data-currentuser', true);
+            return;
+        }
         msg.setAttribute('data-message-id', messageid);
         const msgGroup = msg.closest('.message-group');
         if (!msgGroup) return;
@@ -193,6 +253,15 @@ export default class extends EventListener {
         const currentUser = userid === TempApi.currentUserId;
         if (currentUser) user.setAttribute('data-currentuser', true);
         Events.emit('ui:useridset', user);
+    }
+
+    setChannelId(channel) {
+        if (channel.hasAttribute('data-channel-id')) return;
+        const channelObj = Reflection(channel).prop('channel');
+        if (!channelObj) return;
+        channel.setAttribute('data-channel-id', channelObj.id);
+        if (channelObj.nsfw) channel.setAttribute('data-channel-nsfw', true);
+        if (channelObj.type && channelObj.type === 2) channel.setAttribute('data-channel-voice', true);
     }
 
     get appMount() {

@@ -8,17 +8,22 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI, Modals } from 'ui';
+import { DOM, BdUI, Modals, Reflection } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi } from 'modules';
-import { ClientLogger as Logger, ClientIPC } from 'common';
+import { Patcher, Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, ReactComponents, DiscordApi } from 'modules';
+import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { EmoteModule } from 'builtin';
-const ignoreExternal = false;
+const ignoreExternal = true;
 
 class BetterDiscord {
 
     constructor() {
         window.discordApi = DiscordApi;
+        window.bdu = Utils;
+        window.ref = Reflection;
+        window.rc = ReactComponents;
+
+        window.ReactComponents = ReactComponents;
         window.bddb = Database;
         window.bdglobals = Globals;
         window.ClientIPC = ClientIPC;
@@ -34,7 +39,11 @@ class BetterDiscord {
         window.dom = DOM;
 
         DOM.injectStyle(BdCss, 'bdmain');
-        Events.on('global-ready', this.globalReady.bind(this));
+        this.globalReady = this.globalReady.bind(this);
+        Events.on('global-ready', this.globalReady);
+        Globals.initg();
+        //this.globalReady = this.globalReady.bind(this);
+        //this.globalReady();
     }
 
     async init() {
@@ -68,5 +77,38 @@ class BetterDiscord {
 if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
-    let bdInstance = new BetterDiscord();
+    let instance = null;
+    function init() {
+        instance = new BetterDiscord();
+    }
+
+    window.Patcher = Patcher;
+    Events.on('react-ensure', init);
+    function ensureReact() {
+        if (!window.webpackJsonp || !WebpackModules.getModuleByName('React')) return setTimeout(ensureReact, 10);
+        ReactComponents.getComponent('Message').then(Message => {
+            Events.emit('react-ensure');
+            Message.patchRender([{
+                selector: '.message',
+                method: 'replace',
+                fn: function (item) {
+                    if (!this.props || !this.props.message) return item;
+                    const { message } = this.props;
+                    const { id, colorString, bot, author, attachments, embeds } = message;
+                    item.props['data-message-id'] = id;
+                    item.props['data-colourstring'] = colorString;
+                    if (bot || (author && author.bot)) item.props.className += ' bd-isBot';
+                    if (attachments && attachments.length) item.props.className += ' bd-hasAttachments';
+                    if (embeds && embeds.length) item.props.className += ' bd-hasEmbeds';
+                    if (author && author.id === '301511787814191105') item.props.className += ' bd-isCurrentUser';
+                    return item;
+                }
+            }]);
+        });
+        Patcher.superpatch('React', 'createElement', function (component, retVal) {
+            if (!component.displayName) return;
+            ReactComponents.push(component, retVal);
+        });
+    }
+    ensureReact();
 }

@@ -10,52 +10,154 @@
 
 import { ipcMain, ipcRenderer } from 'electron';
 
+const callbacks = new WeakMap();
+
 /**
  * The IPC module used in all renderer processes (the main window and the CSS editor window).
  */
 export class ClientIPC {
-    static on(channel, cb) {
-        ipcRenderer.on(channel, (event, message) => cb(event, message));
+    /**
+     * Adds an IPC event listener.
+     * @param {String} channel The channel to listen on
+     * @param {Function} callback A function that will be called when a message is received
+     * @param {Boolean} reply Whether to automatically reply to the message with the callback's return value
+     * @return {Promise}
+     */
+    static on(channel, callback, reply) {
+        channel = channel.startsWith('bd-') ? channel : `bd-${channel}`;
+
+        const boundCallback = async (event, args) => {
+            const ipcevent = new BDIpcEvent(event, args);
+            try {
+                const r = callback(ipcevent, ipcevent.message);
+                if (reply) ipcevent.resolve(await r);
+            } catch (err) {
+                console.error('Error in IPC callback:', err);
+                if (reply) ipcevent.reject(err);
+            }
+        };
+
+        callbacks.set(callback, boundCallback);
+        ipcRenderer.on(channel, boundCallback);
     }
 
-    static async send(channel, message) {
+    static off(channel, callback) {
+        ipcRenderer.removeListener(channel, callbacks.get(callback));
+    }
+
+    /**
+     * Sends a message to the main process and returns a promise that is resolved when the main process replies.
+     * @param {String} channel The channel to send a message to
+     * @param {Any} message Data to send to the main process
+     * @param {Boolean} error Whether to mark the message as an error
+     * @return {Promise}
+     */
+    static async send(channel, message, error) {
         channel = channel.startsWith('bd-') ? channel : `bd-${channel}`;
-        const __eid = Date.now().toString();
-        ipcRenderer.send(channel, Object.assign(message ? message : {}, { __eid }));
+
+        const eid = 'bd-' + Date.now().toString();
+        ipcRenderer.send(channel, { eid, message, error });
+
         return new Promise((resolve, reject) => {
-            ipcRenderer.once(__eid, (event, arg) => {
-                if (arg.err) {
-                    return reject(arg.err);
-                }
-                resolve(arg);
+            ipcRenderer.once(eid, (event, arg) => {
+                if (arg.error) reject(arg.message);
+                else resolve(arg.message);
             });
         });
     }
+
+    /**
+     * Sends a message to the Discord window and returns a promise that is resolved when it replies.
+     * @param {String} channel The channel to send a message to
+     * @param {Any} message Data to send to the renderer process
+     * @return {Promise}
+     */
+    static sendToDiscord(channel, message) {
+        return this.send('bd-sendToDiscord', {
+            channel, message
+        });
+    }
+
+    /**
+     * Sends a message to the CSS editor window and returns a promise that is resolved when it replies.
+     * @param {String} channel The channel to send a message to
+     * @param {Any} message Data to send to the CSS editor window
+     * @return {Promise}
+     */
+    static sendToCssEditor(channel, message) {
+        return this.send('bd-sendToCssEditor', {
+            channel, message
+        });
+    }
+
+    static ping() {
+        return this.send('ping');
+    }
+
+    static getConfig() {
+        return this.send('getConfig');
+    }
+
+    static showOpenDialog(options) {
+        return this.send('native-open', options);
+    }
+
+    static compileSass(options) {
+        return this.send('compileSass', options);
+    }
+
+    static dba(command) {
+        return this.send('dba', command);
+    }
 }
 
-class BDIpcEvent {
+ClientIPC.on('ping', () => 'pong', true);
 
+/**
+ * An IPC event.
+ */
+class BDIpcEvent {
     constructor(event, args) {
         this.args = args;
         this.ipcEvent = event;
+        this.replied = false;
     }
 
     bindings() {
-        this.send = this.send.bind(this);
+        // this.send = this.send.bind(this);
         this.reply = this.reply.bind(this);
     }
 
-    send(message) {
-        this.ipcEvent.sender.send(this.args.__eid, message);
+    /**
+     * Sends a message back to the message's sender.
+     * @param {Any} message Data to send to this message's sender
+     */
+    get send() { return this.reply }
+    reply(message, error) {
+        if (this.replied)
+            throw {message: 'This message has already been replied to.'};
+
+        this.replied = true;
+        return ClientIPC.send(this.eid, message, error);
     }
 
-    reply(message) {
-        this.send(message);
+    resolve(message) {
+        return this.reply(message);
     }
-}
 
-export class CoreIPC {
-    static on(channel, cb) {
-        ipcMain.on(channel, (event, args) => cb(new BDIpcEvent(event, args)));
+    reject(err) {
+        return this.reply(err, true);
+    }
+
+    get message() {
+        return this.args.message;
+    }
+
+    get error() {
+        return this.args.error;
+    }
+
+    get eid() {
+        return this.args.eid;
     }
 }

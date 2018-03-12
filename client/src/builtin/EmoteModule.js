@@ -7,11 +7,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
 */
-import { FileUtils } from 'common';
+
+import { ClientLogger as Logger, FileUtils } from 'common';
 import { Events, Globals } from 'modules';
 import { DOM, VueInjector } from 'ui';
 import EmoteComponent from './EmoteComponent.vue';
-let emotes = null;
+
+let emotes = undefined;
 
 export default class {
 
@@ -19,13 +21,13 @@ export default class {
         const dataPath = Globals.getObject('paths').find(path => path.id === 'data').path;
         try {
             emotes = await FileUtils.readJsonFromFile(dataPath + '/emotes.json');
-            Events.on('ui:mutable:.markup',
-                markup => {
-                    if (!emotes) return;
-                    this.injectEmotes(markup);
-                });
+            Events.on('ui:mutable:.markup', markup => {
+                if (!emotes) return;
+                this.injectEmotes(markup);
+            });
         } catch (err) {
-            console.log(err);
+            emotes = [];
+            Logger.err('EmoteModule', err);
         }
     }
 
@@ -61,16 +63,16 @@ export default class {
                         newNode.appendChild(document.createTextNode(text));
                         text = null;
                     }
-                    
+
                     const emoteRoot = document.createElement('span');
                     newNode.appendChild(emoteRoot);
-                    VueInjector.inject(
-                        emoteRoot,
-                        DOM.createElement('span'),
-                        { EmoteComponent },
-                        `<EmoteComponent src="${isEmote.src}" name="${isEmote.name}"/>`,
-                        true
-                    );
+
+                    VueInjector.inject(emoteRoot, {
+                        template: `<EmoteComponent :src="e.src" :name="e.name" />`,
+                        components: { EmoteComponent },
+                        data: { e: isEmote }
+                    });
+
                     continue;
                 }
 
@@ -115,4 +117,5 @@ export default class {
             }
         });
     }
+
 }

@@ -33,7 +33,7 @@
 </template>
 
 <script>
-    import BDIpc from './BDIpc';
+    import { ClientIPC } from 'common';
 
     import { remote } from 'electron';
 
@@ -131,42 +131,38 @@
             }
         },
         created() {
-            BDIpc.on('set-scss', (_, data) => {
-                if (data.error) {
-                    console.log(data.error);
-                    return;
-                }
-                console.log(data);
-                this.setScss(data.scss);
-            });
+            ClientIPC.on('set-scss', (_, scss) => this.setScss(scss));
 
-            BDIpc.on('scss-error', (_, err) => {
+            ClientIPC.on('scss-error', (_, err) => {
                 this.error = err;
                 this.$forceUpdate();
                 if (err)
                     console.error('SCSS parse error:', err);
             });
 
-            BDIpc.on('set-liveupdate', (e, liveUpdate) => this.liveUpdate = liveUpdate);
+            ClientIPC.on('set-liveupdate', (e, liveUpdate) => this.liveUpdate = liveUpdate);
         },
         mounted() {
             this.codemirror.on('keyup', this.cmOnKeyUp);
-            BDIpc.sendToDiscord('get-scss');
-            BDIpc.sendToDiscord('get-liveupdate');
+
+            (async () => {
+                this.setScss(await ClientIPC.sendToDiscord('get-scss'));
+                this.liveUpdate = await ClientIPC.sendToDiscord('get-liveupdate');
+            })();
         },
         watch: {
             liveUpdate(liveUpdate) {
-                BDIpc.sendToDiscord('set-liveupdate', liveUpdate);
+                ClientIPC.sendToDiscord('set-liveupdate', liveUpdate);
             }
         },
         methods: {
             save() {
                 const scss = this.codemirror.getValue();
-                BDIpc.sendToDiscord('save-scss', scss);
+                ClientIPC.sendToDiscord('save-scss', scss);
             },
             update() {
                 const scss = this.codemirror.getValue();
-                BDIpc.sendToDiscord('update-scss', scss);
+                ClientIPC.sendToDiscord('update-scss', scss);
             },
             toggleaot() {
                 this.alwaysOnTop = !this.alwaysOnTop;
@@ -180,7 +176,7 @@
                 this.codemirror.setValue(scss || '');
             },
             cmOnChange(value) {
-                if(this.liveUpdate) BDIpc.sendToDiscord('update-scss', value);
+                if(this.liveUpdate) ClientIPC.sendToDiscord('update-scss', value);
             },
             cmOnKeyUp(editor, event) {
                 if (event.ctrlKey) return;

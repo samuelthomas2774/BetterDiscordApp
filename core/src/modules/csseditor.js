@@ -12,6 +12,7 @@ const path = require('path');
 const { BrowserWindow } = require('electron');
 
 const { Module } = require('./modulebase');
+const { BDIpc } = require('./bdipc');
 const { WindowUtils } = require('./utils');
 
 class CSSEditor extends Module {
@@ -22,46 +23,42 @@ class CSSEditor extends Module {
     }
 
     /**
-     * Opens an editor and replies to an IPC event.
-     * @param {BDIpcEvent} event
+     * Opens the CSS editor.
+     * @param {Object} options Additional options to pass to BrowserWindow
+     * @return {Promise}
      */
-    openEditor(o) {
-        if (this.editor) {
-            if (this.editor.isFocused()) return;
+    openEditor(options) {
+        return new Promise((resolve, reject) => {
+            if (this.editor) {
+                if (this.editor.isFocused()) return;
 
-            this.editor.focus();
-            this.editor.flashFrame(true);
-            o.reply(true);
-            return;
-        }
+                this.editor.focus();
+                this.editor.flashFrame(true);
+                return resolve(true);
+            }
 
-        const options = Object.assign(this.options, o.message);
+            options = Object.assign({}, this.options, options);
 
-        this.editor = new BrowserWindow(options);
-        this.editor.loadURL('about:blank');
-        this.editor.setSheetOffset(33);
-        this.editorUtils = new WindowUtils({ window: this.editor });
+            this.editor = new BrowserWindow(options);
+            this.editor.loadURL('about:blank');
+            this.editor.setSheetOffset(33);
+            this.editorUtils = new WindowUtils({ window: this.editor });
 
-        this.editor.on('close', () => {
-            this.bd.windowUtils.send('bd-save-csseditor-bounds', this.editor.getBounds());
-            this.editor = null;
+            this.editor.on('close', () => {
+                BDIpc.send(this.bd.windowUtils.window, 'bd-save-csseditor-bounds', this.editor.getBounds());
+                BDIpc.send(this.bd.windowUtils.window, 'csseditor-closed');
+                this.editor = null;
+            });
+
+            this.editor.once('ready-to-show', () => {
+                this.editor.show();
+            });
+
+            this.editor.webContents.on('did-finish-load', () => {
+                this.editorUtils.injectScript(path.join(this.editorPath, 'csseditor.js'));
+                resolve(true);
+            });
         });
-
-        this.editor.once('ready-to-show', () => {
-            this.editor.show();
-        });
-
-        this.editor.webContents.on('did-finish-load', () => {
-            this.editorUtils.injectScript(path.join(this.editorPath, 'csseditor.js'));
-            o.reply(true);
-        });
-    }
-
-    /**
-     * Sets the SCSS in the editor.
-     */
-    setSCSS(scss) {
-        this.send('set-scss', scss);
     }
 
     /**
@@ -71,7 +68,7 @@ class CSSEditor extends Module {
      */
     send(channel, data) {
         if (!this.editor) return;
-        this.editor.webContents.send(channel, data);
+        return BDIpc.send(this.editor, channel, data);
     }
 
     /**

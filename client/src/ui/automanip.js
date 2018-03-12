@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, WebpackModules, EventListener } from 'modules';
+import { Events, WebpackModules, EventListener, ReactComponents, Renderer } from 'modules';
 import Reflection from './reflection';
 import DOM from './dom';
 import VueInjector from './vueinjector';
@@ -41,6 +41,10 @@ class TempApi {
 
 export default class extends EventListener {
 
+    constructor(args) {
+        super(args);
+    }
+
     bindings() {
         this.manipAll = this.manipAll.bind(this);
         this.markupInjector = this.markupInjector.bind(this);
@@ -50,6 +54,8 @@ export default class extends EventListener {
     }
 
     get eventBindings() {
+        return [{ id: 'gkh:keyup', callback: this.injectAutocomplete }];
+        /*
         return [
             { id: 'server-switch', callback: this.manipAll },
             { id: 'channel-switch', callback: this.manipAll },
@@ -57,6 +63,7 @@ export default class extends EventListener {
             { id: 'discord:MESSAGE_UPDATE', callback: this.markupInjector },
             { id: 'gkh:keyup', callback: this.injectAutocomplete }
         ];
+        */
     }
 
     manipAll() {

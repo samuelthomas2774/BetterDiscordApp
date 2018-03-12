@@ -389,6 +389,21 @@ export class FileUtils {
     }
 
     /**
+     * Writes to a file.
+     * @param {String} path The file's path
+     * @param {String} data The file's new contents
+     * @return {Promise}
+     */
+    static async appendToFile(path, data) {
+        return new Promise((resolve, reject) => {
+            fs.appendFile(path, data, err => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
+    /**
      * Returns the contents of a file parsed as JSON.
      * @param {String} path The file's path
      * @return {Promise}

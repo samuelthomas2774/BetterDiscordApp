@@ -9,15 +9,21 @@
 */
 
 import Vendor from 'vendor';
+import { FileUtils } from './utils';
 
 const logs = [];
 
-export class ClientLogger {
+export class Logger {
 
-    static err(module, message) { this.log(module, message, 'err'); }
-    static warn(module, message) { this.log(module, message, 'warn'); }
-    static info(module, message) { this.log(module, message, 'info'); }
-    static dbg(module, message) { this.log(module, message, 'dbg'); }
+    constructor() {
+        this.logs = [];
+        this.file = undefined;
+    }
+
+    err(module, message) { this.log(module, message, 'err'); }
+    warn(module, message) { this.log(module, message, 'warn'); }
+    info(module, message) { this.log(module, message, 'info'); }
+    dbg(module, message) { this.log(module, message, 'dbg'); }
 
     /**
      * Logs a message.
@@ -25,39 +31,35 @@ export class ClientLogger {
      * @param {Any} message Data to be logged
      * @param {String} level The log level
      */
-    static log(module, message, level = 'log') {
-        level = this.parseLevel(level);
+    log(module, message, level = 'log') {
+        level = Logger.parseLevel(level);
         if (typeof message === 'object' && !(message instanceof Array)) {
             console[level]('[%cBetter%cDiscord:%s]', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, message);
             let message_string = message.toString();
             if (message_string === '[object Object]')
                 message_string += ' ' + JSON.stringify(message, null, 4);
 
-            logs.push(`${level.toUpperCase()} : [${this.timestamp}|${module}] ${message_string}${message_string === '[object Object]' ? ' ' + JSON.stringify(message, null, 4) : ''}`);
+            logs.push(`${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message_string}${message_string === '[object Object]' ? ' ' + JSON.stringify(message, null, 4) : ''}`);
             return;
         }
 
         message = typeof message === 'object' && message instanceof Array ? message : [message];
         console[level]('[%cBetter%cDiscord:%s]', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, ...message);
-        logs.push(`${level.toUpperCase()} : [${this.timestamp}|${module}] ${message.join(' ')}`);
+        logs.push(`${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message.join(' ')}`);
+
+        if (this.file)
+            FileUtils.appendToFile(this.file, `${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message.join(' ')}\n`);
     }
 
     /**
      * Logs an error.
      */
-    static logError(err) {
+    logError(err) {
         if (!err.module && !err.message) {
             console.log(err);
             return;
         }
         this.err(err.module, err.message);
-    }
-
-    /**
-     * An array of logged messages.
-     */
-    static get logs() {
-        return logs;
     }
 
     /**
@@ -91,3 +93,6 @@ export class ClientLogger {
     }
 
 }
+
+const ClientLogger = new Logger();
+export { ClientLogger };

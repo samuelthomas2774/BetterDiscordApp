@@ -13,12 +13,16 @@ import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManag
 import { ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
 import BdCss from './styles/index.scss';
+import path from 'path';
 
 const ignoreExternal = false;
 
 class BetterDiscord {
 
     constructor() {
+        Logger.file = path.join(__dirname, '..', '..', 'tests', 'log.txt');
+        Logger.log('main', 'BetterDiscord starting');
+
         window.bddb = Database;
         window.bdglobals = Globals;
         window.ClientIPC = ClientIPC;

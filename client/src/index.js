@@ -18,32 +18,34 @@ const ignoreExternal = true;
 class BetterDiscord {
 
     constructor() {
-        window.discordApi = DiscordApi;
-        window.bdu = Utils;
-        window.ref = Reflection;
-        window.rc = ReactComponents;
-
-        window.ReactComponents = ReactComponents;
-        window.bddb = Database;
-        window.bdglobals = Globals;
-        window.ClientIPC = ClientIPC;
-        window.css = CssEditor;
-        window.pm = PluginManager;
-        window.tm = ThemeManager;
-        window.events = Events;
-        window.wpm = WebpackModules;
-        window.bdsettings = Settings;
-        window.bdmodals = Modals;
-        window.bdlogs = Logger;
-        window.emotes = EmoteModule;
-        window.dom = DOM;
+        window._bd = {
+            DOM,
+            BdUI,
+            Modals,
+            Reflection,
+            Patcher,
+            Events,
+            CssEditor,
+            Globals,
+            ExtModuleManager,
+            PluginManager,
+            ThemeManager,
+            ModuleManager,
+            WebpackModules,
+            Settings,
+            Database,
+            ReactComponents,
+            DiscordApi,
+            Logger,
+            ClientIPC,
+            Utils,
+            EmoteModule
+        }
 
         DOM.injectStyle(BdCss, 'bdmain');
         this.globalReady = this.globalReady.bind(this);
         Events.on('global-ready', this.globalReady);
         Globals.initg();
-        //this.globalReady = this.globalReady.bind(this);
-        //this.globalReady();
     }
 
     async init() {

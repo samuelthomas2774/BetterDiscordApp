@@ -1,11 +1,14 @@
+.bd-setting-switch,
 .bd-form-textinput,
 .bd-form-textarea,
-.bd-form-fileinput,
+.bd-form-numberinput,
 .bd-form-dropdown,
 .bd-form-radio,
-.bd-form-numberinput,
 .bd-form-slider,
-.bd-setting-switch {
+.bd-form-colourpicker,
+.bd-form-keybind,
+.bd-form-fileinput,
+.bd-form-settingsarray {
     .bd-title {
         display: flex;
 
@@ -21,10 +24,8 @@
 
     .bd-hint {
         flex: 1 1 auto;
-        color: #72767d;
-        font-size: 14px;
-        font-weight: 500;
         margin-top: 5px;
+        margin-bottom: 0;
         line-height: 20px;
         border-bottom: 0px solid rgba(114, 118, 126, 0.1);
     }
@@ -35,5 +36,15 @@
         &, input {
             cursor: not-allowed !important;
         }
+    }
+}
+
+.bd-form-customsetting {
+    &.bd-form-customsetting-debug + .bd-form-divider {
+        margin-top: 0;
+    }
+
+    > .bd-drawer {
+        margin-bottom: 0;
     }
 }

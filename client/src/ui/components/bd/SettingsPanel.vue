@@ -9,43 +9,54 @@
 */
 
 <template>
-    <div>
-        <template v-for="category in settings">
-            <div v-if="category.category === 'default' || !category.type">
-                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
+    <div class="bd-settings-panel">
+        <div class="bd-settings-schemes" v-if="schemes && schemes.length">
+            <div class="bd-settings-schemes-container">
+                <template v-for="scheme in schemes">
+                    <div class="bd-settings-scheme" :class="{'bd-active': scheme.isActive(settings)}" @click="() => scheme.applyTo(settings)">
+                        <div class="bd-settings-scheme-icon" :style="{'background-image': `url(&quot;${scheme.icon_url}&quot;)`}"></div>
+                        <div class="bd-settings-scheme-name" v-if="scheme.name">{{ scheme.name }}</div>
+                        <div class="bd-settings-scheme-hint" v-if="scheme.hint">{{ scheme.hint }}</div>
+                    </div>
+                </template>
             </div>
-            <div v-else-if="category.type === 'static'">
-                <div class="bd-form-header">
-                    <span class="bd-form-header-text">{{category.category}} static with header</span>
+        </div>
+
+        <div class="bd-settings-categories">
+            <template v-for="category in settings.categories">
+                <div class="bd-settings-category">
+                    <div v-if="category.category === 'default' || !category.type">
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" />
+                    </div>
+                    <div class="bd-settings-static" v-else-if="category.type === 'static'">
+                        <div class="bd-form-header">
+                            <span class="bd-form-header-text">{{ category.category_name }}</span>
+                        </div>
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" />
+                    </div>
+                    <Drawer v-else-if="category.type === 'drawer'" :label="category.category_name">
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" />
+                    </Drawer>
+                    <div v-else>
+                        <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" />
+                    </div>
                 </div>
-                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
-            </div>
-            <Drawer v-else-if="category.type === 'drawer'" :label="category.category">
-                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
-            </Drawer>
-            <div v-else>
-                <Setting v-for="setting in category.settings" :key="setting.id" :setting="setting" :change="v => settingChange(category, setting, v)" />
-            </div>
-        </template>
+            </template>
+        </div>
     </div>
 </template>
 
 <script>
     // Imports
+    import { Utils } from 'common';
     import Setting from './setting/Setting.vue';
     import Drawer from '../common/Drawer.vue';
 
     export default {
-        props: ['settings', 'change'],
+        props: ['settings', 'schemes'],
         components: {
             Setting,
             Drawer
-        },
-        methods: {
-            settingChange(category, setting, value) {
-                if (setting.disabled) return;
-                this.change(category.category, setting.id, value);
-            }
         }
     }
 </script>

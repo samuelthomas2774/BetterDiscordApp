@@ -1,0 +1,32 @@
+.bd-settings-modal {
+    .bd-modal .bd-modal-body {
+        padding: 0;
+    }
+
+    .bd-modal .bd-modal-footer {
+        .bd-ok {
+            width: 100px;
+        }
+    }
+
+    .bd-settings-modal-body {
+        padding: 0 15px;
+        margin: 0 0 74px;
+
+        .bd-switch-wrapper {
+            width: 40px;
+            height: 20px;
+
+            .bd-switch::before {
+                width: 14px;
+                height: 14px;
+            }
+        }
+    }
+
+    &.bd-edited {
+        .bd-scroller::-webkit-scrollbar-track {
+            margin-bottom: 74px;
+        }
+    }
+}

@@ -1,0 +1,167 @@
+@keyframes bd-refresh-circle-anim-out {
+    0% {
+        transform: rotate(0deg);
+        stroke-dasharray: 36.5, 200;
+        stroke-dashoffset: -7.5;
+    }
+
+    80% {
+        stroke-dasharray: 36.5, 200;
+        stroke-dashoffset: -44;
+    }
+
+    100% {
+        transform: rotate(360deg);
+        stroke-dasharray: 36.5, 200;
+        stroke-dashoffset: -44;
+    }
+}
+
+@keyframes bd-refresh-circle-anim-in {
+    0% {
+        transform: rotate(-360deg);
+        stroke-dasharray: 0, 200;
+        stroke-dashoffset: -7.5;
+    }
+
+    100% {
+        transform: rotate(0deg);
+        stroke-dasharray: 36.5, 200;
+        stroke-dashoffset: -7.5;
+    }
+}
+
+@keyframes bd-refresh-arrow-rotate {
+    from {
+        transform: rotate(-680deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.bd-refresh-button {
+    cursor: pointer;
+    height: 31px;
+    width: 31px;
+    display: block;
+
+    svg,
+    svg * {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    svg {
+        height: 19px;
+        width: 19px;
+        margin: 6px;
+    }
+
+    .bd-svg-refresh {
+        opacity: 1;
+    }
+
+    &.bd-refreshed {
+        .bd-svg-refresh {
+            transition: .5s cubic-bezier(.4,0,0,1) .2s;
+        }
+
+        .bd-svg-cancel-line:nth-of-type(1) {
+            transform-origin: bottom;
+            transition: .5s cubic-bezier(0,0,0,1) .1s, transform-origin 1ms;
+        }
+
+        .bd-svg-cancel-line:nth-of-type(2) {
+            transform-origin: left;
+            transition: .5s cubic-bezier(0,0,0,1), transform-origin 1ms;
+        }
+
+        .bd-svg-circle {
+            stroke-dasharray: 36.5, 200;
+            stroke-dashoffset: -7.5;
+            transform-origin: center;
+            animation: bd-refresh-circle-anim-in 1s cubic-bezier(.4,0,0,1);
+        }
+
+        .bd-svg-arrow {
+            transform-origin: center;
+            animation: bd-refresh-arrow-rotate 1s cubic-bezier(.4,0,0,1);
+        }
+    }
+
+    &.bd-refreshing {
+        .bd-svg-refresh {
+            transition: .5s cubic-bezier(.4,0,0,1);
+            opacity: .3;
+        }
+
+        .bd-svg-cancel-line {
+            opacity: 1;
+        }
+
+        .bd-svg-cancel-line:nth-of-type(1) {
+            transform-origin: top;
+            transform: scale(1,1);
+            transition: .5s cubic-bezier(0,0,0,1) .4s, transform-origin 1ms;
+        }
+
+        .bd-svg-cancel-line:nth-of-type(2) {
+            transform-origin: right;
+            transform: scale(1,1);
+            transition: .5s cubic-bezier(0,0,0,1) .3s, transform-origin 1ms;
+        }
+
+        .bd-svg-circle {
+            stroke-dasharray: 36.5, 200;
+            stroke-dashoffset: -44;
+            transform-origin: center;
+            animation: bd-refresh-circle-anim-out 1s cubic-bezier(.4,0,0,1);
+        }
+
+        .bd-svg-arrow {
+            transform-origin: center;
+            transform: rotate(360deg);
+            transition: 1s cubic-bezier(.4,0,0,1);
+        }
+
+        .bd-svg-arrow-triangle {
+            transition: .5s ease;
+            transform: scale(0);
+        }
+    }
+
+    .bd-svg-cancel {
+        transform: rotate(-45deg);
+        transform-origin: center;
+    }
+
+    .bd-svg-cancel-line {
+        opacity: .4;
+    }
+
+    .bd-svg-cancel-line:nth-of-type(1) {
+        transform: scale(1,0);
+    }
+
+    .bd-svg-cancel-line:nth-of-type(2) {
+        transform: scale(0,1);
+    }
+
+    .bd-svg-circle {
+        stroke-dasharray: 36.5, 200;
+        stroke-dashoffset: -7.5;
+    }
+
+    .bd-svg-arrow {
+        transform-origin: center;
+        transform: rotate(0deg);
+    }
+
+    .bd-svg-arrow-triangle {
+        transform-origin: 17.1px 6.9px;
+        transition: .8s ease .2s;
+        transform: scale(1);
+    }
+}

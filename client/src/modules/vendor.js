@@ -12,7 +12,7 @@ import WebpackModules from './webpackmodules';
 import jQuery from 'jquery';
 import lodash from 'lodash';
 
-export { jQuery, jQuery as $ };
+export { jQuery as $ };
 
 export default class {
 

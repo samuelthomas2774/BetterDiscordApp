@@ -11,10 +11,9 @@
 import EventListener from './eventlistener';
 import { Utils } from 'common';
 import Events from './events';
+import WebpackModules from './webpackmodules';
 
-import {
-    MESSAGE_CREATE
-} from '../structs/socketstructs';
+import * as SocketStructs from '../structs/socketstructs';
 
 
 /**
@@ -22,6 +21,11 @@ import {
  * @extends {EventListener}
  */
 export default class extends EventListener {
+
+    init() {
+        console.log(SocketStructs);
+        this.hook();
+    }
 
     bindings() {
         this.hook = this.hook.bind(this);
@@ -33,9 +37,19 @@ export default class extends EventListener {
         ];
     }
 
-    hook() {}
+    hook() {
+        const self = this;
+        const orig = this.eventsModule.prototype.emit;
+        this.eventsModule.prototype.emit = function (...args) {
+            orig.call(this, ...args);
+            self.wsc = this;
+            self.emit(...args);
+        }
+    }
 
-    get eventsModule() {}
+    get eventsModule() {
+        return WebpackModules.getModuleByPrototypes(['setMaxListeners', 'emit']);
+    }
 
     /**
      * Discord emit overload
@@ -56,36 +70,14 @@ export default class extends EventListener {
      * @param {any} d Event Args
      */
     dispatch(e, d) {
-
         Events.emit('raw-event', { type: e, data: d });
-
-        switch (e) {
-            case this.actions.READ:
-                Events.emit('discord-ready');
-                break;
-            case this.actions.RESUMED:
-                Events.emit('discord-resumed');
-                break;
-            case this.actions.TYPING_START:
-                Events.emit('discord-event', {
-                    type: e,
-                    channelId: d.channel_id,
-                    userId: d.user_id
-                });
-                break;
-            case this.actions.MESSAGE_CREATE:
-                Events.emit('discord-event', { type: e, data: new MESSAGE_CREATE(d) });
-                break;
-            case 'k':
-                Events.emit('discord-event', {
-
-                });
-                break;
-            case this.actions.ACTIVITY_START:
-                Events.emit('discord-event', this.construct(e, d));
-                break;
-
+        if (e === this.actions.READY || e === this.actions.RESUMED) {
+            Events.emit(e, d);
+            return;
         }
+        if (!Object.keys(SocketStructs).includes(e)) return;
+        const evt = new SocketStructs[e](d);
+        Events.emit(`discord:${e}`, evt);
     }
 
     /**

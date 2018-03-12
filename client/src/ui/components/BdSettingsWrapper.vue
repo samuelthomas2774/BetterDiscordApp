@@ -10,22 +10,28 @@
 
 <template>
     <div class="bd-settings-wrapper" :class="[{active: active}, 'platform-' + this.platform]">
-        <div class="bd-settings-button" :class="{'bd-active': active}" @click="showSettings">
-            <div class="bd-settings-button-btn" :class="[{'bd-loading': !loaded}]"></div>
+        <div class="bd-settings-button" :class="{'bd-active': active, 'bd-animating': animating}" @click="showSettings">
+            <div v-if="updating === 0" v-tooltip.right="'Checking for updates'" class="bd-settings-button-btn bd-loading"></div>
+            <div v-else-if="updating === 2" v-tooltip.right="'Updates available!'" class="bd-settings-button-btn bd-updates"></div>
+            <div v-else class="bd-settings-button-btn" :class="[{'bd-loading': !loaded}]"></div>
         </div>
-        <BdSettings :active="active" :close="hideSettings" />
+        <BdSettings ref="settings" :active="active" :close="hideSettings" />
     </div>
 </template>
 <script>
     // Imports
-    import { Events } from 'modules';
+    import { Events, Settings } from 'modules';
+    import { Modals } from 'ui';
     import BdSettings from './BdSettings.vue';
 
     export default {
         data() {
             return {
                 loaded: false,
+                updating: false,
                 active: false,
+                animating: false,
+                timeout: null,
                 platform: global.process.platform
             }
         },
@@ -40,16 +46,31 @@
             hideSettings() { this.active = false },
             toggleSettings() { this.active = !this.active },
             keyupListener(e) {
-                if (document.getElementsByClassName('bd-backdrop').length) return;
-                if (this.active && e.which === 27) return this.hideSettings();
-                if (!e.metaKey && !e.ctrlKey || e.key !== 'b') return;
-                this.toggleSettings();
+                if (Modals.stack.length || !this.active || e.which !== 27) return;
+                if (this.$refs.settings.activeIndex !== -1) this.$refs.settings.closeContent();
+                else this.hideSettings();
                 e.stopImmediatePropagation();
+            }
+        },
+        watch: {
+            active(active) {
+                this.animating = true;
+                if (this.timeout) clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => {
+                    this.animating = false;
+                    this.timeout = null;
+                }, 400);
             }
         },
         created() {
             Events.on('ready', e => this.loaded = true);
+            Events.on('update-check-start', e => this.updating = 0);
+            Events.on('update-check-end', e => this.updating = 1);
+            Events.on('updates-available', e => this.updating = 2);
             window.addEventListener('keyup', this.keyupListener);
+
+            const menuKeybind = Settings.getSetting('core', 'default', 'menu-keybind');
+            menuKeybind.on('keybind-activated', () => this.active = !this.active);
         },
         destroyed() {
             window.removeEventListener('keyup', this.keyupListener);

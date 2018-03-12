@@ -37,16 +37,16 @@ class DOMObserver {
         this.subscribe = this.subscribe.bind(this);
         this.observerCallback = this.observerCallback.bind(this);
         this.observer = new MutationObserver(this.observerCallback);
+        this.observe();
     }
 
     observerCallback(mutations) {
         for (let sub of this.subscriptions) {
             try {
-                const f = mutations.find(sub.filter);
-                if (f) {
-                    sub.callback(f);
-                    continue;
-                }
+                const f = sub.type && sub.type === 'filter' ? mutations.filter(sub.filter) : mutations.find(sub.filter);
+                if (!f) continue;
+                if (sub.type && sub.type === 'filter' && !f.length) continue;
+                sub.callback(f);
             } catch(err) {}
         }
     }
@@ -67,12 +67,13 @@ class DOMObserver {
         return this._subscriptions || (this._subscriptions = []);
     }
 
-    subscribe(id, filter, callback) {
+    subscribe(id, filter, callback, type) {
         if (this.subscriptions.find(sub => sub.id === id)) return;
         this.subscriptions.push({
             id,
             filter,
-            callback
+            callback,
+            type
         });
     }
 
@@ -84,7 +85,28 @@ class DOMObserver {
 
 }
 
-class DOM {
+class Manip {
+    static setText(text, refocus) {
+        const activeElement = document.activeElement;
+        const txt = document.querySelector('.chat form textarea');
+        if (!txt) return;
+        txt.focus();
+        txt.select();
+        document.execCommand('insertText', false, text);
+        if (activeElement && refocus) activeElement.focus();
+    }
+    static getText() {
+        const txt = document.querySelector('.chat form textarea');
+        if (!txt) return '';
+        return txt.value;
+    }
+}
+
+export default class DOM {
+
+    static get manip() {
+        return Manip;
+    }
 
     static get observer() {
         return this._observer || (this._observer = new DOMObserver());
@@ -116,33 +138,39 @@ class DOM {
         return document.querySelector(e);
     }
 
+    static getElements(e) {
+        return document.querySelectorAll(e);
+    }
+
     static createElement(tag = 'div', className = null, id = null) {
         return new BdNode(tag, className, id);
     }
 
     static deleteStyle(id) {
-        const exists = this.getElement(`bd-styles > #${id}`);
+        const exists = Array.from(this.bdStyles.children).find(e => e.id === id);
         if (exists) exists.remove();
-    }   
+    }
 
     static injectStyle(css, id) {
-        this.deleteStyle(id);
-        this.bdStyles.append(this.createStyle(css, id));
+        const style = Array.from(this.bdStyles.children).find(e => e.id === id) || this.createElement('style', null, id).element;
+        style.textContent = css;
+        this.bdStyles.append(style);
     }
 
     static getStyleCss(id) {
-        const exists = this.getElement(`bd-styles > #${id}`);
+        const exists = this.bdStyles.children.find(e => e.id === id);
         return exists ? exists.textContent : '';
     }
 
     static deleteTheme(id) {
-        const exists = this.getElement(`bd-themes > #${id}`);
+        const exists = Array.from(this.bdThemes.children).find(e => e.id === id);
         if (exists) exists.remove();
     }
 
     static injectTheme(css, id) {
-        this.deleteTheme(id);
-        this.bdThemes.append(this.createStyle(css, id));
+        const style = Array.from(this.bdThemes.children).find(e => e.id === id) || this.createElement('style', null, id).element;
+        style.textContent = css;
+        this.bdThemes.append(style);
     }
 
     static createStyle(css, id) {
@@ -152,6 +180,10 @@ class DOM {
         style.appendChild(document.createTextNode(css));
         return style;
     }
-}
 
-export default DOM;
+    static setAttributes(node, attributes) {
+        for (let attribute of attributes) {
+            node.setAttribute(attribute.name, attribute.value);
+        }
+    }
+}

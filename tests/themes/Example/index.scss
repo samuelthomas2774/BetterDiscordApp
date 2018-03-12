@@ -1,7 +1,7 @@
-@import 'vars.scss';
+@import 'vars';
 
 div {
-    background: $divBg;
+    background: unquote($divBg);
 }
 
 span {
@@ -10,7 +10,26 @@ span {
     opacity: $spanOpacity2 !important;
 }
 
+.chat .messages-wrapper,
+#friends .friends-table {
+    background-image: url(map-get($relative-file-test, url));
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
 .avatar-large {
-    background-image: url($avatar) !important;
+    background-image: url(map-get($avatar, url)) !important;
     border-radius: $avatarRadius !important;
+}
+
+// Can't use a for loop as then we don't get the index
+$index: 0;
+@while $index < length($additional-colours) {
+    $additional-colour: nth($additional-colours, $index + 1);
+
+    div:nth-child(#{length($additional-colours)}n + #{$index}) {
+        color: unquote(map-get($additional-colour, colour)) !important;
+    }
+
+    $index: $index + 1;
 }

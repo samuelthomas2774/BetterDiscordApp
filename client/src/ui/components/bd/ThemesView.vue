@@ -10,26 +10,24 @@
 
 <template>
     <SettingsWrapper headertext="Themes">
-        <div class="bd-flex bd-flex-col bd-themesView">
-            <div class="bd-flex bd-tabheader">
-                <div class="bd-flex-grow bd-button" :class="{'bd-active': local}" @click="showLocal">
-                    <h3>Local</h3>
-                    <div class="bd-material-button" @click="refreshLocal">
-                        <MiRefresh />
-                    </div>
-                </div>
-                <div class="bd-flex-grow bd-button" :class="{'bd-active': !local}" @click="showOnline">
-                    <h3>Online</h3>
-                    <div class="bd-material-button">
-                        <MiRefresh />
-                    </div>
-                </div>
+        <div class="bd-tabbar" slot="header">
+            <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
+                <h3>Installed</h3>
+                <RefreshBtn v-if="local" :onClick="refreshLocal"/>
             </div>
+            <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
+                <h3>Browse</h3>
+                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
+            </div>
+        </div>
+
+        <div class="bd-flex bd-flex-col bd-themesview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">
-                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="toggleTheme" :reloadTheme="reloadTheme" :showSettings="showSettings" />
+                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="reload => reloadTheme(theme, reload)" :showSettings="dont_clone => showSettings(theme, dont_clone)" :deleteTheme="unload => deleteTheme(theme, unload)" />
             </div>
-            <div v-if="!local" class="bd-spinner-container">
-                <div class="bd-spinner-2"></div>
+            <div v-if="!local" class="bd-online-ph">
+                <h3>Coming Soon</h3>
+                <a href="https://v2.betterdiscord.net/themes" target="_new">Website Browser</a>
             </div>
         </div>
     </SettingsWrapper>
@@ -42,6 +40,7 @@
     import { SettingsWrapper } from './';
     import { MiRefresh } from '../common';
     import ThemeCard from './ThemeCard.vue';
+    import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
@@ -52,7 +51,8 @@
         },
         components: {
             SettingsWrapper, ThemeCard,
-            MiRefresh
+            MiRefresh,
+            RefreshBtn
         },
         methods: {
             showLocal() {
@@ -61,35 +61,40 @@
             showOnline() {
                 this.local = false;
             },
-            refreshLocal() {
-                (async () => {
-                    await ThemeManager.refreshTheme();
-                })();
+            async refreshLocal() {
+                await ThemeManager.refreshThemes();
             },
-            toggleTheme(theme) {
+            async refreshOnline() {
+
+            },
+            async toggleTheme(theme) {
                 // TODO Display error if theme fails to enable/disable
                 try {
-                    if (theme.enabled) {
-                        ThemeManager.disableTheme(theme);
-                    } else {
-                        ThemeManager.enableTheme(theme);
-                    }
+                    await theme.enabled ? ThemeManager.disableTheme(theme) : ThemeManager.enableTheme(theme);
                 } catch (err) {
                     console.log(err);
                 }
             },
-            reloadTheme(theme) {
-                (async () => {
-                    try {
-                        await ThemeManager.reloadTheme(theme);
-                        this.$forceUpdate();
-                    } catch (err) {
-                        console.log(err);
-                    }
-                })();
+            async reloadTheme(theme, reload) {
+                try {
+                    if (reload) await ThemeManager.reloadTheme(theme);
+                    else await theme.recompile();
+                } catch (err) {
+                    console.log(err);
+                }
             },
-            showSettings(theme) {
-                return Modals.themeSettings(theme);
+            async deleteTheme(theme, unload) {
+                try {
+                    if (unload) await ThemeManager.unloadTheme(theme);
+                    else await ThemeManager.deleteTheme(theme);
+                } catch (err) {
+                    console.error(err);
+                }
+            },
+            showSettings(theme, dont_clone) {
+                return Modals.contentSettings(theme, null, {
+                    dont_clone
+                });
             }
         }
     }

@@ -12,11 +12,11 @@ import Vue from './vue';
 
 export default class {
     
-    static inject(root, bdnode, components, template) {
-        bdnode.appendTo(root);
+    static inject(root, bdnode, components, template, replaceRoot) {
+        if(!replaceRoot) bdnode.appendTo(root);
 
         return new Vue({
-            el: bdnode.element,
+            el: replaceRoot ? root : bdnode.element,
             components,
             template
         });

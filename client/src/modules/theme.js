@@ -8,152 +8,165 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import Content from './content';
+import Settings from './settings';
 import ThemeManager from './thememanager';
-import { EventEmitter } from 'events';
-import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
-import { DOM, Modals } from 'ui';
-import { FileUtils, ClientIPC } from 'common';
-import ContentConfig from './contentconfig';
+import { DOM } from 'ui';
+import { FileUtils, ClientIPC, ClientLogger as Logger } from 'common';
+import filewatcher from 'filewatcher';
 
-class ThemeEvents {
-    constructor(theme) {
-        this.theme = theme;
-        this.emitter = new EventEmitter();
+export default class Theme extends Content {
+
+    constructor(internals) {
+        super(internals);
+
+        const watchfiles = Settings.getSetting('css', 'default', 'watch-files');
+        if (watchfiles.value) this.watchfiles = this.files;
+        watchfiles.on('setting-updated', event => {
+            if (event.value) this.watchfiles = this.files;
+            else this.watchfiles = [];
+        });
     }
 
-    on(eventname, callback) {
-        this.emitter.on(eventname, callback);
-    }
+    get type() { return 'theme' }
+    get css() { return this.data.css }
 
-    off(eventname, callback) {
-        this.emitter.removeListener(eventname, callback);
-    }
-
-    emit(...args) {
-        this.emitter.emit(...args);
-    }
-}
-
-export default class Theme {
-
-    constructor(themeInternals) {
-        this.__themeInternals = themeInternals;
-        this.hasSettings = this.themeConfig && this.themeConfig.length > 0;
-        this.saveSettings = this.saveSettings.bind(this);
-        this.enable = this.enable.bind(this);
-        this.disable = this.disable.bind(this);
-    }
-
-    get configs() { return this.__themeInternals.configs }
-    get info() { return this.__themeInternals.info }
-    get icon() { return this.info.icon }
-    get paths() { return this.__themeInternals.paths }
-    get main() { return this.__themeInternals.main }
-    get defaultConfig() { return this.configs.defaultConfig }
-    get userConfig() { return this.configs.userConfig }
-    get id() { return this.info.id || this.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/\s+/g, '-') }
-    get name() { return this.info.name }
-    get authors() { return this.info.authors }
-    get version() { return this.info.version }
-    get themePath() { return this.paths.contentPath }
-    get dirName() { return this.paths.dirName }
-    get enabled() { return this.userConfig.enabled }
-    get config() { return this.userConfig.config || [] }
+    // Don't use - these will eventually be removed!
+    get themePath() { return this.contentPath }
     get themeConfig() { return this.config }
-    get css() { return this.userConfig.css }
-    get events() { return this.EventEmitter ? this.EventEmitter : (this.EventEmitter = new ThemeEvents(this)) }
 
-    showSettingsModal() {
-        return Modals.themeSettings(this);
+    /**
+     * Called when settings are updated.
+     * This can be overridden by other content types.
+     */
+    __settingsUpdated(event) {
+        return this.recompile();
     }
 
-    async saveSettings(newSettings) {
-        const updatedSettings = [];
-
-        for (let newCategory of newSettings) {
-            const category = this.themeConfig.find(c => c.category === newCategory.category);
-            for (let newSetting of newCategory.settings) {
-                const setting = category.settings.find(s => s.id === newSetting.id);
-                if (setting.value === newSetting.value) continue;
-
-                const old_value = setting.value;
-                setting.value = newSetting.value;
-                updatedSettings.push({ category_id: category.category, setting_id: setting.id, value: setting.value, old_value });
-                this.settingUpdated(category.category, setting.id, setting.value, old_value);
-            }
-        }
-
-        // As the theme's configuration has changed it needs recompiling
-        // When the compiled CSS has been save it will also save the configuration
-        await this.recompile();
-
-        return this.settingsUpdated(updatedSettings);
-    }
-
-    settingUpdated(category_id, setting_id, value, old_value) {
-        const event = new SettingUpdatedEvent({ category_id, setting_id, value, old_value });
-        this.events.emit('setting-updated', event);
-        this.events.emit(`setting-updated_{$category_id}_${setting_id}`, event);
-    }
-
-    settingsUpdated(updatedSettings) {
-        const event = new SettingsUpdatedEvent({ settings: updatedSettings.map(s => new SettingUpdatedEvent(s)) });
-        this.events.emit('settings-updated', event);
-    }
-
-    async saveConfiguration() {
-        try {
-            const config = new ContentConfig(this.themeConfig).strip();
-            await FileUtils.writeFile(`${this.themePath}/user.config.json`, JSON.stringify({
-                enabled: this.enabled,
-                config,
-                css: this.css
-            }));
-        } catch (err) {
-            throw err;
-        }
-    }
-
-    enable() {
-        if (!this.enabled) {
-            this.userConfig.enabled = true;
-            this.saveConfiguration();
-        }
+    /**
+     * This is called when the theme is enabled.
+     */
+    async onstart() {
+        if (!this.css) await this.recompile();
         DOM.injectTheme(this.css, this.id);
     }
 
-    disable() {
-        this.userConfig.enabled = false;
-        this.saveConfiguration();
+    /**
+     * This is called when the theme is disabled.
+     */
+    onstop() {
         DOM.deleteTheme(this.id);
     }
 
+    /**
+     * Compiles the theme and returns an object containing the CSS and an array of files that were included.
+     * @return {Promise}
+     */
     async compile() {
         console.log('Compiling CSS');
 
-        let css = '';
         if (this.info.type === 'sass') {
-            css = await ClientIPC.send('bd-compileSass', {
-                data: ThemeManager.getConfigAsSCSS(this.themeConfig),
+            const config = await ThemeManager.getConfigAsSCSS(this.settings);
+
+            const result = await ClientIPC.send('bd-compileSass', {
+                data: config,
                 path: this.paths.mainPath.replace(/\\/g, '/')
             });
-            console.log(css);
-        } else {
-            css = await FileUtils.readFile(this.paths.mainPath);
-        }
 
-        return css;
+            Logger.log(this.name, ['Finished compiling theme', new class Info {
+                get SCSS_variables() { console.log(config); }
+                get Compiled_SCSS() { console.log(result.css.toString()); }
+				get Result() { console.log(result); }
+            }]);
+
+            return {
+                css: result.css.toString(),
+                files: result.stats.includedFiles
+            };
+        } else {
+            return {
+                css: await FileUtils.readFile(this.paths.mainPath)
+            };
+        }
     }
 
+    /**
+     * Compiles the theme and updates and saves the CSS and the list of include files.
+     * @return {Promise}
+     */
     async recompile() {
-        const css = await this.compile();
-        this.userConfig.css = css;
+        const data = await this.compile();
+        this.data.css = data.css;
+        this.files = data.files;
 
         await this.saveConfiguration();
 
         if (this.enabled) {
             DOM.deleteTheme(this.id);
             DOM.injectTheme(this.css, this.id);
+        }
+    }
+
+    /**
+     * An array of files that are imported in the theme's SCSS.
+     * @return {Array} Files being watched
+     */
+    get files() {
+        return this.data.files || (this.data.files = []);
+    }
+
+    /**
+     * Sets all files that are imported in the theme's SCSS.
+     * @param {Array} files Files to watch
+     */
+    set files(files) {
+        this.data.files = files;
+        if (Settings.get('css', 'default', 'watch-files'))
+            this.watchfiles = files;
+    }
+
+    /**
+     * A filewatcher instance.
+     */
+    get filewatcher() {
+        if (this._filewatcher) return this._filewatcher;
+        this._filewatcher = filewatcher();
+        this._filewatcher.on('change', (file, stat) => {
+            // Recompile SCSS
+            this.recompile();
+        });
+        return this._filewatcher;
+    }
+
+    /**
+     * An array of files that are being watched for changes.
+     * @return {Array} Files being watched
+     */
+    get watchfiles() {
+        return this._watchfiles || (this._watchfiles = []);
+    }
+
+    /**
+     * Sets all files to be watched.
+     * @param {Array} files Files to watch
+     */
+    set watchfiles(files) {
+        for (let file of files) {
+            if (!this.watchfiles.includes(file)) {
+                this.filewatcher.add(file);
+                this.watchfiles.push(file);
+                Logger.log(this.name, `Watching file ${file} for changes`);
+            }
+        }
+
+        for (let index in this.watchfiles) {
+            let file = this.watchfiles[index];
+            while (file && !files.find(f => f === file)) {
+                this.filewatcher.remove(file);
+                this.watchfiles.splice(index, 1);
+                Logger.log(this.name, `No longer watching file ${file} for changes`);
+                file = this.watchfiles[index];
+            }
         }
     }
 

@@ -10,6 +10,8 @@
 
 import ContentManager from './contentmanager';
 import Theme from './theme';
+import { FileUtils } from 'common';
+import path from 'path';
 
 export default class ThemeManager extends ContentManager {
 
@@ -29,9 +31,8 @@ export default class ThemeManager extends ContentManager {
         return 'themes';
     }
 
-    static get loadAllThemes() {
-        return this.loadAllContent;
-    }
+    static get loadAllThemes() { return this.loadAllContent }
+    static get refreshThemes() { return this.refreshContent }
 
     static get loadContent() { return this.loadTheme }
     static async loadTheme(paths, configs, info, main) {
@@ -44,12 +45,20 @@ export default class ThemeManager extends ContentManager {
                     mainPath: paths.mainPath
                 }
             });
-            if (!instance.css) instance.recompile();
-            else if (instance.enabled) instance.enable();
+            if (instance.enabled) {
+                instance.userConfig.enabled = false;
+                instance.enable();
+            }
             return instance;
         } catch (err) {
             throw err;
         }
+    }
+
+    static get unloadTheme() { return this.unloadContent }
+    static async reloadTheme(theme) {
+        theme = await this.reloadContent(theme);
+        theme.recompile();
     }
 
     static enableTheme(theme) {
@@ -60,40 +69,48 @@ export default class ThemeManager extends ContentManager {
         theme.disable();
     }
 
-    static reloadTheme(theme) {
-        theme.recompile();
+    static get isTheme() { return this.isThisContent }
+    static isThisContent(theme) {
+        return theme instanceof Theme;
     }
 
-    static getConfigAsSCSS(config) {
+    static async getConfigAsSCSS(settingsset) {
         const variables = [];
 
-        for (let category of config) {
+        for (let category of settingsset.categories) {
             for (let setting of category.settings) {
-                variables.push(this.parseSetting(setting));
+                const setting_scss = await this.parseSetting(setting);
+                if (setting_scss) variables.push(`$${setting_scss[0]}: ${setting_scss[1]};`);
             }
         }
+
         return variables.join('\n');
     }
 
-    static parseSetting(setting) {
+    static async getConfigAsSCSSMap(settingsset) {
+        const variables = [];
+
+        for (let category of settingsset.categories) {
+            for (let setting of category.settings) {
+                const setting_scss = await this.parseSetting(setting);
+                if (setting_scss) variables.push(`${setting_scss[0]}: (${setting_scss[1]})`);
+            }
+        }
+
+        return '(' + variables.join(', ') + ')';
+    }
+
+    static async parseSetting(setting) {
         const { type, id, value } = setting;
         const name = id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
+        const scss = await setting.toSCSS();
 
-        if (type === 'slider') {
-            return `$${name}: ${value * setting.multi || 1};`;
-        }
+        if (scss) return [name, scss];
+    }
 
-        if (type === 'dropdown' || type === 'radio') {
-            return `$${name}: ${setting.options.find(opt => opt.id === value).value};`;
-        }
-
-        if (typeof value === 'boolean' || typeof value === 'number') {
-            return `$${name}: ${value};`;
-        }
-
-        if (typeof value === 'string') {
-            return `$${name}: ${setting.scss_raw ? value : `'${setting.value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`};`;
-        }
+    static toSCSSString(value) {
+        if (typeof value !== 'string' && value.toString) value = value.toString();
+        return `'${typeof value === 'string' ? value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') : ''}'`;
     }
 
 }

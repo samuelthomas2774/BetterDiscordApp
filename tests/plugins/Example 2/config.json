@@ -6,6 +6,6 @@
     "description": "Example Plugin 2 Description"
   },
     "main": "index.js",
-    "type":  "plugin", 
+    "type": "plugin",
     "defaultConfig": []
 }

@@ -1,0 +1,16 @@
+{
+    "info": {
+        "id": "permission-test",
+        "name": "Permission Test",
+        "authors": [ "Jiiks" ],
+        "version": 1.0,
+        "description": "Permission Test Description"
+    },
+    "main": "index.js",
+    "type": "plugin",
+    "permissions": [
+        "READ_MESSAGES",
+        "SEND_MESSAGES"
+    ],
+    "defaultConfig": []
+}

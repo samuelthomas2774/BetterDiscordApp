@@ -8,8 +8,6 @@
         flex-direction: column;
         overflow-y: auto;
         overflow-x: hidden;
-        padding: 10px 10px 10px 0;
-        margin: 10px 0;
 
         @include scrollbar;
     }

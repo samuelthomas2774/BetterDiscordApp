@@ -1,14 +1,23 @@
 .bd-form-radio {
     display: flex;
-    flex-direction: column;
 
     .bd-form-radio-details {
         flex: 1 1 auto;
     }
 
-    .bd-form-radio-group {
-        flex: 0 0 auto;
-        margin-top: 10px;
+    .bd-radio-group {
+        width: 180px;
+        margin-left: 15px;
+    }
+
+    .bd-form-item-fullwidth & {
+        flex-direction: column;
+
+        .bd-radio-group {
+            width: 100%;
+            margin-top: 10px;
+            margin-left: 0;
+        }
     }
 }
 
@@ -45,6 +54,8 @@
     .bd-radio-text {
         flex: 1 1 auto;
         color: white;
+        word-wrap: break-word;
+        width: 1px;
     }
 
     &:not(:last-child) {

@@ -11,7 +11,7 @@
 <template>
     <div class="bd-sidebar-view" :class="{active: contentVisible, animating: animating}">
         <div class="bd-sidebar-region bd-flex-col">
-            <div class="bd-settingsWrap">
+            <div class="bd-settingswrap">
                 <ScrollerWrap dark="true">
                     <slot name="sidebar" />
                 </ScrollerWrap>

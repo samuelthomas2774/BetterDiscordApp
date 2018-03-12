@@ -16,4 +16,4 @@ module.exports = (Plugin, Api, Vendor) =>
         }
     }
 
-}
+};

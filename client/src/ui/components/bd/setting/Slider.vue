@@ -21,9 +21,9 @@
                         <div class="bd-slider-bar-filled" :style="{width: `${getPointPosition() * 100}%`}"></div>
                     </div>
                     <div class="bd-slider-thumb-wrap">
-                        <div class="bd-slider-thumb" v-tooltip="{content: (setting.value || '0') + setting.unit, show: toolTip, trigger: 'manual'}" :style="{left: `${getPointPosition() * 100}%`}"></div>
+                        <div class="bd-slider-thumb" v-tooltip="{content: (value || '0') + setting.unit, show: toolTip, trigger: 'manual'}" :style="{left: `${getPointPosition() * 100}%`}"></div>
                     </div>
-                    <input type="range" :value="setting.value" :min="setting.min || 0" :max="setting.max || 100" :step="setting.step || 1" @keyup.stop @input="input" />
+                    <input type="range" :value="value" :min="setting.min || 0" :max="setting.max || 100" :step="setting.step || 1" @keyup.stop @input="input" />
                 </div>
             </div>
         </div>
@@ -39,14 +39,19 @@
                 toolTip: false
             };
         },
+        computed: {
+            value() {
+                return this.setting.value / this.setting.multi;
+            }
+        },
         methods: {
             input(e) {
                 let number = parseFloat(e.target.value);
                 if (Number.isNaN(number)) return;
-                this.change(number);
+                this.change(number * this.setting.multi);
             },
             getPointPosition(value) {
-                return ((value || this.setting.value) - (this.setting.min || 0)) / ((this.setting.max || 100) - (this.setting.min || 0));
+                return ((value || this.value) - (this.setting.min || 0)) / ((this.setting.max || 100) - (this.setting.min || 0));
             },
             showTooltip() {
                 this.toolTip = true;

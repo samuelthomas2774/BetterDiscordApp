@@ -10,26 +10,24 @@
 
 <template>
     <SettingsWrapper headertext="Plugins">
-        <div class="bd-flex bd-flex-col bd-pluginsView">
-            <div class="bd-flex bd-tabheader">
-                <div class="bd-flex-grow bd-button" :class="{'bd-active': local}" @click="showLocal">
-                    <h3>Local</h3>
-                    <div class="bd-material-button" @click="refreshLocal">
-                        <MiRefresh />
-                    </div>
-                </div>
-                <div class="bd-flex-grow bd-button" :class="{'bd-active': !local}" @click="showOnline">
-                    <h3>Online</h3>
-                    <div class="bd-material-button">
-                        <MiRefresh />
-                    </div>
-                </div>
+        <div class="bd-tabbar" slot="header">
+            <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
+                <h3>Installed</h3>
+                <RefreshBtn v-if="local" :onClick="refreshLocal" />
             </div>
+            <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
+                <h3>Browse</h3>
+                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
+            </div>
+        </div>
+
+        <div class="bd-flex bd-flex-col bd-pluginsview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
-                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="togglePlugin" :reloadPlugin="reloadPlugin" :showSettings="showSettings" />
+                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :deletePlugin="unload => deletePlugin(plugin, unload)" :showSettings="dont_clone => showSettings(plugin, dont_clone)" />
             </div>
-            <div v-if="!local" class="bd-spinner-container">
-                <div class="bd-spinner-2"></div>
+            <div v-if="!local" class="bd-online-ph">
+                <h3>Coming Soon</h3>
+                <a href="https://v2.betterdiscord.net/plugins" target="_new">Website Browser</a>
             </div>
         </div>
     </SettingsWrapper>
@@ -42,6 +40,7 @@
     import { SettingsWrapper } from './';
     import PluginCard from './PluginCard.vue';
     import { MiRefresh } from '../common';
+    import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
@@ -52,7 +51,8 @@
         },
         components: {
             SettingsWrapper, PluginCard,
-            MiRefresh
+            MiRefresh,
+            RefreshBtn
         },
         methods: {
             showLocal() {
@@ -61,35 +61,39 @@
             showOnline() {
                 this.local = false;
             },
-            refreshLocal() {
-                (async () => {
-                    await PluginManager.refreshPlugins();
-                })();
+            async refreshLocal() {
+                await PluginManager.refreshPlugins();
             },
-            togglePlugin(plugin) {
+            async refreshOnline() {
+
+            },
+            async togglePlugin(plugin) {
                 // TODO Display error if plugin fails to start/stop
                 try {
-                    if (plugin.enabled) {
-                        PluginManager.stopPlugin(plugin);
-                    } else {
-                        PluginManager.startPlugin(plugin);
-                    }
+                    await plugin.enabled ? PluginManager.stopPlugin(plugin) : PluginManager.startPlugin(plugin);
                 } catch (err) {
                     console.log(err);
                 }
             },
-            reloadPlugin(plugin) {
-                (async () => {
-                    try {
-                        await PluginManager.reloadPlugin(plugin);
-                        this.$forceUpdate();
-                    } catch (err) {
-                        console.log(err);
-                    }
-                })();
+            async reloadPlugin(plugin) {
+                try {
+                    await PluginManager.reloadPlugin(plugin);
+                } catch (err) {
+                    console.log(err);
+                }
             },
-            showSettings(plugin) {
-                return Modals.pluginSettings(plugin);
+            async deletePlugin(plugin, unload) {
+                try {
+                    if (unload) await PluginManager.unloadPlugin(plugin);
+                    else await PluginManager.deletePlugin(plugin);
+                } catch (err) {
+                    console.error(err);
+                }
+            },
+            showSettings(plugin, dont_clone) {
+                return Modals.contentSettings(plugin, null, {
+                    dont_clone
+                });
             }
         }
     }

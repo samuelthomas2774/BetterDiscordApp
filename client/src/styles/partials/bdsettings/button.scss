@@ -13,9 +13,9 @@
         top: 27px;
     }
 
-	.platform-linux & {
-		top: 0;
-	}
+    .platform-linux & {
+        top: 0;
+    }
 
     .bd-settings-button-btn {
         background-image: $logoSmallBw;
@@ -38,13 +38,17 @@
         &.bd-loading {
             animation: bd-settings-button-pulse 1.5s infinite;
         }
+
+        &.bd-updates {
+            filter: hue-rotate(250deg) !important;
+            opacity: 1 !important;
+        }
     }
 
     &.bd-active {
         background: transparent;
         opacity: 1;
         box-shadow: none;
-        z-index: 3001;
 
         .bd-settings-button-btn {
             background-image: $logoBigBw;
@@ -56,6 +60,11 @@
             margin-left: 20px;
             cursor: default;
         }
+    }
+
+    &.bd-active,
+    &.bd-animating {
+        z-index: 3001;
     }
 }
 

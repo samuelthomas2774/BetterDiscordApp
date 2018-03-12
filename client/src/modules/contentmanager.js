@@ -8,15 +8,18 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import Content from './content';
 import Globals from './globals';
-import { FileUtils, ClientLogger as Logger } from 'common';
-import path from 'path';
+import Database from './database';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { Events } from 'modules';
-import { ErrorEvent } from 'structs';
+import { SettingsSet, ErrorEvent } from 'structs';
 import { Modals } from 'ui';
+import path from 'path';
+import Combokeys from 'combokeys';
 
 /**
- * Base class for external content managing
+ * Base class for managing external content
  */
 export default class {
 
@@ -55,6 +58,10 @@ export default class {
 
             for (let dir of directories) {
                 try {
+                    await FileUtils.directoryExists(path.join(this.contentPath, dir));
+                } catch (err) { continue; }
+
+                try {
                     await this.preloadContent(dir);
                 } catch (err) {
                     this.errors.push(new ErrorEvent({
@@ -85,8 +92,9 @@ export default class {
 
     /**
      * Refresh locally stored content
+     * @param {bool} suppressErrors Suppress any errors that occur during loading of content
      */
-    static async refreshContent() {
+    static async refreshContent(suppressErrors = false) {
         if (!this.localContent.length) return this.loadAllContent();
 
         try {
@@ -98,22 +106,52 @@ export default class {
                 if (this.getContentByDirName(dir)) continue;
 
                 try {
+                    await FileUtils.directoryExists(path.join(this.contentPath, dir));
+                } catch (err) { continue; }
+
+                try {
                     // Load if not
                     await this.preloadContent(dir);
                 } catch (err) {
-                    //We don't want every plugin/theme to fail loading when one does
+                    // We don't want every plugin/theme to fail loading when one does
+                    this.errors.push(new ErrorEvent({
+                        module: this.moduleName,
+                        message: `Failed to load ${dir}`,
+                        err
+                    }));
+
                     Logger.err(this.moduleName, err);
                 }
             }
 
             for (let content of this.localContent) {
                 if (directories.includes(content.dirName)) continue;
-                //Plugin/theme was deleted manually, stop it and remove any reference
-                this.unloadContent(content);
+
+                try {
+                    // Plugin/theme was deleted manually, stop it and remove any reference
+                    await this.unloadContent(content);
+                } catch (err) {
+                    this.errors.push(new ErrorEvent({
+                        module: this.moduleName,
+                        message: `Failed to unload ${content.dirName}`,
+                        err
+                    }));
+
+                    Logger.err(this.moduleName, err);
+                }
+            }
+
+            if (this.errors.length && !suppressErrors) {
+                Modals.error({
+                    header: `${this.moduleName} - ${this.errors.length} ${this.contentType}${this.errors.length !== 1 ? 's' : ''} failed to load`,
+                    module: this.moduleName,
+                    type: 'err',
+                    content: this.errors
+                });
+                this._errors = [];
             }
 
             return this.localContent;
-
         } catch (err) {
             throw err;
         }
@@ -141,48 +179,61 @@ export default class {
             const readConfig = await this.readConfig(contentPath);
             const mainPath = path.join(contentPath, readConfig.main);
 
-            readConfig.defaultConfig = readConfig.defaultConfig || [];
+            const defaultConfig = new SettingsSet({
+                settings: readConfig.defaultConfig,
+                schemes: readConfig.configSchemes
+            });
 
             const userConfig = {
                 enabled: false,
-                config: readConfig.defaultConfig
+                config: undefined,
+                data: {}
             };
 
             try {
-                const readUserConfig = await this.readUserConfig(contentPath);
-                userConfig.enabled = readUserConfig.enabled || false;
-                userConfig.config = readConfig.defaultConfig.map(config => {
-                    const userSet = readUserConfig.config.find(c => c.category === config.category);
-                    // return userSet || config;
-                    if (!userSet) return config;
-
-                    config.settings = config.settings.map(setting => {
-                        const userSetting = userSet.settings.find(s => s.id === setting.id);
-                        if (!userSetting) return setting;
-
-                        setting.value = userSetting.value;
-                        return setting;
-                    });
-                    return config;
-                });
-                userConfig.css = readUserConfig.css || null;
-                // userConfig.config = readUserConfig.config;
+                //const readUserConfig = await this.readUserConfig(contentPath);
+                const readUserConfig = await Database.find({ type: 'contentconfig', name: readConfig.info.name });
+                if (readUserConfig.length) {
+                    userConfig.enabled = readUserConfig[0].enabled || false;
+                    // await userConfig.config.merge({ settings: readUserConfig.config });
+                    // userConfig.config.setSaved();
+                    // userConfig.config = userConfig.config.clone({ settings: readUserConfig.config });
+                    userConfig.config = readUserConfig[0].config;
+                    userConfig.data = readUserConfig[0].data || {};
+                }
             } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
-
+                Logger.info(this.moduleName, `Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`);
+                Logger.err(this.moduleName, err);
             }
+
+            userConfig.config = defaultConfig.clone({ settings: userConfig.config });
+            userConfig.config.setSaved();
+
+            for (let setting of userConfig.config.findSettings(() => true)) {
+                // This will load custom settings
+                // Setting the content's path on only the live config (and not the default config) ensures that custom settings will not be loaded on the default settings
+                setting.setContentPath(contentPath);
+            }
+
+            Utils.deepfreeze(defaultConfig, object => object instanceof Combokeys);
 
             const configs = {
-                defaultConfig: readConfig.defaultConfig,
+                defaultConfig,
+                schemes: userConfig.schemes,
                 userConfig
-            }
+            };
 
             const paths = {
                 contentPath,
                 dirName,
                 mainPath
-            }
+            };
 
-            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies);
+            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies, readConfig.permissions);
+            if (!content) return undefined;
+            if (!reload && this.getContentById(content.id))
+                throw {message: `A ${this.contentType} with the ID ${content.id} already exists.`};
+
             if (reload) this.localContent[index] = content;
             else this.localContent.push(content);
             return content;
@@ -190,6 +241,45 @@ export default class {
         } catch (err) {
             throw err;
         }
+    }
+
+    /**
+     * Unload content
+     * @param {any} content Content to unload
+     * @param {bool} reload Whether to reload the content after
+     */
+    static async unloadContent(content, reload) {
+        content = this.findContent(content);
+        if (!content) throw {message: `Could not find a ${this.contentType} from ${content}.`};
+
+        try {
+            await content.disable(false);
+            await content.emit('unload', reload);
+
+            const index = this.getContentIndex(content);
+
+            delete window.require.cache[window.require.resolve(content.paths.mainPath)];
+
+            if (reload) {
+                const newcontent = await this.preloadContent(content.dirName, true, index);
+                if (newcontent.enabled) {
+                    newcontent.userConfig.enabled = false;
+                    newcontent.start(false);
+                }
+                return newcontent;
+            } else this.localContent.splice(index, 1);
+        } catch (err) {
+            Logger.err(this.moduleName, err);
+            throw err;
+        }
+    }
+
+    /**
+     * Reload content
+     * @param {any} content Content to reload
+     */
+    static reloadContent(content) {
+        return this.unloadContent(content, true);
     }
 
     /**
@@ -211,25 +301,40 @@ export default class {
     }
 
     /**
-     * Wildcard content finder
-     * @param {any} wild Content name | id | path | dirname
+     * Checks if the passed object is an instance of this content type.
+     * @param {any} content Object to check
      */
-    //TODO make this nicer
-    static findContent(wild) {
-        let content = this.getContentByName(wild);
-        if (content) return content;
-        content = this.getContentById(wild);
-        if (content) return content;
-        content = this.getContentByPath(wild);
-        if (content) return content;
-        return this.getContentByDirName(wild);
+    static isThisContent(content) {
+        return content instanceof Content;
+    }
+
+    /**
+     * Returns the first content where calling {function} returns true.
+     * @param {Function} function A function to call to filter content
+     */
+    static find(f) {
+        return this.localContent.find(f);
+    }
+
+    /**
+     * Wildcard content finder
+     * @param {any} wild Content ID / directory name / path / name
+     * @param {bool} nonunique Allow searching attributes that may not be unique
+     */
+    static findContent(wild, nonunique) {
+        if (this.isThisContent(wild)) return wild;
+        let content;
+        content = this.getContentById(wild); if (content) return content;
+        content = this.getContentByDirName(wild); if (content) return content;
+        content = this.getContentByPath(wild); if (content) return content;
+        content = this.getContentByName(wild); if (content && nonunique) return content;
     }
 
     static getContentIndex(content) { return this.localContent.findIndex(c => c === content) }
-    static getContentByName(name) { return this.localContent.find(c => c.name === name) }
     static getContentById(id) { return this.localContent.find(c => c.id === id) }
-    static getContentByPath(path) { return this.localContent.find(c => c.contentPath === path) }
     static getContentByDirName(dirName) { return this.localContent.find(c => c.dirName === dirName) }
+    static getContentByPath(path) { return this.localContent.find(c => c.contentPath === path) }
+    static getContentByName(name) { return this.localContent.find(c => c.name === name) }
 
     /**
      * Wait for content to load

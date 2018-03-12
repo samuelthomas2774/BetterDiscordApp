@@ -10,41 +10,58 @@
 
 import { DOM, BdUI, Modals } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, DiscordApi } from 'modules';
+import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
+import { EmoteModule } from 'builtin';
+const ignoreExternal = false;
 
 class BetterDiscord {
 
     constructor() {
         window.discordApi = DiscordApi;
+        window.bddb = Database;
+        window.bdglobals = Globals;
         window.ClientIPC = ClientIPC;
         window.css = CssEditor;
         window.pm = PluginManager;
+        window.tm = ThemeManager;
         window.events = Events;
         window.wpm = WebpackModules;
         window.bdsettings = Settings;
         window.bdmodals = Modals;
+        window.bdlogs = Logger;
+        window.emotes = EmoteModule;
+        window.dom = DOM;
+
         DOM.injectStyle(BdCss, 'bdmain');
         Events.on('global-ready', this.globalReady.bind(this));
     }
 
     async init() {
-        await Settings.loadSettings();
-        await ModuleManager.initModules();
-        await ExtModuleManager.loadAllModules(true);
-        await PluginManager.loadAllPlugins(true);
-        await ThemeManager.loadAllThemes(true);
-        Modals.showContentManagerErrors();
-        Events.emit('ready');
-        Events.emit('discord-ready');
+        try {
+            await Database.init();
+            await Settings.loadSettings();
+            await ModuleManager.initModules();
+            Modals.showContentManagerErrors();
+            if (!ignoreExternal) {
+                await ExtModuleManager.loadAllModules(true);
+                await PluginManager.loadAllPlugins(true);
+                await ThemeManager.loadAllThemes(true);
+            }
+            if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
+                Modals.showContentManagerErrors();
+            Events.emit('ready');
+            Events.emit('discord-ready');
+            EmoteModule.observe();
+        } catch (err) {
+            Logger.err('main', ['FAILED TO LOAD!', err]);
+        }
     }
 
     globalReady() {
         BdUI.initUiEvents();
         this.vueInstance = BdUI.injectUi();
-        (async () => {
-            this.init();
-        })();
+        this.init();
     }
 }
 

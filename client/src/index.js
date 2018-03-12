@@ -102,7 +102,7 @@ if (window.BetterDiscord) {
                     if (bot || (author && author.bot)) item.props.className += ' bd-isBot';
                     if (attachments && attachments.length) item.props.className += ' bd-hasAttachments';
                     if (embeds && embeds.length) item.props.className += ' bd-hasEmbeds';
-                    if (author && author.id === '301511787814191105') item.props.className += ' bd-isCurrentUser';
+                    if (author && author.id === DiscordApi.currentUser.id) item.props.className += ' bd-isCurrentUser';
                     return item;
                 }
             }]);

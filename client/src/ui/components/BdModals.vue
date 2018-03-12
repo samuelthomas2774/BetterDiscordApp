@@ -23,9 +23,9 @@
     // Imports
     import { Events } from 'modules';
     import { Modals } from 'ui';
-    import { Modal } from '../common';
-    import { MiError } from '../common/MaterialIcon';
-    import ErrorModal from './modals/ErrorModal.vue';
+    import { Modal } from './common';
+    import { MiError } from './common/MaterialIcon';
+    import ErrorModal from './bd/modals/ErrorModal.vue';
 
     export default {
         components: {

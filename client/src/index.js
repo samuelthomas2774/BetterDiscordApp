@@ -13,6 +13,7 @@ import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
+
 const ignoreExternal = false;
 
 class BetterDiscord {
@@ -41,27 +42,31 @@ class BetterDiscord {
             await Database.init();
             await Settings.loadSettings();
             await ModuleManager.initModules();
-            Modals.showContentManagerErrors();
+
             if (!ignoreExternal) {
                 await ExtModuleManager.loadAllModules(true);
                 await PluginManager.loadAllPlugins(true);
                 await ThemeManager.loadAllThemes(true);
             }
+
             if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
                 Modals.showContentManagerErrors();
+
             Events.emit('ready');
             Events.emit('discord-ready');
             EmoteModule.observe();
         } catch (err) {
             Logger.err('main', ['FAILED TO LOAD!', err]);
+            BdUI.vueInstance.error = err;
         }
     }
 
     globalReady() {
         BdUI.initUiEvents();
-        this.vueInstance = BdUI.injectUi();
+        BdUI.injectUi();
         this.init();
     }
+
 }
 
 if (window.BetterDiscord) {

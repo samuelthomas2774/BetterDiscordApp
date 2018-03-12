@@ -62,13 +62,12 @@ export default class extends EventListener {
         if (!wrapperParent || wrapperParent.children.length < 2) return;
         wrapperParent.insertBefore(root, wrapperParent.children[1]);
         const { developer, contributor, webdev } = c;
-        VueInjector.inject(
-            root,
-            DOM.createElement('div', null, 'bdmessagebadges'),
-            { BdMessageBadge },
-            `<BdMessageBadge developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`,
-            true
-        );
+
+        VueInjector.inject(root, {
+            template: `<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />`,
+            components: { BdMessageBadge },
+            data: { c }
+        });
     }
 
     userlistBadge(e) {
@@ -79,19 +78,18 @@ export default class extends EventListener {
         const root = document.createElement('span');
         memberUsername.append(root);
         const { developer, contributor, webdev } = c;
-        VueInjector.inject(
-            root,
-            DOM.createElement('div', null, 'bdmessagebadges'),
-            { BdMessageBadge },
-            `<BdMessageBadge developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`,
-            true
-        );
+
+        VueInjector.inject(root, {
+            template: `<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />`,
+            components: { BdMessageBadge },
+            data: { c }
+        });
     }
 
     inject(userid) {
         const c = this.contributors.find(c => c.id === userid);
         if (!c) return;
- 
+
         setTimeout(() => {
             let hasBadges = false;
             let root = document.querySelector('[class*="profileBadges"]');
@@ -103,12 +101,11 @@ export default class extends EventListener {
 
             const { developer, contributor, webdev } = c;
 
-            VueInjector.inject(
-                root,
-                DOM.createElement('div', null, 'bdprofilebadges'),
-                { BdBadge },
-                `<BdBadge hasBadges="${hasBadges}" developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`
-            );
+            VueInjector.inject(root, {
+                template: `<BdBadge :hasBadges="hasBadges" :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />`,
+                components: { BdBadge },
+                data: { c, hasBadges }
+            }, DOM.createElement('div', null, 'bdprofilebadges'));
         }, 400);
     }
 
@@ -119,7 +116,7 @@ export default class extends EventListener {
             { 'id': '138850472541814784', 'webdev': true, 'developer': false, 'contributor': true }, // Hammock
             { 'id': '249746236008169473', 'webdev': false, 'developer': true, 'contributor': true }, // Zerebos
             { 'id': '125367412370440192', 'webdev': false, 'developer': true, 'contributor': true }, // Pierce
-            { 'id': '284056145272766465', 'webdev': false, 'developer': false, 'contributor': true }, // Samuel Elliott
+            { 'id': '284056145272766465', 'webdev': false, 'developer': true, 'contributor': true }, // Samuel Elliott
             { 'id': '184021060562321419', 'webdev': false, 'developer': false, 'contributor': true }, // Lilian Tedone
             { 'id': '76052829285916672', 'webdev': false, 'developer': false, 'contributor': true }, // samfun123
             { 'id': '171005991272316937', 'webdev': false, 'developer': false, 'contributor': true }, // samogot

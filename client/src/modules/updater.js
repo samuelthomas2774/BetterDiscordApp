@@ -22,6 +22,9 @@ export default class {
         this.checkForUpdates = this.checkForUpdates.bind(this);
     }
 
+    /**
+     * The interval to wait before checking for updates.
+     */
     get interval() {
         return 60 * 1000 * 30;
     }
@@ -30,34 +33,51 @@ export default class {
         this.updateInterval = setInterval(this.checkForUpdates, this.interval);
     }
 
+    /**
+     * Installs an update.
+     * TODO
+     */
     update() {
-        // TODO
         this.updatesAvailable = false;
         Events.emit('update-check-end');
     }
 
+    /**
+     * Checks for updates.
+     * @return {Promise}
+     */
     checkForUpdates() {
-        if (this.updatesAvailable) return;
-        Events.emit('update-check-start');
-        Logger.info('Updater', 'Checking for updates');
-        $.ajax({
-            type: 'GET',
-            url: 'https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json',
-            cache: false,
-            success: e => {
-                try {
-                    Events.emit('update-check-end');
-                    Logger.info('Updater',
-                        `Latest Version: ${e.version} - Current Version: ${Globals.getObject('version')}`);
-                    if (e.version !== Globals.getObject('version')) {
-                        this.updatesAvailable = true;
-                        Events.emit('updates-available');
+        return new Promise((resolve, reject) => {
+            if (this.updatesAvailable) return resolve(true);
+            Events.emit('update-check-start');
+            Logger.info('Updater', 'Checking for updates');
+
+            $.ajax({
+                type: 'GET',
+                url: 'https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json',
+                cache: false,
+                success: e => {
+                    try {
+                        Events.emit('update-check-end');
+                        Logger.info('Updater', `Latest Version: ${e.version} - Current Version: ${Globals.getObject('version')}`);
+
+                        if (e.version !== Globals.getObject('version')) {
+                            this.updatesAvailable = true;
+                            Events.emit('updates-available');
+                            resolve(true);
+                        }
+
+                        resolve(false);
+                    } catch (err) {
+                        Events.emit('update-check-fail', err);
+                        reject(err);
                     }
-                } catch (err) {
+                },
+                fail: err => {
                     Events.emit('update-check-fail', err);
+                    reject(err);
                 }
-            },
-            fail: e => Events.emit('update-check-fail', e)
+            });
         });
     }
 

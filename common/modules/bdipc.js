@@ -8,8 +8,11 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const { ipcRenderer, ipcMain } = require('electron');
+import { ipcMain, ipcRenderer } from 'electron';
 
+/**
+ * The IPC module used in all renderer processes (the main window and the CSS editor window).
+ */
 export class ClientIPC {
     static on(channel, cb) {
         ipcRenderer.on(channel, (event, message) => cb(event, message));

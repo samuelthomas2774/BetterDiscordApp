@@ -65,7 +65,7 @@
                 this.active = false;
                 this.recordingValue = undefined;
                 this.setting.value = sequence.join(' ');
-                console.log('keypress', sequence);
+                Logger.log('Keybind', ['Recorded sequence', sequence]);
             },
             getDisplayString(value) {
                 if (!value) return;

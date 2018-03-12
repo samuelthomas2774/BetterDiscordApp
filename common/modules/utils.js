@@ -14,7 +14,6 @@ const
     _ = require('lodash');
 
 import { PatchedFunction, Patch } from './monkeypatch';
-import { Vendor } from 'modules';
 import filetype from 'file-type';
 
 export class Utils {
@@ -28,6 +27,10 @@ export class Utils {
 
     /**
      * Monkey-patches an object's method.
+     * @param {Object} object The object containing the function to monkey patch
+     * @param {String} methodName The name of the method to monkey patch
+     * @param {Object|String|Function} options Options to pass to the Patch constructor
+     * @param {Function} function If {options} is either "before" or "after", this function will be used as that hook
      */
     static monkeyPatch(object, methodName, options, f) {
         const patchedFunction = new PatchedFunction(object, methodName);
@@ -38,12 +41,31 @@ export class Utils {
 
     /**
      * Monkey-patches an object's method and returns a promise that will be resolved with the data object when the method is called.
-     * You will have to call data.callOriginalMethod() if it wants the original method to be called.
+     * This can only be used to get the arguments and return data. If you want to change anything, call Utils.monkeyPatch with the once option set to true.
      */
     static monkeyPatchOnce(object, methodName) {
         return new Promise((resolve, reject) => {
+            this.monkeyPatch(object, methodName, 'after', data => {
+                data.patch.cancel();
+                resolve(data);
+            });
+        });
+    }
+
+    /**
+     * Monkey-patches an object's method and returns a promise that will be resolved with the data object when the method is called.
+     * You will have to call data.callOriginalMethod() if you wants the original method to be called.
+     */
+    static monkeyPatchAsync(object, methodName, callback) {
+        return new Promise((resolve, reject) => {
             this.monkeyPatch(object, methodName, data => {
                 data.patch.cancel();
+
+                data.promise = data.return = callback ? Promise.all(callback.call(global, data, ...data.arguments)) : new Promise((resolve, reject) => {
+                    data.resolve = resolve;
+                    data.reject = reject;
+                });
+
                 resolve(data);
             });
         });
@@ -78,15 +100,20 @@ export class Utils {
         };
 
         const patch = this.monkeyPatch(what, methodName, {
-            before: before ? compatible_function(before) : undefined,
+            before: !instead && before ? compatible_function(before) : undefined,
             instead: instead ? compatible_function(instead) : undefined,
-            after: after ? compatible_function(after) : undefined,
+            after: !instead && after ? compatible_function(after) : undefined,
             once
         });
 
         return cancelPatch;
     }
 
+    /**
+     * Attempts to parse a string as JSON.
+     * @param {String} json The string to parse
+     * @return {Any}
+     */
     static async tryParseJson(jsonString) {
         try {
             return JSON.parse(jsonString);
@@ -98,6 +125,11 @@ export class Utils {
         }
     }
 
+    /**
+     * Returns a new object with normalised keys.
+     * @param {Object} object
+     * @return {Object}
+     */
     static toCamelCase(o) {
         const camelCased = {};
         _.forEach(o, (value, key) => {
@@ -109,17 +141,20 @@ export class Utils {
         return camelCased;
     }
 
-    static compare(value1, value2) {
+    /**
+     * Checks if two or more values contain the same data.
+     * @param {Any} ...value The value to compare
+     * @return {Boolean}
+     */
+    static compare(value1, value2, ...values) {
         // Check to see if value1 and value2 contain the same data
         if (typeof value1 !== typeof value2) return false;
         if (value1 === null && value2 === null) return true;
         if (value1 === null || value2 === null) return false;
 
-        if (typeof value1 === 'object' || typeof value1 === 'array') {
+        if (typeof value1 === 'object') {
             // Loop through the object and check if everything's the same
-            let value1array = typeof value1 === 'array' ? value1 : Object.keys(value1);
-            let value2array = typeof value2 === 'array' ? value2 : Object.keys(value2);
-            if (value1array.length !== value2array.length) return false;
+            if (Object.keys(value1).length !== Object.keys(value2).length) return false;
 
             for (let key in value1) {
                 if (!this.compare(value1[key], value2[key])) return false;
@@ -127,9 +162,20 @@ export class Utils {
         } else if (value1 !== value2) return false;
 
         // value1 and value2 contain the same data
+        // Check any more values
+        for (let value3 of values) {
+            if (!this.compare(value1, value3))
+                return false;
+        }
+
         return true;
     }
 
+    /**
+     * Clones an object and all it's properties.
+     * @param {Any} value The value to clone
+     * @return {Any} The cloned value
+     */
     static deepclone(value) {
         if (typeof value === 'object') {
             if (value instanceof Array) return value.map(i => this.deepclone(i));
@@ -146,6 +192,11 @@ export class Utils {
         return value;
     }
 
+    /**
+     * Freezes an object and all it's properties.
+     * @param {Any} object The object to freeze
+     * @param {Function} exclude A function to filter object that shouldn't be frozen
+     */
     static deepfreeze(object, exclude) {
         if (exclude && exclude(object)) return;
 
@@ -162,25 +213,57 @@ export class Utils {
         return object;
     }
 
+    /**
+     * Removes an item from an array. This differs from Array.prototype.filter as it mutates the original array instead of creating a new one.
+     * @param {Array} array The array to filter
+     * @param {Any} item The item to remove from the array
+     * @return {Array}
+     */
     static removeFromArray(array, item) {
         let index;
         while ((index = array.indexOf(item)) > -1)
             array.splice(index, 1);
         return array;
     }
+
+    /**
+     * Defines a property with a getter that can be changed like a normal property.
+     * @param {Object} object The object to define a property on
+     * @param {String} property The property to define
+     * @param {Function} getter The property's getter
+     * @return {Object}
+     */
+    static defineSoftGetter(object, property, get) {
+        return Object.defineProperty(object, property, {
+            get,
+            set: value => Object.defineProperty(object, property, {
+                value,
+                writable: true,
+                configurable: true,
+                enumerable: true
+            }),
+            configurable: true,
+            enumerable: true
+        });
+    }
 }
 
 export class FileUtils {
+    /**
+     * Checks if a file exists and is a file.
+     * @param {String} path The file's path
+     * @return {Promise}
+     */
     static async fileExists(path) {
         return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if (err) return reject({
-                    'message': `No such file or directory: ${err.path}`,
+                    message: `No such file or directory: ${err.path}`,
                     err
                 });
 
                 if (!stats.isFile()) return reject({
-                    'message': `Not a file: ${path}`,
+                    message: `Not a file: ${path}`,
                     stats
                 });
 
@@ -189,16 +272,21 @@ export class FileUtils {
         });
     }
 
+    /**
+     * Checks if a directory exists and is a directory.
+     * @param {String} path The directory's path
+     * @return {Promise}
+     */
     static async directoryExists(path) {
         return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if (err) return reject({
-                    'message': `Directory does not exist: ${path}`,
+                    message: `Directory does not exist: ${path}`,
                     err
                 });
 
                 if (!stats.isDirectory()) return reject({
-                    'message': `Not a directory: ${path}`,
+                    message: `Not a directory: ${path}`,
                     stats
                 });
 
@@ -207,18 +295,25 @@ export class FileUtils {
         });
     }
 
+    /**
+     * Creates a directory.
+     * @param {String} path The directory's path
+     * @return {Promise}
+     */
     static async createDirectory(path) {
         return new Promise((resolve, reject) => {
             fs.mkdir(path, err => {
-                if (err) {
-                    if (err.code === 'EEXIST') return resolve();
-                    else return reject(err);
-                }
-                resolve();
+                if (err) reject(err);
+                else resolve();
             });
         });
     }
 
+    /**
+     * Checks if a directory exists and creates it if it doesn't.
+     * @param {String} path The directory's path
+     * @return {Promise}
+     */
     static async ensureDirectory(path) {
         try {
             await this.directoryExists(path);
@@ -233,17 +328,22 @@ export class FileUtils {
         }
     }
 
+    /**
+     * Returns the contents of a file.
+     * @param {String} path The file's path
+     * @return {Promise}
+     */
     static async readFile(path) {
         try {
             await this.fileExists(path);
         } catch (err) {
-            throw (err);
+            throw err;
         }
 
         return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf-8', (err, data) => {
-                if (err) reject({
-                    'message': `Could not read file: ${path}`,
+                if (err) return reject({
+                    message: `Could not read file: ${path}`,
                     err
                 });
 
@@ -252,24 +352,47 @@ export class FileUtils {
         });
     }
 
+    /**
+     * Returns the contents of a file.
+     * @param {String} path The file's path
+     * @param {Object} options Additional options to pass to fs.readFile
+     * @return {Promise}
+     */
     static async readFileBuffer(path, options) {
+        try {
+            await this.fileExists(path);
+        } catch (err) {
+            throw err;
+        }
+
         return new Promise((resolve, reject) => {
             fs.readFile(path, options || {}, (err, data) => {
-                if (err) return reject(err);
-                resolve(data);
+                if (err) reject(err);
+                else resolve(data);
             });
         });
     }
 
+    /**
+     * Writes to a file.
+     * @param {String} path The file's path
+     * @param {String} data The file's new contents
+     * @return {Promise}
+     */
     static async writeFile(path, data) {
         return new Promise((resolve, reject) => {
             fs.writeFile(path, data, err => {
-                if (err) return reject(err);
-                resolve();
+                if (err) reject(err);
+                else resolve();
             });
         });
     }
 
+    /**
+     * Returns the contents of a file parsed as JSON.
+     * @param {String} path The file's path
+     * @return {Promise}
+     */
     static async readJsonFromFile(path) {
         let readFile;
         try {
@@ -279,41 +402,57 @@ export class FileUtils {
         }
 
         try {
-            const parsed = await Utils.tryParseJson(readFile);
-            return parsed;
+            return await Utils.tryParseJson(readFile);
         } catch (err) {
-            throw (Object.assign(err, { path }));
+            throw Object.assign(err, { path });
         }
     }
 
+    /**
+     * Writes to a file as JSON.
+     * @param {String} path The file's path
+     * @param {Any} data The file's new contents
+     * @return {Promise}
+     */
     static async writeJsonToFile(path, json) {
         return this.writeFile(path, JSON.stringify(json));
     }
 
+    /**
+     * Returns an array of items in a directory.
+     * @param {String} path The directory's path
+     * @return {Promise}
+     */
     static async listDirectory(path) {
-        try {
-            await this.directoryExists(path);
-            return new Promise((resolve, reject) => {
-                fs.readdir(path, (err, files) => {
-                    if (err) return reject(err);
-                    resolve(files);
-                });
+        await this.directoryExists(path);
+        return new Promise((resolve, reject) => {
+            fs.readdir(path, (err, files) => {
+                if (err) reject(err);
+                else resolve(files);
             });
-        } catch (err) {
-            throw err;
-        }
+        });
     }
 
     static async readDir(path) {
         return this.listDirectory(path);
     }
 
+    /**
+     * Returns a file or buffer's MIME type and typical file extension.
+     * @param {String|Buffer} buffer A buffer or the path of a file
+     * @return {Promise}
+     */
     static async getFileType(buffer) {
         if (typeof buffer === 'string') buffer = await this.readFileBuffer(buffer);
 
         return filetype(buffer);
     }
 
+    /**
+     * Returns a file's contents as a data URI.
+     * @param {String} path The directory's path
+     * @return {Promise}
+     */
     static async toDataURI(buffer, type) {
         if (typeof buffer === 'string') buffer = await this.readFileBuffer(buffer);
         if (!type) type = this.getFileType(buffer).mime;

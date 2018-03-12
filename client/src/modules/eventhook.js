@@ -1,5 +1,5 @@
 /**
- * BetterDiscord WebpackModules Module
+ * BetterDiscord Event Hook
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -9,12 +9,11 @@
 */
 
 import EventListener from './eventlistener';
-import { Utils } from 'common';
+import { Utils, ClientLogger as Logger } from 'common';
 import Events from './events';
 import WebpackModules from './webpackmodules';
 
 import * as SocketStructs from '../structs/socketstructs';
-
 
 /**
  * Discord socket event hook
@@ -23,7 +22,7 @@ import * as SocketStructs from '../structs/socketstructs';
 export default class extends EventListener {
 
     init() {
-        console.log(SocketStructs);
+        Logger.log('EventHook', SocketStructs);
         this.hook();
     }
 
@@ -38,17 +37,19 @@ export default class extends EventListener {
     }
 
     hook() {
-        const self = this;
-        const orig = this.eventsModule.prototype.emit;
-        this.eventsModule.prototype.emit = function (...args) {
-            orig.call(this, ...args);
-            self.wsc = this;
-            self.emit(...args);
-        }
+        // const self = this;
+        // const orig = this.eventsModule.prototype.emit;
+        // this.eventsModule.prototype.emit = function (...args) {
+        //     orig.call(this, ...args);
+        //     self.wsc = this;
+        //     self.emit(...args);
+        // };
+
+        Utils.monkeyPatch(this.eventsModule.prototype, 'emit', 'after', data => this.emit(data.arguments));
     }
 
     get eventsModule() {
-        return WebpackModules.getModuleByPrototypes(['setMaxListeners', 'emit']);
+        return WebpackModules.getModuleByName('Events');
     }
 
     /**
@@ -66,8 +67,8 @@ export default class extends EventListener {
 
     /**
      * Emit callback
-     * @param {any} e Event Action
-     * @param {any} d Event Args
+     * @param {any} event Event
+     * @param {any} data Event data
      */
     dispatch(e, d) {
         Events.emit('raw-event', { type: e, data: d });
@@ -143,7 +144,7 @@ export default class extends EventListener {
             LFG_LISTING_CREATE: 'LFG_LISTING_CREATE', // No groups here
             LFG_LISTING_DELETE: 'LFG_LISTING_DELETE', // Thank you
             BRAINTREE_POPUP_BRIDGE_CALLBACK: 'BRAINTREE_POPUP_BRIDGE_CALLBACK' // What
-        }
+        };
     }
 
 }

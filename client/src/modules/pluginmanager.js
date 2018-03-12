@@ -76,12 +76,12 @@ export default class extends ContentManager {
     static async loadPlugin(paths, configs, info, main, dependencies, permissions) {
         if (permissions && permissions.length > 0) {
             for (let perm of permissions) {
-                console.log(`Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
+                Logger.log(this.moduleName, `Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
             }
             try {
                 const allowed = await Modals.permissions(`${info.name} wants to:`, info.name, permissions).promise;
             } catch (err) {
-                return null;
+                return;
             }
         }
 
@@ -98,7 +98,7 @@ export default class extends ContentManager {
             }
         }
 
-        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor, deps);
+        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info, paths.contentPath), Vendor, deps);
         if (!(plugin.prototype instanceof Plugin))
             throw {message: `Plugin ${info.name} did not return a class that extends Plugin.`};
 

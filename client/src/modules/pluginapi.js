@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Api
+ * BetterDiscord Plugin API
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -22,16 +22,29 @@ import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
 
 export default class PluginApi {
 
-    constructor(pluginInfo) {
+    constructor(pluginInfo, pluginPath) {
         this.pluginInfo = pluginInfo;
-        this.Events = new EventsWrapper(Events);
+        this.pluginPath = pluginPath;
+
+        this._events = undefined;
+        this._logger = undefined;
+        this._utils = undefined;
+        this._settings = undefined;
+        this._internalsettings = undefined;
+        this._cssutils = undefined;
+        this._modals = undefined;
+        this._plugins = undefined;
+        this._themes = undefined;
+        this._extmodules = undefined;
+        this._webpackmodules = undefined;
+
         this._menuItems = undefined;
         this._injectedStyles = undefined;
         this._modalStack = undefined;
     }
 
     get plugin() {
-        return PluginManager.getPluginById(this.pluginInfo.id || this.pluginInfo.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-'));
+        return PluginManager.getPluginByPath(this.pluginPath);
     }
 
     async bridge(plugin_id) {
@@ -48,6 +61,20 @@ export default class PluginApi {
 
     get Api() { return this }
 
+    get AsyncEventEmitter() { return AsyncEventEmitter }
+    get EventsWrapper() { return EventsWrapper }
+
+    /**
+     * Events
+     */
+
+    get Events() {
+        if (this._events) return this._events;
+        this._events = new EventsWrapper(Events);
+        Utils.defineSoftGetter(this._events, 'bind', () => this.plugin);
+        return this._events;
+    }
+
     /**
      * Logger
      */
@@ -58,13 +85,13 @@ export default class PluginApi {
     loggerInfo(...message) { Logger.info(this.pluginInfo.name, message) }
     loggerDbg(...message) { Logger.dbg(this.pluginInfo.name, message) }
     get Logger() {
-        return {
+        return this._logger || (this._logger = {
             log: this.loggerLog.bind(this),
             err: this.loggerErr.bind(this),
             warn: this.loggerWarn.bind(this),
             info: this.loggerInfo.bind(this),
             dbg: this.loggerDbg.bind(this)
-        };
+        });
     }
 
     /**
@@ -72,17 +99,20 @@ export default class PluginApi {
      */
 
     get Utils() {
-        return {
+        return this._utils || (this._utils = {
             overload: () => Utils.overload.apply(Utils, arguments),
             monkeyPatch: () => Utils.monkeyPatch.apply(Utils, arguments),
             monkeyPatchOnce: () => Utils.monkeyPatchOnce.apply(Utils, arguments),
-            compatibleMonkeyPatch: () => Utils.monkeyPatchOnce.apply(Utils, arguments),
+            monkeyPatchAsync: () => Utils.monkeyPatchAsync.apply(Utils, arguments),
+            compatibleMonkeyPatch: () => Utils.compatibleMonkeyPatch.apply(Utils, arguments),
             tryParseJson: () => Utils.tryParseJson.apply(Utils, arguments),
             toCamelCase: () => Utils.toCamelCase.apply(Utils, arguments),
             compare: () => Utils.compare.apply(Utils, arguments),
             deepclone: () => Utils.deepclone.apply(Utils, arguments),
-            deepfreeze: () => Utils.deepfreeze.apply(Utils, arguments)
-        };
+            deepfreeze: () => Utils.deepfreeze.apply(Utils, arguments),
+            removeFromArray: () => Utils.removeFromArray.apply(Utils, arguments),
+            defineSoftGetter: () => Utils.defineSoftGetter.apply(Utils, arguments)
+        });
     }
 
     /**
@@ -102,12 +132,21 @@ export default class PluginApi {
         return new SettingsScheme(args);
     }
     get Settings() {
-        return {
+        if (this._settings) return this._settings;
+        this._settings = {
             createSet: this.createSettingsSet.bind(this),
             createCategory: this.createSettingsCategory.bind(this),
             createSetting: this.createSetting.bind(this),
-            createScheme: this.createSettingsScheme.bind(this)
+            createScheme: this.createSettingsScheme.bind(this),
+            on: () => this._settings.events.on(...arguments),
+            once: () => this._settings.events.once(...arguments),
+            off: () => this._settings.events.off(...arguments),
+            unsubscribeAll: () => this._settings.events.unsubscribeAll(...arguments)
         };
+
+        let events;
+        Utils.defineSoftGetter(this._settings, 'events', () => events || (events = new EventsWrapper(this.plugin.settings.emitter, this.plugin)));
+        return this._settings;
     }
 
     /**
@@ -118,9 +157,9 @@ export default class PluginApi {
         return Settings.get(set, category, setting);
     }
     get InternalSettings() {
-        return {
+        return this._internalsettings || (this._internalsettings = {
             get: this.getInternalSetting.bind(this)
-        };
+        });
     }
 
     /**
@@ -128,9 +167,9 @@ export default class PluginApi {
      */
 
     get BdMenu() {
-        return {
+        return this._bdmenu || (this._bdmenu = {
             BdMenuItems: this.BdMenuItems
-        };
+        });
     }
 
     /**
@@ -160,7 +199,7 @@ export default class PluginApi {
             BdMenuItems.remove(item);
     }
     get BdMenuItems() {
-        return Object.defineProperty({
+        return this._bdmenuitems || (this._bdmenuitems = Object.defineProperty({
             add: this.addMenuItem.bind(this),
             addSettingsSet: this.addMenuSettingsSet.bind(this),
             addVueComponent: this.addMenuVueComponent.bind(this),
@@ -168,7 +207,7 @@ export default class PluginApi {
             removeAll: this.removeAllMenuItems.bind(this)
         }, 'items', {
             get: () => this.menuItems
-        });
+        }));
     }
 
     /**
@@ -211,7 +250,7 @@ export default class PluginApi {
         }
     }
     get CssUtils() {
-        return {
+        return this._cssutils || (this._cssutils = {
             compileSass: this.compileSass.bind(this),
             getConfigAsSCSS: this.getConfigAsSCSS.bind(this),
             getConfigAsSCSSMap: this.getConfigAsSCSSMap.bind(this),
@@ -219,7 +258,7 @@ export default class PluginApi {
             injectSass: this.injectSass.bind(this),
             deleteStyle: this.deleteStyle.bind(this),
             deleteAllStyles: this.deleteAllStyles.bind(this)
-        };
+        });
     }
 
     /**
@@ -262,7 +301,7 @@ export default class PluginApi {
         return this.addModal(Modals.settings(settingsset, headertext, options));
     }
     get Modals() {
-        return Object.defineProperties({
+        return this._modals || (this._modals = Object.defineProperties({
             add: this.addModal.bind(this),
             close: this.closeModal.bind(this),
             closeAll: this.closeAllModals.bind(this),
@@ -276,7 +315,7 @@ export default class PluginApi {
             baseComponent: {
                 get: () => this.baseModalComponent
             }
-        });
+        }));
     }
 
     /**
@@ -291,10 +330,10 @@ export default class PluginApi {
         return PluginManager.localContent.map(plugin => plugin.id);
     }
     get Plugins() {
-        return {
+        return this._plugins || (this._plugins = {
             getPlugin: this.getPlugin.bind(this),
             listPlugins: this.listPlugins.bind(this)
-        };
+        });
     }
 
     /**
@@ -309,10 +348,10 @@ export default class PluginApi {
         return ThemeManager.localContent.map(theme => theme.id);
     }
     get Themes() {
-        return {
+        return this._themes || (this._themes = {
             getTheme: this.getTheme.bind(this),
             listThemes: this.listThemes.bind(this)
-        };
+        });
     }
 
     /**
@@ -327,10 +366,10 @@ export default class PluginApi {
         return ExtModuleManager.localContent.map(module => module.id);
     }
     get ExtModules() {
-        return {
+        return this._extmodules || (this._extmodules = {
             getModule: this.getModule.bind(this),
             listModules: this.listModules.bind(this)
-        };
+        });
     }
 
     /**
@@ -349,23 +388,31 @@ export default class PluginApi {
     getWebpackModuleByRegex(regex, first = true) {
         return WebpackModules.getModuleByRegex(regex, first);
     }
-    getWebpackModuleByProperties(props, first = true) {
-        return WebpackModules.getModuleByProps(props, first);
+    getWebpackModuleByProperties(...props) {
+        return WebpackModules.getModuleByProps(props, true);
     }
-    getWebpackModuleByPrototypeFields(props, first = true) {
-        return WebpackModules.getModuleByPrototypes(props, first);
+    getWebpackModuleByPrototypeFields(...props) {
+        return WebpackModules.getModuleByPrototypes(props, true);
+    }
+    getWebpackModulesByProperties(...props) {
+        return WebpackModules.getModuleByProps(props, false);
+    }
+    getWebpackModulesByPrototypeFields(...props) {
+        return WebpackModules.getModuleByPrototypes(props, false);
     }
     get WebpackModules() {
-        return Object.defineProperty({
+        return this._webpackmodules || (this._webpackmodules = Object.defineProperty({
             getModule: this.getWebpackModule.bind(this),
             getModuleByName: this.getWebpackModuleByName.bind(this),
             getModuleByDisplayName: this.getWebpackModuleByName.bind(this),
             getModuleByRegex: this.getWebpackModuleByRegex.bind(this),
             getModuleByProperties: this.getWebpackModuleByProperties.bind(this),
-            getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this)
+            getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this),
+            getModulesByProperties: this.getWebpackModulesByProperties.bind(this),
+            getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this)
         }, 'require', {
             get: () => this.webpackRequire
-        });
+        }));
     }
 
 }

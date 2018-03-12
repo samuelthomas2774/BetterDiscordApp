@@ -28,20 +28,18 @@ export default new class extends Module {
     first() {
         (async() => {
             const config = await ClientIPC.send('getConfig');
-            this.setState(config);
+            this.setState({ config });
 
             // This is for Discord to stop error reporting :3
             window.BetterDiscord = {
-                'version': config.version,
-                'v': config.version
+                version: config.version,
+                v: config.version
             };
             window.jQuery = {};
 
             if (window.__bd) {
-                this.setState(window.__bd);
-                window.__bd = {
-                    setWS: this.setWS
-                }
+                this.setState({ bd: window.__bd });
+                this.bd.setWS = this.setWS;
             }
 
             Events.emit('global-ready');
@@ -51,13 +49,37 @@ export default new class extends Module {
 
     setWS(wSocket) {
         const state = this.state;
-        state.wsHook = wSocket;
+        state.bd.wsHook = wSocket;
         this.setState(state);
         Events.emit('socket-created');
     }
 
     getObject(name) {
-        return this.state[name];
+        return this.bd[name] || this.config[name];
+    }
+
+    get bd() {
+        return this.state.bd;
+    }
+
+    get localStorage() {
+        return this.bd.localStorage;
+    }
+
+    get webSocket() {
+        return this.bd.wsHook;
+    }
+
+    get config() {
+        return this.state.config;
+    }
+
+    get version() {
+        return this.config.version;
+    }
+
+    get paths() {
+        return this.config.paths;
     }
 
 }

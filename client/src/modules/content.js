@@ -91,9 +91,9 @@ export default class Content {
                 config: this.settings.strip().settings,
                 data: this.data
             });
-			this.settings.setSaved();
+            this.settings.setSaved();
         } catch (err) {
-			Logger.err(this.name, ['Failed to save configuration', err]);
+            Logger.err(this.name, ['Failed to save configuration', err]);
             throw err;
         }
     }

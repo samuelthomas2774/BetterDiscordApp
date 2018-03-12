@@ -9,6 +9,7 @@
 */
 
 import { Events, WebpackModules, EventListener } from 'modules';
+import { ClientLogger as Logger } from 'common';
 import Reflection from './reflection';
 import DOM from './dom';
 import VueInjector from './vueinjector';
@@ -134,7 +135,7 @@ export default class extends EventListener {
             this.setIds();
             this.makeMutable();
         } catch (err) {
-            console.log(err);
+            Logger.err('AutoManip', err);
         }
     }
 
@@ -189,13 +190,12 @@ export default class extends EventListener {
         if (markup.ets) {
             const etsRoot = document.createElement('span');
             markup.clone.appendChild(etsRoot);
-            VueInjector.inject(
-                etsRoot,
-                DOM.createElement('span', null, 'test'),
-                { EditedTimeStamp },
-                `<EditedTimeStamp ets="${markup.ets}"/>`,
-                true
-            );
+
+            VueInjector.inject(etsRoot, {
+				template: `<EditedTimeStamp :ets="markup.ets" />`,
+				components: { EditedTimeStamp },
+				data: { markup }
+			});
         }
 
         Events.emit('ui:mutable:.markup', markup.clone);
@@ -275,12 +275,10 @@ export default class extends EventListener {
         const parent = document.querySelector('[class*="channelTextArea"] > [class*="inner"]');
         if (!parent) return;
         parent.append(root);
-        VueInjector.inject(
-            root,
-            DOM.createElement('span'),
-            { Autocomplete },
-           `<Autocomplete initial="${e.target.value}"/>`,
-            true
-        );
+
+        VueInjector.inject(root, {
+            template: `<Autocomplete :initial="initial" />`,
+            components: { Autocomplete }
+        });
     }
 }

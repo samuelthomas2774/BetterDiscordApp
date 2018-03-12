@@ -5,13 +5,12 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
-/*
-Base Module that every non-static module should extend
-*/
-
+/**
+ * Base Module that every non-static module should extend
+ */
 export default class Module {
 
     constructor(args) {
@@ -37,7 +36,6 @@ export default class Module {
 
     set args(t) { }
     get args() { return this.__.args; }
-
 
     set state(state) { return this.__.state = state; }
     get state() { return this.__.state; }

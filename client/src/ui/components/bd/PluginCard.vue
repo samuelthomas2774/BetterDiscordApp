@@ -21,16 +21,12 @@
 </template>
 <script>
     // Imports
+    import { ClientLogger as Logger } from 'common';
     import { shell } from 'electron';
     import Card from './Card.vue';
     import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension } from '../common';
 
     export default {
-        data() {
-            return {
-                settingsOpen: false
-            }
-        },
         props: ['plugin', 'togglePlugin', 'reloadPlugin', 'deletePlugin', 'showSettings'],
         components: {
             Card, Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
@@ -38,9 +34,9 @@
         methods: {
             editPlugin() {
                 try {
-                    shell.openItem(this.plugin.pluginPath);
+                    shell.openItem(this.plugin.contentPath);
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('PluginCard', [`Error opening plugin directory ${this.plugin.contentPath}:`, err]);
                 }
             }
         }

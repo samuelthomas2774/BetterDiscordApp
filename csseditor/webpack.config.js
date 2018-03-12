@@ -1,16 +1,16 @@
-const
-    path = require('path'),
-    webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
+
 const vueLoader = {
     test: /\.(vue)$/,
     exclude: /node_modules/,
     loader: 'vue-loader'
-}
+};
 
 const scssLoader = {
     test: /\.(css|scss)$/,
     loader: ['css-loader', 'sass-loader']
-}
+};
 
 module.exports = {
     entry: './src/index.js',
@@ -21,9 +21,17 @@ module.exports = {
     module: {
         loaders: [vueLoader, scssLoader]
     },
+    externals: {
+        electron: 'window.require("electron")',
+        fs: 'window.require("fs")'
+    },
     resolve: {
         alias: {
             vue$: path.resolve('..', 'node_modules', 'vue', 'dist', 'vue.esm.js')
-        }
+        },
+        modules: [
+            path.resolve('..', 'node_modules'),
+            path.resolve('..', 'common', 'modules')
+        ]
     }
 };

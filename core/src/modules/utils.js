@@ -8,33 +8,25 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const
-    path = require('path'),
-    fs = require('fs');
+const path = require('path');
+const fs = require('fs');
 
 const { Module } = require('./modulebase');
 
 class Utils {
-
     static async tryParseJson(jsonString) {
         try {
             return JSON.parse(jsonString);
-        }catch(err) {
+        } catch(err) {
             throw ({
-                'message': 'Failed to parse json',
+                message: 'Failed to parse json',
                 err
             });
         }
     }
-
-    static get timestamp() {
-        return 'Timestamp';
-    }
-
 }
 
 class FileUtils {
-
     static async fileExists(path) {
         return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
@@ -75,7 +67,7 @@ class FileUtils {
         try {
             await this.fileExists(path);
         } catch(err) {
-            throw(err);
+            throw err;
         }
 
         return new Promise((resolve, reject) => {
@@ -102,13 +94,12 @@ class FileUtils {
             const parsed = await Utils.tryParseJson(readFile);
             return parsed;
         } catch(err) {
-            throw(Object.assign(err, { path }));
+            throw Object.assign(err, { path });
         }
     }
 }
 
 class WindowUtils extends Module {
-
     bindings() {
         this.openDevTools = this.openDevTools.bind(this);
         this.executeJavascript = this.executeJavascript.bind(this);
@@ -128,20 +119,25 @@ class WindowUtils extends Module {
     }
 
     executeJavascript(script) {
-        this.webContents.executeJavaScript(script);
+        return this.webContents.executeJavaScript(script);
     }
 
     injectScript(fpath, variable) {
-        console.log(`Injecting: ${fpath}`);
-
-        const escaped_path = fpath.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-        const escaped_variable = variable ? variable.replace(/\\/g, '\\\\').replace(/"/g, '\\"') : null;
-
-        if (variable) this.executeJavascript(`window["${escaped_variable}"] = require("${escaped_path}");`);
-        else this.executeJavascript(`require("${escaped_path}");`);
+        WindowUtils.injectScript(this.window, fpath, variable);
     }
 
-    events(event, callback) {
+    static injectScript(window, fpath, variable) {
+        // console.log(`Injecting: ${fpath}`);
+
+        const escaped_path = fpath.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        const escaped_variable = variable ? variable.replace(/\\/g, '\\\\').replace(/"/g, '\\"') : undefined;
+
+        const script = `${variable ? `window["${escaped_variable}"] = ` : ''}require("${escaped_path}");`;
+
+        return window.webContents.executeJavaScript(script);
+    }
+
+    on(event, callback) {
         this.webContents.on(event, callback);
     }
 
@@ -149,7 +145,6 @@ class WindowUtils extends Module {
         channel = channel.startsWith('bd-') ? channel : `bd-${channel}`;
         this.webContents.send(channel, message);
     }
-
 }
 
 module.exports = {

@@ -63,6 +63,7 @@ export default class Modals {
      * @return {Modal} The Modal object that was passed or created using the passed options
      */
     static add(_modal, component) {
+        if (this.stack.includes(_modal)) return;
         const modal = _modal instanceof Modal ? _modal : new Modal(_modal, component);
 
         this.stack.push(modal);
@@ -209,7 +210,7 @@ export default class Modals {
                 ThemeManager._errors = [];
             }
 
-			return modal;
+            return modal;
         }
     }
 

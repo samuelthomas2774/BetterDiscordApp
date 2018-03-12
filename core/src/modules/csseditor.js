@@ -21,6 +21,10 @@ class CSSEditor extends Module {
         this.bd = bd;
     }
 
+    /**
+     * Opens an editor and replies to an IPC event.
+     * @param {BDIpcEvent} event
+     */
     openEditor(o) {
         if (this.editor) {
             if (this.editor.isFocused()) return;
@@ -31,10 +35,7 @@ class CSSEditor extends Module {
             return;
         }
 
-        const options = this.options;
-        for (let option in o.args) {
-            options[option] = o.args[option];
-        }
+        const options = Object.assign(this.options, o.message);
 
         this.editor = new BrowserWindow(options);
         this.editor.loadURL('about:blank');
@@ -56,20 +57,34 @@ class CSSEditor extends Module {
         });
     }
 
+    /**
+     * Sets the SCSS in the editor.
+     */
     setSCSS(scss) {
         this.send('set-scss', scss);
     }
 
+    /**
+     * Sends data to the editor.
+     * @param {String} channel
+     * @param {Any} data
+     */
     send(channel, data) {
         if (!this.editor) return;
         this.editor.webContents.send(channel, data);
     }
 
+    /**
+     * Sets the CSS editor's always on top flag.
+     */
     set alwaysOnTop(state) {
         if (!this.editor) return;
         this.editor.setAlwaysOnTop(state);
     }
 
+    /**
+     * Default options to pass to BrowserWindow.
+     */
     get options() {
         return {
             width: 800,
@@ -79,10 +94,11 @@ class CSSEditor extends Module {
         };
     }
 
-    //TODO Currently uses a development path
+    /**
+     * The CSS editor's path.
+     */
     get editorPath() {
         return path.resolve(__dirname, '..', '..', '..', 'csseditor', 'dist');
-        // return path.resolve(__dirname, '..', '..', '..', 'tests', 'csseditor');
     }
 
 }

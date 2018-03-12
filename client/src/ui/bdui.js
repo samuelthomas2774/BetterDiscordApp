@@ -8,12 +8,12 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Events, WebpackModules } from 'modules';
+import { Utils } from 'common';
 import DOM from './dom';
 import Vue from './vue';
 import { BdSettingsWrapper } from './components';
-import BdModals from './components/bd/BdModals.vue';
-import { Events, WebpackModules } from 'modules';
-import { Utils } from 'common';
+import BdModals from './components/BdModals.vue';
 import AutoManip from './automanip';
 import { remote } from 'electron';
 
@@ -31,14 +31,14 @@ class TempApi {
             const currentChannelId = WebpackModules.getModuleByName('SelectedChannelStore').getChannelId();
             return WebpackModules.getModuleByName('ChannelStore').getChannel(currentChannelId);
         } catch (err) {
-            return 0;
+            return null;
         }
     }
     static get currentUserId() {
         try {
             return WebpackModules.getModuleByName('UserStore').getCurrentUser().id;
         } catch (err) {
-            return 0;
+            return null;
         }
     }
 }
@@ -94,7 +94,6 @@ export default class {
                     this.pathCache.channel &&
                     this.pathCache.channel.id !== currentChannel.id) Events.emit('channel-switch', currentChannel);
 
-
                 this.pathCache.server = currentGuild;
                 this.pathCache.channel = currentChannel;
             });
@@ -102,7 +101,7 @@ export default class {
     }
 
     static get profilePopupModule() {
-        return WebpackModules.getModuleByProps(['fetchMutualFriends', 'setSection']);
+        return WebpackModules.getModuleByName('UserProfileModals');
     }
 
     static injectUi() {
@@ -110,19 +109,20 @@ export default class {
         DOM.createElement('div', null, 'bd-modals').appendTo(DOM.bdModals);
         DOM.createElement('bd-tooltips').appendTo(DOM.bdBody);
 
-        const modals = new Vue({
+        this.modals = new Vue({
             el: '#bd-modals',
             components: { BdModals },
             template: '<BdModals/>'
         });
 
-        const vueInstance = new Vue({
+        this.vueInstance = new Vue({
             el: '#bd-settings',
             components: { BdSettingsWrapper },
-            template: '<BdSettingsWrapper/>'
+            template: '<BdSettingsWrapper :error="error" />',
+            data: { error: undefined }
         });
 
-        return vueInstance;
+        return this.vueInstance;
     }
 
 }

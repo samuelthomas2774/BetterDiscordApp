@@ -10,21 +10,26 @@
 
 <template>
     <div class="bd-settings-wrapper" :class="[{active: active}, 'platform-' + this.platform]">
-        <div class="bd-settings-button" :class="{'bd-active': active, 'bd-animating': animating}" @click="showSettings">
-            <div v-if="updating === 0" v-tooltip.right="'Checking for updates'" class="bd-settings-button-btn bd-loading"></div>
+        <div class="bd-settings-button" :class="{'bd-active': active, 'bd-animating': animating}" @click="buttonClick">
+            <div v-if="error" v-tooltip.right="'Error starting BetterDiscord'" class="bd-settings-button-btn bd-error"></div>
+            <div v-else-if="!loaded" v-tooltip.right="'Starting BetterDiscord...'" class="bd-settings-button-btn bd-loading"></div>
+            <div v-else-if="updating === 0" v-tooltip.right="'Checking for updates'" class="bd-settings-button-btn bd-loading"></div>
             <div v-else-if="updating === 2" v-tooltip.right="'Updates available!'" class="bd-settings-button-btn bd-updates"></div>
             <div v-else class="bd-settings-button-btn" :class="[{'bd-loading': !loaded}]"></div>
         </div>
-        <BdSettings ref="settings" :active="active" :close="hideSettings" />
+        <BdSettings v-if="loaded" ref="settings" :active="active" :close="hideSettings" />
     </div>
 </template>
 <script>
     // Imports
     import { Events, Settings } from 'modules';
     import { Modals } from 'ui';
+    import { ErrorEvent } from 'structs';
+    import { ClientLogger as Logger } from 'common';
     import BdSettings from './BdSettings.vue';
 
     export default {
+        props: ['error'],
         data() {
             return {
                 loaded: false,
@@ -33,18 +38,35 @@
                 animating: false,
                 timeout: null,
                 platform: global.process.platform
-            }
+            };
         },
         components: {
             BdSettings
         },
         methods: {
-            showSettings() {
-                if (!this.loaded) return;
-                this.active = true;
-            },
+            showSettings() { this.active = true },
             hideSettings() { this.active = false },
             toggleSettings() { this.active = !this.active },
+            buttonClick(e) {
+                if (this.active) return;
+
+                if (this.error) {
+                    Modals.error({
+                        header: `BetterDiscord failed to start`,
+                        module: 'main',
+                        type: 'err',
+                        content: [
+                            new ErrorEvent({
+                                module: 'main',
+                                message: this.error.message,
+                                err: this.error
+                            })
+                        ]
+                    });
+                } else if (this.loaded) {
+                    this.showSettings();
+                }
+            },
             keyupListener(e) {
                 if (Modals.stack.length || !this.active || e.which !== 27) return;
                 if (this.$refs.settings.activeIndex !== -1) this.$refs.settings.closeContent();
@@ -54,6 +76,9 @@
         },
         watch: {
             active(active) {
+                if (active && !this.loaded || this.error)
+                    return this.active = false;
+
                 this.animating = true;
                 if (this.timeout) clearTimeout(this.timeout);
                 this.timeout = setTimeout(() => {

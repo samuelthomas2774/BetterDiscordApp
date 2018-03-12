@@ -9,10 +9,10 @@
 */
 
 import { DOM, BdUI, Modals } from 'ui';
-import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
+import BdCss from './styles/index.scss';
 
 const ignoreExternal = false;
 
@@ -39,6 +39,8 @@ class BetterDiscord {
 
     async init() {
         try {
+            throw new Error('Test');
+
             await Database.init();
             await Settings.loadSettings();
             await ModuleManager.initModules();
@@ -72,5 +74,5 @@ class BetterDiscord {
 if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
-    let bdInstance = new BetterDiscord();
+    let bdInstance = window.bdInstance = new BetterDiscord();
 }

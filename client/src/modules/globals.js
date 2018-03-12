@@ -26,7 +26,7 @@ export default new class extends Module {
     }
 
     first() {
-        (async() => {
+        (async () => {
             const config = await ClientIPC.send('getConfig');
             this.setState({ config });
 

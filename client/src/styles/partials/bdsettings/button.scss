@@ -39,6 +39,11 @@
             animation: bd-settings-button-pulse 1.5s infinite;
         }
 
+        &:not(.bd-loading).bd-error {
+            filter: grayscale(0%) hue-rotate(150deg);
+            transition-property: opacity;
+        }
+
         &.bd-updates {
             filter: hue-rotate(250deg) !important;
             opacity: 1 !important;

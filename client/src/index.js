@@ -99,6 +99,7 @@ if (window.BetterDiscord) {
                     const { id, colorString, bot, author, attachments, embeds } = message;
                     item.props['data-message-id'] = id;
                     item.props['data-colourstring'] = colorString;
+                    if (author && author.id) item.props['data-user-id'] = author.id;
                     if (bot || (author && author.bot)) item.props.className += ' bd-isBot';
                     if (attachments && attachments.length) item.props.className += ' bd-hasAttachments';
                     if (embeds && embeds.length) item.props.className += ' bd-hasEmbeds';

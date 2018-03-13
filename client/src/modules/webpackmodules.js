@@ -70,7 +70,9 @@ const KnownModules = {
     // Channel Store & Actions
     ChannelStore: Filters.byProperties(['getChannels', 'getDMFromUserId']),
     SelectedChannelStore: Filters.byProperties(['getLastSelectedChannelId']),
-    ChannelActions: Filters.byProperties(['selectChannel']),
+    ChannelActions: Filters.byProperties(["selectChannel"]),
+    PrivateChannelActions: Filters.byProperties(['openPrivateChannel']),
+    ChannelSelector: Filters.byProperties(['selectGuild', 'selectChannel']),
 
     // Current User Info, State and Settings
     UserInfoStore: Filters.byProperties(['getToken']),
@@ -80,6 +82,7 @@ const KnownModules = {
     OnlineWatcher: Filters.byProperties(['isOnline']),
     CurrentUserIdle: Filters.byProperties(['getIdleTime']),
     RelationshipStore: Filters.byProperties(['isBlocked']),
+    RelationshipManager: Filters.byProperties(['addRelationship']),
     MentionStore: Filters.byProperties(['getMentions']),
 
     // User Stores and Utils
@@ -91,7 +94,7 @@ const KnownModules = {
 
     // Emoji Store and Utils
     EmojiInfo: Filters.byProperties(['isEmojiDisabled']),
-    EmojiUtils: Filters.byProperties(['diversitySurrogate']),
+    EmojiUtils: Filters.byProperties(['getGuildEmoji']),
     EmojiStore: Filters.byProperties(['getByCategory', 'EMOJI_NAME_RE']),
 
     // Invite Store and Utils
@@ -107,9 +110,10 @@ const KnownModules = {
     ClassResolver: Filters.byProperties(['getClass']),
     ButtonData: Filters.byProperties(['ButtonSizes']),
     IconNames: Filters.byProperties(['IconNames']),
+    NavigationUtils: Filters.byProperties(['transitionTo', 'replaceWith', 'getHistory']),
 
     // Discord Messages
-    HistoryUtils: Filters.byProperties(['transitionTo', 'replaceWith', 'getHistory']),
+    MessageStore: Filters.byProperties(['getMessages']),
     MessageActions: Filters.byProperties(['jumpToMessage', '_sendMessage']),
     MessageQueue: Filters.byProperties(['enqueue']),
     MessageParser: Filters.byProperties(['createMessage', 'parse', 'unparse']),
@@ -175,6 +179,7 @@ const KnownModules = {
     // URLs and Utils
     URLParser: Filters.byProperties(['Url', 'parse']),
     ExtraURLs: Filters.byProperties(['getArticleURL']),
+
 
     /* DOM/React Components */
     /* ==================== */

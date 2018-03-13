@@ -14,3 +14,4 @@ export { default as EventHook } from './eventhook';
 export { default as Permissions } from './permissionmanager';
 export { default as Database } from './database';
 export { default as EventsWrapper } from './eventswrapper';
+export { default as DiscordApi } from './discordapi';

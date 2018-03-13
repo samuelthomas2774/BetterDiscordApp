@@ -9,7 +9,7 @@
 */
 
 import { DOM, BdUI, Modals } from 'ui';
-import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database } from 'modules';
+import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi } from 'modules';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
 import BdCss from './styles/index.scss';
@@ -23,6 +23,7 @@ class BetterDiscord {
         Logger.file = path.join(__dirname, '..', '..', 'tests', 'log.txt');
         Logger.log('main', 'BetterDiscord starting');
 
+        window.discordApi = DiscordApi;
         window.bddb = Database;
         window.bdglobals = Globals;
         window.ClientIPC = ClientIPC;

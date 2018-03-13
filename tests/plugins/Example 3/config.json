@@ -2,9 +2,11 @@
     "info": {
         "id": "example-plugin-3",
         "name": "Example Plugin 3",
-        "authors": [ "Samuel Elliott" ],
+        "authors": [
+            "Samuel Elliott"
+        ],
         "version": 1.0,
-        "description": "A plugin for testing BetterDiscord plugin exports"
+        "description": "A plugin for testing BetterDiscord plugin bridge"
     },
     "main": "index.js"
 }

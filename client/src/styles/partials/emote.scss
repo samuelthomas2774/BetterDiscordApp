@@ -1,0 +1,11 @@
+.bd-emote-outer.bd-is-emote {
+    font-size: 0;
+}
+.bd-emotewrapper {
+    position: relative;
+    display: inline-block;
+
+    img {
+        max-height: 32px;
+    }
+}

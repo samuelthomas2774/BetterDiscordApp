@@ -80,6 +80,10 @@ class Reflection {
         }
         return this.propIterator(curProp, propNames);
     }
+
+    static getState(node) {
+        return this.reactInternalInstance(node).return.stateNode.state;
+    }
 }
 
 export default function (node) {
@@ -90,6 +94,9 @@ export default function (node) {
         }
         get props() {
             return 'not yet implemented';
+        }
+        get state() {
+            return Reflection.getState(this.node);
         }
         get reactInternalInstance() {
             return Reflection.reactInternalInstance(this.node);

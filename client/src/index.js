@@ -10,7 +10,7 @@
 
 import { DOM, BdUI, Modals, Reflection } from 'ui';
 import BdCss from './styles/index.scss';
-import { Patcher, Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, ReactComponents, DiscordApi } from 'modules';
+import { Patcher, Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { EmoteModule } from 'builtin';
 const ignoreExternal = true;
@@ -83,35 +83,6 @@ if (window.BetterDiscord) {
     function init() {
         instance = new BetterDiscord();
     }
-
-    window.Patcher = Patcher;
-    Events.on('react-ensure', init);
-    function ensureReact() {
-        if (!window.webpackJsonp || !WebpackModules.getModuleByName('React')) return setTimeout(ensureReact, 10);
-        ReactComponents.getComponent('Message').then(Message => {
-            Events.emit('react-ensure');
-            Message.patchRender([{
-                selector: '.message',
-                method: 'replace',
-                fn: function (item) {
-                    if (!this.props || !this.props.message) return item;
-                    const { message } = this.props;
-                    const { id, colorString, bot, author, attachments, embeds } = message;
-                    item.props['data-message-id'] = id;
-                    item.props['data-colourstring'] = colorString;
-                    if (author && author.id) item.props['data-user-id'] = author.id;
-                    if (bot || (author && author.bot)) item.props.className += ' bd-isBot';
-                    if (attachments && attachments.length) item.props.className += ' bd-hasAttachments';
-                    if (embeds && embeds.length) item.props.className += ' bd-hasEmbeds';
-                    if (author && author.id === DiscordApi.currentUser.id) item.props.className += ' bd-isCurrentUser';
-                    return item;
-                }
-            }]);
-        });
-        Patcher.superpatch('React', 'createElement', function (component, retVal) {
-            if (!component.displayName) return;
-            ReactComponents.push(component, retVal);
-        });
-    }
-    ensureReact();
+    Events.on('autopatcher', init);
+    ReactAutoPatcher.autoPatch().then(() => Events.emit('autopatcher'));
 }

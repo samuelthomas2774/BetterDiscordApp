@@ -19,7 +19,7 @@
                     </div>
                 </div>
             </div>
-            <div v-for="(emote, index) in emotes" class="bd-autocompleteRow" :key="emote.id">
+            <div v-for="(emote, index) in emotes" class="bd-autocompleteRow" :key="index">
                 <div class="bd-autocompleteSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}" @mouseover="() => { selected = emote.id }" @click="() => inject(emote)">
                     <div class="bd-autocompleteField">
                         <img :src="getEmoteSrc(emote)"/>
@@ -54,12 +54,14 @@
         created() {
             window.addEventListener('keydown', this.prevents);
             const ta = document.querySelector('.chat textarea');
+            if(!ta) return;
             ta.addEventListener('keydown', this.setCaret);
             ta.addEventListener('keyup', this.searchEmotes);
         },
         destroyed() {
             window.removeEventListener('keydown', this.prevents);
             const ta = document.querySelector('.chat textarea');
+            if (!ta) return;
             ta.removeEventListener('keydown', this.setCaret);
             ta.removeEventListener('keyup', this.searchEmotes);
         },
@@ -91,20 +93,30 @@
                     const selected = this.emotes[this.selectedIndex];
                     if (!selected) return;
                     this.inject(selected);
+                    this.open = false;
                     return;
                 }
+                if (e.key === 'Tab' && !this.open) this.open = true;
+                if (!this.open) return;
                 const se = e.target.selectionEnd;
                 this.sterm = e.target.value.substr(0, se).split(' ').slice(-1).pop();
 
                 if (this.sterm.length < 3) {
-                    this.emotes = [];
-                    this.selected = '';
-                    this.selectedIndex = 0;
+                    this.reset();
                     return;
                 }
                 this.title = this.sterm;
                 this.emotes = EmoteModule.filter(new RegExp(this.sterm, ''), 10);
                 this.open = this.emotes.length;
+            },
+            reset() {
+                this.emotes = [];
+                this.title = '';
+                this.selIndex = 0;
+                this.selected = '';
+                this.open = false;
+                this.selectedIndex = 0;
+                this.sterm = '';
             },
             inject(emote) {
                 const ta = document.querySelector('.chat textarea');

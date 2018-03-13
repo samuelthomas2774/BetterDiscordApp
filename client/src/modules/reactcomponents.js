@@ -1,4 +1,36 @@
 import Patcher from './patcher';
+import WebpackModules from './webpackmodules';
+import DiscordApi from './discordapi';
+import { EmoteModule } from 'builtin';
+
+class Filters {
+    static get byPrototypeFields() {
+        return (fields, selector = x => x) => (module) => {
+            const component = selector(module);
+            if (!component) return false;
+            if (!component.prototype) return false;
+            for (const field of fields) {
+                if (!component.prototype[field]) return false;
+            }
+            return true;
+        }
+    }
+    static get byCode() {
+        return (search, selector = x => x) => (module) => {
+            const method = selector(module);
+            if (!method) return false;
+            return method.toString().search(search) !== -1;
+        }
+    }
+    static get and() {
+        return (...filters) => (module) => {
+            for (const filter of filters) {
+                if (!filter(module)) return false;
+            }
+            return true;
+        }
+    }
+}
 
 class Helpers {
     static get plannedActions() {
@@ -105,6 +137,20 @@ class Helpers {
         if (selector.startsWith('#')) return { id: selector.substr(1) }
         return {}
     }
+    static findByProp(obj, what, value) {
+        if (obj.hasOwnProperty(what) && obj[what] === value) return obj;
+        if (obj.props && !obj.children) return this.findByProp(obj.props, what, value);
+        if (!obj.children || !obj.children.length) return null;
+        for (const child of obj.children) {
+            if (!child) continue;
+            const findInChild = this.findByProp(child, what, value);
+            if (findInChild) return findInChild;
+        }
+        return null;
+    }
+    static get ReactDOM() {
+        return WebpackModules.getModuleByName('ReactDOM');
+    }
 }
 
 class ReactComponent {
@@ -112,6 +158,52 @@ class ReactComponent {
         this._id = id;
         this._component = component;
         this._retVal = retVal;
+        const self = this;
+        Patcher.slavepatch(this.component.prototype, 'componentDidMount', function (a, parv) {
+            self.eventCallback('componentDidMount', {
+                props: this.props,
+                state: this.state,
+                element: Helpers.ReactDOM.findDOMNode(this),
+                retVal: parv.retVal
+            });
+        });
+        Patcher.slavepatch(this.component.prototype, 'componentDidUpdate', function(a, parv) {
+            self.eventCallback('componentDidUpdate', {
+                prevProps: a[0],
+                prevState: a[1],
+                props: this.props,
+                state: this.state,
+                element: Helpers.ReactDOM.findDOMNode(this),
+                retVal: parv.retVal
+            });
+        });
+        Patcher.slavepatch(this.component.prototype, 'render', function (a, parv) {
+            self.eventCallback('render', {
+                component: this,
+                retVal: parv.retVal,
+                p: parv
+            });
+        });
+    }
+
+    eventCallback(event, eventData) {
+        for (const listener of this.events.find(e => e.id === event).listeners) {
+            listener(eventData);
+        }
+    }
+
+    get events() {
+        return this._events || (this._events = [
+            { id: 'componentDidMount', listeners: [] },
+            { id: 'componentDidUpdate', listeners: [] },
+            { id: 'render', listeners: [] }
+        ]);
+    }
+
+    on(event, callback) {
+        const have = this.events.find(e => e.id === event);
+        if (!have) return;
+        have.listeners.push(callback);
     }
 
     get id() {
@@ -129,15 +221,17 @@ class ReactComponent {
     unpatchRender() {
         
     }
-
+    /*
     patchRender(actions, updateOthers) {
         const self = this;
         if (!(actions instanceof Array)) actions = [actions];
-        Patcher.slavepatch(this.component.prototype, 'render', function(args, obj) {
+        Patcher.slavepatch(this.component.prototype, 'render', function (args, obj) {
+            console.log('obj', obj);
             for (const action of actions) {
                 let { selector, method, fn } = action;
                 if ('string' === typeof selector) selector = Helpers.parseSelector(selector);
                 const { item, parent, key } = Helpers.getFirstChild(obj, 'retVal', selector);
+                console.log('item2', item);
                 if (!item) continue;
                 const content = fn.apply(this, [item]);
                 switch (method) {
@@ -149,20 +243,99 @@ class ReactComponent {
             if (updateOthers) self.forceUpdateOthers();
         });
     }
-
+    */
     forceUpdateOthers() {
 
     }
 }
 
-export default class ReactComponents {
+export class ReactAutoPatcher {
+    static async autoPatch() {
+        await this.ensureReact();
+        Patcher.superpatch('React', 'createElement', (component, retVal) => ReactComponents.push(component, retVal));
+        this.patchem();
+        return 1;
+    }
+    static async ensureReact() {
+        while (!window.webpackJsonp || !WebpackModules.getModuleByName('React')) await new Promise(resolve => setTimeout(resolve, 10));
+        return 1;
+    }
+    static async patchem() {
+        this.patchMessage();
+        this.patchMessageGroup();
+        this.patchChannelMember();
+    }
+
+    static async patchMessage() {
+        this.Message.component = await ReactComponents.getComponent('Message');
+        this.Message.component.on('render', ({ component, retVal, p }) => {
+            const { message } = component.props;
+            const { id, colorString, bot, author, attachments, embeds } = message;
+            retVal.props['data-message-id'] = id;
+            retVal.props['data-colourstring'] = colorString;
+            if (author && author.id) retVal.props['data-user-id'] = author.id;
+            if (bot || (author && author.bot)) retVal.props.className += ' bd-isBot';
+            if (attachments && attachments.length) retVal.props.className += ' bd-hasAttachments';
+            if (embeds && embeds.length) retVal.props.className += ' bd-hasEmbeds';
+            if (author && author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+            try {
+                const markup = Helpers.findByProp(retVal, 'className', 'markup').children; // First child has all the actual text content, second is the edited timestamp
+                markup[0] = EmoteModule.processMarkup(markup[0]);
+            } catch (err) {
+                console.error('MARKUP PARSER ERROR', err);
+            }
+        });
+    }
+
+    static async patchMessageGroup() {
+        ReactComponents.setName('MessageGroup', this.MessageGroup.filter);
+        this.MessageGroup.component = await ReactComponents.getComponent('MessageGroup');
+        this.MessageGroup.component.on('render', ({ component, retVal, p }) => {
+            const authorid = component.props.messages[0].author.id;
+            retVal.props['data-author-id'] = authorid;
+            if (authorid === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+        });
+    }
+
+    static async patchChannelMember() {
+        this.ChannelMember.component = await ReactComponents.getComponent('ChannelMember');
+        this.ChannelMember.component.on('render', ({ component, retVal, p }) => {
+            const { user, isOwner } = component.props;
+            retVal.props['data-member-id'] = user.id;
+            if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+            if (isOwner) retVal.props.className += ' bd-isOwner';
+        });
+    }
+
+    static get MessageGroup() {
+        return this._messageGroup || (
+            this._messageGroup = {
+                filter: Filters.byCode(/"message-group"[\s\S]*"has-divider"[\s\S]*"hide-overflow"[\s\S]*"is-local-bot-message"/, c => c.prototype && c.prototype.render)
+            });
+    }
+
+    static get Message() {
+        return this._message || (this._message = {});
+    }
+
+    static get ChannelMember() {
+        return this._channelMember || (
+            this._channelMember = {});
+    }
+}
+
+export class ReactComponents {
     static get components() { return this._components || (this._components = []) }
+    static get unknownComponents() { return this._unknownComponents || (this._unknownComponents = [])}
     static get listeners() { return this._listeners || (this._listeners = []) }
+    static get nameSetters() { return this._nameSetters || (this._nameSetters =[])}
 
     static push(component, retVal) {
         if (!(component instanceof Function)) return null;
         const { displayName } = component;
-        if (!displayName) return null;
+        if (!displayName) {
+            return this.processUnknown(component, retVal);
+        }
         const have = this.components.find(comp => comp.id === displayName);
         if (have) return component;
         const c = new ReactComponent(displayName, component, retVal);
@@ -189,4 +362,31 @@ export default class ReactComponents {
         });
     }
 
+    static setName(name, filter, callback) {
+        const have = this.components.find(c => c.id === name);
+        if (have) return have;
+
+        for (const [rci, rc] of this.unknownComponents.entries()) {
+            if (filter(rc.component)) {
+                rc.component.displayName = name;
+                this.unknownComponents.splice(rci, 1);
+                return this.push(rc.component);
+            }
+        }
+        return this.nameSetters.push({ name, filter });
+    }
+
+    static processUnknown(component, retVal) {
+        const have = this.unknownComponents.find(c => c.component === component);
+        for (const [fi, filter] of this.nameSetters.entries()) {
+            if (filter.filter(component)) {
+                component.displayName = filter.name;
+                this.nameSetters.splice(fi, 1);
+                return this.push(component, retVal);
+            }
+        }
+        if (have) return have;
+        this.unknownComponents.push(c);
+        return c;
+    }
 }

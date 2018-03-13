@@ -19,12 +19,3 @@
         }
     }
 </script>
-<style>
-.bd-emotewrapper {
-    position: relative;
-    display: inline-block;
-}
-.bd-emotewrapper img {
-    max-height: 32px;
-}
-</style>

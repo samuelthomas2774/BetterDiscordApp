@@ -16,4 +16,4 @@ export { default as Database } from './database';
 export { default as EventsWrapper } from './eventswrapper';
 export { default as DiscordApi } from './discordapi';
 export { default as Patcher } from './patcher';
-export { default as ReactComponents } from './reactcomponents';
+export * from './reactcomponents';

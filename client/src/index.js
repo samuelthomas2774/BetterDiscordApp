@@ -43,8 +43,6 @@ class BetterDiscord {
 
     async init() {
         try {
-            throw new Error('Test');
-
             await Database.init();
             await Settings.loadSettings();
             await ModuleManager.initModules();

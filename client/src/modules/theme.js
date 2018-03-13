@@ -31,10 +31,6 @@ export default class Theme extends Content {
     get type() { return 'theme' }
     get css() { return this.data.css }
 
-    // Don't use - these will eventually be removed!
-    get themePath() { return this.contentPath }
-    get themeConfig() { return this.config }
-
     /**
      * Called when settings are updated.
      * This can be overridden by other content types.

@@ -53,14 +53,4 @@ module.exports = {
         __filename: false,
         __dirname: false
     }
-    /* resolve: {
-        alias: {
-            'momentjs': 'vendor/moment.min.js'
-        },
-        modules: [
-            path.resolve('./node_modules'),
-            path.resolve(__dirname, '..'),
-            path.resolve(__dirname, '..', 'node_modules')
-        ]
-    } */
 };

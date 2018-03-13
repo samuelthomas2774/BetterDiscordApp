@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { ipcMain, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 
 const callbacks = new WeakMap();
 

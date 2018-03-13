@@ -121,24 +121,24 @@ export default class extends ContentManager {
     static get unloadPlugin() { return this.unloadContent }
     static get reloadPlugin() { return this.reloadContent }
 
-    static stopPlugin(name) {
-        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
-        try {
-            if (plugin) return plugin.stop();
-        } catch (err) {
-           // Logger.err('PluginManager', err);
-        }
-        return true; //Return true anyways since plugin doesn't exist
+    /**
+     * Stops a plugin.
+     * @param {Plugin|String} plugin
+     * @return {Promise}
+     */
+    static stopPlugin(plugin) {
+        plugin = this.isPlugin(plugin) ? plugin : this.getPluginById(plugin);
+        return plugin.stop();
     }
 
-    static startPlugin(name) {
-        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
-        try {
-            if (plugin) return plugin.start();
-        } catch (err) {
-           // Logger.err('PluginManager', err);
-        }
-        return true; //Return true anyways since plugin doesn't exist
+    /**
+     * Starts a plugin.
+     * @param {Plugin|String} plugin
+     * @return {Promise}
+     */
+    static startPlugin(plugin) {
+        plugin = this.isPlugin(plugin) ? plugin : this.getPluginById(plugin);
+        return plugin.start();
     }
 
     static get isPlugin() { return this.isThisContent }

@@ -37,14 +37,6 @@ export default class extends EventListener {
     }
 
     hook() {
-        // const self = this;
-        // const orig = this.eventsModule.prototype.emit;
-        // this.eventsModule.prototype.emit = function (...args) {
-        //     orig.call(this, ...args);
-        //     self.wsc = this;
-        //     self.emit(...args);
-        // };
-
         Utils.monkeyPatch(this.eventsModule.prototype, 'emit', 'after', data => this.emit(data.arguments));
     }
 

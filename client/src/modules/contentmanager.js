@@ -24,24 +24,24 @@ import Combokeys from 'combokeys';
 export default class {
 
     /**
-     * Any errors that happened
-     * returns {Array}
+     * Any errors that happened.
+     * @return {Array}
      */
     static get errors() {
         return this._errors || (this._errors = []);
     }
 
     /**
-     * Locallly stored content
-     * returns {Array}
+     * Locallly stored content.
+     * @return {Array}
      */
     static get localContent() {
         return this._localContent ? this._localContent : (this._localContent = []);
     }
 
     /**
-     * Local path for content
-     * returns {String}
+     * Local path for content.
+     * @return {String}
      */
     static get contentPath() {
         return this._contentPath ? this._contentPath : (this._contentPath = Globals.getObject('paths').find(path => path.id === this.pathId).path);
@@ -83,8 +83,6 @@ export default class {
                 });
                 this._errors = [];
             }
-
-            return this.localContent;
         } catch (err) {
             throw err;
         }
@@ -150,8 +148,6 @@ export default class {
                 });
                 this._errors = [];
             }
-
-            return this.localContent;
         } catch (err) {
             throw err;
         }
@@ -169,15 +165,13 @@ export default class {
 
             await FileUtils.directoryExists(contentPath);
 
-            if (!reload) {
-                const loaded = this.localContent.find(content => content.contentPath === contentPath);
-                if (loaded) {
-                    throw { 'message': `Attempted to load already loaded user content: ${path}` };
-                }
+            if (!reload && this.getContentByPath(contentPath)) {
+                throw { message: `Attempted to load already loaded user content: ${path}` };
             }
 
-            const readConfig = await this.readConfig(contentPath);
-            const mainPath = path.join(contentPath, readConfig.main);
+            const configPath = path.resolve(contentPath, 'config.json');
+            const readConfig = await FileUtils.readJsonFromFile(configPath);
+            const mainPath = path.join(contentPath, readConfig.main || 'index.js');
 
             const defaultConfig = new SettingsSet({
                 settings: readConfig.defaultConfig,
@@ -191,17 +185,18 @@ export default class {
             };
 
             try {
-                //const readUserConfig = await this.readUserConfig(contentPath);
-                const readUserConfig = await Database.find({ type: 'contentconfig', name: readConfig.info.name });
+                const readUserConfig = await Database.find({
+                    type: `${this.contentType}-config`,
+                    id: readConfig.info.id || readConfig.info.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-')
+                });
+
                 if (readUserConfig.length) {
                     userConfig.enabled = readUserConfig[0].enabled || false;
-                    // await userConfig.config.merge({ settings: readUserConfig.config });
-                    // userConfig.config.setSaved();
-                    // userConfig.config = userConfig.config.clone({ settings: readUserConfig.config });
                     userConfig.config = readUserConfig[0].config;
                     userConfig.data = readUserConfig[0].data || {};
                 }
-            } catch (err) { /*We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config*/
+            } catch (err) {
+                // We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config
                 Logger.info(this.moduleName, `Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`);
                 Logger.err(this.moduleName, err);
             }
@@ -245,8 +240,9 @@ export default class {
 
     /**
      * Unload content
-     * @param {any} content Content to unload
-     * @param {bool} reload Whether to reload the content after
+     * @param {Content|String} content Content to unload
+     * @param {Boolean} reload Whether to reload the content after
+     * @return {Content}
      */
     static async unloadContent(content, reload) {
         content = this.findContent(content);
@@ -276,7 +272,8 @@ export default class {
 
     /**
      * Reload content
-     * @param {any} content Content to reload
+     * @param {Content|String} content Content to reload
+     * @return {Content}
      */
     static reloadContent(content) {
         return this.unloadContent(content, true);
@@ -284,7 +281,8 @@ export default class {
 
     /**
      * Read content config file
-     * @param {any} configPath Config file path
+     * @param {String} configPath Config file path
+     * @return {Promise}
      */
     static async readConfig(configPath) {
         configPath = path.resolve(configPath, 'config.json');
@@ -293,7 +291,8 @@ export default class {
 
     /**
      * Read content user config file
-     * @param {any} configPath User config file path
+     * @param {String} configPath User config file path
+     * @return {Promise}
      */
     static async readUserConfig(configPath) {
         configPath = path.resolve(configPath, 'user.config.json');
@@ -302,7 +301,8 @@ export default class {
 
     /**
      * Checks if the passed object is an instance of this content type.
-     * @param {any} content Object to check
+     * @param {Any} content Object to check
+     * @return {Boolean}
      */
     static isThisContent(content) {
         return content instanceof Content;
@@ -311,6 +311,7 @@ export default class {
     /**
      * Returns the first content where calling {function} returns true.
      * @param {Function} function A function to call to filter content
+     * @return {Content}
      */
     static find(f) {
         return this.localContent.find(f);
@@ -318,8 +319,9 @@ export default class {
 
     /**
      * Wildcard content finder
-     * @param {any} wild Content ID / directory name / path / name
-     * @param {bool} nonunique Allow searching attributes that may not be unique
+     * @param {Any} wild Content ID / directory name / path / name
+     * @param {Boolean} nonunique Allow searching attributes that may not be unique
+     * @return {Content}
      */
     static findContent(wild, nonunique) {
         if (this.isThisContent(wild)) return wild;
@@ -338,7 +340,8 @@ export default class {
 
     /**
      * Wait for content to load
-     * @param {any} content_id
+     * @param {Any} content_id
+     * @return {Promise}
      */
     static waitForContent(content_id) {
         return new Promise((resolve, reject) => {

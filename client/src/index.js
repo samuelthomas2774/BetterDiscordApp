@@ -13,7 +13,7 @@ import BdCss from './styles/index.scss';
 import { Patcher, Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { EmoteModule } from 'builtin';
-const ignoreExternal = true;
+const ignoreExternal = false;
 
 class BetterDiscord {
 

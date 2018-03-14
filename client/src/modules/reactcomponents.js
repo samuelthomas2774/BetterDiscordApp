@@ -261,7 +261,7 @@ export class ReactAutoPatcher {
         while (!window.webpackJsonp || !WebpackModules.getModuleByName('React')) await new Promise(resolve => setTimeout(resolve, 10));
         return 1;
     }
-    static async patchem() {
+    static patchem() {
         this.patchMessage();
         this.patchMessageGroup();
         this.patchChannelMember();
@@ -290,7 +290,7 @@ export class ReactAutoPatcher {
 
     static async patchMessageGroup() {
         ReactComponents.setName('MessageGroup', this.MessageGroup.filter);
-        this.MessageGroup.component = await ReactComponents.getComponent('MessageGroup');
+        this.MessageGroup.component = await ReactComponents.getComponent('MessageGroup', true, { selector: '.message-group' });
         this.MessageGroup.component.on('render', ({ component, retVal, p }) => {
             const authorid = component.props.messages[0].author.id;
             retVal.props['data-author-id'] = authorid;

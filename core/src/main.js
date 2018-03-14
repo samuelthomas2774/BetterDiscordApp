@@ -150,7 +150,7 @@ class BetterDiscord {
         //this.windowUtils.webContents.on('did-finish-load', e => this.injectScripts(true));
 
         this.windowUtils.events('did-get-response-details', () => this.ignite(this.windowUtils.window));
-        this.windowUtils.events('did-get-response-details', e => this.injectScripts(true));
+        this.windowUtils.events('did-finish-load', e => this.injectScripts(true));
 
         this.windowUtils.events('did-navigate-in-page', (event, url, isMainFrame) => {
             this.windowUtils.send('did-navigate-in-page', { event, url, isMainFrame });

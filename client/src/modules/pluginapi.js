@@ -16,6 +16,7 @@ import ThemeManager from './thememanager';
 import Events from './events';
 import EventsWrapper from './eventswrapper';
 import WebpackModules from './webpackmodules';
+import DiscordApi from './discordapi';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { BdMenuItems, Modals, DOM } from 'ui';
 import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
@@ -37,6 +38,7 @@ export default class PluginApi {
         this._themes = undefined;
         this._extmodules = undefined;
         this._webpackmodules = undefined;
+        this._discordapi = undefined;
 
         this._menuItems = undefined;
         this._injectedStyles = undefined;
@@ -100,18 +102,18 @@ export default class PluginApi {
 
     get Utils() {
         return this._utils || (this._utils = {
-            overload: () => Utils.overload.apply(Utils, arguments),
-            monkeyPatch: () => Utils.monkeyPatch.apply(Utils, arguments),
-            monkeyPatchOnce: () => Utils.monkeyPatchOnce.apply(Utils, arguments),
-            monkeyPatchAsync: () => Utils.monkeyPatchAsync.apply(Utils, arguments),
-            compatibleMonkeyPatch: () => Utils.compatibleMonkeyPatch.apply(Utils, arguments),
-            tryParseJson: () => Utils.tryParseJson.apply(Utils, arguments),
-            toCamelCase: () => Utils.toCamelCase.apply(Utils, arguments),
-            compare: () => Utils.compare.apply(Utils, arguments),
-            deepclone: () => Utils.deepclone.apply(Utils, arguments),
-            deepfreeze: () => Utils.deepfreeze.apply(Utils, arguments),
-            removeFromArray: () => Utils.removeFromArray.apply(Utils, arguments),
-            defineSoftGetter: () => Utils.defineSoftGetter.apply(Utils, arguments)
+            overload: (...args) => Utils.overload.apply(Utils, args),
+            monkeyPatch: (...args) => Utils.monkeyPatch.apply(Utils, args),
+            monkeyPatchOnce: (...args) => Utils.monkeyPatchOnce.apply(Utils, args),
+            monkeyPatchAsync: (...args) => Utils.monkeyPatchAsync.apply(Utils, args),
+            compatibleMonkeyPatch: (...args) => Utils.compatibleMonkeyPatch.apply(Utils, args),
+            tryParseJson: (...args) => Utils.tryParseJson.apply(Utils, args),
+            toCamelCase: (...args) => Utils.toCamelCase.apply(Utils, args),
+            compare: (...args) => Utils.compare.apply(Utils, args),
+            deepclone: (...args) => Utils.deepclone.apply(Utils, args),
+            deepfreeze: (...args) => Utils.deepfreeze.apply(Utils, args),
+            removeFromArray: (...args) => Utils.removeFromArray.apply(Utils, args),
+            defineSoftGetter: (...args) => Utils.defineSoftGetter.apply(Utils, agss)
         });
     }
 
@@ -226,6 +228,9 @@ export default class PluginApi {
     getConfigAsSCSSMap(settingsset) {
         return ThemeManager.getConfigAsSCSSMap(settingsset ? settingsset : this.plugin.settings);
     }
+    escapeSCSSString(value) {
+        return ThemeManager.toSCSSString(value);
+    }
     injectStyle(id, css) {
         if (id && !css) css = id, id = undefined;
         this.deleteStyle(id);
@@ -254,6 +259,7 @@ export default class PluginApi {
             compileSass: this.compileSass.bind(this),
             getConfigAsSCSS: this.getConfigAsSCSS.bind(this),
             getConfigAsSCSSMap: this.getConfigAsSCSSMap.bind(this),
+            escapeString: this.escapeSCSSString.bind(this),
             injectStyle: this.injectStyle.bind(this),
             injectSass: this.injectSass.bind(this),
             deleteStyle: this.deleteStyle.bind(this),
@@ -401,7 +407,7 @@ export default class PluginApi {
         return WebpackModules.getModuleByPrototypes(props, false);
     }
     get WebpackModules() {
-        return this._webpackmodules || (this._webpackmodules = Object.defineProperty({
+        return this._webpackmodules || (this._webpackmodules = Object.defineProperties({
             getModule: this.getWebpackModule.bind(this),
             getModuleByName: this.getWebpackModuleByName.bind(this),
             getModuleByDisplayName: this.getWebpackModuleByName.bind(this),
@@ -410,9 +416,22 @@ export default class PluginApi {
             getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this),
             getModulesByProperties: this.getWebpackModulesByProperties.bind(this),
             getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this)
-        }, 'require', {
-            get: () => this.webpackRequire
+        }, {
+            require: {
+                get: () => this.webpackRequire
+            },
+            Filters: {
+                get: () => WebpackModules.Filters
+            }
         }));
+    }
+
+    /**
+     * DiscordApi
+     */
+
+    get DiscordApi() {
+        return this._discordapi || (this._discordapi = new Proxy(DiscordApi, {}));
     }
 
 }

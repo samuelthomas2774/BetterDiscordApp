@@ -8,27 +8,27 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-class Filters {
-    static byProperties(props, selector = m => m) {
+export class Filters {
+    static byProperties(props, selector) {
         return module => {
-            const component = selector(module);
+            const component = selector ? selector(module) : module;
             if (!component) return false;
             return props.every(property => component[property] !== undefined);
         };
     }
 
-    static byPrototypeFields(fields, selector = m => m) {
+    static byPrototypeFields(fields, selector) {
         return module => {
-            const component = selector(module);
+            const component = selector ? selector(module) : module;
             if (!component) return false;
             if (!component.prototype) return false;
             return fields.every(field => component.prototype[field] !== undefined);
         };
     }
 
-    static byCode(search, selector = m => m) {
+    static byCode(search, selector) {
         return module => {
-            const method = selector(module);
+            const method = selector ? selector(module) : module;
             if (!method) return false;
             return method.toString().search(search) !== -1;
         };
@@ -70,7 +70,7 @@ const KnownModules = {
     // Channel Store & Actions
     ChannelStore: Filters.byProperties(['getChannels', 'getDMFromUserId']),
     SelectedChannelStore: Filters.byProperties(['getLastSelectedChannelId']),
-    ChannelActions: Filters.byProperties(["selectChannel"]),
+    ChannelActions: Filters.byProperties(['selectChannel']),
     PrivateChannelActions: Filters.byProperties(['openPrivateChannel']),
     ChannelSelector: Filters.byProperties(['selectGuild', 'selectChannel']),
 
@@ -137,7 +137,7 @@ const KnownModules = {
     DNDSources: Filters.byProperties(['addTarget']),
     DNDObjects: Filters.byProperties(['DragSource']),
 
-    // Electron & Other Internals with Utils*/
+    // Electron & Other Internals with Utils
     ElectronModule: Filters.byProperties(['_getMainWindow']),
     Dispatcher: Filters.byProperties(['dirtyDispatch']),
     PathUtils: Filters.byProperties(['hasBasename']),
@@ -180,9 +180,9 @@ const KnownModules = {
     URLParser: Filters.byProperties(['Url', 'parse']),
     ExtraURLs: Filters.byProperties(['getArticleURL']),
 
-
     /* DOM/React Components */
     /* ==================== */
+
     UserSettingsWindow: Filters.byProperties(['open', 'updateAccount']),
     LayerManager: Filters.byProperties(['popLayer', 'pushLayer']),
 
@@ -258,11 +258,12 @@ export default class WebpackModules {
     /**
      * Finds a module using it's code.
      * @param {RegExp} regex A regular expression to use to filter modules
+     * @param {Function} selector A function to call the get the method to check
      * @param {Boolean} first Whether to return the only the first matching module
      * @return {Any}
      */
-    static getModuleByRegex(regex, first = true) {
-        return this.getModule(Filters.byCode(regex), first);
+    static getModuleByRegex(regex, selector, first = true) {
+        return this.getModule(Filters.byCode(regex, selector), first);
     }
 
     /**

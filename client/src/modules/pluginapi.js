@@ -17,8 +17,9 @@ import Events from './events';
 import EventsWrapper from './eventswrapper';
 import WebpackModules from './webpackmodules';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenuItems, Modals, DOM } from 'ui';
-import SettingsModal from '../ui/components/bd/modals/SettingsModal.vue';
+import { BdMenuItems, Modals, DOM, Reflection } from 'ui';
+import DiscordApi from './discordapi';
+import { ReactComponents } from './reactcomponents';
 
 export default class PluginApi {
 
@@ -29,7 +30,15 @@ export default class PluginApi {
         this._injectedStyles = undefined;
         this._modalStack = undefined;
     }
-
+    get Discord() {
+        return DiscordApi;
+    }
+    get ReactComponents() {
+        return ReactComponents;
+    }
+    get Reflection() {
+        return Reflection;
+    }
     get plugin() {
         return PluginManager.getPluginById(this.pluginInfo.id || this.pluginInfo.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-'));
     }

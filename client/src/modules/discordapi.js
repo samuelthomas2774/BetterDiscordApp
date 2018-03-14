@@ -11,58 +11,59 @@ class List extends Array {
         return this.find(item => {
             for (let filter of filters) {
                 for (let key in filter) {
-                    if (item[key] !== filter[key]) return false;
+                    if (filter.hasOwnProperty(key)) {
+                        if (item[key] !== filter[key]) return false;
+                    }
                 }
             }
             return true;
         });
     }
-
 }
 
 class PermissionsError extends Error {
     constructor(message) {
-        super(message)
-        this.name = "PermissionsError";
+        super(message);
+        this.name = 'PermissionsError';
     }
 }
 
 class InsufficientPermissions extends PermissionsError {
     constructor(message) {
         super(`Missing Permission — ${message}`)
-        this.name = "InsufficientPermissions";
+        this.name = 'InsufficientPermissions';
     }
 }
 
 const Modules = {
     _getModule(name) {
-        let foundModule = WebpackModules.getModuleByName(name);
+        const foundModule = WebpackModules.getModuleByName(name);
         if (!foundModule) return null;
         delete this[name];
         return this[name] = foundModule;
     },
-    get ChannelSelector() { return this._getModule("ChannelSelector"); },
-    get MessageActions() { return this._getModule("MessageActions"); },
-    get MessageParser() { return this._getModule("MessageParser"); },
-    get MessageStore() { return this._getModule("MessageStore"); },
-    get EmojiUtils() { return this._getModule("EmojiUtils"); },
-    get PermissionUtils() { return this._getModule("Permissions"); },
-    get SortedGuildStore() { return this._getModule("SortedGuildStore"); },
-    get PrivateChannelActions() { return this._getModule("PrivateChannelActions"); },
-    get GuildMemberStore() { return this._getModule("GuildMemberStore"); },
-    get GuildChannelsStore() { return this._getModule("GuildChannelsStore"); },
-    get MemberCountStore() { return this._getModule("MemberCountStore"); },
-    get GuildActions() { return this._getModule("GuildActions"); },
-    get NavigationUtils() { return this._getModule("NavigationUtils"); },
-    get GuildPermissions() { return this._getModule("GuildPermissions"); },
-    get DiscordConstants() { return this._getModule("DiscordConstants"); },
-    get ChannelStore() { return this._getModule("ChannelStore"); },
-    get GuildStore() { return this._getModule("GuildStore"); },
-    get SelectedGuildStore() { return this._getModule("SelectedGuildStore"); },
-    get SelectedChannelStore() { return this._getModule("SelectedChannelStore"); },
-    get UserStore() { return this._getModule("UserStore"); },
-    get RelationshipStore() { return this._getModule("RelationshipStore"); },
-    get RelationshipManager() { return this._getModule("RelationshipManager"); },
+    get ChannelSelector() { return this._getModule('ChannelSelector'); },
+    get MessageActions() { return this._getModule('MessageActions'); },
+    get MessageParser() { return this._getModule('MessageParser'); },
+    get MessageStore() { return this._getModule('MessageStore'); },
+    get EmojiUtils() { return this._getModule('EmojiUtils'); },
+    get PermissionUtils() { return this._getModule('Permissions'); },
+    get SortedGuildStore() { return this._getModule('SortedGuildStore'); },
+    get PrivateChannelActions() { return this._getModule('PrivateChannelActions'); },
+    get GuildMemberStore() { return this._getModule('GuildMemberStore'); },
+    get GuildChannelsStore() { return this._getModule('GuildChannelsStore'); },
+    get MemberCountStore() { return this._getModule('MemberCountStore'); },
+    get GuildActions() { return this._getModule('GuildActions'); },
+    get NavigationUtils() { return this._getModule('NavigationUtils'); },
+    get GuildPermissions() { return this._getModule('GuildPermissions'); },
+    get DiscordConstants() { return this._getModule('DiscordConstants'); },
+    get ChannelStore() { return this._getModule('ChannelStore'); },
+    get GuildStore() { return this._getModule('GuildStore'); },
+    get SelectedGuildStore() { return this._getModule('SelectedGuildStore'); },
+    get SelectedChannelStore() { return this._getModule('SelectedChannelStore'); },
+    get UserStore() { return this._getModule('UserStore'); },
+    get RelationshipStore() { return this._getModule('RelationshipStore'); },
+    get RelationshipManager() { return this._getModule('RelationshipManager'); },
 
     get DiscordPermissions() { return this.DiscordConstants.Permissions; }
 
@@ -70,7 +71,9 @@ const Modules = {
 
 class User {
     constructor(data) {
-        for (let key in data) this[key] = data[key];
+        for (let key in data)
+            if (data.hasOwnProperty(key))
+                this[key] = data[key];
         this.discordObject = data;
     }
 
@@ -79,8 +82,8 @@ class User {
     }
 
     async sendMessage(content, parse = true) {
-        let id = await Modules.PrivateChannelActions.ensurePrivateChannel(DiscordApi.currentUser.id, this.id);
-        let channel = new PrivateChannel(Modules.ChannelStore.getChannel(id));
+        const id = await Modules.PrivateChannelActions.ensurePrivateChannel(DiscordApi.currentUser.id, this.id);
+        const channel = new PrivateChannel(Modules.ChannelStore.getChannel(id));
         channel.sendMessage(content, parse);
     }
 
@@ -93,19 +96,19 @@ class User {
     }
 
     addFriend() {
-        Modules.RelationshipManager.addRelationship(this.id, {location: "Context Menu"});
+        Modules.RelationshipManager.addRelationship(this.id, {location: 'Context Menu'});
     }
 
     removeFriend() {
-        Modules.RelationshipManager.removeRelationship(this.id, {location: "Context Menu"});
+        Modules.RelationshipManager.removeRelationship(this.id, {location: 'Context Menu'});
     }
 
     block() {
-        Modules.RelationshipManager.addRelationship(this.id, {location: "Context Menu"}, Modules.DiscordConstants.RelationshipTypes.BLOCKED);
+        Modules.RelationshipManager.addRelationship(this.id, {location: 'Context Menu'}, Modules.DiscordConstants.RelationshipTypes.BLOCKED);
     }
 
     unblock() {
-        Modules.RelationshipManager.removeRelationship(this.id, {location: "Context Menu"});
+        Modules.RelationshipManager.removeRelationship(this.id, {location: 'Context Menu'});
     }
 }
 
@@ -113,7 +116,9 @@ class Member extends User {
     constructor(data, guild) {
         super(data);
         const userData = Modules.UserStore.getUser(data.userId);
-        for (let key in userData) this[key] = userData[key];
+        for (let key in userData)
+            if (userData.hasOwnProperty(key))
+                this[key] = userData[key];
         this.guild_id = guild;
     }
 
@@ -121,28 +126,28 @@ class Member extends User {
         return Modules.PermissionUtils.can(perms, DiscordApi.currentUser, Modules.GuildStore.getGuild(this.guild_id));
     }
 
-    kick(reason = "") {
-        if (!this.checkPermissions(Modules.DiscordPermissions.KICK_MEMBERS)) throw new InsufficientPermissions("KICK_MEMBERS");
+    kick(reason = '') {
+        if (!this.checkPermissions(Modules.DiscordPermissions.KICK_MEMBERS)) throw new InsufficientPermissions('KICK_MEMBERS');
         Modules.GuildActions.kickUser(this.guild_id, this.id, reason);
     }
 
-    ban(daysToDelete = "1", reason = "") {
-        if (!this.checkPermissions(Modules.DiscordPermissions.BAN_MEMBERS)) throw new InsufficientPermissions("BAN_MEMBERS");
+    ban(daysToDelete = '1', reason = '') {
+        if (!this.checkPermissions(Modules.DiscordPermissions.BAN_MEMBERS)) throw new InsufficientPermissions('BAN_MEMBERS');
         Modules.GuildActions.banUser(this.guild_id, this.id, daysToDelete, reason);
     }
 
     unban() {
-        if (!this.checkPermissions(Modules.DiscordPermissions.BAN_MEMBERS)) throw new InsufficientPermissions("BAN_MEMBERS");
+        if (!this.checkPermissions(Modules.DiscordPermissions.BAN_MEMBERS)) throw new InsufficientPermissions('BAN_MEMBERS');
         Modules.GuildActions.unbanUser(this.guild_id, this.id);
     }
 
     move(channel_id) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.MOVE_MEMBERS)) throw new InsufficientPermissions("MOVE_MEMBERS");
+        if (!this.checkPermissions(Modules.DiscordPermissions.MOVE_MEMBERS)) throw new InsufficientPermissions('MOVE_MEMBERS');
         Modules.GuildActions.setChannel(this.guild_id, this.id, channel_id);
     }
 
     mute(active = true) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.MUTE_MEMBERS)) throw new InsufficientPermissions("MUTE_MEMBERS");
+        if (!this.checkPermissions(Modules.DiscordPermissions.MUTE_MEMBERS)) throw new InsufficientPermissions('MUTE_MEMBERS');
         Modules.GuildActions.setServerMute(this.guild_id, this.id, active);
     }
 
@@ -151,7 +156,7 @@ class Member extends User {
     }
 
     deafen(active = true) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.DEAFEN_MEMBERS)) throw new InsufficientPermissions("DEAFEN_MEMBERS");
+        if (!this.checkPermissions(Modules.DiscordPermissions.DEAFEN_MEMBERS)) throw new InsufficientPermissions('DEAFEN_MEMBERS');
         Modules.GuildActions.setServerDeaf(this.guild_id, this.id, active);
     }
 
@@ -160,10 +165,11 @@ class Member extends User {
     }
 }
 
-
 class Guild {
     constructor(data) {
-        for (let key in data) this[key] = data[key];
+        for (let key in data)
+            if (data.hasOwnProperty(key))
+                this[key] = data[key];
         this.discordObject = data;
     }
 
@@ -171,10 +177,12 @@ class Guild {
         const channels = Modules.GuildChannelsStore.getChannels(this.id);
         const returnChannels = new List();
         for (const category in channels) {
-            if (!Array.isArray(channels[category])) continue;
-            let channelList = channels[category];
-            for (const channel of channelList) {
-                returnChannels.push(new GuildChannel(channel.channel));
+            if (channels.hasOwnProperty(category)) {
+                if (!Array.isArray(channels[category])) continue;
+                const channelList = channels[category];
+                for (const channel of channelList) {
+                    returnChannels.push(new GuildChannel(channel.channel));
+                }
             }
         }
         return returnChannels;
@@ -234,7 +242,9 @@ class Guild {
 
 class Channel {
     constructor(data) {
-        for (let key in data) this[key] = data[key];
+        for (let key in data)
+            if (data.hasOwnProperty(key))
+                this[key] = data[key];
         this.discordObject = data;
     }
 
@@ -243,7 +253,7 @@ class Channel {
     }
 
     async sendMessage(content, parse = true) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES)) throw new InsufficientPermissions("SEND_MESSAGES");
+        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES)) throw new InsufficientPermissions('SEND_MESSAGES');
         let response = {};
         if (parse) response = await Modules.MessageActions._sendMessage(this.id, Modules.MessageParser.parse(this.discordObject, content));
         else response = await Modules.MessageActions._sendMessage(this.id, {content});
@@ -251,13 +261,15 @@ class Channel {
     }
 
     get messages() {
-        let messages = Modules.MessageStore.getMessages(this.id).toArray();
-        for (let i in messages) messages[i] = new Message(messages[i]);
+        const messages = Modules.MessageStore.getMessages(this.id).toArray();
+        for (let i in messages)
+            if (messages.hasOwnProperty(i))
+                messages[i] = new Message(messages[i]);
         return new List(...messages);
     }
 
     jumpToPresent() {
-        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL)) throw new InsufficientPermissions("VIEW_CHANNEL");
+        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL)) throw new InsufficientPermissions('VIEW_CHANNEL');
         if (this.hasMoreAfter) Modules.MessageActions.jumpToPresent(this.id, Modules.DiscordConstants.MAX_MESSAGES_PER_CHANNEL);
         else this.messages[this.messages.length - 1].jumpTo(false);
     }
@@ -267,12 +279,12 @@ class Channel {
     }
 
     sendInvite(inviteId) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES)) throw new InsufficientPermissions("SEND_MESSAGES");
+        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES)) throw new InsufficientPermissions('SEND_MESSAGES');
         Modules.MessageActions.sendInvite(this.id, inviteId);
     }
 
     select() {
-        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL)) throw new InsufficientPermissions("VIEW_CHANNEL");
+        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL)) throw new InsufficientPermissions('VIEW_CHANNEL');
         Modules.NavigationUtils.transitionToGuild(this.guild_id ? this.guild_id : Modules.DiscordConstants.ME, this.id);
     }
 }
@@ -305,7 +317,9 @@ class PrivateChannel extends Channel {
 
 class Message {
     constructor(data) {
-        for (let key in data) this[key] = data[key];
+        for (let key in data)
+            if (data.hasOwnProperty(key))
+                this[key] = data[key];
         this.discordObject = data;
     }
 
@@ -387,7 +401,7 @@ export default class DiscordApi {
     }
 
     static get currentChannel() {
-        let channel = Modules.ChannelStore.getChannel(Modules.SelectedChannelStore.getChannelId());
+        const channel = Modules.ChannelStore.getChannel(Modules.SelectedChannelStore.getChannelId());
         return channel.isPrivate ? new PrivateChannel(channel) : new GuildChannel(channel);
     }
 

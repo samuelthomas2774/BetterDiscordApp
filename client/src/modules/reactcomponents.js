@@ -301,9 +301,9 @@ export class ReactAutoPatcher {
         this.ChannelMember.component = await ReactComponents.getComponent('ChannelMember');
         this.ChannelMember.component.on('render', ({ component, retVal, p }) => {
             const { user, isOwner } = component.props;
-            retVal.props['data-member-id'] = user.id;
-            if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
-            if (isOwner) retVal.props.className += ' bd-isOwner';
+            retVal.props.children.props['data-member-id'] = user.id;
+            if (user.id === DiscordApi.currentUser.id) retVal.props.children.props.className += ' bd-isCurrentUser';
+            if (isOwner) retVal.props.children.props.className += ' bd-isOwner';
         });
     }
 

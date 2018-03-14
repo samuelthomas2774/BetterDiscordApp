@@ -38,7 +38,7 @@
                 settings: null,
                 closing: false,
                 saving: false
-            }
+            };
         },
         components: {
             Modal,

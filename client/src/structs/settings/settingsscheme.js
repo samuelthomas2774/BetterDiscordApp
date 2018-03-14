@@ -15,11 +15,11 @@ export default class SettingsScheme {
     constructor(args) {
         this.args = args.args || args;
 
-        this.args.settings = this.settings.map(({ category, settings }) => ({
-            category, settings: settings.map(({ id, value }) => ({
-                id, value
-            }))
-        }));
+        // this.args.settings = this.settings.map(({ category, settings }) => ({
+        //     category, settings: settings.map(({ id, value }) => ({
+        //         id, value
+        //     }))
+        // }));
 
         Object.freeze(this);
     }

@@ -268,7 +268,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchMessage() {
-        this.Message.component = await ReactComponents.getComponent('Message', true, { selector: '.message', displayName: 'Message' });
+        this.Message.component = await ReactComponents.getComponent('Message', true, { selector: '.message' });
         this.Message.component.on('render', ({ component, retVal, p }) => {
             const { message } = component.props;
             const { id, colorString, bot, author, attachments, embeds } = message;

@@ -82,7 +82,19 @@ class Reflection {
     }
 
     static getState(node) {
-        return this.reactInternalInstance(node).return.stateNode.state;
+        try {
+            return this.reactInternalInstance(node).return.stateNode.state;
+        } catch (err) {
+            return null;
+        }
+    }
+
+    static getComponent(node) {
+        try {
+            return this.reactInternalInstance(node).return.type;
+        } catch (err) {
+            return null;
+        }
     }
 }
 
@@ -100,6 +112,9 @@ export default function (node) {
         }
         get reactInternalInstance() {
             return Reflection.reactInternalInstance(this.node);
+        }
+        get component() {
+            return Reflection.getComponent(this.node);
         }
         prop(propName) {
             const split = propName.split('.');

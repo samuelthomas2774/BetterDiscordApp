@@ -2,6 +2,7 @@ import Patcher from './patcher';
 import WebpackModules from './webpackmodules';
 import DiscordApi from './discordapi';
 import { EmoteModule } from 'builtin';
+import { Reflection } from 'ui';
 
 class Filters {
     static get byPrototypeFields() {
@@ -267,7 +268,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchMessage() {
-        this.Message.component = await ReactComponents.getComponent('Message');
+        this.Message.component = await ReactComponents.getComponent('Message', true, { selector: '.message', displayName: 'Message' });
         this.Message.component.on('render', ({ component, retVal, p }) => {
             const { message } = component.props;
             const { id, colorString, bot, author, attachments, embeds } = message;
@@ -349,9 +350,30 @@ export class ReactComponents {
         return c;
     }
 
-    static async getComponent(name) {
+    static async getComponent(name, important, importantArgs) {
         const have = this.components.find(c => c.id === name);
         if (have) return have;
+        if (important) {
+            const importantInterval = setInterval(() => {
+                if (this.components.find(c => c.id === name)) {
+                    console.info(`Important component ${name} already found`);
+                    clearInterval(importantInterval);
+                    return;
+                }
+                const select = document.querySelector(importantArgs.selector);
+                if (!select) return;
+                const reflect = Reflection(select);
+                if (!reflect.component) {
+                    clearInterval(important);
+                    console.error(`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select);
+                    return;
+                }
+                if (!reflect.component.displayName) reflect.component.displayName = name;
+                console.info(`Found important component ${name} with reflection.`);
+                this.push(reflect.component);
+                clearInterval(importantInterval);
+            }, 50);
+        }
         const listener = this.listeners.find(l => l.id === name);
         if (!listener) this.listeners.push({
             id: name,

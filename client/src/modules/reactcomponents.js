@@ -1,3 +1,14 @@
+/**
+ * BetterDiscord React Component Manipulations
+ * original concept and some code by samogot - https://github.com/samogot / https://github.com/samogot/betterdiscord-plugins/tree/master/v2/1Lib%20Discord%20Internals
+ * Copyright (c) 2015-present JsSucks - https://github.com/JsSucks
+ * All rights reserved.
+ * https://github.com/JsSucks - https://betterdiscord.net
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree. 
+*/
+
 import Patcher from './patcher';
 import WebpackModules from './webpackmodules';
 import DiscordApi from './discordapi';

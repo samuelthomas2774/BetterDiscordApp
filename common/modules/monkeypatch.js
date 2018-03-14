@@ -60,7 +60,7 @@ export class PatchedFunction {
         Utils.removeFromArray(this.patches, patch);
 
         if (typeof restoreOriginal === 'undefined')
-            restoreOriginal = this.object[this.methodName] === this.originalMethod;
+            restoreOriginal = this.canRestoreOriginal();
 
         if (!this.patches.length && restoreOriginal)
             this.restoreOriginal();
@@ -81,6 +81,10 @@ export class PatchedFunction {
                 this.originalMethod = newFunction;
             }
         });
+    }
+
+    canRestoreOriginal() {
+        return this.object[this.methodName] === this.originalMethod;
     }
 
     /**
@@ -107,7 +111,6 @@ export class PatchedFunction {
             returned: undefined,
             originalMethod: this.originalMethod,
             callOriginalMethod: () => {
-                Logger.log('MonkeyPatch', [`Calling original method`, this, data]);
                 data.return = this.originalMethod.apply(data.this, data.arguments);
             }
         };

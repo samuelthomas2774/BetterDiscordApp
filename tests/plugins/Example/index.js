@@ -1,7 +1,7 @@
 module.exports = (Plugin, Api, Vendor, Dependencies) => {
 
     const { $, moment, _ } = Vendor;
-    const { Events, Logger, InternalSettings, CssUtils } = Api;
+    const { Events, Logger, InternalSettings, CssUtils, DiscordApi } = Api;
 
     return class extends Plugin {
         get api() {
@@ -50,9 +50,11 @@ module.exports = (Plugin, Api, Vendor, Dependencies) => {
         }
 
         async injectStyles() {
+            const user = DiscordApi.currentUser;
+
             const scss = await CssUtils.getConfigAsSCSS() + `.layer-kosS71 .guilds-wrapper + * {
                 &::before {
-                    content: 'Example plugin stuff (test radio setting #{$default-5} selected)';
+                    content: 'Hi there ' ${CssUtils.escapeString(user.tag)} '! (test radio setting #{$default-5} selected)';
                     display: block;
                     padding: 10px 40px;
                     color: #eee;

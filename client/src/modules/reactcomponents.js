@@ -65,6 +65,7 @@ class Helpers {
     }
     static recursiveArrayCount(parent, key) {
         let count = 0;
+        // eslint-disable-next-line no-empty-pattern
         for (let { } of this.recursiveArray(parent, key))
             ++count;
         return this.recursiveArray(parent, key, count);
@@ -419,7 +420,7 @@ export class ReactComponents {
             }
         }
         if (have) return have;
-        this.unknownComponents.push(c);
-        return c;
+        this.unknownComponents.push(component);
+        return component;
     }
 }

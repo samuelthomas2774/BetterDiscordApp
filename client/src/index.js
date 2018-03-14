@@ -80,6 +80,7 @@ if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
     let instance = null;
+    // eslint-disable-next-line no-inner-declarations
     function init() {
         instance = new BetterDiscord();
     }

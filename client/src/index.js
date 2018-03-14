@@ -14,32 +14,36 @@ import { Patcher, Events, CssEditor, Globals, ExtModuleManager, PluginManager, T
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { EmoteModule } from 'builtin';
 const ignoreExternal = false;
+const DEV = true;
 
 class BetterDiscord {
 
     constructor() {
-        window._bd = {
-            DOM,
-            BdUI,
-            Modals,
-            Reflection,
-            Patcher,
-            Events,
-            CssEditor,
-            Globals,
-            ExtModuleManager,
-            PluginManager,
-            ThemeManager,
-            ModuleManager,
-            WebpackModules,
-            Settings,
-            Database,
-            ReactComponents,
-            DiscordApi,
-            Logger,
-            ClientIPC,
-            Utils,
-            EmoteModule
+        window.BDDEVMODE = function () {
+            if (!DEV) return;
+            window._bd = {
+                DOM,
+                BdUI,
+                Modals,
+                Reflection,
+                Patcher,
+                Events,
+                CssEditor,
+                Globals,
+                ExtModuleManager,
+                PluginManager,
+                ThemeManager,
+                ModuleManager,
+                WebpackModules,
+                Settings,
+                Database,
+                ReactComponents,
+                DiscordApi,
+                Logger,
+                ClientIPC,
+                Utils,
+                EmoteModule
+            }
         }
 
         DOM.injectStyle(BdCss, 'bdmain');

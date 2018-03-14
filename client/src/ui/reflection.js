@@ -90,6 +90,7 @@ class Reflection {
     }
 
     static getComponent(node) {
+        // IMPORTANT TODO Currently only checks the first found component. For example channel-member will not return the correct component
         try {
             return this.reactInternalInstance(node).return.type;
         } catch (err) {

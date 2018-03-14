@@ -115,34 +115,6 @@
                 }
                 return false;
             },
-            searchEmotesOLD(e) {
-                if (e.key === 'ArrowDown' && this.open && this.caret) {
-                    this.selectedIndex = (this.selectedIndex + 1) >= 10 ? 0 : this.selectedIndex + 1;
-                    return;
-                } else if (e.key === 'ArrowUp' && this.open && this.caret) {
-                    this.selectedIndex = (this.selectedIndex - 1) < 0 ? 9 : this.selectedIndex - 1;
-                    return;
-                }
-                if (e.key === 'Tab' && this.open && this.caret) {
-                    const selected = this.emotes[this.selectedIndex];
-                    if (!selected) return;
-                    this.inject(selected);
-                    this.open = false;
-                    return;
-                }
-                if (e.key === 'Tab' && !this.open) this.open = true;
-                if (!this.open) return;
-                const se = e.target.selectionEnd;
-                this.sterm = e.target.value.substr(0, se).split(/\s+/g).pop();
-
-                if (this.sterm.length < 3) {
-                    this.reset();
-                    return;
-                }
-                this.title = this.sterm;
-                this.emotes = EmoteModule.filter(new RegExp(this.sterm, ''), 10);
-                this.open = this.emotes.length;
-            },
             reset() {
                 this.emotes = [];
                 this.title = '';
@@ -162,6 +134,7 @@
 
                 DOM.manip.setText(substr + value.substr(selectionEnd, value.length), false);
                 ta.selectionEnd = ta.selectionStart = selectionEnd + en.length - this.sterm.length;
+                this.reset();
             }
         }
     }

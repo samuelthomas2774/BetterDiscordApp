@@ -80,6 +80,23 @@ class Reflection {
         }
         return this.propIterator(curProp, propNames);
     }
+
+    static getState(node) {
+        try {
+            return this.reactInternalInstance(node).return.stateNode.state;
+        } catch (err) {
+            return null;
+        }
+    }
+
+    static getComponent(node) {
+        // IMPORTANT TODO Currently only checks the first found component. For example channel-member will not return the correct component
+        try {
+            return this.reactInternalInstance(node).return.type;
+        } catch (err) {
+            return null;
+        }
+    }
 }
 
 export default function (node) {
@@ -91,8 +108,14 @@ export default function (node) {
         get props() {
             return 'not yet implemented';
         }
+        get state() {
+            return Reflection.getState(this.node);
+        }
         get reactInternalInstance() {
             return Reflection.reactInternalInstance(this.node);
+        }
+        get component() {
+            return Reflection.getComponent(this.node);
         }
         prop(propName) {
             const split = propName.split('.');

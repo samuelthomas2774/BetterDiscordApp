@@ -19,7 +19,7 @@
                     </div>
                 </div>
             </div>
-            <div v-for="(emote, index) in emotes" class="bd-autocompleteRow" :key="emote.id">
+            <div v-for="(emote, index) in emotes" class="bd-autocompleteRow" :key="index">
                 <div class="bd-autocompleteSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}" @mouseover="() => { selected = emote.id }" @click="() => inject(emote)">
                     <div class="bd-autocompleteField">
                         <img :src="getEmoteSrc(emote)"/>
@@ -54,12 +54,14 @@
         created() {
             window.addEventListener('keydown', this.prevents);
             const ta = document.querySelector('.chat textarea');
+            if(!ta) return;
             ta.addEventListener('keydown', this.setCaret);
             ta.addEventListener('keyup', this.searchEmotes);
         },
         destroyed() {
             window.removeEventListener('keydown', this.prevents);
             const ta = document.querySelector('.chat textarea');
+            if (!ta) return;
             ta.removeEventListener('keydown', this.setCaret);
             ta.removeEventListener('keyup', this.searchEmotes);
         },
@@ -80,48 +82,59 @@
                 return uri.replace(':id', value);
             },
             searchEmotes(e) {
-                if (e.key === 'ArrowDown' && this.open && this.caret) {
-                    this.selectedIndex = (this.selectedIndex + 1) >= 10 ? 0 : this.selectedIndex + 1;
-                    return;
-                } else if (e.key === 'ArrowUp' && this.open && this.caret) {
-                    this.selectedIndex = (this.selectedIndex - 1) < 0 ? 9 : this.selectedIndex - 1;
-                    return;
-                }
-                if (e.key === 'Tab' && this.open && this.caret) {
+                if (this.traverse(e)) return;
+                if (e.key === 'Tab' && this.open) {
                     const selected = this.emotes[this.selectedIndex];
                     if (!selected) return;
                     this.inject(selected);
+                    this.reset();
                     return;
                 }
-                const se = e.target.selectionEnd;
-                this.sterm = e.target.value.substr(0, se).split(' ').slice(-1).pop();
+                if (e.key === 'Tab' && !this.open) this.open = true;
+                if (!this.open) return;
+                const { selectionEnd, value } = e.target;
+                this.sterm = value.substr(0, selectionEnd).split(/\s+/g).pop();
 
                 if (this.sterm.length < 3) {
-                    this.emotes = [];
-                    this.selected = '';
-                    this.selectedIndex = 0;
+                    this.reset();
                     return;
                 }
                 this.title = this.sterm;
                 this.emotes = EmoteModule.filter(new RegExp(this.sterm, ''), 10);
                 this.open = this.emotes.length;
             },
+            traverse(e) {
+                if (!this.open) return false;
+                if (e.key === 'ArrowUp') {
+                    this.selectedIndex = (this.selectedIndex - 1) < 0 ? 9 : this.selectedIndex - 1;
+                    return true;
+                }
+                if (e.key === 'ArrowDown') {
+                    this.selectedIndex = (this.selectedIndex + 1) >= 10 ? 0 : this.selectedIndex + 1;
+                    return true;
+                }
+                return false;
+            },
+            reset() {
+                this.emotes = [];
+                this.title = '';
+                this.selIndex = 0;
+                this.selected = '';
+                this.open = false;
+                this.selectedIndex = 0;
+                this.sterm = '';
+            },
             inject(emote) {
                 const ta = document.querySelector('.chat textarea');
                 if (!ta) return;
-                const currentText = document.querySelector('.chat textarea').value;
-                const se = ta.selectionEnd;
-                const split = currentText.substr(0, se).split(' ');
-                split.pop();
-                split.push(`:${emote.id}:`);
-                const join = split.join(' ');
-                const rest = currentText.substr(se, currentText.length);
-                DOM.manip.setText(join + ' ' + rest, false);
-                this.emotes = [];
-                this.open = false;
-                this.selectedIndex = 0;
-                this.selected = '';
-                ta.selectionEnd = ta.selectionStart = se + `:${emote.id}:`.length - this.title.length;
+                const { selectionEnd, value } = ta;
+                const en = `:${emote.id}:`;
+                let substr = value.substr(0, selectionEnd);
+                substr = substr.replace(new RegExp(this.sterm + '$'), en);
+
+                DOM.manip.setText(substr + value.substr(selectionEnd, value.length), false);
+                ta.selectionEnd = ta.selectionStart = selectionEnd + en.length - this.sterm.length;
+                this.reset();
             }
         }
     }

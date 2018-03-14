@@ -8,14 +8,15 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI, Modals } from 'ui';
-import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi } from 'modules';
-import { ClientLogger as Logger, ClientIPC } from 'common';
+import { DOM, BdUI, Modals, Reflection } from 'ui';
+import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi, Patcher, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
+import { Utils, ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
 import BdCss from './styles/index.scss';
 import path from 'path';
 
 const ignoreExternal = false;
+const DEV = true;
 
 class BetterDiscord {
 
@@ -23,23 +24,37 @@ class BetterDiscord {
         Logger.file = path.join(__dirname, '..', '..', 'tests', 'log.txt');
         Logger.log('main', 'BetterDiscord starting');
 
-        window.discordApi = DiscordApi;
-        window.bddb = Database;
-        window.bdglobals = Globals;
-        window.ClientIPC = ClientIPC;
-        window.css = CssEditor;
-        window.pm = PluginManager;
-        window.tm = ThemeManager;
-        window.events = Events;
-        window.wpm = WebpackModules;
-        window.bdsettings = Settings;
-        window.bdmodals = Modals;
-        window.bdlogs = Logger;
-        window.emotes = EmoteModule;
-        window.dom = DOM;
+        window.BDDEVMODE = function () {
+            if (!DEV) return;
+            window._bd = {
+                DOM,
+                BdUI,
+                Modals,
+                Reflection,
+                Patcher,
+                Events,
+                CssEditor,
+                Globals,
+                ExtModuleManager,
+                PluginManager,
+                ThemeManager,
+                ModuleManager,
+                WebpackModules,
+                Settings,
+                Database,
+                ReactComponents,
+                DiscordApi,
+                Logger,
+                ClientIPC,
+                Utils,
+                EmoteModule
+            };
+        };
 
         DOM.injectStyle(BdCss, 'bdmain');
-        Events.on('global-ready', this.globalReady.bind(this));
+        this.globalReady = this.globalReady.bind(this);
+        Events.on('global-ready', this.globalReady);
+        Globals.initg();
     }
 
     async init() {
@@ -77,5 +92,11 @@ class BetterDiscord {
 if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
-    let bdInstance = window.bdInstance = new BetterDiscord();
+    let instance = null;
+    // eslint-disable-next-line no-inner-declarations
+    function init() {
+        instance = new BetterDiscord();
+    }
+    Events.on('autopatcher', init);
+    ReactAutoPatcher.autoPatch().then(() => Events.emit('autopatcher'));
 }

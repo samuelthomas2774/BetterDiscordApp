@@ -16,6 +16,9 @@ export default new class extends Module {
 
     constructor(args) {
         super(args);
+    }
+
+    initg() {
         this.first();
     }
 

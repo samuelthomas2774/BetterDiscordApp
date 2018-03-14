@@ -15,7 +15,7 @@ import { List, User, Member, Guild, Channel, GuildChannel, PrivateChannel, Messa
 
 export const Modules = {
     _getModule(name) {
-        let foundModule = WebpackModules.getModuleByName(name);
+        const foundModule = WebpackModules.getModuleByName(name);
         if (!foundModule) return null;
         delete this[name];
         return this[name] = foundModule;

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, WebpackModules, EventListener } from 'modules';
+import { Events, WebpackModules, EventListener, ReactComponents, Renderer } from 'modules';
 import { ClientLogger as Logger } from 'common';
 import Reflection from './reflection';
 import DOM from './dom';
@@ -42,72 +42,8 @@ class TempApi {
 
 export default class extends EventListener {
 
-    constructor() {
-        super();
-        const messageFilter = function (m) {
-            return m.addedNodes && m.addedNodes.length && m.addedNodes[0].classList && m.addedNodes[0].classList.contains('message-group');
-        }
-
-        DOM.observer.subscribe('loading-more-manip', messageFilter, mutations => {
-            this.setIds();
-            this.makeMutable();
-            Events.emit('ui:laodedmore', mutations.map(m => m.addedNodes[0]));
-        }, 'filter');
-
-        const userFilter = function (m) {
-            return m.addedNodes && m.addedNodes.length && m.addedNodes[0].classList && m.addedNodes[0].classList.contains('member');
-        }
-
-        DOM.observer.subscribe('loading-more-users-manip', userFilter, mutations => {
-            this.setUserIds();
-            Events.emit('ui:loadedmoreusers', mutations.map(m => m.addedNodes[0]));
-        }, 'filter');
-
-        const channelFilter = function(m) {
-            return m.addedNodes &&
-                m.addedNodes.length &&
-                m.addedNodes[0].className &&
-                m.addedNodes[0].className.includes('container');
-        }
-
-        DOM.observer.subscribe('loading-more-channels-manip', channelFilter, mutations => {
-            this.setChannelIds();
-            Events.emit('ui:loadedmorechannels', mutations.map(m => m.addedNodes[0]));
-        }, 'filter');
-
-        const popoutFilter = function(m) {
-            return m.addedNodes &&
-                m.addedNodes.length &&
-                m.addedNodes[0].className &&
-                m.addedNodes[0].className.includes('popout');
-        }
-
-        DOM.observer.subscribe('userpopout-manip', popoutFilter, mutations => {
-            const userPopout = document.querySelector('[class*=userPopout]');
-            if (!userPopout) return;
-            const user = Reflection(userPopout).prop('user');
-            if (!user) return;
-            userPopout.setAttribute('data-user-id', user.id);
-            if (user.id === TempApi.currentUserId) userPopout.setAttribute('data-currentuser', true);
-        }, 'filter');
-
-        const modalFilter = function(m) {
-            return m.addedNodes &&
-                m.addedNodes.length &&
-                m.addedNodes[0].className &&
-                m.addedNodes[0].className.includes('modal');
-        }
-
-        DOM.observer.subscribe('modal-manip', modalFilter, mutations => {
-            const userModal = document.querySelector('[class*=modal] > [class*=inner]');
-            if (!userModal) return;
-            const user = Reflection(userModal).prop('user');
-            if (!user) return;
-            const modal = userModal.closest('[class*=modal]');
-            if (!modal) return;
-            modal.setAttribute('data-user-id', user.id);
-            if (user.id === TempApi.currentUserId) modal.setAttribute('data-currentuser', true);
-        });
+    constructor(args) {
+        super(args);
     }
 
     bindings() {
@@ -119,6 +55,8 @@ export default class extends EventListener {
     }
 
     get eventBindings() {
+        return [{ id: 'gkh:keyup', callback: this.injectAutocomplete }];
+        /*
         return [
             { id: 'server-switch', callback: this.manipAll },
             { id: 'channel-switch', callback: this.manipAll },
@@ -126,6 +64,7 @@ export default class extends EventListener {
             { id: 'discord:MESSAGE_UPDATE', callback: this.markupInjector },
             { id: 'gkh:keyup', callback: this.injectAutocomplete }
         ];
+        */
     }
 
     manipAll() {

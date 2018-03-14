@@ -57,10 +57,10 @@ export default class {
             if (!this.profilePopupModule) return;
             clearInterval(defer);
 
-            Utils.monkeyPatch(this.profilePopupModule, 'open', 'after', (data, userid) => Events.emit('ui-event', {
+            /*Utils.monkeyPatch(this.profilePopupModule, 'open', 'after', (data, userid) => Events.emit('ui-event', {
                 event: 'profile-popup-open',
                 data: { userid }
-            }));
+            }));*/
         }, 100);
 
         const ehookInterval = setInterval(() => {

@@ -7,7 +7,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
 */
-/*DO NOT USE THIS BRANCH YOU WILL DIE IF YOU DO*/
+
 const path = require('path');
 const sass = require('node-sass');
 

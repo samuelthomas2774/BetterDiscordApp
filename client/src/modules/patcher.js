@@ -5,19 +5,22 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 import WebpackModules from './webpackmodules';
 
 export default class Patcher {
+
     static get patches() { return this._patches || (this._patches = {}) }
+
     static resolveModule(mn) {
         if (mn instanceof Function || (mn instanceof Object && !(mn instanceof Array))) return mn;
-        if ('string' === typeof mn) return WebpackModules.getModuleByName(mn);
+        if (typeof mn === 'string') return WebpackModules.getModuleByName(mn);
         if (mn instanceof Array) return WebpackModules.getModuleByProps(mn);
         return null;
     }
+
     static overrideFn(patch) {
         return function () {
             for (const s of patch.supers) {
@@ -90,4 +93,5 @@ export default class Patcher {
         patchObject.slaves.push(patch);
         return patch;
     }
+
 }

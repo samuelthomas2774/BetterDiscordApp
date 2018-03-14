@@ -19,7 +19,6 @@ import WebpackModules from './webpackmodules';
 import DiscordApi from './discordapi';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { BdMenuItems, Modals, DOM, Reflection } from 'ui';
-import DiscordApi from './discordapi';
 import { ReactComponents } from './reactcomponents';
 
 export default class PluginApi {
@@ -45,15 +44,7 @@ export default class PluginApi {
         this._injectedStyles = undefined;
         this._modalStack = undefined;
     }
-    get Discord() {
-        return DiscordApi;
-    }
-    get ReactComponents() {
-        return ReactComponents;
-    }
-    get Reflection() {
-        return Reflection;
-    }
+
     get plugin() {
         return PluginManager.getPluginByPath(this.pluginPath);
     }
@@ -441,6 +432,14 @@ export default class PluginApi {
 
     get DiscordApi() {
         return this._discordapi || (this._discordapi = new Proxy(DiscordApi, {}));
+    }
+
+    get ReactComponents() {
+        return ReactComponents;
+    }
+
+    get Reflection() {
+        return Reflection;
     }
 
 }

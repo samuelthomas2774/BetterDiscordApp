@@ -9,7 +9,7 @@
 */
 
 import { DOM, BdUI, Modals, Reflection } from 'ui';
-import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi, Patcher, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
+import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi, Patcher, ReactComponents, ReactAutoPatcher } from 'modules';
 import { Utils, ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
 import BdCss from './styles/index.scss';
@@ -92,11 +92,7 @@ class BetterDiscord {
 if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
-    let instance = null;
-    // eslint-disable-next-line no-inner-declarations
-    function init() {
-        instance = new BetterDiscord();
-    }
-    Events.on('autopatcher', init);
+    let instance;
+    Events.on('autopatcher', () => instance = new BetterDiscord());
     ReactAutoPatcher.autoPatch().then(() => Events.emit('autopatcher'));
 }

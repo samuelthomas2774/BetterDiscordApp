@@ -92,7 +92,7 @@ export default class {
         const isEmote = this.isEmote(e.textContent);
         if (!isEmote) return;
         VueInjector.inject(e, {
-            template: `<EmoteComponent src="${isEmote.src}" name="${isEmote.name}"/>`
+            template: `<EmoteComponent :src="isEmote.src" :name="isEmote.name" />`,
             components: { EmoteComponent },
             data: { isEmote }
         }, DOM.createElement('span'));

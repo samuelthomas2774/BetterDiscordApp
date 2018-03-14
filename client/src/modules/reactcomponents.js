@@ -6,7 +6,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 import Patcher from './patcher';
@@ -14,40 +14,13 @@ import WebpackModules from './webpackmodules';
 import DiscordApi from './discordapi';
 import { EmoteModule } from 'builtin';
 import { Reflection } from 'ui';
-
-class Filters {
-    static get byPrototypeFields() {
-        return (fields, selector = x => x) => (module) => {
-            const component = selector(module);
-            if (!component) return false;
-            if (!component.prototype) return false;
-            for (const field of fields) {
-                if (!component.prototype[field]) return false;
-            }
-            return true;
-        }
-    }
-    static get byCode() {
-        return (search, selector = x => x) => (module) => {
-            const method = selector(module);
-            if (!method) return false;
-            return method.toString().search(search) !== -1;
-        }
-    }
-    static get and() {
-        return (...filters) => (module) => {
-            for (const filter of filters) {
-                if (!filter(module)) return false;
-            }
-            return true;
-        }
-    }
-}
+import { Filters } from 'common';
 
 class Helpers {
     static get plannedActions() {
         return this._plannedActions || (this._plannedActions = new Map());
     }
+
     static recursiveArray(parent, key, count = 1) {
         let index = 0;
         function* innerCall(parent, key) {
@@ -63,6 +36,7 @@ class Helpers {
 
         return innerCall(parent, key);
     }
+
     static recursiveArrayCount(parent, key) {
         let count = 0;
         // eslint-disable-next-line no-empty-pattern
@@ -70,8 +44,9 @@ class Helpers {
             ++count;
         return this.recursiveArray(parent, key, count);
     }
+
     static get recursiveChildren() {
-        return function*(parent, key, index = 0, count = 1) {
+        return function* (parent, key, index = 0, count = 1) {
             const item = parent[key];
             yield { item, parent, key, index, count };
             if (item && item.props && item.props.children) {
@@ -81,12 +56,14 @@ class Helpers {
             }
         }
     }
+
     static returnFirst(iterator, process) {
         for (let child of iterator) {
             const retVal = process(child);
             if (retVal !== undefined) return retVal;
         }
     }
+
     static getFirstChild(rootParent, rootKey, selector) {
         const getDirectChild = (item, selector) => {
             if (item && item.props && item.props.children) {
@@ -145,11 +122,13 @@ class Helpers {
         };
         return this.returnFirst(this.recursiveChildren(rootParent, rootKey), checkFilter.bind(null, selector)) || {};
     }
+
     static parseSelector(selector) {
         if (selector.startsWith('.')) return { className: selector.substr(1) }
         if (selector.startsWith('#')) return { id: selector.substr(1) }
         return {}
     }
+
     static findByProp(obj, what, value) {
         if (obj.hasOwnProperty(what) && obj[what] === value) return obj;
         if (obj.props && !obj.children) return this.findByProp(obj.props, what, value);
@@ -161,6 +140,7 @@ class Helpers {
         }
         return null;
     }
+
     static get ReactDOM() {
         return WebpackModules.getModuleByName('ReactDOM');
     }
@@ -180,7 +160,7 @@ class ReactComponent {
                 retVal: parv.retVal
             });
         });
-        Patcher.slavepatch(this.component.prototype, 'componentDidUpdate', function(a, parv) {
+        Patcher.slavepatch(this.component.prototype, 'componentDidUpdate', function (a, parv) {
             self.eventCallback('componentDidUpdate', {
                 prevProps: a[0],
                 prevState: a[1],
@@ -230,36 +210,6 @@ class ReactComponent {
     get retVal() {
         return this._retVal;
     }
-
-    unpatchRender() {
-        
-    }
-    /*
-    patchRender(actions, updateOthers) {
-        const self = this;
-        if (!(actions instanceof Array)) actions = [actions];
-        Patcher.slavepatch(this.component.prototype, 'render', function (args, obj) {
-            console.log('obj', obj);
-            for (const action of actions) {
-                let { selector, method, fn } = action;
-                if ('string' === typeof selector) selector = Helpers.parseSelector(selector);
-                const { item, parent, key } = Helpers.getFirstChild(obj, 'retVal', selector);
-                console.log('item2', item);
-                if (!item) continue;
-                const content = fn.apply(this, [item]);
-                switch (method) {
-                    case 'replace':
-                        parent[key] = content;
-                        break;
-                }
-            }
-            if (updateOthers) self.forceUpdateOthers();
-        });
-    }
-    */
-    forceUpdateOthers() {
-
-    }
 }
 
 export class ReactAutoPatcher {
@@ -267,12 +217,13 @@ export class ReactAutoPatcher {
         await this.ensureReact();
         Patcher.superpatch('React', 'createElement', (component, retVal) => ReactComponents.push(component, retVal));
         this.patchem();
-        return 1;
     }
+
     static async ensureReact() {
-        while (!window.webpackJsonp || !WebpackModules.getModuleByName('React')) await new Promise(resolve => setTimeout(resolve, 10));
-        return 1;
+        while (!window.webpackJsonp || !WebpackModules.getModuleByName('React'))
+            await new Promise(resolve => setTimeout(resolve, 10));
     }
+
     static patchem() {
         this.patchMessage();
         this.patchMessageGroup();

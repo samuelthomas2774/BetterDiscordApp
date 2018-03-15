@@ -231,10 +231,6 @@ class ReactComponent {
         return this._retVal;
     }
 
-    unpatchRender() {
-        
-    }
-
     forceUpdateOthers() {
 
     }

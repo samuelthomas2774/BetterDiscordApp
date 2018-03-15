@@ -10,7 +10,7 @@
 
 import { DOM, BdUI, Modals, Reflection } from 'ui';
 import BdCss from './styles/index.scss';
-import { Patcher, Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
+import { Patcher, Vendor, Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { EmoteModule } from 'builtin';
 const ignoreExternal = false;
@@ -20,13 +20,14 @@ class BetterDiscord {
 
     constructor() {
         window.BDDEVMODE = function () {
-            if (!DEV) return;
-            window._bd = {
+            if (!DEV) return null;
+            return window._bd = {
                 DOM,
                 BdUI,
                 Modals,
                 Reflection,
                 Patcher,
+                Vendor,
                 Events,
                 CssEditor,
                 Globals,

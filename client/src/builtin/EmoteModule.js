@@ -15,6 +15,9 @@ let emotes = null;
 const emotesEnabled = true;
 
 export default class {
+    static get searchCache() {
+        return this._searchCache || (this._searchCache = {});
+    }
     static get emoteDb() {
         return emotes;
     }
@@ -123,9 +126,11 @@ export default class {
     }
 
     static filter(regex, limit, start = 0) {
+        const key = `${regex}:${limit}:${start}`;
+        if (this.searchCache.hasOwnProperty(key)) return this.searchCache[key];
         let index = 0;
         let startIndex = 0;
-        return emotes.filter(emote => {
+        return this.searchCache[key] = emotes.filter(emote => {
             if (index >= limit) return false;
             if (regex.test(emote.id)) {
                 if (startIndex < start) {

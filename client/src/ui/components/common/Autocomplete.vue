@@ -68,7 +68,7 @@
         methods: {
             prevents(e) {
                 if (!this.open) return;
-                if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Tab') return;
+                if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Tab' && e.key !== 'Enter') return;
                 e.stopPropagation();
                 e.preventDefault();
             },
@@ -83,24 +83,28 @@
             },
             searchEmotes(e) {
                 if (this.traverse(e)) return;
-                if (e.key === 'Tab' && this.open) {
+                if (e.key === 'Tab' || e.key === 'Enter' && this.open) {
                     const selected = this.emotes[this.selectedIndex];
                     if (!selected) return;
                     this.inject(selected);
                     this.reset();
                     return;
                 }
-                if (e.key === 'Tab' && !this.open) this.open = true;
-                if (!this.open) return;
+
                 const { selectionEnd, value } = e.target;
                 this.sterm = value.substr(0, selectionEnd).split(/\s+/g).pop();
 
-                if (this.sterm.length < 3) {
+                if (!this.sterm.startsWith(';')) {
+                    this.reset();
+                    return;
+                }
+
+                if (this.sterm.length < 4) {
                     this.reset();
                     return;
                 }
                 this.title = this.sterm;
-                this.emotes = EmoteModule.filter(new RegExp(this.sterm, ''), 10);
+                this.emotes = EmoteModule.filter(new RegExp(this.sterm.substr(1), ''), 10);
                 this.open = this.emotes.length;
             },
             traverse(e) {
@@ -128,7 +132,7 @@
                 const ta = document.querySelector('.chat textarea');
                 if (!ta) return;
                 const { selectionEnd, value } = ta;
-                const en = `:${emote.id}:`;
+                const en = `;${emote.id};`;
                 let substr = value.substr(0, selectionEnd);
                 substr = substr.replace(new RegExp(this.sterm + '$'), en);
 

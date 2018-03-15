@@ -15,6 +15,9 @@ let emotes = null;
 const emotesEnabled = true;
 
 export default class {
+    static get emoteDb() {
+        return emotes;
+    }
     static get React() {
         return WebpackModules.getModuleByName('React');
     }
@@ -119,11 +122,16 @@ export default class {
         return filtered.slice(0, 10);
     }
 
-    static filter(regex, limit) {
+    static filter(regex, limit, start = 0) {
         let index = 0;
+        let startIndex = 0;
         return emotes.filter(emote => {
             if (index >= limit) return false;
             if (regex.test(emote.id)) {
+                if (startIndex < start) {
+                    startIndex++;
+                    return false;
+                }
                 index++;
                 return true;
             }

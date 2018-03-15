@@ -15,6 +15,12 @@ let emotes = null;
 const emotesEnabled = true;
 
 export default class {
+    static get searchCache() {
+        return this._searchCache || (this._searchCache = {});
+    }
+    static get emoteDb() {
+        return emotes;
+    }
     static get React() {
         return WebpackModules.getModuleByName('React');
     }
@@ -119,11 +125,18 @@ export default class {
         return filtered.slice(0, 10);
     }
 
-    static filter(regex, limit) {
+    static filter(regex, limit, start = 0) {
+        const key = `${regex}:${limit}:${start}`;
+        if (this.searchCache.hasOwnProperty(key)) return this.searchCache[key];
         let index = 0;
-        return emotes.filter(emote => {
+        let startIndex = 0;
+        return this.searchCache[key] = emotes.filter(emote => {
             if (index >= limit) return false;
             if (regex.test(emote.id)) {
+                if (startIndex < start) {
+                    startIndex++;
+                    return false;
+                }
                 index++;
                 return true;
             }

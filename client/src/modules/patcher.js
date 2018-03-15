@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree. 
 */
 
-import WebpackModules from './webpackmodules';
+import { WebpackModules } from './webpackmodules';
 import { ClientLogger as Logger } from 'common';
 
 export default class Patcher {

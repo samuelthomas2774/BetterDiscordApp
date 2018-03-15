@@ -10,39 +10,10 @@
 */
 
 import Patcher from './patcher';
-import WebpackModules from './webpackmodules';
+import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
 import { EmoteModule } from 'builtin';
 import { Reflection } from 'ui';
-
-class Filters {
-    static get byPrototypeFields() {
-        return (fields, selector = x => x) => (module) => {
-            const component = selector(module);
-            if (!component) return false;
-            if (!component.prototype) return false;
-            for (const field of fields) {
-                if (!component.prototype[field]) return false;
-            }
-            return true;
-        }
-    }
-    static get byCode() {
-        return (search, selector = x => x) => (module) => {
-            const method = selector(module);
-            if (!method) return false;
-            return method.toString().search(search) !== -1;
-        }
-    }
-    static get and() {
-        return (...filters) => (module) => {
-            for (const filter of filters) {
-                if (!filter(module)) return false;
-            }
-            return true;
-        }
-    }
-}
 
 class Helpers {
     static get plannedActions() {

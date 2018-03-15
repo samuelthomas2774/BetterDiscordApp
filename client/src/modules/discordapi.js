@@ -1,4 +1,4 @@
-import WebpackModules from './webpackmodules';
+import { WebpackModules } from './webpackmodules';
 import { $ } from 'vendor';
 
 class List extends Array {

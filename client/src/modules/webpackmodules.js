@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-class Filters {
+export class Filters {
     static byProperties(props, selector = m => m) {
         return module => {
             const component = selector(module);
@@ -205,7 +205,7 @@ const KnownModules = {
     ExternalLink: Filters.byCode(/\.trusted\b/)
 };
 
-export default class WebpackModules {
+export class WebpackModules {
 
 	/**
 	 * Finds a module using a filter function.

@@ -15,7 +15,7 @@ import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
 import EventsWrapper from './eventswrapper';
-import WebpackModules from './webpackmodules';
+import { WebpackModules } from './webpackmodules';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { BdMenuItems, Modals, DOM, Reflection } from 'ui';
 import DiscordApi from './discordapi';

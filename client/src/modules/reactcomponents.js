@@ -10,39 +10,10 @@
 */
 
 import Patcher from './patcher';
-import WebpackModules from './webpackmodules';
+import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
 import { EmoteModule } from 'builtin';
 import { Reflection } from 'ui';
-
-class Filters {
-    static get byPrototypeFields() {
-        return (fields, selector = x => x) => (module) => {
-            const component = selector(module);
-            if (!component) return false;
-            if (!component.prototype) return false;
-            for (const field of fields) {
-                if (!component.prototype[field]) return false;
-            }
-            return true;
-        }
-    }
-    static get byCode() {
-        return (search, selector = x => x) => (module) => {
-            const method = selector(module);
-            if (!method) return false;
-            return method.toString().search(search) !== -1;
-        }
-    }
-    static get and() {
-        return (...filters) => (module) => {
-            for (const filter of filters) {
-                if (!filter(module)) return false;
-            }
-            return true;
-        }
-    }
-}
 
 class Helpers {
     static get plannedActions() {
@@ -231,32 +202,6 @@ class ReactComponent {
         return this._retVal;
     }
 
-    unpatchRender() {
-        
-    }
-    /*
-    patchRender(actions, updateOthers) {
-        const self = this;
-        if (!(actions instanceof Array)) actions = [actions];
-        Patcher.slavepatch(this.component.prototype, 'render', function (args, obj) {
-            console.log('obj', obj);
-            for (const action of actions) {
-                let { selector, method, fn } = action;
-                if ('string' === typeof selector) selector = Helpers.parseSelector(selector);
-                const { item, parent, key } = Helpers.getFirstChild(obj, 'retVal', selector);
-                console.log('item2', item);
-                if (!item) continue;
-                const content = fn.apply(this, [item]);
-                switch (method) {
-                    case 'replace':
-                        parent[key] = content;
-                        break;
-                }
-            }
-            if (updateOthers) self.forceUpdateOthers();
-        });
-    }
-    */
     forceUpdateOthers() {
 
     }

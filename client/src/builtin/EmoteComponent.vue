@@ -1,6 +1,6 @@
 <template>
     <span class="bd-emotewrapper" v-tooltip="name">
-        <img class="bd-emote" :src="src" :alt="name"/>
+        <img class="bd-emote" :src="src" :alt="`;${name};`"/>
     </span>
 </template>
 

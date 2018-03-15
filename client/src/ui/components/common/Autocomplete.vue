@@ -69,6 +69,7 @@
             prevents(e) {
                 if (!this.open) return;
                 if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Tab' && e.key !== 'Enter') return;
+                this.traverse(e);
                 e.stopPropagation();
                 e.preventDefault();
             },
@@ -82,7 +83,7 @@
                 return uri.replace(':id', value);
             },
             searchEmotes(e) {
-                if (this.traverse(e)) return;
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') return;
                 if (e.key === 'Tab' || e.key === 'Enter' && this.open) {
                     const selected = this.emotes[this.selectedIndex];
                     if (!selected) return;
@@ -108,16 +109,16 @@
                 this.open = this.emotes.length;
             },
             traverse(e) {
-                if (!this.open) return false;
+                if (!this.open) return;
                 if (e.key === 'ArrowUp') {
                     this.selectedIndex = (this.selectedIndex - 1) < 0 ? 9 : this.selectedIndex - 1;
-                    return true;
+                    return;
                 }
                 if (e.key === 'ArrowDown') {
                     this.selectedIndex = (this.selectedIndex + 1) >= 10 ? 0 : this.selectedIndex + 1;
-                    return true;
+                    return;
                 }
-                return false;
+                return;
             },
             reset() {
                 this.emotes = [];

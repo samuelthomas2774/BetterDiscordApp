@@ -234,29 +234,7 @@ class ReactComponent {
     unpatchRender() {
         
     }
-    /*
-    patchRender(actions, updateOthers) {
-        const self = this;
-        if (!(actions instanceof Array)) actions = [actions];
-        Patcher.slavepatch(this.component.prototype, 'render', function (args, obj) {
-            console.log('obj', obj);
-            for (const action of actions) {
-                let { selector, method, fn } = action;
-                if ('string' === typeof selector) selector = Helpers.parseSelector(selector);
-                const { item, parent, key } = Helpers.getFirstChild(obj, 'retVal', selector);
-                console.log('item2', item);
-                if (!item) continue;
-                const content = fn.apply(this, [item]);
-                switch (method) {
-                    case 'replace':
-                        parent[key] = content;
-                        break;
-                }
-            }
-            if (updateOthers) self.forceUpdateOthers();
-        });
-    }
-    */
+
     forceUpdateOthers() {
 
     }

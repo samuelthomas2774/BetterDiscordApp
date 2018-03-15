@@ -70,9 +70,9 @@ export default class Patcher {
 
         const patch = this.patches[patchId] || this.pushPatch(patchId, module, functionName);
         if (!patch.proxyFunction) this.rePatch(patch);
-
+        const id = patch.supers.length + 1;
         const superPatch = {
-            id: patch.supers.length + 1,
+            id,
             callback,
             unpactch: () => patch.slaves.splice(patch.slaves.findIndex(slave => slave.id === id), 1) // This doesn't actually work correctly not, fix in a moment
         };
@@ -89,9 +89,9 @@ export default class Patcher {
 
         const patch = this.patches[patchId] || this.pushPatch(patchId, module, functionName);
         if (!patch.proxyFunction) this.rePatch(patch);
-
+        const id = patch.slaves.length + 1;
         const slavePatch = {
-            id: patch.slaves.length + 1,
+            id,
             callback,
             unpactch: () => patch.slaves.splice(patch.slaves.findIndex(slave => slave.id === id), 1) // This doesn't actually work correctly not, fix in a moment
         };

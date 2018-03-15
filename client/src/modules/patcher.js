@@ -9,6 +9,7 @@
 */
 
 import WebpackModules from './webpackmodules';
+import { ClientLogger as Logger } from 'common';
 
 export default class Patcher {
     static get patches() { return this._patches || (this._patches = {}) }
@@ -23,13 +24,17 @@ export default class Patcher {
             for (const s of patch.supers) {
                 try {
                     s.fn.apply(this, arguments);
-                } catch (err) { }
+                } catch (err) {
+                    Logger.err('Patcher', err);
+                }
             }
             const retVal = patch.ofn.apply(this, arguments);
             for (const s of patch.slaves) {
                 try {
-                     s.fn.apply(this, [arguments, { patch, retVal }]);
-                } catch (err) { }
+                    s.fn.apply(this, [arguments, { patch, retVal }]);
+                } catch (err) {
+                    Logger.err('Patcher', err);
+                }
             }
             return retVal;
         }

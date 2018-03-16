@@ -10,11 +10,10 @@
 */
 
 import Patcher from './patcher';
-import WebpackModules from './webpackmodules';
+import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
 import { EmoteModule } from 'builtin';
 import { Reflection } from 'ui';
-import { Filters } from 'common';
 
 class Helpers {
     static get plannedActions() {
@@ -152,29 +151,78 @@ class ReactComponent {
         this._component = component;
         this._retVal = retVal;
         const self = this;
-        Patcher.slavepatch(this.component.prototype, 'componentDidMount', function (a, parv) {
-            self.eventCallback('componentDidMount', {
-                props: this.props,
-                state: this.state,
-                element: Helpers.ReactDOM.findDOMNode(this),
+        Patcher.slavepatch(this.component.prototype, 'componentWillMount', function(args, parv) {
+            self.eventCallback('componentWillMount', {
+                component: this,
                 retVal: parv.retVal
             });
         });
-        Patcher.slavepatch(this.component.prototype, 'componentDidUpdate', function (a, parv) {
-            self.eventCallback('componentDidUpdate', {
-                prevProps: a[0],
-                prevState: a[1],
-                props: this.props,
-                state: this.state,
-                element: Helpers.ReactDOM.findDOMNode(this),
-                retVal: parv.retVal
-            });
-        });
-        Patcher.slavepatch(this.component.prototype, 'render', function (a, parv) {
+        Patcher.slavepatch(this.component.prototype, 'render', function (args, parv) {
             self.eventCallback('render', {
                 component: this,
-                retVal: parv.retVal,
-                p: parv
+                retVal: parv.retVal
+            });
+        });
+        Patcher.slavepatch(this.component.prototype, 'componentDidMount', function (args, parv) {
+            self.eventCallback('componentDidMount', {
+                component: this,
+                props: this.props,
+                state: this.state,
+                element: Helpers.ReactDOM.findDOMNode(this),
+                retVal: parv.retVal
+            });
+        });
+        Patcher.slavepatch(this.component.prototype, 'componentWillReceiveProps', function (args, parv) {
+            const [nextProps] = args;
+            self.eventCallback('componentWillReceiveProps', {
+                component: this,
+                nextProps,
+                retVal: parv.retVal
+            });
+        });
+        Patcher.slavepatch(this.component.prototype, 'shouldComponentUpdate', function (args, parv) {
+            const [nextProps, nextState] = args;
+            self.eventCallback('shouldComponentUpdate', {
+                component: this,
+                nextProps,
+                nextState,
+                retVal: parv.retVal
+            });
+        });
+        Patcher.slavepatch(this.component.prototype, 'componentWillUpdate', function (args, parv) {
+            const [nextProps, nextState] = args;
+            self.eventCallback('componentWillUpdate', {
+                component: this,
+                nextProps,
+                nextState,
+                retVal: parv.retVal
+            });
+        });
+        Patcher.slavepatch(this.component.prototype, 'componentDidUpdate', function(args, parv) {
+            const [prevProps, prevState] = args;
+            self.eventCallback('componentDidUpdate', {
+                component: this,
+                prevProps,
+                prevState,
+                props: this.props,
+                state: this.state,
+                element: Helpers.ReactDOM.findDOMNode(this),
+                retVal: parv.retVal
+            });
+        });
+        Patcher.slavepatch(this.component.prototype, 'componentWillUnmount', function (args, parv) {
+            self.eventCallback('componentWillUnmount', {
+                component: this,
+                retVal: parv.retVal
+            });
+        });
+        Patcher.slavepatch(this.component.prototype, 'componentDidCatch', function (args, parv) {
+            const [error, info] = args;
+            self.eventCallback('componentDidCatch', {
+                component: this,
+                error,
+                info,
+                retVal: parv.retVal
             });
         });
     }
@@ -187,9 +235,15 @@ class ReactComponent {
 
     get events() {
         return this._events || (this._events = [
+            { id: 'componentWillMount', listeners: [] },
+            { id: 'render', listeners: [] },
             { id: 'componentDidMount', listeners: [] },
+            { id: 'componentWillReceiveProps', listeners: [] },
+            { id: 'shouldComponentUpdate', listeners: [] },
+            { id: 'componentWillUpdate', listeners: [] },
             { id: 'componentDidUpdate', listeners: [] },
-            { id: 'render', listeners: [] }
+            { id: 'componentWillUnmount', listeners: [] },
+            { id: 'componentDidCatch', listeners: [] }
         ]);
     }
 

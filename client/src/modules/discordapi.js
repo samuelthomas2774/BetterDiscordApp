@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import WebpackModules from './webpackmodules';
+import { WebpackModules } from './webpackmodules';
 import { $ } from 'vendor';
 
 import { List, User, Member, Guild, Channel, GuildChannel, PrivateChannel, Message } from 'discordstructs';

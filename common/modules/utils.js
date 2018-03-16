@@ -213,6 +213,19 @@ export class Utils {
         return object;
     }
 
+    static filterArray(array, filter) {
+        const indexes = [];
+        for (let index in array) {
+            if (!filter(array[index], index))
+                indexes.push(index);
+        }
+
+        for (let i in indexes)
+            array.splice(indexes[i] - i, 1);
+
+        return array;
+    }
+
     /**
      * Removes an item from an array. This differs from Array.prototype.filter as it mutates the original array instead of creating a new one.
      * @param {Array} array The array to filter

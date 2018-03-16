@@ -8,90 +8,99 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import WebpackModules from './webpackmodules';
+import { WebpackModules } from './webpackmodules';
+import { ClientLogger as Logger } from 'common';
 
 export default class Patcher {
 
     static get patches() { return this._patches || (this._patches = {}) }
-
-    static resolveModule(mn) {
-        if (mn instanceof Function || (mn instanceof Object && !(mn instanceof Array))) return mn;
-        if (typeof mn === 'string') return WebpackModules.getModuleByName(mn);
-        if (mn instanceof Array) return WebpackModules.getModuleByProps(mn);
+    static resolveModule(module) {
+        if (module instanceof Function || (module instanceof Object && !(module instanceof Array))) return module;
+        if (typeof module === 'string') return WebpackModules.getModuleByName(module);
+        if (module instanceof Array) return WebpackModules.getModuleByProps(module);
         return null;
     }
 
     static overrideFn(patch) {
         return function () {
-            for (const s of patch.supers) {
+            for (const superPatch of patch.supers) {
                 try {
-                    s.fn.apply(this, arguments);
-                } catch (err) { }
+                    superPatch.callback.apply(this, arguments);
+                } catch (err) {
+                    Logger.err('Patcher', err);
+                }
             }
-            const retVal = patch.ofn.apply(this, arguments);
-            for (const s of patch.slaves) {
+            const retVal = patch.originalFunction.apply(this, arguments);
+            for (const slavePatch of patch.slaves) {
                 try {
-                     s.fn.apply(this, [arguments, { patch, retVal }]);
-                } catch (err) { }
+                    slavePatch.callback.apply(this, [arguments, { patch, retVal }]);
+                } catch (err) {
+                    Logger.err('Patcher', err);
+                }
             }
             return retVal;
         }
     }
 
-    static rePatch(po) {
-        po.patch = po.module[po.fnn] = this.overrideFn(po);
+    static rePatch(patch) {
+        patch.proxyFunction = patch.module[patch.functionName] = this.overrideFn(patch);
     }
 
-    static pushPatch(id, module, fnn) {
+    static pushPatch(id, module, functionName) {
         const patch = {
             module,
-            fnn,
-            ofn: module[fnn],
+            functionName,
+            originalFunction: module[functionName],
+            proxyFunction: null,
             revert: () => {
-                patch.module[patch.fnn] = patch.ofn;
-                patch.patch = null;
+                patch.module[patch.functionName] = patch.originalFunction;
+                patch.proxyFunction = null;
                 patch.slaves = patch.supers = [];
             },
             supers: [],
-            slaves: [],
-            patch: null
+            slaves: []
         };
-        patch.patch = module[fnn] = this.overrideFn(patch);
+        patch.proxyFunction = module[functionName] = this.overrideFn(patch);
         return this.patches[id] = patch;
     }
 
-    static superpatch(mn, fnn, cb, dn) {
-        const module = this.resolveModule(mn);
-        if (!module || !module[fnn] || !(module[fnn] instanceof Function)) return null;
-        const displayName = 'string' === typeof mn ? mn  : dn || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
-        const patchId = `${displayName}:${fnn}`;
-        const patchObject = this.patches[patchId] || this.pushPatch(patchId, module, fnn);
-        if (!patchObject.patch) this.rePatch(patchObject);
-        const id = patchObject.supers.length + 1;
-        const patch = {
+    static superpatch(unresolveModule, functionName, callback, displayName) {
+        const module = this.resolveModule(unresolveModule);
+        if (!module || !module[functionName] || !(module[functionName] instanceof Function)) return null;
+        displayName = 'string' === typeof unresolveModule ? unresolveModule : displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
+        const patchId = `${displayName}:${functionName}`;
+
+        const patch = this.patches[patchId] || this.pushPatch(patchId, module, functionName);
+        if (!patch.proxyFunction) this.rePatch(patch);
+        const id = patch.supers.length + 1;
+        const superPatch = {
             id,
-            fn: cb,
-            unpatch: () => patchObject.supers.splice(patchObject.supers.findIndex(slave => slave.id === id), 1)
+            callback,
+            unpactch: () => patch.slaves.splice(patch.slaves.findIndex(slave => slave.id === id), 1) // This doesn't actually work correctly not, fix in a moment
         };
-        patchObject.supers.push(patch);
-        return patch;
+
+        patch.supers.push(superPatch);
+        return superPatch;
     }
 
-    static slavepatch(mn, fnn, cb, dn) {
-        const module = this.resolveModule(mn);
-        if (!module || !module[fnn] || !(module[fnn] instanceof Function)) return null;
-        const displayName = 'string' === typeof mn ? mn : dn || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
-        const patchId = `${displayName}:${fnn}`;
-        const patchObject = this.patches[patchId] || this.pushPatch(patchId, module, fnn);
-        if (!patchObject.patch) this.rePatch(patchObject);
-        const id = patchObject.slaves.length + 1;
-        const patch = {
+    static slavepatch(unresolveModule, functionName, callback, displayName) {
+        const module = this.resolveModule(unresolveModule);
+        if (!module || !module[functionName] || !(module[functionName] instanceof Function)) return null;
+        displayName = 'string' === typeof unresolveModule ? unresolveModule : displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
+        const patchId = `${displayName}:${functionName}`;
+
+        const patch = this.patches[patchId] || this.pushPatch(patchId, module, functionName);
+        if (!patch.proxyFunction) this.rePatch(patch);
+        const id = patch.slaves.length + 1;
+        const slavePatch = {
             id,
-            fn: cb,
-            unpatch: () => patchObject.slaves.splice(patchObject.slaves.findIndex(slave => slave.id === id), 1)
+            callback,
+            // This doesn't actually work correctly not, fix in a moment
+            unpactch: () => patch.slaves.splice(patch.slaves.findIndex(slave => slave.id === id), 1)
         };
-        patchObject.slaves.push(patch);
-        return patch;
+
+        patch.slaves.push(slavePatch);
+        return slavePatch;
     }
 
 }

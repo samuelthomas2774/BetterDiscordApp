@@ -7,6 +7,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
 */
+
 import { FileUtils } from 'common';
 import { Events, Globals, WebpackModules, ReactComponents } from 'modules';
 import { DOM, VueInjector } from 'ui';
@@ -16,6 +17,12 @@ let emotes = null;
 const emotesEnabled = true;
 
 export default class {
+    static get searchCache() {
+        return this._searchCache || (this._searchCache = {});
+    }
+    static get emoteDb() {
+        return emotes;
+    }
     static get React() {
         return WebpackModules.getModuleByName('React');
     }
@@ -23,34 +30,34 @@ export default class {
     static processMarkup(markup) {
         if (!emotesEnabled) return markup; // TODO Get it from setttings
         const newMarkup = [];
-        for (const [ti, t] of markup.entries()) {
-            if ('string' !== typeof t) {
-                newMarkup.push(t);
+        for (const child of markup) {
+            if ('string' !== typeof child) {
+                newMarkup.push(child);
                 continue;
             }
-
-            const words = t.split(/([^\s]+)([\s]|$)/g);
+            if (!this.testWord(child)) {
+                newMarkup.push(child);
+                continue;
+            }
+            const words = child.split(/([^\s]+)([\s]|$)/g);
             if (!words) continue;
             let text = null;
-            for (const [wi, word] of words.entries()) {
-                let isEmote = false;
-                if (this.testWord(word)) {
-                    isEmote = true;
-                }
+            for (const [wordIndex, word] of words.entries()) {
+                const isEmote = this.isEmote(word);
                 if (isEmote) {
                     if (text !== null) {
                         newMarkup.push(text);
                         text = null;
                     }
-                    newMarkup.push(this.React.createElement('span', { className: 'bd-emote-outer' }, word));
+                    newMarkup.push(this.React.createElement('span', { className: 'bd-emote-outer', 'data-bdemote-name': isEmote.name, 'data-bdemote-src': isEmote.src }));
                     continue;
                 }
                 if (text === null) {
-                    text = `${word}`;
+                    text = word;
                 } else {
-                    text += `${word}`;
+                    text += word;
                 }
-                if (wi === words.length - 1) {
+                if (wordIndex === words.length - 1) {
                     newMarkup.push(text);
                 }
             }
@@ -59,7 +66,7 @@ export default class {
     }
 
     static testWord(word) {
-        if (!/:[\w]+:/gmi.test(word)) return false;
+        if (!/;[\w]+;/gmi.test(word)) return false;
         return true;
     }
 
@@ -87,16 +94,16 @@ export default class {
         }
     }
 
-    static injectEmote(e) {
+    static injectEmote(root) {
         if (!emotesEnabled) return;
-        const isEmote = this.isEmote(e.textContent);
-        if (!isEmote) return;
+        const emote = root.dataset;
+        if (!emote) return;
         VueInjector.inject(e, {
-            template: `<EmoteComponent :src="isEmote.src" :name="isEmote.name" />`,
+            template: `<EmoteComponent :src="emote.src" :name="emote.name" />`,
             components: { EmoteComponent },
-            data: { isEmote }
+            data: { emote }
         }, DOM.createElement('span'));
-        e.classList.add('bd-is-emote');
+        root.classList.add('bd-is-emote');
     }
 
     static injectEmotes(element) {
@@ -106,7 +113,7 @@ export default class {
 
     static isEmote(word) {
         if (!emotes) return null;
-        const name = word.replace(/:/g, '');
+        const name = word.replace(/;/g, '');
         const emote = emotes.find(emote => emote.id === name);
         if (!emote) return null;
         let { id, value } = emote;
@@ -121,11 +128,18 @@ export default class {
         return filtered.slice(0, 10);
     }
 
-    static filter(regex, limit) {
+    static filter(regex, limit, start = 0) {
+        const key = `${regex}:${limit}:${start}`;
+        if (this.searchCache.hasOwnProperty(key)) return this.searchCache[key];
         let index = 0;
-        return emotes.filter(emote => {
+        let startIndex = 0;
+        return this.searchCache[key] = emotes.filter(emote => {
             if (index >= limit) return false;
             if (regex.test(emote.id)) {
+                if (startIndex < start) {
+                    startIndex++;
+                    return false;
+                }
                 index++;
                 return true;
             }

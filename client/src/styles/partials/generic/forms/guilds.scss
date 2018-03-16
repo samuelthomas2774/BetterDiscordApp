@@ -1,0 +1,44 @@
+.bd-guilds {
+    .bd-guild {
+        $size: 36px;
+
+        display: inline-block;
+        width: $size;
+        height: $size;
+        background-color: rgb(47, 49, 54);
+        background-size: cover;
+        margin: 10px 10px 0 0;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: border-radius .4s cubic-bezier(0.5, 0, 0.27, 1.55), background-color .4s cubic-bezier(0.5, 0, 0.27, 1.55), box-shadow .3s cubic-bezier(0.5, 0, 0.27, 1.55);
+
+        .bd-guild-text {
+            float: left;
+            display: block;
+            width: $size;
+            height: $size;
+            text-align: center;
+            vertical-align: middle;
+            line-height: $size;
+            font-size: 15px;
+        }
+
+        &:hover {
+            border-radius: 30%;
+            background-color: $colbdblue;
+
+            &.bd-guild-has-icon {
+                background-color: rgb(47, 49, 54);
+            }
+        }
+
+        &.bd-active {
+            background-color: $colbdblue;
+            box-shadow: 0 0 7px 2px $colbdblue;
+
+            &.bd-guild-has-icon {
+                background-color: rgb(47, 49, 54);
+            }
+        }
+    }
+}

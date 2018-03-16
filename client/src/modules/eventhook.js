@@ -11,7 +11,7 @@
 import EventListener from './eventlistener';
 import { Utils, ClientLogger as Logger } from 'common';
 import Events from './events';
-import WebpackModules from './webpackmodules';
+import { WebpackModules } from './webpackmodules';
 
 import * as SocketStructs from '../structs/socketstructs';
 

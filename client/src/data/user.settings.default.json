@@ -47,10 +47,9 @@
                     {
                         "id": "developer-mode",
                         "type": "bool",
-                        "text": "Developer Mode",
-                        "hint": "BetterDiscord developer mode",
-                        "value": false,
-                        "disabled": true
+                        "text": "Developer mode",
+                        "hint": "Adds some of BetterDiscord's internal modules to `global._bd`.",
+                        "value": false
                     },
                     {
                         "id": "ignore-content-manager-errors",

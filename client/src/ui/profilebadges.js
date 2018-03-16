@@ -61,7 +61,6 @@ export default class extends EventListener {
         const wrapperParent = msgGroup.querySelector('.username-wrapper').parentElement;
         if (!wrapperParent || wrapperParent.children.length < 2) return;
         wrapperParent.insertBefore(root, wrapperParent.children[1]);
-        const { developer, contributor, webdev } = c;
 
         VueInjector.inject(root, {
             template: `<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />`,
@@ -77,7 +76,6 @@ export default class extends EventListener {
         if (!memberUsername) return;
         const root = document.createElement('span');
         memberUsername.append(root);
-        const { developer, contributor, webdev } = c;
 
         VueInjector.inject(root, {
             template: `<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />`,
@@ -98,8 +96,6 @@ export default class extends EventListener {
             } else {
                 root = document.querySelector('[class*="headerInfo"]');
             }
-
-            const { developer, contributor, webdev } = c;
 
             VueInjector.inject(root, {
                 template: `<BdBadge :hasBadges="hasBadges" :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />`,

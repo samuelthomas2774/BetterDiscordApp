@@ -83,6 +83,9 @@ export default class GuildSetting extends Setting {
      * @param {SettingUpdatedEvent} updatedSetting
      */
     async setValueHook(updatedSetting) {
+        this.value.sort();
+        this.changed = !Utils.compare(this.args.value, this.args.saved_value);
+
         const newGuilds = [];
         let error;
 

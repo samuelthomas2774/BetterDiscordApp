@@ -19,33 +19,37 @@ const DEV = true;
 class BetterDiscord {
 
     constructor() {
-        window.BDDEVMODE = function () {
-            if (!DEV) return null;
-            return window._bd = {
-                DOM,
-                BdUI,
-                Modals,
-                Reflection,
-                Patcher,
-                Vendor,
-                Events,
-                CssEditor,
-                Globals,
-                ExtModuleManager,
-                PluginManager,
-                ThemeManager,
-                ModuleManager,
-                WebpackModules,
-                Settings,
-                Database,
-                ReactComponents,
-                DiscordApi,
-                Logger,
-                ClientIPC,
-                Utils,
-                EmoteModule
-            }
-        }
+        this._bd = {
+            DOM,
+            BdUI,
+            Modals,
+            Reflection,
+            Patcher,
+            Vendor,
+            Events,
+            CssEditor,
+            Globals,
+            ExtModuleManager,
+            PluginManager,
+            ThemeManager,
+            ModuleManager,
+            WebpackModules,
+            Settings,
+            Database,
+            ReactComponents,
+            DiscordApi,
+            Logger,
+            ClientIPC,
+            Utils,
+            EmoteModule
+        };
+
+        const developermode = Settings.getSetting('core', 'advanced', 'developer-mode');
+        if (developermode.value) window._bd = this._bd;
+        developermode.on('setting-updated', event => {
+            if (event.value) window._bd = this._bd;
+            else if (window._bd) delete window._bd;
+        });
 
         DOM.injectStyle(BdCss, 'bdmain');
         this.globalReady = this.globalReady.bind(this);
@@ -79,16 +83,13 @@ class BetterDiscord {
         this.vueInstance = BdUI.injectUi();
         this.init();
     }
+
 }
 
 if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
     let instance = null;
-    // eslint-disable-next-line no-inner-declarations
-    function init() {
-        instance = new BetterDiscord();
-    }
-    Events.on('autopatcher', init);
+    Events.on('autopatcher', () => instance = new BetterDiscord());
     ReactAutoPatcher.autoPatch().then(() => Events.emit('autopatcher'));
 }

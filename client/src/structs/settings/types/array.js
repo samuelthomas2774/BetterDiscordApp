@@ -215,11 +215,6 @@ export default class ArraySetting extends Setting {
         if (error) throw error;
     }
 
-    // emit(...args) {
-    //     console.log('Emitting event', args[0], 'with data', args[1]);
-    //     return this.emitter.emit(...args);
-    // }
-
     /**
      * Updates the value of this array setting.
      * This only exists for use by array settings.

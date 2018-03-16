@@ -19,6 +19,7 @@ import SliderSetting from './types/slider';
 import ColourSetting from './types/colour';
 import KeybindSetting from './types/keybind';
 import FileSetting from './types/file';
+import GuildSetting from './types/guild';
 import ArraySetting from './types/array';
 import CustomSetting from './types/custom';
 
@@ -38,6 +39,7 @@ export default class Setting {
         else if (args.type === 'colour') return new ColourSetting(args, ...merge);
         else if (args.type === 'keybind') return new KeybindSetting(args, ...merge);
         else if (args.type === 'file') return new FileSetting(args, ...merge);
+        else if (args.type === 'guild') return new GuildSetting(args, ...merge);
         else if (args.type === 'array') return new ArraySetting(args, ...merge);
         else if (args.type === 'custom') return new CustomSetting(args, ...merge);
         else throw {message: `Setting type ${args.type} unknown`};

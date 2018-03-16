@@ -20,6 +20,7 @@
         <ColourSetting v-if="setting.type === 'colour'" :setting="setting" :change="change" />
         <KeybindSetting v-if="setting.type === 'keybind'" :setting="setting" />
         <FileSetting v-if="setting.type === 'file'" :setting="setting" :change="change" />
+        <GuildSetting v-if="setting.type === 'guild'" :setting="setting" />
         <ArraySetting v-if="setting.type === 'array'" :setting="setting" :change="change" />
         <CustomSetting v-if="setting.type === 'custom'" :setting="setting" :change="change" />
         <div class="bd-form-divider"></div>
@@ -37,6 +38,7 @@
     import ColourSetting from './Colour.vue';
     import KeybindSetting from './Keybind.vue';
     import FileSetting from './File.vue';
+    import GuildSetting from './Guild.vue';
     import ArraySetting from './Array.vue';
     import CustomSetting from './Custom.vue';
 
@@ -55,6 +57,7 @@
             ColourSetting,
             KeybindSetting,
             FileSetting,
+            GuildSetting,
             ArraySetting,
             CustomSetting
         },

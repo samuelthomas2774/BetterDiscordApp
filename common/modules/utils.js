@@ -162,6 +162,19 @@ export class Utils {
         return object;
     }
 
+    static filterArray(array, filter) {
+        const indexes = [];
+        for (let index in array) {
+            if (!filter(array[index], index))
+                indexes.push(index);
+        }
+
+        for (let i in indexes)
+            array.splice(indexes[i] - i, 1);
+
+        return array;
+    }
+
     static removeFromArray(array, item) {
         let index;
         while ((index = array.indexOf(item)) > -1)

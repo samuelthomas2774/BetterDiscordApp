@@ -9,14 +9,8 @@
 */
 
 import { DOM, BdUI, Modals, Reflection } from 'ui';
-<<<<<<< HEAD
-import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi, Patcher, ReactComponents, ReactAutoPatcher } from 'modules';
+import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi, Patcher, ReactComponents, ReactAutoPatcher, Vendor } from 'modules';
 import { Utils, ClientLogger as Logger, ClientIPC } from 'common';
-=======
-import BdCss from './styles/index.scss';
-import { Patcher, Vendor, Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
-import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
->>>>>>> upstream/master
 import { EmoteModule } from 'builtin';
 import BdCss from './styles/index.scss';
 import path from 'path';

@@ -62,6 +62,7 @@ export default class Patcher {
         return this.patches[id] = patch;
     }
 
+    static get before() { return this.superpatch; }
     static superpatch(unresolveModule, functionName, callback, displayName) {
         const module = this.resolveModule(unresolveModule);
         if (!module || !module[functionName] || !(module[functionName] instanceof Function)) return null;
@@ -81,6 +82,7 @@ export default class Patcher {
         return superPatch;
     }
 
+    static get after() { return this.slavepatch; }
     static slavepatch(unresolveModule, functionName, callback, displayName) {
         const module = this.resolveModule(unresolveModule);
         if (!module || !module[functionName] || !(module[functionName] instanceof Function)) return null;

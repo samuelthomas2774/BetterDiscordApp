@@ -17,7 +17,7 @@ export default class GuildSetting extends Setting {
     constructor(args, ...merge) {
         super(args, ...merge);
 
-        this.args.guilds = this.value ? this.value.map(guild_id => DiscordApi.guilds.get({ id: guild_id })) : [];
+        this.args.guilds = this.value ? this.value.map(id => DiscordApi.guilds.get({ id })) : [];
     }
 
     /**
@@ -56,12 +56,6 @@ export default class GuildSetting extends Setting {
      */
     addGuild(guild_id) {
         return this.setValue(this.value.concat([guild_id]));
-
-        // if (this.guilds.find(g => g && g.id === guild_id)) return;
-        // const guild = DiscordApi.guilds.get({ id: guild_id });
-        // this.guilds.push(guild);
-        // await this.emit('guild-added', guild);
-        // return await this.setValue(this.value.concat([guild_id]));
     }
 
     /**
@@ -71,14 +65,6 @@ export default class GuildSetting extends Setting {
      */
     removeGuild(guild_id) {
         return this.setValue(this.value.filter(g => g !== guild_id));
-
-        // const guild = this.guilds.find(g => g && g.id === guild_id);
-        // const value = Utils.removeFromArray(this.value.slice(0), guild_id);
-        // if (guild) {
-        //     Utils.filterArray(this.guilds, g => !g || g.id !== guild_id);
-        //     await this.emit('guild-removed', guild);
-        // }
-        // return await this.setValue(value);
     }
 
     /**
@@ -88,7 +74,7 @@ export default class GuildSetting extends Setting {
      * @param {SettingUpdatedEvent} updatedSetting
      */
     setValueHookSync(updatedSetting) {
-        this.args.guilds = updatedSetting.value ? updatedSetting.value.map(guild_id => DiscordApi.guilds.get({ id: guild_id })) : [];
+        this.args.guilds = updatedSetting.value ? updatedSetting.value.map(id => DiscordApi.guilds.get({ id })) : [];
     }
 
     /**
@@ -134,9 +120,9 @@ export default class GuildSetting extends Setting {
 
     /**
      * Returns a representation of this setting's value in SCSS.
-     * @return {String|Promise}
+     * @return {String}
      */
-    async toSCSS() {
+    toSCSS() {
         if (!this.value || !this.value.length) return '()';
 
         const guilds = [];

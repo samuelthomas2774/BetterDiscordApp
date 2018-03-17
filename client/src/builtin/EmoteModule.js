@@ -122,6 +122,9 @@ export default class {
 
     static injectEmote(root) {
         if (!emotesEnabled) return;
+        while (root.firstChild) {
+            root.removeChild(root.firstChild);
+        }
         const { bdemoteName, bdemoteSrc } = root.dataset;
         if (!bdemoteName || !bdemoteSrc) return;
         VueInjector.inject(

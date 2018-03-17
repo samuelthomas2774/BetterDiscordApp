@@ -16,15 +16,17 @@
             </div>
             <span>{{item.name}}</span>
             <div class="bd-flex-spacer" />
-            <slot name="toggle"/>
+            <slot name="toggle" />
         </div>
         <div class="bd-card-body">
-            <div class="bd-card-description">{{item.description}}</div>
-            <div class="bd-card-footer">
-                <div class="bd-card-extra">v{{item.version}} by {{item.authors.join(', ').replace(/,(?!.*,)/gmi, ' and')}}</div>
-                <div class="bd-controls">
-                    <slot name="controls"/>
-                </div>
+            <slot name="body">
+                <div class="bd-card-description">{{ item.description }}</div>
+            </slot>
+        </div>
+        <div class="bd-card-footer">
+            <div class="bd-card-extra">v{{item.version}} by {{item.authors.join(', ').replace(/,(?!.*,)/gmi, ' and')}}</div>
+            <div class="bd-controls">
+                <slot name="controls" />
             </div>
         </div>
     </div>

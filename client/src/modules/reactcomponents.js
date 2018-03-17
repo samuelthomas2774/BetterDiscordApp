@@ -287,9 +287,13 @@ export class ReactAutoPatcher {
     }
 
     static async patchComponents() {
-        this.patchMessage();
-        this.patchMessageGroup();
-        this.patchChannelMember();
+        await this.patchMessage();
+        await this.patchMessageGroup();
+        await this.patchChannelMember();
+        await this.patchGuild();
+        await this.patchChannel();
+        await this.patchChannelList();
+        this.forceUpdate();
     }
 
     static async patchMessage() {
@@ -325,5 +329,41 @@ export class ReactAutoPatcher {
             if (!user) return;
             retVal.props['data-user-id'] = user.id;
         });
+    }
+
+    static async patchGuild() {
+        this.Guild = await ReactComponents.getComponent('Guild');
+        this.unpatchGuild = MonkeyPatch('BD:ReactComponents', this.Guild.component.prototype).after('render', (component, args, retVal) => {
+            const { guild } = component.props;
+            if (!guild) return;
+            retVal.props['data-guild-id'] = guild.id;
+            retVal.props['data-guild-name'] = guild.name;
+        });
+    }
+
+    static async patchChannel() {
+        this.Channel = await ReactComponents.getComponent('Channel');
+        this.unpatchChannel = MonkeyPatch('BD:ReactComponents', this.Channel.component.prototype).after('render', (component, args, retVal) => {
+            const channel = component.props.channel || component.state.channel;
+            if (!channel) return;
+            retVal.props['data-channel-id'] = channel.id;
+            retVal.props['data-channel-name'] = channel.name;
+        });
+    }
+
+    static async patchChannelList() {
+        this.GuildChannel = await ReactComponents.getComponent('GuildChannel', { selector: '.containerDefault-7RImuF' });
+        this.unpatchGuildChannel = MonkeyPatch('BD:ReactComponents', this.GuildChannel.component.prototype).after('render', (component, args, retVal) => {
+            const { channel } = component.props;
+            if (!channel) return;
+            retVal.props['data-channel-id'] = channel.id;
+            retVal.props['data-channel-name'] = channel.name;
+        });
+    }
+
+    static forceUpdate() {
+        for (const e of document.querySelectorAll('.message,.message-group,.guild,.containerDefault-7RImuF,.channel-members .member')) {
+            Reflection(e).forceUpdate();
+        }
     }
 }

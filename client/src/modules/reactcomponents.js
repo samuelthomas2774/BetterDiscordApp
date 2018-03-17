@@ -272,12 +272,13 @@ export class ReactAutoPatcher {
     }
 
     static async patchComponents() {
-        this.patchMessage();
-        this.patchMessageGroup();
-        this.patchChannelMember();
-        this.patchGuild();
-        this.patchChannel();
-        this.patchChannelList();
+        await this.patchMessage();
+        await this.patchMessageGroup();
+        await this.patchChannelMember();
+        await this.patchGuild();
+        await this.patchChannel();
+        await this.patchChannelList();
+        this.forceUpdate();
     }
 
     static async patchMessage() {
@@ -343,5 +344,11 @@ export class ReactAutoPatcher {
             retVal.props['data-channel-id'] = channel.id;
             retVal.props['data-channel-name'] = channel.name;
         });
+    }
+
+    static forceUpdate() {
+        for (const e of document.querySelectorAll('.message,.message-group,.guild,.containerDefault-7RImuF,.channel-members .member')) {
+            Reflection(e).forceUpdate();
+        }
     }
 }

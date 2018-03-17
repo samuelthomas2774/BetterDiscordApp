@@ -89,6 +89,14 @@ class Reflection {
         }
     }
 
+    static getStateNode(node) {
+        try {
+            return this.reactInternalInstance(node).return.stateNode;
+        } catch (err) {
+            return null;
+        }
+    }
+
     static getComponent(node, first = true) {
         // IMPORTANT TODO Currently only checks the first found component. For example channel-member will not return the correct component
         try {
@@ -121,11 +129,23 @@ export default function (node) {
         get state() {
             return Reflection.getState(this.node);
         }
+        get stateNode() {
+            return Reflection.getStateNode(this.node);
+        }
         get reactInternalInstance() {
             return Reflection.reactInternalInstance(this.node);
         }
         get component() {
             return Reflection.getComponent(this.node);
+        }
+        forceUpdate() {
+            try {
+                const stateNode = Reflection.getStateNode(this.node);
+                if (!stateNode || !stateNode.forceUpdate) return;
+                stateNode.forceUpdate();
+            } catch (err) {
+                Logger.err('Reflection', err);
+            }
         }
         prop(propName) {
             const split = propName.split('.');

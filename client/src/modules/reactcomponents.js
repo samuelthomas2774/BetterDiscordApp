@@ -9,7 +9,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import Patcher from './patcher';
+import { MonkeyPatch, Patcher } from './patcher';
 import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
 import { EmoteModule } from 'builtin';
@@ -142,6 +142,19 @@ class Helpers {
         return null;
     }
 
+    static findProp(obj, what) {
+        if (obj.hasOwnProperty(what)) return obj[what];
+        if (obj.props && !obj.children) return this.findProp(obj.props, what);
+        if (!obj.children) return null;
+        if (!(obj.children instanceof Array)) return this.findProp(obj.children, what);
+        for (const child of obj.children) {
+            if (!child) continue;
+            const findInChild = this.findProp(child, what);
+            if (findInChild) return findInChild;
+        }
+        return null;
+    }
+
     static get ReactDOM() {
         return WebpackModules.getModuleByName('ReactDOM');
     }
@@ -153,81 +166,6 @@ class ReactComponent extends EventEmitter {
         this._id = id;
         this._component = component;
         this._retVal = retVal;
-        const self = this;
-        Patcher.slavepatch(this.component.prototype, 'componentWillMount', function (args, parv) {
-            self.emit('componentWillMount', {
-                component: this,
-                retVal: parv.retVal
-            });
-        });
-        Patcher.slavepatch(this.component.prototype, 'render', function (args, parv) {
-            self.emit('render', {
-                component: this,
-                retVal: parv.retVal
-            });
-        });
-        Patcher.slavepatch(this.component.prototype, 'componentDidMount', function (args, parv) {
-            self.emit('componentDidMount', {
-                component: this,
-                props: this.props,
-                state: this.state,
-                element: Helpers.ReactDOM.findDOMNode(this),
-                retVal: parv.retVal
-            });
-        });
-        Patcher.slavepatch(this.component.prototype, 'componentWillReceiveProps', function (args, parv) {
-            const [nextProps] = args;
-            self.emit('componentWillReceiveProps', {
-                component: this,
-                nextProps,
-                retVal: parv.retVal
-            });
-        });
-        Patcher.slavepatch(this.component.prototype, 'shouldComponentUpdate', function (args, parv) {
-            const [nextProps, nextState] = args;
-            self.emit('shouldComponentUpdate', {
-                component: this,
-                nextProps,
-                nextState,
-                retVal: parv.retVal
-            });
-        });
-        Patcher.slavepatch(this.component.prototype, 'componentWillUpdate', function (args, parv) {
-            const [nextProps, nextState] = args;
-            self.emit('componentWillUpdate', {
-                component: this,
-                nextProps,
-                nextState,
-                retVal: parv.retVal
-            });
-        });
-        Patcher.slavepatch(this.component.prototype, 'componentDidUpdate', function(args, parv) {
-            const [prevProps, prevState] = args;
-            self.emit('componentDidUpdate', {
-                component: this,
-                prevProps,
-                prevState,
-                props: this.props,
-                state: this.state,
-                element: Helpers.ReactDOM.findDOMNode(this),
-                retVal: parv.retVal
-            });
-        });
-        Patcher.slavepatch(this.component.prototype, 'componentWillUnmount', function (args, parv) {
-            self.emit('componentWillUnmount', {
-                component: this,
-                retVal: parv.retVal
-            });
-        });
-        Patcher.slavepatch(this.component.prototype, 'componentDidCatch', function (args, parv) {
-            const [error, info] = args;
-            self.emit('componentDidCatch', {
-                component: this,
-                error,
-                info,
-                retVal: parv.retVal
-            });
-        });
     }
 
     get id() {
@@ -243,88 +181,11 @@ class ReactComponent extends EventEmitter {
     }
 }
 
-export class ReactAutoPatcher {
-    static async autoPatch() {
-        await this.ensureReact();
-        Patcher.superpatch('React', 'createElement', (component, retVal) => ReactComponents.push(component, retVal));
-        this.patchem();
-    }
-
-    static async ensureReact() {
-        while (!window.webpackJsonp || !WebpackModules.getModuleByName('React'))
-            await new Promise(resolve => setTimeout(resolve, 10));
-    }
-
-    static patchem() {
-        this.patchMessage();
-        this.patchMessageGroup();
-        this.patchChannelMember();
-    }
-
-    static async patchMessage() {
-        this.Message.component = await ReactComponents.getComponent('Message', true, { selector: '.message' });
-        this.Message.component.on('render', ({ component, retVal, p }) => {
-            const { message } = component.props;
-            const { id, colorString, bot, author, attachments, embeds } = message;
-            retVal.props['data-message-id'] = id;
-            retVal.props['data-colourstring'] = colorString;
-            if (author && author.id) retVal.props['data-user-id'] = author.id;
-            if (bot || (author && author.bot)) retVal.props.className += ' bd-isBot';
-            if (attachments && attachments.length) retVal.props.className += ' bd-hasAttachments';
-            if (embeds && embeds.length) retVal.props.className += ' bd-hasEmbeds';
-            if (author && author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
-            try {
-                // First child has all the actual text content, second is the edited timestamp
-                const markup = Helpers.findByProp(retVal, 'className', 'markup').children;
-                markup[0] = EmoteModule.processMarkup(markup[0]);
-            } catch (err) {
-                Logger.err('ReactAutoPatcher', ['MARKUP PARSER ERROR', err]);
-            }
-        });
-    }
-
-    static async patchMessageGroup() {
-        ReactComponents.setName('MessageGroup', this.MessageGroup.filter);
-        this.MessageGroup.component = await ReactComponents.getComponent('MessageGroup', true, { selector: '.message-group' });
-        this.MessageGroup.component.on('render', ({ component, retVal, p }) => {
-            const authorid = component.props.messages[0].author.id;
-            retVal.props['data-author-id'] = authorid;
-            if (authorid === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
-        });
-    }
-
-    static async patchChannelMember() {
-        this.ChannelMember.component = await ReactComponents.getComponent('ChannelMember');
-        this.ChannelMember.component.on('render', ({ component, retVal, p }) => {
-            const { user, isOwner } = component.props;
-            retVal.props.children.props['data-member-id'] = user.id;
-            if (user.id === DiscordApi.currentUser.id) retVal.props.children.props.className += ' bd-isCurrentUser';
-            if (isOwner) retVal.props.children.props.className += ' bd-isOwner';
-        });
-    }
-
-    static get MessageGroup() {
-        return this._messageGroup || (
-            this._messageGroup = {
-                filter: Filters.byCode(/"message-group"[\s\S]*"has-divider"[\s\S]*"hide-overflow"[\s\S]*"is-local-bot-message"/, c => c.prototype && c.prototype.render)
-            });
-    }
-
-    static get Message() {
-        return this._message || (this._message = {});
-    }
-
-    static get ChannelMember() {
-        return this._channelMember || (
-            this._channelMember = {});
-    }
-}
-
 export class ReactComponents {
     static get components() { return this._components || (this._components = []) }
-    static get unknownComponents() { return this._unknownComponents || (this._unknownComponents = [])}
+    static get unknownComponents() { return this._unknownComponents || (this._unknownComponents = []) }
     static get listeners() { return this._listeners || (this._listeners = []) }
-    static get nameSetters() { return this._nameSetters || (this._nameSetters =[])}
+    static get nameSetters() { return this._nameSetters || (this._nameSetters = []) }
 
     static push(component, retVal) {
         if (!(component instanceof Function)) return null;
@@ -345,7 +206,7 @@ export class ReactComponents {
         return c;
     }
 
-    static async getComponent(name, important, importantArgs) {
+    static async getComponent(name, important) {
         const have = this.components.find(c => c.id === name);
         if (have) return have;
         if (important) {
@@ -355,11 +216,11 @@ export class ReactComponents {
                     clearInterval(importantInterval);
                     return;
                 }
-                const select = document.querySelector(importantArgs.selector);
+                const select = document.querySelector(important.selector);
                 if (!select) return;
                 const reflect = Reflection(select);
                 if (!reflect.component) {
-                    clearInterval(important);
+                    clearInterval(importantInterval);
                     Logger.err('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select]);
                     return;
                 }
@@ -396,7 +257,8 @@ export class ReactComponents {
     static processUnknown(component, retVal) {
         const have = this.unknownComponents.find(c => c.component === component);
         for (const [fi, filter] of this.nameSetters.entries()) {
-            if (filter.filter(component)) {
+            if (filter.filter.filter(component)) {
+                console.log('filter match!');
                 component.displayName = filter.name;
                 this.nameSetters.splice(fi, 1);
                 return this.push(component, retVal);
@@ -405,5 +267,63 @@ export class ReactComponents {
         if (have) return have;
         this.unknownComponents.push(component);
         return component;
+    }
+}
+
+export class ReactAutoPatcher {
+    static async autoPatch() {
+        await this.ensureReact();
+        this.React = {};
+        this.React.unpatchCreateElement = MonkeyPatch('BD:ReactComponents:createElement', 'React').before('createElement', (component, args) => {
+            ReactComponents.push(args[0]);
+        });
+        this.patchComponents();
+        return 1;
+    }
+
+    static async ensureReact() {
+        while (!window.webpackJsonp || !WebpackModules.getModuleByName('React')) await new Promise(resolve => setTimeout(resolve, 10));
+        return 1;
+    }
+
+    static async patchComponents() {
+        this.patchMessage();
+        this.patchMessageGroup();
+        this.patchChannelMember();
+    }
+
+    static async patchMessage() {
+        this.Message = await ReactComponents.getComponent('Message', { selector: '.message' });
+        this.unpatchMessageRender = MonkeyPatch('BD:ReactComponents', this.Message.component.prototype).after('render', (component, args, retVal) => {
+            const { message } = component.props;
+            const { id, colorString, bot, author, attachments, embeds } = message;
+            retVal.props['data-message-id'] = id;
+            retVal.props['data-colourstring'] = colorString;
+            if (author && author.id) retVal.props['data-user-id'] = author.id;
+            if (bot || (author && author.bot)) retVal.props.className += ' bd-isBot';
+            if (attachments && attachments.length) retVal.props.className += ' bd-hasAttachments';
+            if (embeds && embeds.length) retVal.props.className += ' bd-hasEmbeds';
+            if (author && author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+        });
+    }
+
+    static async patchMessageGroup() {
+        this.MessageGroup = await ReactComponents.getComponent('MessageGroup', { selector: '.message-group' });
+        this.unpatchMessageGroupRender = MonkeyPatch('BD:ReactComponents', this.MessageGroup.component.prototype).after('render', (component, args, retVal) => {
+            const { author, type } = component.props.messages[0];
+            retVal.props['data-author-id'] = author.id;
+            if (author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+            if (type !== 0) retVal.props.className += ' bd-isSystemMessage';
+        });
+    }
+
+    static async patchChannelMember() {
+        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member.member-status' });
+        this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
+            if (!retVal.props || !retVal.props.children || !retVal.props.children.length) return;
+            const user = Helpers.findProp(component, 'user');
+            if (!user) return;
+            retVal.props['data-user-id'] = user.id;
+        });
     }
 }

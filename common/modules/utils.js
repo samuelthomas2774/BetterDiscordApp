@@ -17,6 +17,9 @@ import { PatchedFunction, Patch } from './monkeypatch';
 import filetype from 'file-type';
 
 export class Utils {
+    static isArrowFunction(fn) {
+        return !fn.toString().startsWith('function');
+    }
     static overload(fn, cb) {
         const orig = fn;
         return function (...args) {

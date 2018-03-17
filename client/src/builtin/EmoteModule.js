@@ -9,7 +9,7 @@
 */
 
 import { FileUtils, ClientLogger as Logger } from 'common';
-import { Events, Globals, WebpackModules, ReactComponents } from 'modules';
+import { Events, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
 import { DOM, VueInjector } from 'ui';
 import EmoteComponent from './EmoteComponent.vue';
 
@@ -20,11 +20,17 @@ export default class {
     static get searchCache() {
         return this._searchCache || (this._searchCache = {});
     }
+
     static get emoteDb() {
         return emotes;
     }
+
     static get React() {
         return WebpackModules.getModuleByName('React');
+    }
+
+    static get ReactDOM() {
+        return WebpackModules.getModuleByName('ReactDOM');
     }
 
     static processMarkup(markup) {
@@ -79,17 +85,49 @@ export default class {
         }
     }
 
+    static findByProp(obj, what, value) {
+        if (obj.hasOwnProperty(what) && obj[what] === value) return obj;
+        if (obj.props && !obj.children) return this.findByProp(obj.props, what, value);
+        if (!obj.children || !obj.children.length) return null;
+        for (const child of obj.children) {
+            if (!child) continue;
+            const findInChild = this.findByProp(child, what, value);
+            if (findInChild) return findInChild;
+        }
+        return null;
+    }
+
     static async observe() {
         const dataPath = Globals.getObject('paths').find(path => path.id === 'data').path;
         try {
             emotes = await FileUtils.readJsonFromFile(dataPath + '/emotes.json');
-            const Message = await ReactComponents.getComponent('Message');
-            Message.on('componentDidMount', ({ element }) => this.injectEmotes(element));
-            Message.on('componentDidUpdate', ({ state, element }) => {
-                if (!state.isEditing) this.injectEmotes(element);
-            });
         } catch (err) {
             emotes = [];
+            Logger.err('EmoteModule', [`Error loading emotes - make sure you've downloaded the emote data and placed it in ${dataPath}/emotes.json`, err]);
+        }
+
+        try {
+            const Message = await ReactComponents.getComponent('Message');
+            this.unpatchRender = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('render', (component, args, retVal) => {
+                try {
+                    const markup = this.findByProp(retVal, 'className', 'markup'); // First child has all the actual text content, second is the edited timestamp
+                    if (!markup) return;
+                    markup.children[0] = this.processMarkup(markup.children[0]);
+                } catch (err) {
+                    Logger.err('EmoteModule', err);
+                }
+            });
+            this.unpatchMount = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidMount', (component, args) => {
+                const element = this.ReactDOM.findDOMNode(component);
+                if (!element) return;
+                this.injectEmotes(element);
+            });
+            this.unpatchUpdate = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidUpdate', (component, args) => {
+                const element = this.ReactDOM.findDOMNode(component);
+                if (!element) return;
+                this.injectEmotes(element);
+            });
+        } catch (err) {
             Logger.err('EmoteModule', err);
         }
     }
@@ -97,9 +135,12 @@ export default class {
     static injectEmote(root) {
         if (!emotesEnabled) return;
         const emote = root.dataset;
+        while (root.firstChild) {
+            root.removeChild(root.firstChild);
+        }
         if (!emote) return;
         VueInjector.inject(e, {
-            template: `<EmoteComponent :src="emote.src" :name="emote.name" />`,
+            template: `<EmoteComponent :src="emote.bdemoteSrc" :name="emote.bdemoteName" />`,
             components: { EmoteComponent },
             data: { emote }
         }, DOM.createElement('span'));

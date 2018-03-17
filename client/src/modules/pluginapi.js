@@ -8,7 +8,6 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, ClientLogger as Logger, ClientIPC } from 'common';
 import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
@@ -17,9 +16,11 @@ import Events from './events';
 import EventsWrapper from './eventswrapper';
 import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
+import { ReactComponents } from './reactcomponents';
+import { MonkeyPatch } from './patcher';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { BdMenuItems, Modals, DOM, Reflection } from 'ui';
-import { ReactComponents } from './reactcomponents';
+import { Utils, ClientLogger as Logger, ClientIPC } from 'common';
 
 export default class PluginApi {
 
@@ -440,6 +441,10 @@ export default class PluginApi {
 
     get Reflection() {
         return Reflection;
+    }
+
+    get MonkeyPatch() {
+        return module => MonkeyPatch(this.pluginInfo.id, module);
     }
 
     get Filters() {

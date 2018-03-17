@@ -8,6 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { ClientLogger as Logger } from 'common';
+
 class Reflection {
     static reactInternalInstance(node) {
         if (!node) return null;

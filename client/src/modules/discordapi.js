@@ -125,7 +125,7 @@ export default class DiscordApi {
         return List.from(friends, id => User.fromId(id));
     }
 
-    get UserPreferences() {
+    static get UserPreferences() {
         return UserPreferences;
     }
 
@@ -141,6 +141,40 @@ export default class DiscordApi {
 }
 
 export class UserPreferences {
+    /**
+     * Opens Discord's settings UI.
+     */
+    static open(section = 'account') {
+        Modules.UserSettingsWindow.setSection(this.settingsWindowSections[section] || section);
+        Modules.UserSettingsWindow.open();
+    }
+
+    /**
+     * An object mapping sections in the settings window to the names Discord uses.
+     */
+    static get settingsWindowSections() {
+        // _bd.Utils.monkeyPatch(_bd.WebpackModules.getModuleByName('UserSettingsWindow'), 'setSection', 'before', (data, section) => _bd.Logger.log('console', ['Opening section', section]))
+        return this._settingswindowsections || (this._settingswindowsections = {
+            account: 'ACCOUNT',
+            privacy: 'PRIVACY_AND_SAFETY',
+            apps: 'AUTHORIZED_APPS',
+            connections: 'CONNECTIONS',
+            nitro: 'PREMIUM',
+            voice: 'VOICE',
+            video: 'VOICE',
+            notifications: 'NOTIFICATIONS',
+            keybinds: 'KEYBINDS',
+            games: 'GAMES',
+            text: 'TEXT',
+            images: 'TEXT',
+            appearance: 'APPEARANCE',
+            streamer: 'STREAMER_MODE',
+            language: 'LOCALE',
+            experiments: 'EXPERIMENTS',
+            developer: 'DEVELOPER_OPTIONS'
+        });
+    }
+
     /**
      * The user's chosen status. Either "online", "idle", "dnd" or "invisible".
      */

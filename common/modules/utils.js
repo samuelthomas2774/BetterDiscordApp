@@ -179,14 +179,22 @@ export class Utils {
      * @param {Any} value The value to clone
      * @return {Any} The cloned value
      */
-    static deepclone(value) {
+    static deepclone(value, clonedObjects) {
+        if (!clonedObjects) clonedObjects = new Map();
+        if (clonedObjects.has(value)) return clonedObjects.get(value);
+
         if (typeof value === 'object') {
-            if (value instanceof Array) return value.map(i => this.deepclone(i));
+            if (value instanceof Array) {
+                const clone = value.map(i => this.deepclone(i, clonedObjects));
+                clonedObjects.set(value, clone);
+                return clone;
+            }
 
             const clone = Object.assign({}, value);
+            clonedObjects.set(value, clone);
 
             for (let key in clone) {
-                clone[key] = this.deepclone(clone[key]);
+                clone[key] = this.deepclone(clone[key], clonedObjects);
             }
 
             return clone;
@@ -198,19 +206,25 @@ export class Utils {
     /**
      * Freezes an object and all it's properties.
      * @param {Any} object The object to freeze
-     * @param {Function} exclude A function to filter object that shouldn't be frozen
+     * @param {Function} exclude A function to filter objects that shouldn't be frozen
      */
-    static deepfreeze(object, exclude) {
-        if (exclude && exclude(object)) return;
+    static deepfreeze(object, exclude, frozenObjects) {
+        if (!frozenObjects) frozenObjects = new Set();
+        if (frozenObjects.has(object)) return object;
+
+        if (exclude && exclude(object)) return object;
 
         if (typeof object === 'object' && object !== null) {
+            frozenObjects.add(object);
+
             const properties = Object.getOwnPropertyNames(object);
 
             for (let property of properties) {
-                this.deepfreeze(object[property], exclude);
+                this.deepfreeze(object[property], exclude, frozenObjects);
             }
 
-            Object.freeze(object);
+            if (!Object.isFrozen(object))
+                Object.freeze(object);
         }
 
         return object;

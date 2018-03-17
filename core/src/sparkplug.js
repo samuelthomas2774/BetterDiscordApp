@@ -11,15 +11,13 @@
  */
 
 (() => {
-    if (window.__bd && window.__bd.ignited) return;
-
     console.log('[BetterDiscord|Sparkplug]');
 
     const ls = window.localStorage;
     if (!ls) console.warn('[BetterDiscord|Sparkplug] Failed to hook localStorage :(');
     const wsOrig = window.WebSocket;
 
-    const bd = window.__bd = {
+    const bd = module.exports.bd = {
         localStorage: ls,
         wsHook: null,
         wsOrig,

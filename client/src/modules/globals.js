@@ -12,6 +12,8 @@ import Module from './module';
 import Events from './events';
 import { ClientIPC } from 'bdipc';
 
+import sparkplug from 'sparkplug';
+
 export default new class extends Module {
 
     constructor(args) {
@@ -40,8 +42,8 @@ export default new class extends Module {
             };
             window.jQuery = {};
 
-            if (window.__bd) {
-                this.setState({ bd: window.__bd });
+            if (sparkplug.bd) {
+                this.setState({ bd: sparkplug.bd });
                 this.bd.setWS = this.setWS;
             }
 

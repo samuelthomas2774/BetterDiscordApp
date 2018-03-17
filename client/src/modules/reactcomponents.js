@@ -15,6 +15,7 @@ import DiscordApi from './discordapi';
 import { EmoteModule } from 'builtin';
 import { Reflection } from 'ui';
 import { ClientLogger as Logger } from 'common';
+import EventEmitter from 'events';
 
 class Helpers {
     static get plannedActions() {
@@ -146,26 +147,27 @@ class Helpers {
     }
 }
 
-class ReactComponent {
+class ReactComponent extends EventEmitter {
     constructor(id, component, retVal) {
+        super();
         this._id = id;
         this._component = component;
         this._retVal = retVal;
         const self = this;
-        Patcher.slavepatch(this.component.prototype, 'componentWillMount', function(args, parv) {
-            self.eventCallback('componentWillMount', {
+        Patcher.slavepatch(this.component.prototype, 'componentWillMount', function (args, parv) {
+            self.emit('componentWillMount', {
                 component: this,
                 retVal: parv.retVal
             });
         });
         Patcher.slavepatch(this.component.prototype, 'render', function (args, parv) {
-            self.eventCallback('render', {
+            self.emit('render', {
                 component: this,
                 retVal: parv.retVal
             });
         });
         Patcher.slavepatch(this.component.prototype, 'componentDidMount', function (args, parv) {
-            self.eventCallback('componentDidMount', {
+            self.emit('componentDidMount', {
                 component: this,
                 props: this.props,
                 state: this.state,
@@ -175,7 +177,7 @@ class ReactComponent {
         });
         Patcher.slavepatch(this.component.prototype, 'componentWillReceiveProps', function (args, parv) {
             const [nextProps] = args;
-            self.eventCallback('componentWillReceiveProps', {
+            self.emit('componentWillReceiveProps', {
                 component: this,
                 nextProps,
                 retVal: parv.retVal
@@ -183,7 +185,7 @@ class ReactComponent {
         });
         Patcher.slavepatch(this.component.prototype, 'shouldComponentUpdate', function (args, parv) {
             const [nextProps, nextState] = args;
-            self.eventCallback('shouldComponentUpdate', {
+            self.emit('shouldComponentUpdate', {
                 component: this,
                 nextProps,
                 nextState,
@@ -192,7 +194,7 @@ class ReactComponent {
         });
         Patcher.slavepatch(this.component.prototype, 'componentWillUpdate', function (args, parv) {
             const [nextProps, nextState] = args;
-            self.eventCallback('componentWillUpdate', {
+            self.emit('componentWillUpdate', {
                 component: this,
                 nextProps,
                 nextState,
@@ -201,7 +203,7 @@ class ReactComponent {
         });
         Patcher.slavepatch(this.component.prototype, 'componentDidUpdate', function(args, parv) {
             const [prevProps, prevState] = args;
-            self.eventCallback('componentDidUpdate', {
+            self.emit('componentDidUpdate', {
                 component: this,
                 prevProps,
                 prevState,
@@ -212,46 +214,20 @@ class ReactComponent {
             });
         });
         Patcher.slavepatch(this.component.prototype, 'componentWillUnmount', function (args, parv) {
-            self.eventCallback('componentWillUnmount', {
+            self.emit('componentWillUnmount', {
                 component: this,
                 retVal: parv.retVal
             });
         });
         Patcher.slavepatch(this.component.prototype, 'componentDidCatch', function (args, parv) {
             const [error, info] = args;
-            self.eventCallback('componentDidCatch', {
+            self.emit('componentDidCatch', {
                 component: this,
                 error,
                 info,
                 retVal: parv.retVal
             });
         });
-    }
-
-    eventCallback(event, eventData) {
-        for (const listener of this.events.find(e => e.id === event).listeners) {
-            listener(eventData);
-        }
-    }
-
-    get events() {
-        return this._events || (this._events = [
-            { id: 'componentWillMount', listeners: [] },
-            { id: 'render', listeners: [] },
-            { id: 'componentDidMount', listeners: [] },
-            { id: 'componentWillReceiveProps', listeners: [] },
-            { id: 'shouldComponentUpdate', listeners: [] },
-            { id: 'componentWillUpdate', listeners: [] },
-            { id: 'componentDidUpdate', listeners: [] },
-            { id: 'componentWillUnmount', listeners: [] },
-            { id: 'componentDidCatch', listeners: [] }
-        ]);
-    }
-
-    on(event, callback) {
-        const have = this.events.find(e => e.id === event);
-        if (!have) return;
-        have.listeners.push(callback);
     }
 
     get id() {

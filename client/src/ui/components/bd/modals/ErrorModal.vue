@@ -30,8 +30,7 @@
     // Imports
     import { Modal } from '../../common';
     import { MiError } from '../../common/MaterialIcon';
-
-    const process = window.require('process');
+    import process from 'process';
 
     export default {
         props: ['modal'],

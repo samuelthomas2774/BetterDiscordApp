@@ -26,13 +26,13 @@
 <script>
     import { shell } from 'electron';
     import { ClientIPC } from 'common';
+    import process from 'process';
     import Combokeys from 'combokeys';
     import CombokeysRecord from 'combokeys/plugins/record';
 
     const combokeys = new Combokeys(document);
     CombokeysRecord(combokeys);
 
-    const process = window.require('process');
     const modifierKey = process.platform === 'darwin' ? 'meta' : 'ctrl';
 
     export default {

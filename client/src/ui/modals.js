@@ -21,27 +21,26 @@ class Modal extends AsyncEventEmitter {
     constructor(_modal, component) {
         super();
 
-        for (let key in _modal)
-            this[key] = _modal[key];
+        Object.assign(this, _modal);
 
         const modal = this;
         this.component = this.component || {
-            template: '<custom-modal :modal="modal" />',
+            template: '<custom-modal :modal="modal" :BaseModal="BaseModal" />',
             components: { 'custom-modal': component },
-            data() { return { modal }; },
+            data() { return { modal, BaseModal }; },
             mounted() {
                 modal.vueInstance = this;
                 modal.vue = this.$children[0];
             }
         };
 
-        this.closing = false;
         this.id = Date.now();
         this.vueInstance = undefined;
         this.vue = undefined;
 
         this.close = this.close.bind(this);
         this.closed = this.once('closed');
+        this.closing = false;
     }
 
     /**

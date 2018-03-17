@@ -1,0 +1,12 @@
+{
+    "info": {
+        "id": "patcher-test",
+        "name": "Patcher Test",
+        "authors": [ "Jiiks" ],
+        "version": 1.0,
+        "description": "Patcher Test Description"
+    },
+    "main": "index.js",
+    "type": "plugin",
+    "defaultConfig": []
+}

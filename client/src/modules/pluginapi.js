@@ -20,6 +20,7 @@ import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs'
 import { BdMenuItems, Modals, DOM, Reflection } from 'ui';
 import DiscordApi from './discordapi';
 import { ReactComponents } from './reactcomponents';
+import { MonkeyPatch } from './patcher';
 
 export default class PluginApi {
 
@@ -38,6 +39,9 @@ export default class PluginApi {
     }
     get Reflection() {
         return Reflection;
+    }
+    get MonkeyPatch() {
+        return module => MonkeyPatch(this.pluginInfo.id, module);
     }
     get plugin() {
         return PluginManager.getPluginById(this.pluginInfo.id || this.pluginInfo.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-'));

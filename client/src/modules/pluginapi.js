@@ -15,7 +15,7 @@ import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
 import EventsWrapper from './eventswrapper';
-import { WebpackModules } from './webpackmodules';
+import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { BdMenuItems, Modals, DOM, Reflection } from 'ui';
@@ -391,8 +391,8 @@ export default class PluginApi {
     getWebpackModuleByName(name, fallback) {
         return WebpackModules.getModuleByName(name, fallback);
     }
-    getWebpackModuleByRegex(regex, first = true) {
-        return WebpackModules.getModuleByRegex(regex, first);
+    getWebpackModuleByRegex(regex, selector, first = true) {
+        return WebpackModules.getModuleByRegex(regex, selector, first);
     }
     getWebpackModuleByProperties(...props) {
         return WebpackModules.getModuleByProps(props, true);
@@ -440,6 +440,10 @@ export default class PluginApi {
 
     get Reflection() {
         return Reflection;
+    }
+
+    get Filters() {
+        return Filters;
     }
 
 }

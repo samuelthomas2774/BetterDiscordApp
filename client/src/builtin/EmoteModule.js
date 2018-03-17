@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { FileUtils } from 'common';
+import { FileUtils, ClientLogger as Logger } from 'common';
 import { Events, Globals, WebpackModules, ReactComponents } from 'modules';
 import { DOM, VueInjector } from 'ui';
 import EmoteComponent from './EmoteComponent.vue';
@@ -90,7 +90,7 @@ export default class {
             });
         } catch (err) {
             emotes = [];
-            console.log(err);
+            Logger.err('EmoteModule', err);
         }
     }
 

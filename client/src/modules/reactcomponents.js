@@ -14,6 +14,7 @@ import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
 import { EmoteModule } from 'builtin';
 import { Reflection } from 'ui';
+import { ClientLogger as Logger } from 'common';
 
 class Helpers {
     static get plannedActions() {
@@ -297,10 +298,11 @@ export class ReactAutoPatcher {
             if (embeds && embeds.length) retVal.props.className += ' bd-hasEmbeds';
             if (author && author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
             try {
-                const markup = Helpers.findByProp(retVal, 'className', 'markup').children; // First child has all the actual text content, second is the edited timestamp
+                // First child has all the actual text content, second is the edited timestamp
+                const markup = Helpers.findByProp(retVal, 'className', 'markup').children;
                 markup[0] = EmoteModule.processMarkup(markup[0]);
             } catch (err) {
-                console.error('MARKUP PARSER ERROR', err);
+                Logger.err('ReactAutoPatcher', ['MARKUP PARSER ERROR', err]);
             }
         });
     }
@@ -373,7 +375,7 @@ export class ReactComponents {
         if (important) {
             const importantInterval = setInterval(() => {
                 if (this.components.find(c => c.id === name)) {
-                    console.info(`Important component ${name} already found`);
+                    Logger.info('ReactComponents', `Important component ${name} already found`);
                     clearInterval(importantInterval);
                     return;
                 }
@@ -382,11 +384,11 @@ export class ReactComponents {
                 const reflect = Reflection(select);
                 if (!reflect.component) {
                     clearInterval(important);
-                    console.error(`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select);
+                    Logger.err('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select]);
                     return;
                 }
                 if (!reflect.component.displayName) reflect.component.displayName = name;
-                console.info(`Found important component ${name} with reflection.`);
+                Logger.info('ReactComponents', `Found important component ${name} with reflection`);
                 this.push(reflect.component);
                 clearInterval(importantInterval);
             }, 50);

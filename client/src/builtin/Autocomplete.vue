@@ -24,10 +24,12 @@
 </template>
 <script>
     import EmoteModule from '../../../builtin/Emotemodule.js';
+    import { ClientLogger as Logger } from 'common';
+
     export default {
         props: ['title', 'emotes'],
         beforeMount() {
-            console.log(EmoteModule);
+            Logger.log('Autocomplete', EmoteModule);
         }
     }
 </script>

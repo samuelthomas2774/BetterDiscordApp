@@ -34,6 +34,7 @@
     "gulp-babel": "^7.0.0",
     "gulp-plumber": "^1.2.0",
     "gulp-watch": "^5.0.0",
+    "html-webpack-plugin": "^3.0.6",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
     "nedb": "^1.8.0",
@@ -57,6 +58,7 @@
     "build_core": "npm run build --prefix core",
     "watch_core": "npm run watch --prefix core",
     "watch_csseditor": "npm run watch --prefix csseditor",
+    "build_installer": "npm run build --prefix installer",
     "lint": "eslint -f unix client/src core/src csseditor/src",
     "test": "npm run build && npm run lint",
     "build_node-sass": "node scripts/build-node-sass.js"

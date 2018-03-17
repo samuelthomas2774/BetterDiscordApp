@@ -90,11 +90,13 @@ class Reflection {
     }
 
     static getComponent(node, first = true) {
+        // IMPORTANT TODO Currently only checks the first found component. For example channel-member will not return the correct component
         try {
             return this.reactInternalInstance(node).return.type;
         } catch (err) {
             return null;
         }
+        /*
         if (!node) return null;
         if (first) node = this.reactInternalInstance(node);
         if (node.hasOwnProperty('return')) {
@@ -103,12 +105,7 @@ class Reflection {
         }
         if (node.hasOwnProperty('type')) return node.type;
         return null;
-        // IMPORTANT TODO Currently only checks the first found component. For example channel-member will not return the correct component
-        try {
-            return this.reactInternalInstance(node).return.type;
-        } catch (err) {
-            return null;
-        }
+        */
     }
 }
 

@@ -116,7 +116,7 @@ export default class {
                 this.injectEmotes(element);
             });
         } catch (err) {
-            console.log(err);
+            Logger.err('EmoteModule', err);
         }
     }
 

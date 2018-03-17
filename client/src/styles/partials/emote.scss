@@ -6,6 +6,8 @@
     font-size: 0;
 }
 .bd-emotewrapper {
+    display: flex;
+    max-height: 32px;
     img {
         height: 32px;
         margin: 0 .05em 0 .1em !important;

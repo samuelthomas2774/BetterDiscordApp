@@ -9,7 +9,7 @@
 */
 
 import { DOM, BdUI, Modals, Reflection, BdMenuItems } from 'ui';
-import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi, Patcher, MonkeyPatch, ReactComponents, ReactAutoPatcher, Vendor } from 'modules';
+import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, DiscordApi, Patcher, MonkeyPatch, ReactComponents, ReactAutoPatcher, Updater, Vendor } from 'modules';
 import { Utils, ClientLogger as Logger, ClientIPC } from 'common';
 import { EmoteModule } from 'builtin';
 import BdCss from './styles/index.scss';

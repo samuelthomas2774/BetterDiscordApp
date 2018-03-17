@@ -91,7 +91,6 @@
     {
         "id": "css",
         "text": "CSS Editor",
-        "hidden": true,
         "settings": [
             {
                 "category": "default",

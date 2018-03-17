@@ -9,7 +9,7 @@
 */
 import { FileUtils, ClientLogger as Logger } from 'common';
 import { Events, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
-import { DOM, VueInjector } from 'ui';
+import { DOM, VueInjector, Reflection } from 'ui';
 import EmoteComponent from './EmoteComponent.vue';
 let emotes = null;
 const emotesEnabled = true;
@@ -105,12 +105,16 @@ export default class {
                     Logger.err('EmoteModule', err);
                 }
             });
-            this.unpatchMount = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidMount', (component, args) => {
+            for (const message of document.querySelectorAll('.message')) {
+                Reflection(message).forceUpdate();
+            }
+            this.injectAll();
+            this.unpatchMount = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidMount', component => {
                 const element = this.ReactDOM.findDOMNode(component);
                 if (!element) return;
                 this.injectEmotes(element);
             });
-            this.unpatchUpdate = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidUpdate', (component, args) => {
+            this.unpatchUpdate = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidUpdate', component => {
                 const element = this.ReactDOM.findDOMNode(component);
                 if (!element) return;
                 this.injectEmotes(element);

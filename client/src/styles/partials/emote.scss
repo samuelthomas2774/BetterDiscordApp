@@ -1,11 +1,18 @@
+.bd-emote-outer {
+    display: inline-block;
+    height: 32px;
+}
 .bd-emote-outer.bd-is-emote {
     font-size: 0;
 }
 .bd-emotewrapper {
-    position: relative;
-    display: inline-block;
-
     img {
+        height: 32px;
+        margin: 0 .05em 0 .1em !important;
+        min-height: 22px;
+        min-width: 22px;
+        object-fit: contain;
+        vertical-align: -.4em;
         max-height: 32px;
     }
 }

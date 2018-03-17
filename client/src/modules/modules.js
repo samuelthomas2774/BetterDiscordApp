@@ -15,5 +15,5 @@ export { default as Permissions } from './permissionmanager';
 export { default as Database } from './database';
 export { default as EventsWrapper } from './eventswrapper';
 export { default as DiscordApi } from './discordapi';
-export { default as Patcher } from './patcher';
+export * from './patcher';
 export * from './reactcomponents';

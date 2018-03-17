@@ -9,31 +9,63 @@
 */
 
 import { WebpackModules } from './webpackmodules';
-import { ClientLogger as Logger } from 'common';
+import { ClientLogger as Logger, Utils } from 'common';
 
-export default class Patcher {
+export class Patcher {
     static get patches() { return this._patches || (this._patches = {}) }
+    static getPatchesByCaller(id) {
+        const patches = [];
+        for (const patch in this.patches) {
+            if (this.patches.hasOwnProperty(patch)) {
+                if (this.patches[patch].caller === id) patches.push(this.patches[patch]);
+            }
+        }
+        return patches;
+    }
+    static unpatchAll(patches) {
+        for (const patch of patches) {
+            for (const child of patch.children) {
+                child.unpatch();
+            }
+        }
+    }
     static resolveModule(module) {
         if (module instanceof Function || (module instanceof Object && !(module instanceof Array))) return module;
         if ('string' === typeof module) return WebpackModules.getModuleByName(module);
         if (module instanceof Array) return WebpackModules.getModuleByProps(module);
         return null;
     }
+
     static overrideFn(patch) {
         return function () {
-            for (const superPatch of patch.supers) {
+            let retVal = null;
+            if (!patch.children) return patch.originalFunction.apply(this, arguments);
+            for (const superPatch of patch.children.filter(c => c.type === 'before')) {
                 try {
-                    superPatch.callback.apply(this, arguments);
+                    superPatch.callback(this, arguments);
                 } catch (err) {
-                    Logger.err('Patcher', err);
+                    Logger.err(`Patcher:${patch.id}`, err);
                 }
             }
-            const retVal = patch.originalFunction.apply(this, arguments);
-            for (const slavePatch of patch.slaves) {
+
+            const insteads = patch.children.filter(c => c.type === 'instead');
+            if (!insteads.length) {
+                retVal = patch.originalFunction.apply(this, arguments);
+            } else {
+                for (const insteadPatch of insteads) {
+                    try {
+                        retVal = insteadPatch.callback(this, arguments);
+                    } catch (err) {
+                        Logger.err(`Patcher:${patch.id}`, err);
+                    }
+                }
+            }
+
+            for (const slavePatch of patch.children.filter(c => c.type === 'after')) {
                 try {
-                    slavePatch.callback.apply(this, [arguments, { patch, retVal }]);
+                    slavePatch.callback(this, arguments, retVal);
                 } catch (err) {
-                    Logger.err('Patcher', err);
+                    Logger.err(`Patcher:${patch.id}`, err);
                 }
             }
             return retVal;
@@ -44,59 +76,56 @@ export default class Patcher {
         patch.proxyFunction = patch.module[patch.functionName] = this.overrideFn(patch);
     }
 
-    static pushPatch(id, module, functionName) {
+    static pushPatch(caller, id, module, functionName) {
         const patch = {
+            caller,
+            id,
             module,
             functionName,
             originalFunction: module[functionName],
             proxyFunction: null,
-            revert: () => {
+            revert: () => { // Calling revert will destroy any patches added to the same module after this
                 patch.module[patch.functionName] = patch.originalFunction;
                 patch.proxyFunction = null;
                 patch.slaves = patch.supers = [];
             },
-            supers: [],
-            slaves: []
+            counter: 0,
+            children: []
         };
         patch.proxyFunction = module[functionName] = this.overrideFn(patch);
         return this.patches[id] = patch;
     }
 
-    static superpatch(unresolveModule, functionName, callback, displayName) {
-        const module = this.resolveModule(unresolveModule);
+    static before() { return this.pushChildPatch(...arguments, 'before') }
+    static after() { return this.pushChildPatch(...arguments, 'after') }
+    static instead() { return this.pushChildPatch(...arguments, 'instead') }
+    static pushChildPatch(caller, unresolvedModule, functionName, callback, displayName, type = 'after') {
+        const module = this.resolveModule(unresolvedModule);
         if (!module || !module[functionName] || !(module[functionName] instanceof Function)) return null;
-        displayName = 'string' === typeof unresolveModule ? unresolveModule : displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
-        const patchId = `${displayName}:${functionName}`;
+        displayName = 'string' === typeof unresolvedModule ? unresolvedModule : displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
+        const patchId = `${displayName}:${functionName}:${caller}`;
 
-        const patch = this.patches[patchId] || this.pushPatch(patchId, module, functionName);
+        const patch = this.patches[patchId] || this.pushPatch(caller, patchId, module, functionName);
         if (!patch.proxyFunction) this.rePatch(patch);
-        const id = patch.supers.length + 1;
-        const superPatch = {
-            id,
+        const child = {
+            caller,
+            type,
+            id: patch.counter,
             callback,
-            unpactch: () => patch.slaves.splice(patch.slaves.findIndex(slave => slave.id === id), 1) // This doesn't actually work correctly not, fix in a moment
+            unpatch: () => {
+                patch.children.splice(patch.children.findIndex(cpatch => cpatch.id === child.id && cpatch.type === type), 1);
+                if (patch.children.length <= 0) delete this.patches[patchId];
+            }
         };
-
-        patch.supers.push(superPatch);
-        return superPatch;
+        patch.children.push(child);
+        patch.counter++;
+        return child.unpatch;
     }
 
-    static slavepatch(unresolveModule, functionName, callback, displayName) {
-        const module = this.resolveModule(unresolveModule);
-        if (!module || !module[functionName] || !(module[functionName] instanceof Function)) return null;
-        displayName = 'string' === typeof unresolveModule ? unresolveModule : displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
-        const patchId = `${displayName}:${functionName}`;
-
-        const patch = this.patches[patchId] || this.pushPatch(patchId, module, functionName);
-        if (!patch.proxyFunction) this.rePatch(patch);
-        const id = patch.slaves.length + 1;
-        const slavePatch = {
-            id,
-            callback,
-            unpactch: () => patch.slaves.splice(patch.slaves.findIndex(slave => slave.id === id), 1) // This doesn't actually work correctly not, fix in a moment
-        };
-
-        patch.slaves.push(slavePatch);
-        return slavePatch;
-    }
 }
+
+export const MonkeyPatch = (caller, module, displayName) => ({
+    before: (functionName, callBack) => Patcher.before(caller, module, functionName, callBack, displayName),
+    after: (functionName, callBack) => Patcher.after(caller, module, functionName, callBack, displayName),
+    instead: (functionName, callBack) => Patcher.instead(caller, module, functionName, callBack, displayName)
+});

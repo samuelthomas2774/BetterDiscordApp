@@ -8,10 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, SocketProxy, EventHook, CssEditor } from 'modules';
+import { Events, SocketProxy, EventHook, CssEditor, Updater } from 'modules';
 import { ProfileBadges } from 'ui';
 import { ClientLogger as Logger } from 'common';
-import Updater from './updater';
 
 /**
  * Module Manager initializes all modules when everything is ready.

@@ -15,8 +15,6 @@ let items = 0;
 const BdMenuItems = new class {
 
     constructor() {
-        window.bdmenu = this;
-
         this.items = [];
 
         this.addSettingsSet('Internal', 'core', 'Core');

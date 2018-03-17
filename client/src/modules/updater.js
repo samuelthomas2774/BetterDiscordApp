@@ -16,7 +16,6 @@ import { ClientLogger as Logger } from 'common';
 export default class {
 
     constructor() {
-        window.updater = this;
         this.updatesAvailable = false;
         this.init = this.init.bind(this);
         this.checkForUpdates = this.checkForUpdates.bind(this);

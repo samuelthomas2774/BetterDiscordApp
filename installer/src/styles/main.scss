@@ -1,0 +1,31 @@
+@import url(https://fonts.googleapis.com/css?family=Inconsolata);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+* {
+    font-family: 'Open Sans', sans-serif;
+    color: #ebebeb;
+    user-select: none;
+    -webkit-user-select: none;
+    outline: none;
+}
+
+.root {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
+
+.license-text:hover::-webkit-scrollbar-thumb {
+    background: $blue;
+}
+
+::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar, ::-webkit-scrollbar-track-piece {
+    background: transparent;
+    width: 5px;
+}

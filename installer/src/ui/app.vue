@@ -10,9 +10,9 @@
                 <div class="bg-logo"></div>
                 <Sidebar :activeIndex="selectedIndex" version="2.0.0" />
                 <div class="content">
-                    <Intro v-if="selectedPanel === 0"/>
-                    <License v-if="selectedPanel === 1"/>
-                    <Destination v-if="selectedPanel === 2" :paths="paths" :setChannel="setChannel" :dataPath="dataPath"/>
+                    <Intro v-if="selectedPanel === 0" />
+                    <License v-if="selectedPanel === 1" />
+                    <Destination v-if="selectedPanel === 2" :paths="paths" :channel="currentChannel" @setChannel="setChannel" @askForDiscordPath="askForDiscordPath" :dataPath="dataPath" @askForDataPath="askForDataPath" />
                 </div>
                 <div class="separator-controls"></div>
                 <div class="controls">
@@ -29,21 +29,22 @@
                     </template>
                     <button @click="cancel">Cancel</button>
                 </div>
-                <div class="border"></div>
+                <div class="border" v-if="platform === 'win32'"></div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    const process = window.require('process');
-    const path = window.require('path');
-    const fs = window.require('fs');
-
     import Sidebar from './sidebar.vue';
     import Intro from './intro.vue';
     import License from './license.vue';
     import Destination from './destination.vue';
+
+    import electron from 'electron';
+    import process from 'process';
+    import path from 'path';
+    import fs from 'fs';
 
     function checkDir(dir) {
         if (dir === null) return false;
@@ -78,8 +79,7 @@
     }
 
     function resolvePaths() {
-        const { platform } = process;
-        const userPath = process.env.APPDATA || (platform === 'darwin' ? process.env.HOME : '/var/local');
+        const userPath = electron.remote.app.getPath('appData');
         const paths = {
             stable: {
                 base: path.join(userPath, 'discord')
@@ -103,8 +103,7 @@
     }
 
     function resolveDataPath() {
-        const { platform } = process;
-        const userPath = process.env.LOCALAPPDATA || (platform === 'darwin' ? process.env.HOME : '/var/local');
+        const userPath = electron.remote.app.getPath('appData');
         return path.join(userPath, 'BetterDiscord');
     }
 
@@ -116,6 +115,7 @@
                 animating: false,
                 animatingr: false,
                 paths: {},
+                currentChannel: 'stable',
                 dataPath: ''
             }
         },
@@ -151,9 +151,38 @@
                     }, 500);
                 }, 500);
             },
-            cancel() { },
+            cancel() {
+                window.close();
+            },
             setChannel(channel) {
                 console.log(`Channel Set To: ${channel}`);
+                this.currentChannel = channel;
+            },
+            askForPath(current) {
+                return new Promise((resolve, reject) => electron.remote.dialog.showOpenDialog(electron.remote.getCurrentWindow(), {
+                    defaultPath: current,
+                    buttonLabel: 'Select',
+                    properties: [
+                        'openDirectory',
+                        'showHiddenFiles',
+                        'treatPackageAsDirectory'
+                    ]
+                }, filenames => {
+                    filenames && filenames.length === 1 ? resolve(filenames[0]) : reject(filenames);
+                }));
+            },
+            async askForDiscordPath() {
+                const path = await this.askForPath(this.paths[this.currentChannel].latest);
+                this.paths.user = {
+                    latest: path,
+                    writable: checkDir(path)
+                };
+                console.log('Channel Set To: user');
+                this.currentChannel = 'user';
+            },
+            async askForDataPath() {
+                const path = await this.askForPath(this.dataPath);
+                this.dataPath = path;
             }
         },
         beforeMount() {

@@ -22,10 +22,18 @@ module.exports = {
     module: {
         loaders: [vueLoader, scssLoader]
     },
+    externals: {
+        electron: 'window.require("electron")',
+        path: 'window.require("path")',
+        fs: 'window.require("fs")'
+    },
     resolve: {
         alias: {
             vue$: path.resolve('..', 'node_modules', 'vue', 'dist', 'vue.esm.js')
         }
+    },
+    node: {
+        process: false
     },
     plugins: [
         new HtmlWebpackPlugin({

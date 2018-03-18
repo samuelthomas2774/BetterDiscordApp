@@ -59,9 +59,10 @@
     "watch_core": "npm run watch --prefix core",
     "build_csseditor": "npm run build --prefix csseditor",
     "watch_csseditor": "npm run watch --prefix csseditor",
+    "installer": "electron installer/test/index.js",
     "build_installer": "npm run build --prefix installer",
     "watch_installer": "npm run watch --prefix installer",
-    "lint": "eslint -f unix client/src core/src csseditor/src",
+    "lint": "eslint -f unix client/src core/src csseditor/src installer/src",
     "test": "npm run build && npm run lint",
     "build_node-sass": "node scripts/build-node-sass.js"
   }

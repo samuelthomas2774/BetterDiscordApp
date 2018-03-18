@@ -1,12 +1,13 @@
 import Vue from 'vue';
-import App from './app.vue';
+import App from './ui/app.vue';
 
 import styles from './styles/index.scss';
 
 const instance = new Vue({
     el: '#app',
     components: { App },
-    template: `<App platform="${process.platform}"/>`
+    data: { platform: process.platform },
+    template: `<App :platform="platform" />`
 });
 
 const style = document.createElement('style');

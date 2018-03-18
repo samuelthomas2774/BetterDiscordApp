@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+    app.quit();
 });
 
 const devMode = true;
@@ -13,13 +13,14 @@ const options = {
     maximizable: false,
     frame: false,
     resizable: devMode ? true : false,
-    alwaysOnTop: devMode ? true : false,
+    // alwaysOnTop: devMode ? true : false,
+    backgroundColor: '#101013',
     transparent: false
-}
+};
 
 let mainWindow;
 
 app.on('ready', () => {
     mainWindow = new BrowserWindow(options);
-    mainWindow.loadURL(path.resolve('..', 'dist', 'index.html'));
+    mainWindow.loadURL('file://' + path.resolve(__dirname, '..', 'dist', 'index.html'));
 });

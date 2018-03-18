@@ -10,9 +10,9 @@
                 <div class="bg-logo"></div>
                 <Sidebar :activeIndex="selectedIndex" version="2.0.0" />
                 <div class="content">
-                    <Intro v-if="selectedPanel === 0"/>
-                    <License v-if="selectedPanel === 1"/>
-                    <Destination v-if="selectedPanel === 2" :paths="paths" :setChannel="setChannel" :dataPath="dataPath"/>
+                    <Intro v-if="selectedPanel === 0" />
+                    <License v-if="selectedPanel === 1" />
+                    <Destination v-if="selectedPanel === 2" :paths="paths" :setChannel="setChannel" :dataPath="dataPath" />
                 </div>
                 <div class="separator-controls"></div>
                 <div class="controls">
@@ -36,14 +36,15 @@
 </template>
 
 <script>
-    const process = window.require('process');
-    const path = window.require('path');
-    const fs = window.require('fs');
-
     import Sidebar from './sidebar.vue';
     import Intro from './intro.vue';
     import License from './license.vue';
     import Destination from './destination.vue';
+
+    import electron from 'electron';
+    import process from 'process';
+    import path from 'path';
+    import fs from 'fs';
 
     function checkDir(dir) {
         if (dir === null) return false;
@@ -78,8 +79,7 @@
     }
 
     function resolvePaths() {
-        const { platform } = process;
-        const userPath = process.env.APPDATA || (platform === 'darwin' ? process.env.HOME : '/var/local');
+        const userPath = electron.remote.app.getPath('appData');
         const paths = {
             stable: {
                 base: path.join(userPath, 'discord')
@@ -103,8 +103,7 @@
     }
 
     function resolveDataPath() {
-        const { platform } = process;
-        const userPath = process.env.LOCALAPPDATA || (platform === 'darwin' ? process.env.HOME : '/var/local');
+        const userPath = electron.remote.app.getPath('appData');
         return path.join(userPath, 'BetterDiscord');
     }
 
@@ -151,7 +150,7 @@
                     }, 500);
                 }, 500);
             },
-            cancel() { },
+            cancel() {},
             setChannel(channel) {
                 console.log(`Channel Set To: ${channel}`);
             }

@@ -151,7 +151,9 @@
                     }, 500);
                 }, 500);
             },
-            cancel() {},
+            cancel() {
+                window.close();
+            },
             setChannel(channel) {
                 console.log(`Channel Set To: ${channel}`);
                 this.currentChannel = channel;

@@ -1,0 +1,80 @@
+.modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, .5);
+    z-index: 3;
+    transition: all .3s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+
+    &.visible {
+        opacity: 1;
+        pointer-events: all;
+
+        .modal-inner {
+            transform: scale(1);
+        }
+    }
+
+    .modal-inner {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        width: 600px;
+        height: 300px;
+        background: $bg;
+        top: 50%;
+        left: 50%;
+        margin-left: -300px;
+        margin-top: -150px;
+        transition: all .3s ease-in-out;
+        transform: scale(0);
+
+        .modal-title {
+            padding: 5px;
+            background: lighten($bg, 2%);
+        }
+
+        .modal-body {
+            padding: 5px;
+            flex: 1 1 auto;
+        }
+
+        .modal-controls {
+            padding: 5px;
+            background: lighten($bg, 2%);
+            display: flex;
+
+            .flex-spacer {
+                flex: 1 1 auto;
+            }
+
+            button {
+                width: 80px;
+                padding: 8px;
+                background: darken($bg, 5%);
+                border: none;
+                cursor: pointer;
+                border-radius: 5px;
+                margin-left: 5px;
+                transition: all .25s ease-in-out;
+                font-family: Roboto;
+                font-weight: 600;
+
+                &:hover {
+                    background: $blue;
+                    color: #fff;
+                }
+
+                &.disabled {
+                    background: darken($bg, 10%);
+                    color: #363636;
+                    cursor: not-allowed;
+                }
+            }
+        }
+    }
+}

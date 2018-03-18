@@ -13,7 +13,7 @@ const options = {
     maximizable: false,
     frame: false,
     resizable: devMode ? true : false,
-    alwaysOnTop: devMode ? true : false,
+    // alwaysOnTop: devMode ? true : false,
     transparent: false
 }
 
@@ -21,5 +21,5 @@ let mainWindow;
 
 app.on('ready', () => {
     mainWindow = new BrowserWindow(options);
-    mainWindow.loadURL(path.resolve('..', 'dist', 'index.html'));
+    mainWindow.loadURL('file://' + path.resolve(__dirname, '..', 'dist', 'index.html'));
 });

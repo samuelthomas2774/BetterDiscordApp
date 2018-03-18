@@ -6,7 +6,7 @@ import styles from './styles/index.scss';
 const instance = new Vue({
     el: '#app',
     components: { App },
-    template: '<App/>'
+    template: `<App platform="${process.platform}"/>`
 });
 
 const style = document.createElement('style');

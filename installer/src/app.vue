@@ -12,7 +12,7 @@
                 <div class="content">
                     <Intro v-if="selectedPanel === 0"/>
                     <License v-if="selectedPanel === 1"/>
-                    <Destination v-if="selectedPanel === 2"/>
+                    <Destination v-if="selectedPanel === 2" :paths="paths" :setChannel="setChannel" :dataPath="dataPath"/>
                 </div>
                 <div class="separator-controls"></div>
                 <div class="controls">
@@ -36,20 +36,90 @@
 </template>
 
 <script>
+    const process = window.require('process');
+    const path = window.require('path');
+    const fs = window.require('fs');
+
     import Sidebar from './sidebar.vue';
     import Intro from './intro.vue';
     import License from './license.vue';
     import Destination from './destination.vue';
+
+    function checkDir(dir) {
+        if (dir === null) return false;
+        try {
+            fs.accessSync(dir, fs.constants.R_OK | fs.constants.W_OK);
+            return true;
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function findLatest(basePath) {
+        const dirs = fs.readdirSync(basePath).map(dir => {
+            return {
+                dir,
+                path: path.join(basePath, dir)
+            }
+        }).filter(d => {
+            return d.dir.match(/^\d\./) && fs.statSync(d.path).isDirectory();
+        });
+
+        if (dirs.length === 1) return dirs[0].path;
+        let latest = null;
+        for (let d of dirs) {
+            if (!latest) {
+                latest = d.dir;
+                continue;
+            }
+            if (d > latest) latest = d;
+        }
+        return latest.path;
+    }
+
+    function resolvePaths() {
+        const { platform } = process;
+        const userPath = process.env.APPDATA || (platform === 'darwin' ? process.env.HOME : '/var/local');
+        const paths = {
+            stable: {
+                base: path.join(userPath, 'discord')
+            },
+            ptb: {
+                base: path.join(userPath, 'discordptb')
+            },
+            canary: {
+                base: path.join(userPath, 'discordcanary')
+            }
+        };
+        paths.stable.latest = findLatest(paths.stable.base);
+        paths.ptb.latest = findLatest(paths.ptb.base);
+        paths.canary.latest = findLatest(paths.canary.base);
+
+        paths.stable.writable = checkDir(paths.stable.latest);
+        paths.ptb.writable = checkDir(paths.ptb.latest);
+        paths.canary.writable = checkDir(paths.canary.latest);
+        console.log(paths);
+        return paths;
+    }
+
+    function resolveDataPath() {
+        const { platform } = process;
+        const userPath = process.env.LOCALAPPDATA || (platform === 'darwin' ? process.env.HOME : '/var/local');
+        return path.join(userPath, 'BetterDiscord');
+    }
+
     export default {
         data() {
             return {
-                selectedIndex: 0,
-                selectedPanel: 0,
+                selectedIndex: 2,
+                selectedPanel: 2,
                 animating: false,
                 animatingr: false,
-                paths: {}
+                paths: {},
+                dataPath: ''
             }
         },
+        props: ['platform'],
         components: {
             Sidebar,
             Intro,
@@ -58,6 +128,7 @@
         },
         methods: {
             next() {
+                if (this.animating || this.animatingr) return;
                 const active = this.selectedIndex + 1;
                 this.animating = true;
                 this.selectedIndex = active;
@@ -69,6 +140,7 @@
                 }, 500);
             },
             back() {
+                if (this.animating || this.animatingr) return;
                 const active = this.selectedIndex - 1;
                 this.animatingr = true;
                 this.selectedIndex = active;
@@ -79,7 +151,14 @@
                     }, 500);
                 }, 500);
             },
-            cancel() {}
+            cancel() { },
+            setChannel(channel) {
+                console.log(`Channel Set To: ${channel}`);
+            }
+        },
+        beforeMount() {
+            this.paths = resolvePaths();
+            this.dataPath = resolveDataPath();
         }
     }
 </script>

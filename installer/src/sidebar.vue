@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
         <ul>
-            <li v-for="(item, index) in items" :key="index" :class="{active: activeIndex === index}">{{item}}</li>
+            <li v-for="(item, index) in items" :key="index" :class="{active: activeIndex === index, visited: activeIndex > index}">{{item}}</li>
         </ul>
         <span class="vi">v{{version}}</span>
     </div>

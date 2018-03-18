@@ -1,0 +1,32 @@
+.radio-group {
+    label {
+        margin-left: 5px;
+    }
+}
+
+input[type="radio"],
+label {
+    cursor: pointer;
+}
+
+input[type="radio"] {
+    height: .9em;
+    width: .9em;
+    background: #FFF;
+    -webkit-appearance: none;
+    border-radius: 1em;
+    border: none;
+    outline: none;
+}
+
+input[type="radio"]:hover {
+    background: lighten($blue, 5%);
+}
+
+input[type="radio"]:focus {
+    outline: none;
+}
+
+input[type="radio"]:checked {
+    background: $blue;
+}

@@ -14,6 +14,7 @@ const options = {
     frame: false,
     resizable: devMode ? true : false,
     // alwaysOnTop: devMode ? true : false,
+    backgroundColor: '#101013',
     transparent: false
 };
 

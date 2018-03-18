@@ -12,7 +12,7 @@
                 <div class="content">
                     <Intro v-if="selectedPanel === 0" />
                     <License v-if="selectedPanel === 1" />
-                    <Destination v-if="selectedPanel === 2" :paths="paths" :setChannel="setChannel" :dataPath="dataPath" />
+                    <Destination v-if="selectedPanel === 2" :paths="paths" :channel="currentChannel" @setChannel="setChannel" @askForDiscordPath="askForDiscordPath" :dataPath="dataPath" @askForDataPath="askForDataPath" />
                 </div>
                 <div class="separator-controls"></div>
                 <div class="controls">
@@ -115,6 +115,7 @@
                 animating: false,
                 animatingr: false,
                 paths: {},
+                currentChannel: 'stable',
                 dataPath: ''
             }
         },
@@ -153,6 +154,33 @@
             cancel() {},
             setChannel(channel) {
                 console.log(`Channel Set To: ${channel}`);
+                this.currentChannel = channel;
+            },
+            askForPath(current) {
+                return new Promise((resolve, reject) => electron.remote.dialog.showOpenDialog(electron.remote.getCurrentWindow(), {
+                    defaultPath: current,
+                    buttonLabel: 'Select',
+                    properties: [
+                        'openDirectory',
+                        'showHiddenFiles',
+                        'treatPackageAsDirectory'
+                    ]
+                }, filenames => {
+                    filenames && filenames.length === 1 ? resolve(filenames[0]) : reject(filenames);
+                }));
+            },
+            async askForDiscordPath() {
+                const path = await this.askForPath(this.paths[this.currentChannel].latest);
+                this.paths.user = {
+                    latest: path,
+                    writable: checkDir(path)
+                };
+                console.log('Channel Set To: user');
+                this.currentChannel = 'user';
+            },
+            async askForDataPath() {
+                const path = await this.askForPath(this.dataPath);
+                this.dataPath = path;
             }
         },
         beforeMount() {

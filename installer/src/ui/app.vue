@@ -1,7 +1,22 @@
 <template>
     <div id="mount">
         <div class="root">
-            <div class="modal"></div>
+            <div class="modal" :class="{visible: modalVisible}">
+                <div class="modal-inner">
+                    <div class="modal-title">Exit Setup?</div>
+                    <div class="modal-body">
+                        Setup is not complete. If you exit now, BetterDiscord will not be installed.
+                        <br/>
+                        <br/>
+                        Exit Setup?
+                    </div>
+                    <div class="modal-controls">
+                        <div class="flex-spacer"></div>
+                        <button @click="modalVisible = false">No</button>
+                        <button @click="cancel">Yes</button>
+                    </div>
+                </div>
+            </div>
             <div class="titleBar">
                 <div class="logo"></div>
                 <span>BetterDiscord Setup</span>
@@ -27,7 +42,7 @@
                         <button @click="back">Back</button>
                         <button class="disabled">Install</button>
                     </template>
-                    <button @click="cancel">Cancel</button>
+                    <button @click="modalVisible = true">Cancel</button>
                 </div>
                 <div class="border" v-if="platform === 'win32'"></div>
             </div>
@@ -116,7 +131,8 @@
                 animatingr: false,
                 paths: {},
                 currentChannel: 'stable',
-                dataPath: ''
+                dataPath: '',
+                modalVisible: false
             }
         },
         props: ['platform'],

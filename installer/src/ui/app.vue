@@ -49,7 +49,7 @@
     function checkDir(dir) {
         if (dir === null) return false;
         try {
-            fs.accessSync(dir, fs.constants.R_OK | fs.constants.W_OK);
+            fs.accessSync(dir, fs.constants.R_OK | fs.constants.W_OK); // TODO this doesn't actually work on windows
             return true;
         } catch (err) {
             return false;
@@ -168,7 +168,9 @@
                         'treatPackageAsDirectory'
                     ]
                 }, filenames => {
-                    filenames && filenames.length === 1 ? resolve(filenames[0]) : reject(filenames);
+                    if (!filenames || filenames.length <= 0) return reject(filenames);
+                    if (checkDir(filenames[0])) return reject(filenames[0]);
+                    resolve(filenames[0]);
                 }));
             },
             async askForDiscordPath() {

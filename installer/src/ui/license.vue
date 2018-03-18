@@ -1,11 +1,11 @@
 <template>
     <div class="content-block license-block">
-        <h3>License & TOS</h3>
+        <h3>License &amp; TOS</h3>
         <div class="separator"></div>
         <div class="license-text">
             The MIT License (MIT)
 
-            Copyright (c) 2015-present Jiiks | Jiiks.net
+            Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
 
             Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -17,7 +17,7 @@
         <div class="license-text">
             Terms of Service
 
-            This software is not in any way affiliated with Discord or Hammer & Chisel.
+            This software is not in any way affiliated with Discord or Hammer &amp; Chisel.
             By using this software you agree to not contact Discord support for any issues.
             In the event of any issue; please join the BetterDiscord Discord server.
             If you must contact Discord support then first uninstall BetterDiscord and see if that fixes your issue.

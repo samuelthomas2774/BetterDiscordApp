@@ -29,7 +29,7 @@
                     </template>
                     <button @click="cancel">Cancel</button>
                 </div>
-                <div class="border"></div>
+                <div class="border" v-if="platform === 'win32'"></div>
             </div>
         </div>
     </div>

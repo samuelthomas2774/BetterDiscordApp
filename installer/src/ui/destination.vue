@@ -5,8 +5,9 @@
         <div class="input-group">
             <span>Discord Path</span>
             <div class="flex-horizontal">
-                <input type="text" name="installpath" readonly :value="paths[channel].latest"/>
+                <input type="text" name="installpath" readonly :value="paths[channel].latest" :class="{nowrite: (paths[channel].writable && paths[channel].writable.err)}"/>
                 <button @click="$emit('askForDiscordPath')">Change</button>
+                <span v-if="paths[channel].writable.err">{{parseError(paths[channel].writable.err)}}</span>
             </div>
             <div class="radio-group">
                 <label for="stable">
@@ -25,8 +26,9 @@
             <div class="separator"></div>
             <span>BetterDiscord Path</span>
             <div class="flex-horizontal">
-                <input type="text" name="installpath" :value="dataPath" readonly />
+                <input type="text" name="installpath" :value="dataPath" :class="{nowrite: (dataPath.writable && dataPath.writable.err)}" readonly />
                 <button @click="$emit('askForDataPath')">Change</button>
+                <span v-if="dataPath.writable && dataPath.writable.err">{{parseError(dataPath.writable.err)}}</span>
             </div>
         </div>
     </div>
@@ -39,6 +41,10 @@
             channelChange(e) {
                 const { value } = e.target;
                 this.$emit('setChannel', value);
+            },
+            parseError(err) {
+                console.log(err);
+                return 'Error';
             }
         }
     }

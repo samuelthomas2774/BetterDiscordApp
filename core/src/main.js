@@ -27,6 +27,9 @@ const _extPath = tests
 const _pluginPath = path.resolve(_extPath, 'plugins');
 const _themePath = path.resolve(_extPath, 'themes');
 const _modulePath = path.resolve(_extPath, 'modules');
+const _cssEditorPath = tests
+    ? path.resolve(__dirname, '..', '..', '..', 'csseditor', 'dist')
+    : path.resolve(__dirname, 'csseditor');
 
 const paths = [
     { id: 'cs', path: _clientScript.replace(/\\/g, '/') },
@@ -34,7 +37,8 @@ const paths = [
     { id: 'ext', path: _extPath.replace(/\\/g, '/') },
     { id: 'plugins', path: _pluginPath.replace(/\\/g, '/') },
     { id: 'themes', path: _themePath.replace(/\\/g, '/') },
-    { id: 'modules', path: _modulePath.replace(/\\/g, '/') }
+    { id: 'modules', path: _modulePath.replace(/\\/g, '/') },
+    { id: 'csseditor', path: _cssEditorPath.replace(/\\/g, '/') }
 ];
 
 const sparkplug = path.resolve(__dirname, 'sparkplug.js').replace(/\\/g, '/');
@@ -138,7 +142,7 @@ class BetterDiscord {
         const window = await this.waitForWindow();
         this.windowUtils = new WindowUtils({ window });
 
-        this.csseditor = new CSSEditor(this);
+        this.csseditor = new CSSEditor(this, paths.find(path => path.id === 'csseditor').path);
 
         this.windowUtils.events('did-get-response-details', () => this.ignite(this.windowUtils.window));
         this.windowUtils.events('did-finish-load', e => this.injectScripts(true));

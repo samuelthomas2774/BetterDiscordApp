@@ -16,8 +16,9 @@ const { WindowUtils } = require('./utils');
 
 class CSSEditor extends Module {
 
-    constructor(bd) {
+    constructor(bd, path) {
         super();
+        this.editorPath = path;
         this.bd = bd;
     }
 
@@ -33,7 +34,9 @@ class CSSEditor extends Module {
 
         const options = this.options;
         for (let option in o.args) {
-            options[option] = o.args[option];
+            if (o.args.hasOwnProperty(option)) {
+                options[option] = o.args[option];
+            }
         }
 
         this.editor = new BrowserWindow(options);
@@ -78,13 +81,7 @@ class CSSEditor extends Module {
             frame: false
         };
     }
-
-    //TODO Currently uses a development path
-    get editorPath() {
-        return path.resolve(__dirname, '..', '..', '..', 'csseditor', 'dist');
-        // return path.resolve(__dirname, '..', '..', '..', 'tests', 'csseditor');
-    }
-
+    
 }
 
 module.exports = { CSSEditor };

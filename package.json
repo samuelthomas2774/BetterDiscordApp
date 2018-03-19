@@ -15,6 +15,10 @@
     "url": "https://github.com/Jiiks/BetterDiscordApp.git"
   },
   "private": false,
+  "dependencies": {
+    "node-sass": "^4.7.2",
+    "nedb": "^1.8.0"
+  }, 
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
@@ -32,11 +36,15 @@
     "filewatcher": "^3.0.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.0",
+    "gulp-copy": "^1.1.0",
+    "gulp-merge": "^0.1.1",
+    "gulp-npm-copy-deps": "^1.0.2",
     "gulp-plumber": "^1.2.0",
     "gulp-watch": "^5.0.0",
     "html-webpack-plugin": "^3.0.6",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
+    "merge-stream": "^1.0.1",
     "nedb": "^1.8.0",
     "node-gyp": "^3.6.2",
     "node-sass": "^4.7.2",
@@ -63,6 +71,7 @@
     "watch_installer": "npm run watch --prefix installer",
     "lint": "eslint -f unix client/src core/src csseditor/src",
     "test": "npm run build && npm run lint",
-    "build_node-sass": "node scripts/build-node-sass.js"
+    "build_node-sass": "node scripts/build-node-sass.js",
+    "release": "npm run build && gulp release"
   }
 }

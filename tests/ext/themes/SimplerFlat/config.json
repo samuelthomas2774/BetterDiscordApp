@@ -1,0 +1,198 @@
+{
+    "info": {
+        "name": "SimplerFlat",
+        "authors": [ "Qwerasd" ],
+        "version": 1.02,
+        "description": "SimplerFlat is a solid colored dark flat theme with customizable colors.",
+        "type": "sass"
+    },
+    "main": "index.scss",
+    "defaultConfig": [
+        {
+            "category": "not default",
+            "category_name":  "not default", 
+            "type":  "drawer", 
+            "settings": [
+                {
+                    "id": "color-light",
+                    "type": "color",
+                    "value": "#3E3E3E",
+                    "text": "Light Color",
+                    "hint": "The color of things that are lighter than the chat panel."
+                },
+                {
+                    "id": "color-medium",
+                    "type": "color",
+                    "value": "#2E2E2E",
+                    "text": "Medium Color",
+                    "hint": "The color of the chat panel."
+                },
+                {
+                    "id": "color-dark",
+                    "type": "color",
+                    "value": "#1E1E1E",
+                    "text": "Dark Color",
+                    "hint": "The color of the channels, and members panels."
+                },
+                {
+                    "id": "color-very-dark",
+                    "type": "color",
+                    "value": "#0E0E0E",
+                    "text": "Very Dark Color",
+                    "hint": "The color of the guilds sidebar."
+                },
+                {
+                    "id": "main-color",
+                    "type": "color",
+                    "value": "#00FAFA",
+                    "text": "Accent Color",
+                    "hint": "For when a little bit of sophistication is required."
+                },
+                {
+                    "id": "main-text-color",
+                    "type": "color",
+                    "value": "#FAFAFA",
+                    "text": "Text Color",
+                    "hint": "Most text will be this color."
+                },
+                {
+                    "id": "chat-text-color",
+                    "type": "color",
+                    "value": "#FFFFFF",
+                    "text": "Chat Color",
+                    "hint": "Text in the chat pane will be this color."
+                },
+                {
+                    "id": "code-text-color",
+                    "type": "color",
+                    "value": "#CCCCCC",
+                    "text": "Code Color",
+                    "hint": "Non syntax-highlighted code in codeblocks will be this color."
+                },
+                {
+                    "id": "tint-color",
+                    "type": "color",
+                    "value": "#00FAFA",
+                    "text": "Tint Color",
+                    "hint": "Tint all of the background colors using this color."
+                },
+                {
+                    "id": "tint-strength",
+                    "type": "slider",
+                    "value": 0,
+                    "min": 0,
+                    "max": 100,
+                    "step": 0.5,
+                    "unit": "%",
+                    "multi": "0.5",
+                    "text": "Tint Strength",
+                    "hint": "How strongly to tint the background colors."
+                },
+                {
+                    "id": "collapsing-panels",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Collapsing Side Panels",
+                    "hint": "Fancy channels and members panels that hide themselves when not needed."
+                },
+                {
+                    "id": "compact-server-list",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Compact Server List",
+                    "hint": "Squishes together your servers so that they take up less space."
+                }
+            ]
+        }
+    ],
+     "configSchemes": [
+        {
+            "id": "default",
+            "name": "Default Colors",
+            "hint": "The basic colors -- good for tinting.",
+            "settings": [
+                {
+                    "category": "default",
+                    "settings": [
+                        {
+                            "id": "color-light",
+                            "value": "#3E3E3E"
+                        },
+                        {
+                            "id": "color-medium",
+                            "value": "#2E2E2E"
+                        },
+                        {
+                            "id": "color-dark",
+                            "value": "#1E1E1E"
+                        },
+                        {
+                            "id": "color-very-dark",
+                            "value": "#0E0E0E"
+                        },
+                        {
+                            "id": "main-color",
+                            "value": "#00FAFA"
+                        },
+                        {
+                            "id": "main-text-color",
+                            "value": "#FAFAFA"
+                        },
+                        {
+                            "id": "chat-text-color",
+                            "value": "#FFFFFF"
+                        },
+                        {
+                            "id": "code-text-color",
+                            "value": "#CCCCCC"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "high-contrast",
+            "name": "High Contrast",
+            "hint": "Very high contrast scheme.",
+            "settings": [
+                {
+                    "category": "default",
+                    "settings": [
+                        {
+                            "id": "color-light",
+                            "value": "#CCCCCC"
+                        },
+                        {
+                            "id": "color-medium",
+                            "value": "#000000"
+                        },
+                        {
+                            "id": "color-dark",
+                            "value": "#000000"
+                        },
+                        {
+                            "id": "color-very-dark",
+                            "value": "#000000"
+                        },
+                        {
+                            "id": "main-color",
+                            "value": "#FFFFFF"
+                        },
+                        {
+                            "id": "main-text-color",
+                            "value": "#FFFFFF"
+                        },
+                        {
+                            "id": "chat-text-color",
+                            "value": "#FFFFFF"
+                        },
+                        {
+                            "id": "code-text-color",
+                            "value": "#FFFFFF"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

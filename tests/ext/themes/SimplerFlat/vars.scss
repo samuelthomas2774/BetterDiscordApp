@@ -1,0 +1,40 @@
+
+
+/* Theme */
+$main-color: #00FAFA !default; /*Main general theme color (#00FAFA Light Cyan by default)*/
+
+/* Text */
+$main-text-color: #FAFAFA !default; /*The colour of text onscreen in most places (#FAFAFA light grey by default)*/
+$chat-text-color: #FFFFFF !default; /*The chat will be this color*/
+$code-text-color: #CCCCCC !default; /*The non-syntax hilighted bits in code blocks will be this color*/
+
+/* Background */
+$color-light: #3E3E3E !default; /*These are all colors used in the background*/
+$color-medium: #2E2E2E !default;
+$color-dark: #1E1E1E !default;
+$color-very-dark: #0E0E0E !default;
+
+/* Tinting */
+
+$tint-color: $main-color !default;
+$tint-strength: 0% !default;
+
+/* Font */
+$global-font: 'Whitney' !default; /*This font will appear most places*/
+$chat-font: 'Whitney' !default; /*This font will appear in the main chat*/
+$chat-font-size: 15px !default;
+$code-font: monospace !default; /*This will appear in code blocks*/
+$code-font-size: 14px !default;
+$code-font-weight: 700 !default;
+
+/* other */
+
+$collapsing-panels: false !default;
+$compact-server-list: false !default;
+
+/* do some stuff with the vars */
+
+$color-light: mix($tint-color, $color-light, $tint-strength);
+$color-medium: mix($tint-color, $color-medium, $tint-strength);
+$color-dark: mix($tint-color, $color-dark, $tint-strength);
+$color-very-dark: mix($tint-color, $color-very-dark, $tint-strength);

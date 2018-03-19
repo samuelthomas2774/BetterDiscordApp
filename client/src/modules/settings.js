@@ -133,6 +133,6 @@ export default new class Settings {
     }
 
     get dataPath() {
-        return this._dataPath ? this._dataPath : (this._dataPath = Globals.getObject('paths').find(p => p.id === 'data').path);
+        return Globals.getPath('data');
     }
 }

@@ -28,7 +28,7 @@ const _pluginPath = path.resolve(_extPath, 'plugins');
 const _themePath = path.resolve(_extPath, 'themes');
 const _modulePath = path.resolve(_extPath, 'modules');
 const _cssEditorPath = tests
-    ? path.resolve(__dirname, '..', '..', '..', 'csseditor', 'dist')
+    ? path.resolve(__dirname, '..', '..', 'csseditor', 'dist')
     : path.resolve(__dirname, 'csseditor');
 
 const paths = [

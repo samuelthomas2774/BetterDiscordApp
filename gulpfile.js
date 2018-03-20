@@ -1,29 +1,42 @@
 const
+    fs = require('fs'),
     gulp = require('gulp'),
+    del = require('del'),
     pump = require('pump'),
     merge = require('gulp-merge'),
     copy = require('gulp-copy'),
+    rename = require('gulp-rename'),
     copydeps = require('gulp-npm-copy-deps');
+
+const corepkg = require('./core/package.json');
+const clientpkg = require('./client/package.json');
+const editorpkg = require('./csseditor/package.json');
 
 const client = function() {
     return pump([
         gulp.src('./client/dist/*.client.js'),
-        copy('release/', { prefix: 2 })
+        rename(`client.${clientpkg.version}.js`),
+        gulp.dest('./release')
     ]);
 }
 
 const core = function() {
     return pump([
-        gulp.src('./core/dist/**/*'),
+        gulp.src('./core/dist/modules/**/*'),
         copy('release/', { prefix: 2 })
     ]);
 }
 
 const core2 = function() {
     return pump([
-        gulp.src('./core/index.js'),
-        copy('release/', { prefix: 1 })
+        gulp.src('./core/dist/main.js'),
+        rename(`core.${corepkg.version}.js`),
+        gulp.dest('./release')
     ]);
+}
+
+const core3 = function() {
+    return fs.writeFileSync('./release/index.js', `module.exports = require('./core.${corepkg.version}.js');`);
 }
 
 const cssEditor = function() {
@@ -44,4 +57,6 @@ const bindings = function() {
     ]);
 }
 
-gulp.task('release', function () { return merge(client(), core(), core2(), cssEditor(), deps(), bindings())});
+gulp.task('release', function () {
+    del(['./release/**/*']).then(() => merge(client(), core(), core2(), core3(), cssEditor(), deps()));
+});

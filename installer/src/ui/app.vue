@@ -60,6 +60,7 @@
     import process from 'process';
     import path from 'path';
     import fs from 'fs';
+    import axios from 'axios';
 
     import github from 'github-api';
     const Github = new github();

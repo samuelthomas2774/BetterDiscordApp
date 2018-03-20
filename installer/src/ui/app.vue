@@ -61,6 +61,18 @@
     import path from 'path';
     import fs from 'fs';
 
+    import github from 'github-api';
+    const Github = new github();
+
+    Github.getLatestRelease = async function (user, repo) {
+        try {
+            const get = await this.getRepo(user, repo).getRelease('latest');
+            return get.data;
+        } catch (err) {
+            throw err;
+        }
+    }
+
     function checkDir(dir) {
         if (dir === null) return false;
         try {

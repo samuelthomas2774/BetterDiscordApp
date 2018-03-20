@@ -14,22 +14,29 @@ export default class MultipleChoiceOption {
 
     constructor(args) {
         this.args = args.args || args;
+
+        Object.freeze(this);
     }
 
+    /**
+     * This option's ID.
+     */
     get id() {
         return this.args.id || this.value;
     }
 
+    /**
+     * A string describing this option.
+     */
     get text() {
         return this.args.text;
     }
 
+    /**
+     * The value to return when this option is active.
+     */
     get value() {
         return this.args.value;
-    }
-
-    clone() {
-        return new MultipleChoiceOption(Utils.deepclone(this.args));
     }
 
 }

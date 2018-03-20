@@ -37,17 +37,19 @@
     // Imports
     import { PluginManager } from 'modules';
     import { Modals } from 'ui';
-    import { SettingsWrapper } from './';
-    import PluginCard from './PluginCard.vue';
+    import { ClientLogger as Logger } from 'common';
     import { MiRefresh } from '../common';
+    import SettingsWrapper from './SettingsWrapper.vue';
+    import PluginCard from './PluginCard.vue';
     import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
             return {
+                PluginManager,
                 local: true,
                 localPlugins: PluginManager.localPlugins
-            }
+            };
         },
         components: {
             SettingsWrapper, PluginCard,
@@ -62,32 +64,32 @@
                 this.local = false;
             },
             async refreshLocal() {
-                await PluginManager.refreshPlugins();
+                await this.PluginManager.refreshPlugins();
             },
             async refreshOnline() {
-
+                // TODO
             },
             async togglePlugin(plugin) {
-                // TODO Display error if plugin fails to start/stop
+                // TODO: display error if plugin fails to start/stop
+                const enabled = plugin.enabled;
                 try {
-                    await plugin.enabled ? PluginManager.stopPlugin(plugin) : PluginManager.startPlugin(plugin);
+                    await enabled ? this.PluginManager.stopPlugin(plugin) : this.PluginManager.startPlugin(plugin);
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('PluginsView', [`Error ${enabled ? 'stopp' : 'start'}ing plugin ${plugin.name}:`, err]);
                 }
             },
             async reloadPlugin(plugin) {
                 try {
-                    await PluginManager.reloadPlugin(plugin);
+                    await this.PluginManager.reloadPlugin(plugin);
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('PluginsView', [`Error reloading plugin ${plugin.name}:`, err]);
                 }
             },
             async deletePlugin(plugin, unload) {
                 try {
-                    if (unload) await PluginManager.unloadPlugin(plugin);
-                    else await PluginManager.deletePlugin(plugin);
+                    await unload ? this.PluginManager.unloadPlugin(plugin) : this.PluginManager.deletePlugin(plugin);
                 } catch (err) {
-                    console.error(err);
+                    Logger.err('PluginsView', [`Error ${unload ? 'unload' : 'delet'}ing plugin ${plugin.name}:`, err]);
                 }
             },
             showSettings(plugin, dont_clone) {

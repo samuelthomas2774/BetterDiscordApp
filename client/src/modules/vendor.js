@@ -16,22 +16,21 @@ export { jQuery as $ };
 
 export default class {
 
-    static get jQuery() {
-        return jQuery;
-    }
+    /**
+     * jQuery
+     */
+    static get jQuery() { return jQuery }
+    static get $() { return this.jQuery }
 
-    static get $() {
-        return this.jQuery;
-    }
+    /**
+     * Lodash
+     */
+    static get lodash() { return lodash }
+    static get _() { return this.lodash }
 
-    static get lodash() {
-        return lodash;
-    }
-
-    static get _() {
-        return this.lodash;
-    }
-
+    /**
+     * Moment
+     */
     static get moment() {
         return WebpackModules.getModuleByName('Moment');
     }

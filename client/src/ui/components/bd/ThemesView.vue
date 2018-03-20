@@ -37,17 +37,19 @@
     // Imports
     import { ThemeManager } from 'modules';
     import { Modals } from 'ui';
-    import { SettingsWrapper } from './';
+    import { ClientLogger as Logger } from 'common';
     import { MiRefresh } from '../common';
+    import SettingsWrapper from './SettingsWrapper.vue';
     import ThemeCard from './ThemeCard.vue';
     import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
             return {
+                ThemeManager,
                 local: true,
                 localThemes: ThemeManager.localThemes
-            }
+            };
         },
         components: {
             SettingsWrapper, ThemeCard,
@@ -62,33 +64,31 @@
                 this.local = false;
             },
             async refreshLocal() {
-                await ThemeManager.refreshThemes();
+                await this.ThemeManager.refreshThemes();
             },
             async refreshOnline() {
-
+                // TODO
             },
             async toggleTheme(theme) {
-                // TODO Display error if theme fails to enable/disable
+                // TODO: display error if theme fails to enable/disable
                 try {
-                    await theme.enabled ? ThemeManager.disableTheme(theme) : ThemeManager.enableTheme(theme);
+                    await theme.enabled ? this.ThemeManager.disableTheme(theme) : this.ThemeManager.enableTheme(theme);
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('ThemesView', [`Error ${enabled ? 'stopp' : 'start'}ing theme ${theme.name}:`, err]);
                 }
             },
             async reloadTheme(theme, reload) {
                 try {
-                    if (reload) await ThemeManager.reloadTheme(theme);
-                    else await theme.recompile();
+                    await reload ? this.ThemeManager.reloadTheme(theme) : theme.recompile();
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('ThemesView', [`Error ${reload ? 'reload' : 'recompil'}ing theme ${theme.name}:`, err]);
                 }
             },
             async deleteTheme(theme, unload) {
                 try {
-                    if (unload) await ThemeManager.unloadTheme(theme);
-                    else await ThemeManager.deleteTheme(theme);
+                    await unload ? this.ThemeManager.unloadTheme(theme) : this.ThemeManager.deleteTheme(theme);
                 } catch (err) {
-                    console.error(err);
+                    Logger.err('ThemesView', [`Error ${unload ? 'unload' : 'delet'}ing theme ${theme.name}:`, err]);
                 }
             },
             showSettings(theme, dont_clone) {

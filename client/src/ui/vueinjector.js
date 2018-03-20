@@ -12,17 +12,14 @@ import Vue from './vue';
 
 export default class {
 
-    static inject(root, bdnode, components, template, replaceRoot) {
-        if(!replaceRoot) bdnode.appendTo(root);
-
-        return new Vue({
-            el: replaceRoot ? root : bdnode.element,
-            components,
-            template
-        });
-    }
-
-    static _inject(root, options, bdnode) {
+    /**
+     * Creates a new Vue object and mounts it in the passed element.
+     * @param {HTMLElement} root The element to mount the new Vue object at
+     * @param {Object} options Options to pass to Vue
+     * @param {BdNode} bdnode The element to append to
+     * @return {Vue}
+     */
+    static inject(root, options, bdnode) {
         if(bdnode) bdnode.appendTo(root);
 
         const vue = new Vue(options);

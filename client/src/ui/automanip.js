@@ -8,36 +8,13 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, WebpackModules, EventListener, ReactComponents, Renderer } from 'modules';
+import { Events, WebpackModules, EventListener, DiscordApi, ReactComponents, Renderer } from 'modules';
+import { ClientLogger as Logger } from 'common';
 import Reflection from './reflection';
 import DOM from './dom';
 import VueInjector from './vueinjector';
 import EditedTimeStamp from './components/common/EditedTimestamp.vue';
 import Autocomplete from './components/common/Autocomplete.vue';
-
-class TempApi {
-    static get currentGuildId() {
-        try {
-            return WebpackModules.getModuleByName('SelectedGuildStore').getGuildId();
-        } catch (err) {
-            return 0;
-        }
-    }
-    static get currentChannelId() {
-        try {
-            return WebpackModules.getModuleByName('SelectedChannelStore').getChannelId();
-        } catch (err) {
-            return 0;
-        }
-    }
-    static get currentUserId() {
-        try {
-            return WebpackModules.getModuleByName('UserStore').getCurrentUser().id;
-        } catch (err) {
-            return 0;
-        }
-    }
-}
 
 export default class extends EventListener {
 
@@ -54,22 +31,19 @@ export default class extends EventListener {
     }
 
     get eventBindings() {
-        return [{ id: 'gkh:keyup', callback: this.injectAutocomplete }];
-        /*
         return [
-            { id: 'server-switch', callback: this.manipAll },
-            { id: 'channel-switch', callback: this.manipAll },
-            { id: 'discord:MESSAGE_CREATE', callback: this.markupInjector },
-            { id: 'discord:MESSAGE_UPDATE', callback: this.markupInjector },
+            // { id: 'server-switch', callback: this.manipAll },
+            // { id: 'channel-switch', callback: this.manipAll },
+            // { id: 'discord:MESSAGE_CREATE', callback: this.markupInjector },
+            // { id: 'discord:MESSAGE_UPDATE', callback: this.markupInjector },
             { id: 'gkh:keyup', callback: this.injectAutocomplete }
         ];
-        */
     }
 
     manipAll() {
         try {
-            this.appMount.setAttribute('guild-id', TempApi.currentGuildId);
-            this.appMount.setAttribute('channel-id', TempApi.currentChannelId);
+            this.appMount.setAttribute('guild-id', DiscordApi.currentGuild.id);
+            this.appMount.setAttribute('channel-id', DiscordApi.currentChannel.id);
             this.setIds();
             this.makeMutable();
         } catch (err) {
@@ -172,14 +146,14 @@ export default class extends EventListener {
             const userTest = Reflection(msgGroup).prop('user');
             if (!userTest) return;
             msgGroup.setAttribute('data-author-id', userTest.id);
-            if (userTest.id === TempApi.currentUserId) msgGroup.setAttribute('data-currentuser', true);
+            if (userTest.id === DiscordApi.currentUserId) msgGroup.setAttribute('data-currentuser', true);
             return;
         }
         msg.setAttribute('data-message-id', messageid);
         const msgGroup = msg.closest('.message-group');
         if (!msgGroup) return;
         msgGroup.setAttribute('data-author-id', authorid);
-        if (authorid === TempApi.currentUserId) msgGroup.setAttribute('data-currentuser', true);
+        if (authorid === DiscordApi.currentUser.id) msgGroup.setAttribute('data-currentuser', true);
     }
 
     setUserId(user) {
@@ -187,7 +161,7 @@ export default class extends EventListener {
         const userid = Reflection(user).prop('user.id');
         if (!userid) return;
         user.setAttribute('data-user-id', userid);
-        const currentUser = userid === TempApi.currentUserId;
+        const currentUser = userid === DiscordApi.currentUser.id;
         if (currentUser) user.setAttribute('data-currentuser', true);
         Events.emit('ui:useridset', user);
     }
@@ -218,4 +192,5 @@ export default class extends EventListener {
             template: '<Autocomplete :initial="initial" />'
         });
     }
+
 }

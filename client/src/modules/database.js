@@ -16,6 +16,12 @@ export default class {
         return true;
     }
 
+    /**
+     * Inserts or updates data in the database.
+     * @param {Object} args The record to find
+     * @param {Object} data The new record
+     * @return {Promise}
+     */
     static async insertOrUpdate(args, data) {
         try {
             return ClientIPC.send('bd-dba', { action: 'update', args, data });
@@ -24,6 +30,11 @@ export default class {
         }
     }
 
+    /**
+     * Finds data in the database.
+     * @param {Object} args The record to find
+     * @return {Promise}
+     */
     static async find(args) {
         try {
             return ClientIPC.send('bd-dba', { action: 'find', args });

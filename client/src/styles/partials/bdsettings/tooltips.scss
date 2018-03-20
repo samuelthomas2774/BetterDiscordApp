@@ -20,17 +20,17 @@ bd-tooltips {
     word-wrap: break-word;
     z-index: 9001;
     margin-bottom: 10px;
-}
 
-.bd-tooltip:after {
-    border: 5px solid transparent;
-    content: " ";
-    height: 0;
-    pointer-events: none;
-    width: 0;
-    border-top-color: #000;
-    left: 50%;
-    margin-left: -5px;
-    position: absolute;
-    top: 100%;
+    .bd-tooltip-arrow {
+        border: 5px solid transparent;
+        content: " ";
+        height: 0;
+        pointer-events: none;
+        width: 0;
+        border-top-color: #000;
+        left: 50%;
+        margin-left: -5px;
+        position: absolute;
+        top: 100%;
+    }
 }

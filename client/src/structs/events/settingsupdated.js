@@ -12,10 +12,16 @@ import Event from './event';
 
 export default class SettingsUpdatedEvent extends Event {
 
+    /**
+     * An array of SettingUpdated events.
+     */
     get updatedSettings() {
         return this.args.updatedSettings;
     }
 
+    /**
+     * The type of event.
+     */
     get __eventType() {
         return 'settings-updated';
     }

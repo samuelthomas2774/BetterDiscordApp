@@ -131,7 +131,7 @@
                 this.timeout = setTimeout(() => {
                     this.animating = false;
                     this.lastActiveIndex = -1;
-					this.timeout = null;
+                    this.timeout = null;
                 }, 400);
             },
             openGithub() {

@@ -18,6 +18,9 @@ import Updater from './updater';
  */
 export default class {
 
+    /**
+     * An array of modules.
+     */
     static get modules() {
         return this._modules ? this._modules : (this._modules = [
             new ProfileBadges(),
@@ -28,6 +31,10 @@ export default class {
         ]);
     }
 
+    /**
+     * Initializes all modules.
+     * @return {Promise}
+     */
     static async initModules() {
         for (let module of this.modules) {
             try {

@@ -25,7 +25,7 @@
 
 <script>
     import { shell } from 'electron';
-    import { ClientIPC } from 'common';
+    import { ClientIPC, ClientLogger as Logger } from 'common';
     import Combokeys from 'combokeys';
     import CombokeysRecord from 'combokeys/plugins/record';
 
@@ -65,7 +65,7 @@
                 this.active = false;
                 this.recordingValue = undefined;
                 this.setting.value = sequence.join(' ');
-                console.log('keypress', sequence);
+                Logger.log('Keybind', ['Recorded sequence', sequence]);
             },
             getDisplayString(value) {
                 if (!value) return;

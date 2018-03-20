@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Api
+ * BetterDiscord Plugin API
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, ClientLogger as Logger, ClientIPC } from 'common';
+import { Utils, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
@@ -24,27 +24,20 @@ import { MonkeyPatch } from './patcher';
 
 export default class PluginApi {
 
-    constructor(pluginInfo) {
+    constructor(pluginInfo, pluginPath) {
         this.pluginInfo = pluginInfo;
+        this.pluginPath = pluginPath;
+
         this.Events = new EventsWrapper(Events);
+        Utils.defineSoftGetter(this.Events, 'bind', () => this.plugin);
+
         this._menuItems = undefined;
         this._injectedStyles = undefined;
         this._modalStack = undefined;
     }
-    get Discord() {
-        return DiscordApi;
-    }
-    get ReactComponents() {
-        return ReactComponents;
-    }
-    get Reflection() {
-        return Reflection;
-    }
-    get MonkeyPatch() {
-        return module => MonkeyPatch(this.pluginInfo.id, module);
-    }
+
     get plugin() {
-        return PluginManager.getPluginById(this.pluginInfo.id || this.pluginInfo.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-'));
+        return PluginManager.getPluginByPath(this.pluginPath);
     }
 
     async bridge(plugin_id) {
@@ -61,15 +54,18 @@ export default class PluginApi {
 
     get Api() { return this }
 
+    get AsyncEventEmitter() { return AsyncEventEmitter }
+    get EventsWrapper() { return EventsWrapper }
+
     /**
      * Logger
      */
 
-    loggerLog(...message) { Logger.log(this.pluginInfo.name, message) }
-    loggerErr(...message) { Logger.err(this.pluginInfo.name, message) }
-    loggerWarn(...message) { Logger.warn(this.pluginInfo.name, message) }
-    loggerInfo(...message) { Logger.info(this.pluginInfo.name, message) }
-    loggerDbg(...message) { Logger.dbg(this.pluginInfo.name, message) }
+    loggerLog(...message) { Logger.log(this.plugin.name, message) }
+    loggerErr(...message) { Logger.err(this.plugin.name, message) }
+    loggerWarn(...message) { Logger.warn(this.plugin.name, message) }
+    loggerInfo(...message) { Logger.info(this.plugin.name, message) }
+    loggerDbg(...message) { Logger.dbg(this.plugin.name, message) }
     get Logger() {
         return {
             log: this.loggerLog.bind(this),
@@ -379,6 +375,24 @@ export default class PluginApi {
         }, 'require', {
             get: () => this.webpackRequire
         });
+    }
+
+    /**
+     * DiscordApi
+     */
+
+    get Discord() {
+        return DiscordApi;
+    }
+
+    get ReactComponents() {
+        return ReactComponents;
+    }
+    get Reflection() {
+        return Reflection;
+    }
+    get MonkeyPatch() {
+        return module => MonkeyPatch(this.plugin.id, module);
     }
 
 }

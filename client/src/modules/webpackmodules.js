@@ -51,6 +51,8 @@ const KnownModules = {
     React: Filters.byProperties(['createElement', 'cloneElement']),
     ReactDOM: Filters.byProperties(['render', 'findDOMNode']),
 
+    Events: Filters.byPrototypeFields(['setMaxListeners', 'emit']),
+
     /* Guild Info, Stores, and Utilities */
     GuildStore: Filters.byProperties(['getGuild']),
     SortedGuildStore: Filters.byProperties(['getSortedGuilds']),
@@ -207,37 +209,37 @@ const KnownModules = {
 
 export class WebpackModules {
 
-	/**
-	 * Finds a module using a filter function.
-	 * @param {Function} filter A function to use to filter modules
-	 * @param {Boolean} first Whether to return only the first matching module
-	 * @return {Any}
-	 */
-	static getModule(filter, first = true) {
-		const modules = this.getAllModules();
-		const rm = [];
-		for (let index in modules) {
-			if (!modules.hasOwnProperty(index)) continue;
-			const module = modules[index];
-			const { exports } = module;
-			let foundModule = null;
+    /**
+     * Finds a module using a filter function.
+     * @param {Function} filter A function to use to filter modules
+     * @param {Boolean} first Whether to return only the first matching module
+     * @return {Any}
+     */
+    static getModule(filter, first = true) {
+        const modules = this.getAllModules();
+        const rm = [];
+        for (let index in modules) {
+            if (!modules.hasOwnProperty(index)) continue;
+            const module = modules[index];
+            const { exports } = module;
+            let foundModule = null;
 
-			if (!exports) continue;
-			if (exports.__esModule && exports.default && filter(exports.default)) foundModule = exports.default;
-			if (filter(exports)) foundModule = exports;
-			if (!foundModule) continue;
-			if (first) return foundModule;
-			rm.push(foundModule);
-		}
-		return first || rm.length == 0 ? undefined : rm;
-	}
+            if (!exports) continue;
+            if (exports.__esModule && exports.default && filter(exports.default)) foundModule = exports.default;
+            if (filter(exports)) foundModule = exports;
+            if (!foundModule) continue;
+            if (first) return foundModule;
+            rm.push(foundModule);
+        }
+        return first || rm.length == 0 ? undefined : rm;
+    }
 
-	/**
-	 * Finds a module by it's name.
-	 * @param {String} name The name of the module
-	 * @param {Function} fallback A function to use to filter modules if not finding a known module
-	 * @return {Any}
-	 */
+    /**
+     * Finds a module by it's name.
+     * @param {String} name The name of the module
+     * @param {Function} fallback A function to use to filter modules if not finding a known module
+     * @return {Any}
+     */
     static getModuleByName(name, fallback) {
         if (Cache.hasOwnProperty(name)) return Cache[name];
         if (KnownModules.hasOwnProperty(name)) fallback = KnownModules[name];
@@ -246,48 +248,48 @@ export class WebpackModules {
         return module ? Cache[name] = module : undefined;
     }
 
-	/**
-	 * Finds a module by it's display name.
-	 * @param {String} name The display name of the module
-	 * @return {Any}
-	 */
+    /**
+     * Finds a module by it's display name.
+     * @param {String} name The display name of the module
+     * @return {Any}
+     */
     static getModuleByDisplayName(name) {
         return this.getModule(Filters.byDisplayName(name), true);
     }
 
-	/**
-	 * Finds a module using it's code.
-	 * @param {RegEx} regex A regular expression to use to filter modules
-	 * @param {Boolean} first Whether to return the only the first matching module
-	 * @return {Any}
-	 */
+    /**
+     * Finds a module using it's code.
+     * @param {RegEx} regex A regular expression to use to filter modules
+     * @param {Boolean} first Whether to return the only the first matching module
+     * @return {Any}
+     */
     static getModuleByRegex(regex, first = true) {
         return this.getModule(Filters.byCode(regex), first);
     }
 
-	/**
-	 * Finds a module using properties on it's prototype.
-	 * @param {Array} props Properties to use to filter modules
-	 * @param {Boolean} first Whether to return only the first matching module
-	 * @return {Any}
-	 */
+    /**
+     * Finds a module using properties on it's prototype.
+     * @param {Array} props Properties to use to filter modules
+     * @param {Boolean} first Whether to return only the first matching module
+     * @return {Any}
+     */
     static getModuleByPrototypes(prototypes, first = true) {
         return this.getModule(Filters.byPrototypeFields(prototypes), first);
     }
 
-	/**
-	 * Finds a module using it's own properties.
-	 * @param {Array} props Properties to use to filter modules
-	 * @param {Boolean} first Whether to return only the first matching module
-	 * @return {Any}
-	 */
+    /**
+     * Finds a module using it's own properties.
+     * @param {Array} props Properties to use to filter modules
+     * @param {Boolean} first Whether to return only the first matching module
+     * @return {Any}
+     */
     static getModuleByProps(props, first = true) {
         return this.getModule(Filters.byProperties(props), first);
     }
 
-	/**
-	 * Discord's __webpack_require__ function.
-	 */
+    /**
+     * Discord's __webpack_require__ function.
+     */
     static get require() {
         if (this._require) return this._require;
         const id = 'bd-webpackmodules';

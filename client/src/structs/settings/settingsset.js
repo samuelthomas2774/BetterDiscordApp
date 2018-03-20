@@ -446,7 +446,7 @@ export default class SettingsSet {
             text: this.text,
             headertext: this.headertext,
             settings: this.categories.map(category => category.clone()),
-            schemes: this.schemes.map(scheme => scheme.clone())
+            schemes: this.schemes
         }, ...merge);
     }
 

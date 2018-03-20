@@ -73,6 +73,6 @@
     "lint": "eslint -f unix client/src core/src csseditor/src",
     "test": "npm run build && npm run lint",
     "build_node-sass": "node scripts/build-node-sass.js",
-    "release": "build && gulp release"
+    "release": "npm run build && gulp release"
   }
 }

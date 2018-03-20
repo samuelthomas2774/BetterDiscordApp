@@ -14,7 +14,8 @@ const sass = require('node-sass');
 const { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
 const { BrowserWindow, dialog } = require('electron');
 
-const tests = true;
+const tests = false;
+const _basePath = __dirname;
 const _clientScript = tests
     ? path.resolve(__dirname, '..', '..', 'client', 'dist', 'betterdiscord.client.js')
     : path.resolve(__dirname, 'betterdiscord.client.js');
@@ -32,6 +33,7 @@ const _cssEditorPath = tests
     : path.resolve(__dirname, 'csseditor');
 
 const paths = [
+    { id: 'base', path: _basePath.replace(/\\/g, '/') },
     { id: 'cs', path: _clientScript.replace(/\\/g, '/') },
     { id: 'data', path: _dataPath.replace(/\\/g, '/') },
     { id: 'ext', path: _extPath.replace(/\\/g, '/') },
@@ -142,6 +144,14 @@ class BetterDiscord {
         const window = await this.waitForWindow();
         this.windowUtils = new WindowUtils({ window });
 
+        await FileUtils.ensureDirectory(paths.find(path => path.id === 'ext').path);
+
+        if (!tests) {
+            const files = await FileUtils.listDirectory(paths.find(path => path.id === 'base').path);
+            const latestCs = FileUtils.resolveLatest(files, file => file.endsWith('.js') && file.startsWith('client.'), file => file.replace('client.', '').replace('.js', ''), 'client.', '.js');
+            paths.find(path => path.id === 'cs').path = path.resolve(paths.find(path => path.id === 'base').path, latestCs).replace(/\\/g, '/');
+        }
+
         this.csseditor = new CSSEditor(this, paths.find(path => path.id === 'csseditor').path);
 
         this.windowUtils.events('did-get-response-details', () => this.ignite(this.windowUtils.window));
@@ -181,8 +191,13 @@ class BetterDiscord {
         window.webContents.executeJavaScript(`require("${sparkplug}");`);
     }
 
-    injectScripts(reload = false) {
+    async injectScripts(reload = false) {
         console.log(`RELOAD? ${reload}`);
+        if (!tests) {
+            const files = await FileUtils.listDirectory(paths.find(path => path.id === 'base').path);
+            const latestCs = FileUtils.resolveLatest(files, file => file.endsWith('.js') && file.startsWith('client.'), file => file.replace('client.', '').replace('.js', ''), 'client.', '.js');
+            paths.find(path => path.id === 'cs').path = path.resolve(paths.find(path => path.id === 'base').path, latestCs).replace(/\\/g, '/');
+        }
         this.windowUtils.injectScript(paths.find(path => path.id === 'cs').path);
     }
 

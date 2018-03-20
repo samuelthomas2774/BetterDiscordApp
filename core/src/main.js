@@ -11,39 +11,47 @@
 const path = require('path');
 const sass = require('node-sass');
 
-/**
- * DEVELOPMENT VARIABLES
- */
-const clientScriptPath = path.resolve(__dirname, '..', '..', 'client', 'dist').replace(/\\/g, '/');
-
-const __DEV = {
-    TESTING: false,
-    clientScriptPath: `${clientScriptPath}/betterdiscord.client.js`
-}
-
-const __dataPath = path.resolve(__dirname, '..', '..', 'tests', 'data');
-const __pluginPath = path.resolve(__dirname, '..', '..', 'tests', 'plugins');
-const __themePath = path.resolve(__dirname, '..', '..', 'tests', 'themes');
-const __modulePath = path.resolve(__dirname, '..', '..', 'tests', 'modules');
-
-const { Utils, FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
+const { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
 const { BrowserWindow, dialog } = require('electron');
 
+const tests = true;
+const _basePath = __dirname;
+const _clientScript = tests
+    ? path.resolve(__dirname, '..', '..', 'client', 'dist', 'betterdiscord.client.js')
+    : path.resolve(__dirname, 'betterdiscord.client.js');
+const _dataPath = tests
+    ? path.resolve(__dirname, '..', '..', 'tests', 'data')
+    : path.resolve(__dirname, 'data');
+const _extPath = tests
+    ? path.resolve(__dirname, '..', '..', 'tests', 'ext')
+    : path.resolve(__dirname, 'ext');
+const _pluginPath = path.resolve(_extPath, 'plugins');
+const _themePath = path.resolve(_extPath, 'themes');
+const _modulePath = path.resolve(_extPath, 'modules');
+const _cssEditorPath = tests
+    ? path.resolve(__dirname, '..', '..', 'csseditor', 'dist')
+    : path.resolve(__dirname, 'csseditor');
+
+const paths = [
+    { id: 'base', path: _basePath.replace(/\\/g, '/') },
+    { id: 'cs', path: _clientScript.replace(/\\/g, '/') },
+    { id: 'data', path: _dataPath.replace(/\\/g, '/') },
+    { id: 'ext', path: _extPath.replace(/\\/g, '/') },
+    { id: 'plugins', path: _pluginPath.replace(/\\/g, '/') },
+    { id: 'themes', path: _themePath.replace(/\\/g, '/') },
+    { id: 'modules', path: _modulePath.replace(/\\/g, '/') },
+    { id: 'csseditor', path: _cssEditorPath.replace(/\\/g, '/') }
+];
+
+const sparkplug = path.resolve(__dirname, 'sparkplug.js').replace(/\\/g, '/');
+
 const Common = {};
+const globals = {
+    version: '2.0.0a',
+    paths
+}
 
-const dummyArgs = {
-    'version': '2.0.0a',
-    'paths': [
-        { 'id': 'base', 'path': 'basePath' },
-        { 'id': 'data', 'path': __dataPath },
-        { 'id': 'plugins', 'path': __pluginPath },
-        { 'id': 'themes', 'path': __themePath },
-        { 'id': 'modules', 'path': __modulePath }
-    ]
-};
-const dbInstance = new Database(dummyArgs.paths.find(path => path.id === 'data').path);
-console.log(dummyArgs);
-
+const dbInstance = new Database(paths.find(path => path.id === 'data').path);
 
 class Comms {
 
@@ -120,7 +128,6 @@ class BetterDiscord {
 
     constructor(args) {
         if (BetterDiscord.loaded) {
-            // Creating two BetterDiscord objects???
             console.log('Creating two BetterDiscord objects???');
             return null;
         }
@@ -128,7 +135,7 @@ class BetterDiscord {
 
         this.injectScripts = this.injectScripts.bind(this);
         this.ignite = this.ignite.bind(this);
-        Common.Config = new Config(args || dummyArgs);
+        Common.Config = new Config(globals);
         this.comms = new Comms(this);
         this.init();
     }
@@ -137,17 +144,9 @@ class BetterDiscord {
         const window = await this.waitForWindow();
         this.windowUtils = new WindowUtils({ window });
 
-        this.csseditor = new CSSEditor(this);
+        await FileUtils.ensureDirectory(paths.find(path => path.id === 'ext').path);
 
-        //Log some events for now
-        //this.windowUtils.webContents.on('did-start-loading', e =>  this.windowUtils.executeJavascript(`console.info('did-start-loading');`));
-        //this.windowUtils.webContents.on('did-stop-loading', e => this.windowUtils.executeJavascript(`console.info('did-stop-loading');`));
-        //this.windowUtils.webContents.on('did-get-response-details', e => this.ignite(this.windowUtils.window));
-        //this.windowUtils.webContents.on('page-favicon-updated', e => this.windowUtils.executeJavascript(`console.info('page-favicon-updated');`));
-        //this.windowUtils.webContents.on('will-navigate', e => this.windowUtils.executeJavascript(`console.info('will-navigate');`));
-        //this.windowUtils.webContents.on('did-navigate', e => this.windowUtils.executeJavascript(`console.info('did-navigate');`));
-        //this.windowUtils.webContents.on('did-navigate-in-page', e => this.windowUtils.executeJavascript(`console.info('did-navigate-in-page');`));
-        //this.windowUtils.webContents.on('did-finish-load', e => this.injectScripts(true));
+        this.csseditor = new CSSEditor(this, paths.find(path => path.id === 'csseditor').path);
 
         this.windowUtils.events('did-get-response-details', () => this.ignite(this.windowUtils.window));
         this.windowUtils.events('did-finish-load', e => this.injectScripts(true));
@@ -157,13 +156,13 @@ class BetterDiscord {
         });
 
         setTimeout(() => {
-            if (__DEV) { this.injectScripts(); }
+            this.injectScripts();
         }, 500);
     }
 
     async waitForWindow() {
         const self = this;
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             const defer = setInterval(() => {
                 const windows = BrowserWindow.getAllWindows();
 
@@ -173,13 +172,7 @@ class BetterDiscord {
                     });
                 }
 
-                if (__DEV && __DEV.TESTING && windows.length > 0) {
-                    resolve(windows[0]);
-                    clearInterval(defer);
-                    return;
-                }
-
-                if (windows.length === 1 && windows[0].webContents.getURL().includes("discordapp.com")) {
+                if (windows.length === 1 && windows[0].webContents.getURL().includes('discordapp.com')) {
                     resolve(windows[0]);
                     clearInterval(defer);
                 }
@@ -189,15 +182,17 @@ class BetterDiscord {
 
     ignite(window) {
         //Hook things that Discord removes from global. These will be removed again in the client script
-        const sp = path.resolve(__dirname, 'sparkplug.js').replace(/\\/g, '/');
-        window.webContents.executeJavaScript(`require("${sp}");`);
+        window.webContents.executeJavaScript(`require("${sparkplug}");`);
     }
 
-    injectScripts(reload = false) {
+    async injectScripts(reload = false) {
         console.log(`RELOAD? ${reload}`);
-        if (__DEV) {
-            this.windowUtils.injectScript(__DEV.clientScriptPath);
+        if (!tests) {
+            const files = await FileUtils.listDirectory(paths.find(path => path.id === 'base').path);
+            const latestCs = FileUtils.resolveLatest(files, file => file.endsWith('.js') && file.startsWith('client.'), file => file.replace('client.', '').replace('.js', ''), 'client.', '.js');
+            paths.find(path => path.id === 'cs').path = path.resolve(paths.find(path => path.id === 'base').path, latestCs).replace(/\\/g, '/');
         }
+        this.windowUtils.injectScript(paths.find(path => path.id === 'cs').path);
     }
 
     get fileUtils() { return FileUtils; }

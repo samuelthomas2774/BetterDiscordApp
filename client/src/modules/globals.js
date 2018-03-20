@@ -63,4 +63,16 @@ export default new class extends Module {
         return this.state[name];
     }
 
+    getPath(id) {
+        return this.state.paths.find(path => path.id === id).path;
+    }
+
+    static get paths() {
+        return this.state.paths;
+    }
+
+    static get version() {
+        return this.state.version;
+    }
+
 }

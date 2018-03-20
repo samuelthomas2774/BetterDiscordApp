@@ -44,7 +44,7 @@ export default class {
      * returns {String}
      */
     static get contentPath() {
-        return this._contentPath ? this._contentPath : (this._contentPath = Globals.getObject('paths').find(path => path.id === this.pathId).path);
+        return Globals.getPath(this.pathId);
     }
 
     /**

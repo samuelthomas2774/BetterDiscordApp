@@ -48,8 +48,8 @@ export default class {
                 try {
                     Events.emit('update-check-end');
                     Logger.info('Updater',
-                        `Latest Version: ${e.version} - Current Version: ${Globals.getObject('version')}`);
-                    if (e.version !== Globals.getObject('version')) {
+                        `Latest Version: ${e.version} - Current Version: ${Globals.version}`);
+                    if (e.version !== Globals.version) {
                         this.updatesAvailable = true;
                         Events.emit('updates-available');
                     }

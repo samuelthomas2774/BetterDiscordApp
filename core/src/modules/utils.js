@@ -8,6 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+// TODO Use common
+
 const
     path = require('path'),
     fs = require('fs');
@@ -103,6 +105,66 @@ class FileUtils {
             return parsed;
         } catch(err) {
             throw(Object.assign(err, { path }));
+        }
+    }
+
+    static async listDirectory(path) {
+        try {
+            await this.directoryExists(path);
+            return new Promise((resolve, reject) => {
+                fs.readdir(path, (err, files) => {
+                    if (err) return reject(err);
+                    resolve(files);
+                });
+            });
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    static filterFiles(files, filter, map) {
+        if (!map) return files.filter(filter);
+        return files.filter(filter).map(map);
+    }
+
+    static resolveLatest(files, filter, map, prefix, suffix) {
+        let latest = null;
+        for (const file of this.filterFiles(files, filter, map)) {
+            const [major, minor, revision] = file.split('.');
+            if (!major || !minor || !revision) continue;
+            if (!latest) {
+                latest = file;
+                continue;
+            }
+
+            latest = file > latest ? file : latest;
+        }
+        return (prefix && suffix) ? `${prefix}${latest}${suffix}` : latest;
+    }
+
+    static async createDirectory(path) {
+        return new Promise((resolve, reject) => {
+            fs.mkdir(path, err => {
+                if (err) {
+                    if (err.code === 'EEXIST') return resolve();
+                    else return reject(err);
+                }
+                resolve();
+            });
+        });
+    }
+
+    static async ensureDirectory(path) {
+        try {
+            await this.directoryExists(path);
+            return true;
+        } catch (err) {
+            try {
+                await this.createDirectory(path);
+                return true;
+            } catch (err) {
+                throw err;
+            }
         }
     }
 }

@@ -39,6 +39,13 @@ const core3 = function() {
     return fs.writeFileSync('./release/index.js', `module.exports = require('./core.${corepkg.version}.js');`);
 }
 
+const sparkplug = function() {
+    return pump([
+        gulp.src('./core/dist/sparkplug.js'),
+        gulp.dest('./release')
+    ]);
+}
+
 const cssEditor = function() {
     return pump([
         gulp.src('./csseditor/dist/**/*'),
@@ -58,5 +65,5 @@ const bindings = function() {
 }
 
 gulp.task('release', function () {
-    del(['./release/**/*']).then(() => merge(client(), core(), core2(), core3(), cssEditor(), deps()));
+    del(['./release/**/*']).then(() => merge(client(), core(), core2(), core3(), sparkplug(), cssEditor(), deps(), bindings()));
 });

@@ -65,5 +65,5 @@ const bindings = function() {
 }
 
 gulp.task('release', function () {
-    del(['./release/**/*']).then(() => merge(client(), core(), core2(), core3(), sparkplug(), cssEditor(), deps()));
+    del(['./release/**/*']).then(() => merge(client(), core(), core2(), core3(), sparkplug(), cssEditor(), deps(), bindings()));
 });

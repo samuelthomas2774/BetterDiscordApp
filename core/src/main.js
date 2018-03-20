@@ -14,7 +14,7 @@ const sass = require('node-sass');
 const { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
 const { BrowserWindow, dialog } = require('electron');
 
-const tests = false;
+const tests = true;
 const _basePath = __dirname;
 const _clientScript = tests
     ? path.resolve(__dirname, '..', '..', 'client', 'dist', 'betterdiscord.client.js')

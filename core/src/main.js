@@ -146,12 +146,6 @@ class BetterDiscord {
 
         await FileUtils.ensureDirectory(paths.find(path => path.id === 'ext').path);
 
-        if (!tests) {
-            const files = await FileUtils.listDirectory(paths.find(path => path.id === 'base').path);
-            const latestCs = FileUtils.resolveLatest(files, file => file.endsWith('.js') && file.startsWith('client.'), file => file.replace('client.', '').replace('.js', ''), 'client.', '.js');
-            paths.find(path => path.id === 'cs').path = path.resolve(paths.find(path => path.id === 'base').path, latestCs).replace(/\\/g, '/');
-        }
-
         this.csseditor = new CSSEditor(this, paths.find(path => path.id === 'csseditor').path);
 
         this.windowUtils.events('did-get-response-details', () => this.ignite(this.windowUtils.window));

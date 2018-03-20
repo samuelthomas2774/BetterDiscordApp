@@ -12,6 +12,7 @@ import { EventListener } from 'modules';
 import DOM from './dom';
 import { BdBadge, BdMessageBadge } from './components/bd';
 import VueInjector from './vueinjector';
+import contributors from '../data/contributors';
 
 export default class extends EventListener {
 
@@ -55,43 +56,39 @@ export default class extends EventListener {
         if (msgGroup.dataset.hasBadges) return;
         msgGroup.setAttribute('data-has-badges', true);
         if (!msgGroup.dataset.authorId) return;
-        const c = this.contributors.find(c => c.id === msgGroup.dataset.authorId);
+        const c = contributors.find(c => c.id === msgGroup.dataset.authorId);
         if (!c) return;
         const root = document.createElement('span');
         const wrapperParent = msgGroup.querySelector('.username-wrapper').parentElement;
         if (!wrapperParent || wrapperParent.children.length < 2) return;
         wrapperParent.insertBefore(root, wrapperParent.children[1]);
         const { developer, contributor, webdev } = c;
-        VueInjector.inject(
-            root,
-            DOM.createElement('div', null, 'bdmessagebadges'),
-            { BdMessageBadge },
-            `<BdMessageBadge developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`,
-            true
-        );
+        VueInjector.inject(root, {
+            components: { BdMessageBadge },
+            data: { developer, contributor, webdev },
+            template: '<BdMessageBadge :developer="developer" :webdev="webdev" :contributor="contributor" />'
+        });
     }
 
     userlistBadge(e) {
-        const c = this.contributors.find(c => c.id === e.dataset.userId);
+        const c = contributors.find(c => c.id === e.dataset.userId);
         if (!c) return;
         const memberUsername = e.querySelector('.member-username');
         if (!memberUsername) return;
         const root = document.createElement('span');
         memberUsername.append(root);
         const { developer, contributor, webdev } = c;
-        VueInjector.inject(
-            root,
-            DOM.createElement('div', null, 'bdmessagebadges'),
-            { BdMessageBadge },
-            `<BdMessageBadge developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`,
-            true
-        );
+        VueInjector.inject(root, {
+            components: { BdMessageBadge },
+            data: { developer, contributor, webdev },
+            template: '<BdMessageBadge :developer="developer" :webdev="webdev" :contributor="contributor" />'
+        });
     }
 
     inject(userid) {
-        const c = this.contributors.find(c => c.id === userid);
+        const c = contributors.find(c => c.id === userid);
         if (!c) return;
- 
+
         setTimeout(() => {
             let hasBadges = false;
             let root = document.querySelector('[class*="profileBadges"]');
@@ -103,27 +100,16 @@ export default class extends EventListener {
 
             const { developer, contributor, webdev } = c;
 
-            VueInjector.inject(
-                root,
-                DOM.createElement('div', null, 'bdprofilebadges'),
-                { BdBadge },
-                `<BdBadge hasBadges="${hasBadges}" developer="${developer}" webdev="${webdev}" contributor="${contributor}"/>`
-            );
+            VueInjector.inject(root, {
+                components: { BdBadge },
+                data: { hasBadges, c },
+                template: '<BdBadge :hasBadges="hasBadges" :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />',
+            }, DOM.createElement('div', null, 'bdprofilebadges'));
         }, 400);
     }
 
     get contributors() {
-        return [
-            { 'id': '81388395867156480', 'webdev': true, 'developer': true, 'contributor': true }, // Jiiks
-            { 'id': '98003542823944192', 'webdev': false, 'developer': true, 'contributor': true }, // Pohky
-            { 'id': '138850472541814784', 'webdev': true, 'developer': false, 'contributor': true }, // Hammock
-            { 'id': '249746236008169473', 'webdev': false, 'developer': true, 'contributor': true }, // Zerebos
-            { 'id': '125367412370440192', 'webdev': false, 'developer': true, 'contributor': true }, // Pierce
-            { 'id': '284056145272766465', 'webdev': false, 'developer': false, 'contributor': true }, // Samuel Elliott
-            { 'id': '184021060562321419', 'webdev': false, 'developer': false, 'contributor': true }, // Lilian Tedone
-            { 'id': '76052829285916672', 'webdev': false, 'developer': false, 'contributor': true }, // samfun123
-            { 'id': '171005991272316937', 'webdev': false, 'developer': false, 'contributor': true }, // samogot
-        ];
+        return contributors;
     }
 
 }

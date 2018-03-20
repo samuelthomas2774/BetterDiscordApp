@@ -15,9 +15,6 @@
     "url": "https://github.com/Jiiks/BetterDiscordApp.git"
   },
   "private": false,
-  "devDependencies": {
-    
-  },
   "scripts": {
     "build": "webpack --progress --colors",
     "watch": "webpack --progress --colors --watch"

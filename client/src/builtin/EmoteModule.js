@@ -131,12 +131,11 @@ export default class {
         }
         const { bdemoteName, bdemoteSrc } = root.dataset;
         if (!bdemoteName || !bdemoteSrc) return;
-        VueInjector.inject(
-            root,
-            DOM.createElement('span'),
-            { EmoteComponent },
-            `<EmoteComponent src="${bdemoteSrc}" name="${bdemoteName}"/>`
-        );
+        VueInjector.inject(root, {
+            components: { EmoteComponent },
+            data: { src: bdemoteSrc, name: bdemoteName },
+            template: '<EmoteComponent :src="src" :name="name" />'
+        }, DOM.createElement('span'));
         root.classList.add('bd-is-emote');
     }
 

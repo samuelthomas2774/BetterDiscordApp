@@ -8,12 +8,14 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-/*Module Manager initializes all modules when everything is ready*/
-
+import { ClientLogger as Logger } from 'common';
 import { Events, SocketProxy, EventHook, CssEditor } from 'modules';
 import { ProfileBadges } from 'ui';
 import Updater from './updater';
 
+/**
+ * Module Manager initializes all modules when everything is ready
+ */
 export default class {
 
     static get modules() {
@@ -31,7 +33,7 @@ export default class {
             try {
                 if (module.init && module.init instanceof Function) module.init();
             } catch (err) {
-                console.log(`Failed to initialize module: ${err}`);
+                Logger.err('Module Manager', ['Failed to initialize module:', err]);
             }
         }
         return true;

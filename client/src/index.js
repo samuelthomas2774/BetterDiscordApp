@@ -10,9 +10,10 @@
 
 import { DOM, BdUI, Modals, Reflection } from 'ui';
 import BdCss from './styles/index.scss';
-import { Patcher, MonkeyPatch, Vendor, Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings, Database, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
+import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { EmoteModule } from 'builtin';
+
 const ignoreExternal = false;
 const DEV = true;
 
@@ -20,29 +21,16 @@ class BetterDiscord {
 
     constructor() {
         this._bd = {
-            DOM,
-            BdUI,
-            Modals,
-            Reflection,
-            Patcher,
-            MonkeyPatch,
+            DOM, BdUI, Modals, Reflection,
+
+            Events, CssEditor, Globals, Settings, Database, Updater,
+            ModuleManager, PluginManager, ThemeManager, ExtModuleManager,
             Vendor,
-            Events,
-            CssEditor,
-            Globals,
-            ExtModuleManager,
-            PluginManager,
-            ThemeManager,
-            ModuleManager,
-            WebpackModules,
-            Settings,
-            Database,
-            ReactComponents,
-            DiscordApi,
-            Logger,
-            ClientIPC,
-            Utils,
-            EmoteModule
+
+            WebpackModules, Patcher, MonkeyPatch, ReactComponents, DiscordApi,
+            EmoteModule,
+
+            Logger, ClientIPC, Utils
         };
 
         const developermode = Settings.getSetting('core', 'advanced', 'developer-mode');
@@ -63,14 +51,16 @@ class BetterDiscord {
             await Database.init();
             await Settings.loadSettings();
             await ModuleManager.initModules();
-            Modals.showContentManagerErrors();
+
             if (!ignoreExternal) {
                 await ExtModuleManager.loadAllModules(true);
                 await PluginManager.loadAllPlugins(true);
                 await ThemeManager.loadAllThemes(true);
             }
+
             if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
                 Modals.showContentManagerErrors();
+
             Events.emit('ready');
             Events.emit('discord-ready');
             EmoteModule.observe();
@@ -90,7 +80,7 @@ class BetterDiscord {
 if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
-    let instance = null;
+    let instance;
     Events.on('autopatcher', () => instance = new BetterDiscord());
     ReactAutoPatcher.autoPatch().then(() => Events.emit('autopatcher'));
 }

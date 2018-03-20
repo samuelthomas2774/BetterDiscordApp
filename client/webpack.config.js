@@ -32,9 +32,10 @@ module.exports = {
         loaders: [jsLoader, vueLoader, scssLoader]
     },
     externals: {
-        'electron': 'window.require("electron")',
-        'fs': 'window.require("fs")',
-        'path': 'window.require("path")'
+        electron: 'window.require("electron")',
+        fs: 'window.require("fs")',
+        path: 'window.require("path")',
+        sparkplug: 'require("../../core/dist/sparkplug")'
     },
     resolve: {
         alias: {

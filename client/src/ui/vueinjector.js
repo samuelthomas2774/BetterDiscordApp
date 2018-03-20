@@ -1,5 +1,5 @@
 /**
- * BetterDiscord VUE Injector Module
+ * BetterDiscord Vue Injector Module
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -11,7 +11,7 @@
 import Vue from './vue';
 
 export default class {
-    
+
     static inject(root, bdnode, components, template, replaceRoot) {
         if(!replaceRoot) bdnode.appendTo(root);
 
@@ -20,6 +20,15 @@ export default class {
             components,
             template
         });
+    }
+
+    static _inject(root, options, bdnode) {
+        if(bdnode) bdnode.appendTo(root);
+
+        const vue = new Vue(options);
+
+        vue.$mount(bdnode || root);
+        return vue;
     }
 
 }

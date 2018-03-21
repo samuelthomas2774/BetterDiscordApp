@@ -8,9 +8,17 @@ const
     rename = require('gulp-rename'),
     copydeps = require('gulp-npm-copy-deps');
 
+const mainpkg = require('./package.json');
 const corepkg = require('./core/package.json');
 const clientpkg = require('./client/package.json');
 const editorpkg = require('./csseditor/package.json');
+
+const releasepkg = function() {
+    delete mainpkg.main;
+    delete mainpkg.devDependencies;
+    delete mainpkg.scripts;
+    return fs.writeFileSync('./release/package.json', JSON.stringify(mainpkg, null, 2));
+};
 
 const client = function() {
     return pump([
@@ -65,5 +73,5 @@ const node_sass_bindings = function() {
 };
 
 gulp.task('release', function () {
-    del(['./release/**/*']).then(() => merge(client(), core(), sparkplug(), core_modules(), index(), cssEditor(), deps(), node_sass_bindings()));
+    del(['./release/**/*']).then(() => merge(releasepkg(), client(), core(), sparkplug(), core_modules(), index(), cssEditor(), deps(), node_sass_bindings()));
 });

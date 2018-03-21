@@ -10,9 +10,9 @@
 
 const path = require('path');
 const sass = require('node-sass');
+const { BrowserWindow, dialog } = require('electron');
 
 const { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
-const { BrowserWindow, dialog } = require('electron');
 
 const tests = true;
 
@@ -34,6 +34,8 @@ const _pluginPath = path.resolve(_extPath, 'plugins');
 const _themePath = path.resolve(_extPath, 'themes');
 const _modulePath = path.resolve(_extPath, 'modules');
 
+const version = require(path.resolve(_basePath, 'package.json')).version;
+
 const paths = [
     { id: 'base', path: _basePath },
     { id: 'cs', path: _clientScript },
@@ -46,7 +48,7 @@ const paths = [
 ];
 
 const globals = {
-    version: '2.0.0a',
+    version,
     paths
 };
 
@@ -115,7 +117,7 @@ class BetterDiscord {
         this.ignite = this.ignite.bind(this);
 
         this.config = new Config(args || globals);
-        this.dbInstance = new Database(this.config.paths.find(path => path.id === 'data').path);
+        this.dbInstance = new Database(this.config.getPath('data'));
         this.comms = new Comms(this);
 
         this.init();
@@ -124,12 +126,19 @@ class BetterDiscord {
     async init() {
         await this.waitForWindowUtils();
 
-        await FileUtils.ensureDirectory(this.config.paths.find(path => path.id === 'ext').path);
+        if (!tests) {
+            const basePath = this.config.getPath('base');
+            const files = await FileUtils.listDirectory(basePath);
+            const latestCs = FileUtils.resolveLatest(files, file => file.endsWith('.js') && file.startsWith('client.'), file => file.replace('client.', '').replace('.js', ''), 'client.', '.js');
+            this.config.getPath('cs', true).path = path.resolve(basePath, latestCs);
+        }
 
-        this.csseditor = new CSSEditor(this, this.config.paths.find(path => path.id === 'csseditor').path);
+        await FileUtils.ensureDirectory(this.config.getPath('ext'));
+
+        this.csseditor = new CSSEditor(this, this.config.getPath('csseditor'));
 
         this.windowUtils.on('did-get-response-details', () => this.ignite());
-        this.windowUtils.on('did-finish-load', e => this.injectScripts(true));
+        this.windowUtils.on('did-finish-load', () => this.injectScripts(true));
 
         this.windowUtils.on('did-navigate-in-page', (event, url, isMainFrame) => {
             this.windowUtils.send('did-navigate-in-page', { event, url, isMainFrame });
@@ -189,12 +198,7 @@ class BetterDiscord {
      */
     async injectScripts(reload = false) {
         console.log(`RELOAD? ${reload}`);
-        if (!tests) {
-            const files = await FileUtils.listDirectory(this.config.paths.find(path => path.id === 'base').path);
-            const latestCs = FileUtils.resolveLatest(files, file => file.endsWith('.js') && file.startsWith('client.'), file => file.replace('client.', '').replace('.js', ''), 'client.', '.js');
-            this.config.paths.find(path => path.id === 'cs').path = path.resolve(this.config.paths.find(path => path.id === 'base').path, latestCs);
-        }
-        return this.windowUtils.injectScript(this.config.paths.find(path => path.id === 'cs').path);
+        return this.windowUtils.injectScript(this.config.getPath('cs'));
     }
 
 }

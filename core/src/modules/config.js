@@ -20,6 +20,11 @@ class Config extends Module {
         return this.args.paths;
     }
 
+    getPath(id, full) {
+        const path = this.paths.find(path => path.id === id);
+        return full ? path : path.path;
+    }
+
     get config() {
         return {
             version: this.version,

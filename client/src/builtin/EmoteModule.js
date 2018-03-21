@@ -7,10 +7,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
 */
+
 import { FileUtils, ClientLogger as Logger } from 'common';
 import { Events, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
 import { DOM, VueInjector, Reflection } from 'ui';
 import EmoteComponent from './EmoteComponent.vue';
+
 let emotes = null;
 const emotesEnabled = true;
 

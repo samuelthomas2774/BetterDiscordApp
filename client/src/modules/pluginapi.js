@@ -388,10 +388,39 @@ export default class PluginApi {
     get ReactComponents() {
         return ReactComponents;
     }
+
     get Reflection() {
         return Reflection;
     }
-    get MonkeyPatch() {
+
+    /**
+     * Patcher
+     */
+
+    get patches() {
+        return Patcher.getPatchesByCaller(this.plugin.id);
+    }
+    patchBefore(...args) { return this.pushChildPatch(...args, 'before') }
+    patchAfter(...args) { return this.pushChildPatch(...args, 'after') }
+    patchInstead(...args) { return this.pushChildPatch(...args, 'instead') }
+    pushChildPatch(...args) {
+        return Patcher.pushChildPatch(this.plugin.id, ...args);
+    }
+    unpatchAll(patches) {
+        return Patcher.unpatchAll(patches || this.plugin.id);
+    }
+    get Patcher() {
+        return Object.defineProperty({
+            before: this.patchBefore.bind(this),
+            after: this.patchAfter.bind(this),
+            instead: this.patchInstead.bind(this),
+            pushChildPatch: this.pushChildPatch.bind(this),
+            unpatchAll: this.unpatchAll.bind(this),
+        }, 'patches', {
+            get: () => this.patches
+        });
+    }
+    get monkeyPatch() {
         return module => MonkeyPatch(this.plugin.id, module);
     }
 

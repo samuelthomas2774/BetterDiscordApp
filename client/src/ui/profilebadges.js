@@ -59,7 +59,9 @@ export default class extends EventListener {
         const c = contributors.find(c => c.id === msgGroup.dataset.authorId);
         if (!c) return;
         const root = document.createElement('span');
-        const wrapperParent = msgGroup.querySelector('.username-wrapper').parentElement;
+        const usernameWrapper = msgGroup.querySelector('.username-wrapper');
+        if (!usernameWrapper) return;
+        const wrapperParent = usernameWrapper.parentElement;
         if (!wrapperParent || wrapperParent.children.length < 2) return;
         wrapperParent.insertBefore(root, wrapperParent.children[1]);
         const { developer, contributor, webdev } = c;

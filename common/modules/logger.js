@@ -21,7 +21,7 @@ export const logLevels = {
     'info': 'info'
 };
 
-export class Logger {
+export default class Logger {
 
     constructor(file) {
         this.logs = [];

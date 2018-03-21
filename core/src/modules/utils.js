@@ -14,6 +14,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { Module } = require('./modulebase');
+const { BDIpc } = require('./bdipc');
 
 class Utils {
     static async tryParseJson(jsonString) {
@@ -177,7 +178,7 @@ class WindowUtils extends Module {
     }
 
     executeJavascript(script) {
-        this.webContents.executeJavaScript(script);
+        return this.webContents.executeJavaScript(script);
     }
 
     injectScript(fpath, variable) {
@@ -185,13 +186,15 @@ class WindowUtils extends Module {
     }
 
     static injectScript(window, fpath, variable) {
-        // console.log(`Injecting: ${fpath}`);
+        window = window.webContents || window;
+        if (!window) return;
+        // console.log(`Injecting: ${fpath} to`, window);
 
         const escaped_path = fpath.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
         const escaped_variable = variable ? variable.replace(/\\/g, '\\\\').replace(/"/g, '\\"') : null;
 
-        if (variable) window.executeJavaScript(`window["${escaped_variable}"] = require("${escaped_path}");`);
-        else window.executeJavaScript(`require("${escaped_path}");`);
+        if (variable) return window.executeJavaScript(`window["${escaped_variable}"] = require("${escaped_path}");`);
+        else return window.executeJavaScript(`require("${escaped_path}");`);
     }
 
     on(event, callback) {
@@ -199,8 +202,7 @@ class WindowUtils extends Module {
     }
 
     send(channel, message) {
-        channel = channel.startsWith('bd-') ? channel : `bd-${channel}`;
-        this.webContents.send(channel, message);
+        return BDIpc.send(this.window, channel, message);
     }
 }
 

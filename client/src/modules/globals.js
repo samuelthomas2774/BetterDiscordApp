@@ -9,7 +9,7 @@
 */
 
 import sparkplug from 'sparkplug';
-import { ClientIPC } from 'bdipc';
+import { ClientIPC } from 'common';
 import Module from './module';
 import Events from './events';
 

@@ -35,7 +35,7 @@ export default new class {
      * Init css editor
      */
     init() {
-        ClientIPC.on('bd-get-scss', () => this.sendToEditor('set-scss', { scss: this.scss }));
+        ClientIPC.on('bd-get-scss', () => this.scss, true);
         ClientIPC.on('bd-update-scss', (e, scss) => this.updateScss(scss));
         ClientIPC.on('bd-save-csseditor-bounds', (e, bounds) => this.saveEditorBounds(bounds));
 
@@ -49,7 +49,7 @@ export default new class {
             this.sendToEditor('set-liveupdate', event.value);
         });
 
-        ClientIPC.on('bd-get-liveupdate', () => this.sendToEditor('set-liveupdate', this.liveupdate.value));
+        ClientIPC.on('bd-get-liveupdate', () => this.liveupdate.value, true);
         ClientIPC.on('bd-set-liveupdate', (e, value) => this.liveupdate.value = value);
 
         this.watchfilessetting = Settings.getSetting('css', 'default', 'watch-files');
@@ -73,7 +73,7 @@ export default new class {
      */
     async updateScss(scss, sendSource) {
         if (sendSource)
-            this.sendToEditor('set-scss', { scss });
+            this.sendToEditor('set-scss', scss);
 
         if (!scss) {
             this._scss = this.css = '';
@@ -137,7 +137,7 @@ export default new class {
      * @param {any} data
      */
     async sendToEditor(channel, data) {
-        return await ClientIPC.send('sendToCssEditor', { channel, data });
+        return ClientIPC.sendToCssEditor(channel, data);
     }
 
     /**
@@ -168,7 +168,7 @@ export default new class {
      */
     setState(scss, css, files, err) {
         this._scss = scss;
-        this.sendToEditor('set-scss', { scss });
+        this.sendToEditor('set-scss', scss);
         this.css = css;
         this.files = files;
         this.error = err;

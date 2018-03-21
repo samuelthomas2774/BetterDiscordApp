@@ -20,7 +20,7 @@ import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs'
 import { BdMenuItems, Modals, DOM, Reflection } from 'ui';
 import DiscordApi from './discordapi';
 import { ReactComponents } from './reactcomponents';
-import { MonkeyPatch } from './patcher';
+import { Patcher, MonkeyPatch } from './patcher';
 
 export default class PluginApi {
 

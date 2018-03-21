@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { ClientIPC } from 'bdipc';
+import { ClientIPC } from 'common';
 
 export default class {
 
@@ -42,4 +42,5 @@ export default class {
             throw err;
         }
     }
+
 }

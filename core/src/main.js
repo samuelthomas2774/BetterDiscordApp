@@ -60,46 +60,46 @@ class Comms {
     }
 
     initListeners() {
-        BDIpc.on('bd-getConfig', o => o.reply(this.bd.config.config));
+        BDIpc.on('ping', () => 'pong', true);
 
-        BDIpc.on('bd-sendToDiscord', event => this.bd.windowUtils.send(event.args.channel, event.args.message));
+        BDIpc.on('bd-getConfig', () => this.bd.config.config, true);
 
-        BDIpc.on('bd-openCssEditor', o => this.bd.csseditor.openEditor(o));
-        // BDIpc.on('bd-setScss', o => this.bd.csseditor.setSCSS(o.args.scss));
-        BDIpc.on('bd-sendToCssEditor', o => this.bd.csseditor.send(o.args.channel, o.args.data));
+        BDIpc.on('bd-sendToDiscord', (event, m) => this.sendToDiscord(m.channel, m.message), true);
 
-        BDIpc.on('bd-native-open', o => {
-            dialog.showOpenDialog(BrowserWindow.fromWebContents(o.ipcEvent.sender), o.args, filenames => {
-                o.reply(filenames);
+        BDIpc.on('bd-openCssEditor', (event, options) => this.bd.csseditor.openEditor(options), true);
+        BDIpc.on('bd-sendToCssEditor', (event, m) => this.sendToCssEditor(m.channel, m.message), true);
+
+        BDIpc.on('bd-native-open', (event, options) => {
+            dialog.showOpenDialog(BrowserWindow.fromWebContents(event.ipcEvent.sender), options, filenames => {
+                event.reply(filenames);
             });
         });
 
-        BDIpc.on('bd-compileSass', o => {
-            if (!o.args.path && !o.args.data) return o.reply('');
-            if (typeof o.args.path === 'string' && typeof o.args.data === 'string') {
-                o.args.data = `${o.args.data} @import '${o.args.path.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}';`;
-                o.args.path = undefined;
+        BDIpc.on('bd-compileSass', (event, options) => {
+            if (typeof options.path === 'string' && typeof options.data === 'string') {
+                options.data = `${options.data} @import '${options.path.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}';`;
+                options.path = undefined;
             }
 
-            sass.render(o.args, (err, result) => {
-                if (err) return o.reply({ err });
-                else o.reply(result);
+            sass.render(options, (err, result) => {
+                if (err) event.reject(err);
+                else event.reply(result);
             });
         });
 
-        BDIpc.on('bd-dba', o => {
-            (async () => {
-                try {
-                    o.reply(await this.bd.dbInstance.exec(o.args));
-                } catch (err) {
-                    o.reply({ err });
-                }
-            })();
-        });
+        BDIpc.on('bd-dba', (event, options) => this.bd.dbInstance.exec(options), true);
     }
 
     async send(channel, message) {
         BDIpc.send(channel, message);
+    }
+
+    async sendToDiscord(channel, message) {
+        return this.bd.windowUtils.send(channel, message);
+    }
+
+    async sendToCssEditor(channel, message) {
+        return this.bd.csseditor.send(channel, message);
     }
 
 }
@@ -156,7 +156,7 @@ class BetterDiscord {
                 const windows = BrowserWindow.getAllWindows();
 
                 for (let window of windows) {
-                    BetterDiscord.ignite(window);
+                    if (window) BetterDiscord.ignite(window);
                 }
 
                 if (windows.length === 1 && windows[0].webContents.getURL().includes('discordapp.com')) {

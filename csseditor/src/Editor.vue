@@ -33,18 +33,18 @@
 </template>
 
 <script>
-    import '../../node_modules/codemirror/addon/scroll/simplescrollbars.js';
-    import '../../node_modules/codemirror/mode/css/css.js';
-    import '../../node_modules/codemirror/addon/hint/css-hint.js';
-    import '../../node_modules/codemirror/addon/search/search.js';
-    import '../../node_modules/codemirror/addon/search/searchcursor.js';
-    import '../../node_modules/codemirror/addon/search/jump-to-line.js';
-    import '../../node_modules/codemirror/addon/dialog/dialog.js';
-    import '../../node_modules/codemirror/addon/hint/show-hint.js';
-
     import BDIpc from './BDIpc';
 
-    const { remote } = window.require('electron');
+    import { remote } from 'electron';
+
+    import 'codemirror/addon/scroll/simplescrollbars.js';
+    import 'codemirror/mode/css/css.js';
+    import 'codemirror/addon/hint/css-hint.js';
+    import 'codemirror/addon/search/search.js';
+    import 'codemirror/addon/search/searchcursor.js';
+    import 'codemirror/addon/search/jump-to-line.js';
+    import 'codemirror/addon/dialog/dialog.js';
+    import 'codemirror/addon/hint/show-hint.js';
 
     const ExcludedIntelliSenseTriggerKeys = {
         '8': 'backspace',

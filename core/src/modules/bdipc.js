@@ -5,14 +5,15 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
+
 const { Module } = require('./modulebase');
 
 const { ipcMain } = require('electron');
 
 class BDIpcEvent extends Module {
-    
+
     constructor(event, args) {
         super(args);
         this.ipcEvent = event;
@@ -34,7 +35,6 @@ class BDIpcEvent extends Module {
 }
 
 class BDIpc {
-
     static on(channel, cb) {
         ipcMain.on(channel, (event, args) => cb(new BDIpcEvent(event, args)));
     }

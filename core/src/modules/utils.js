@@ -10,43 +10,35 @@
 
 // TODO Use common
 
-const
-    path = require('path'),
-    fs = require('fs');
+const path = require('path');
+const fs = require('fs');
 
 const { Module } = require('./modulebase');
 
 class Utils {
-
     static async tryParseJson(jsonString) {
         try {
             return JSON.parse(jsonString);
-        }catch(err) {
+        } catch (err) {
             throw ({
-                'message': 'Failed to parse json',
+                message: 'Failed to parse json',
                 err
             });
         }
     }
-
-    static get timestamp() {
-        return 'Timestamp';
-    }
-
 }
 
 class FileUtils {
-
     static async fileExists(path) {
         return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if(err) return reject({
-                    'message': `No such file or directory: ${err.path}`,
+                    message: `No such file or directory: ${err.path}`,
                     err
                 });
 
                 if(!stats.isFile()) return reject({
-                    'message': `Not a file: ${path}`,
+                    message: `Not a file: ${path}`,
                     stats
                 });
 
@@ -59,12 +51,12 @@ class FileUtils {
         return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if(err) return reject({
-                    'message': `Directory does not exist: ${path}`,
+                    message: `Directory does not exist: ${path}`,
                     err
                 });
 
                 if(!stats.isDirectory()) return reject({
-                    'message': `Not a directory: ${path}`,
+                    message: `Not a directory: ${path}`,
                     stats
                 });
 
@@ -76,14 +68,14 @@ class FileUtils {
     static async readFile(path) {
         try {
             await this.fileExists(path);
-        } catch(err) {
-            throw(err);
+        } catch (err) {
+            throw err;
         }
 
         return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf-8', (err, data) => {
-                if(err) reject({
-                    'message': `Could not read file: ${path}`,
+                if(err) return reject({
+                    message: `Could not read file: ${path}`,
                     err
                 });
 
@@ -97,14 +89,13 @@ class FileUtils {
         try {
             readFile = await this.readFile(path);
         } catch(err) {
-            throw(err);
+            throw err;
         }
 
         try {
-            const parsed = await Utils.tryParseJson(readFile);
-            return parsed;
-        } catch(err) {
-            throw(Object.assign(err, { path }));
+            return await Utils.tryParseJson(readFile);
+        } catch (err) {
+            throw Object.assign(err, { path });
         }
     }
 
@@ -113,8 +104,8 @@ class FileUtils {
             await this.directoryExists(path);
             return new Promise((resolve, reject) => {
                 fs.readdir(path, (err, files) => {
-                    if (err) return reject(err);
-                    resolve(files);
+                    if (err) reject(err);
+                    else resolve(files);
                 });
             });
         } catch (err) {
@@ -145,11 +136,8 @@ class FileUtils {
     static async createDirectory(path) {
         return new Promise((resolve, reject) => {
             fs.mkdir(path, err => {
-                if (err) {
-                    if (err.code === 'EEXIST') return resolve();
-                    else return reject(err);
-                }
-                resolve();
+                if (err) reject(err);
+                else resolve();
             });
         });
     }
@@ -170,7 +158,6 @@ class FileUtils {
 }
 
 class WindowUtils extends Module {
-
     bindings() {
         this.openDevTools = this.openDevTools.bind(this);
         this.executeJavascript = this.executeJavascript.bind(this);
@@ -194,16 +181,20 @@ class WindowUtils extends Module {
     }
 
     injectScript(fpath, variable) {
-        console.log(`Injecting: ${fpath}`);
+        return WindowUtils.injectScript(this.window, fpath, variable);
+    }
+
+    static injectScript(window, fpath, variable) {
+        // console.log(`Injecting: ${fpath}`);
 
         const escaped_path = fpath.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
         const escaped_variable = variable ? variable.replace(/\\/g, '\\\\').replace(/"/g, '\\"') : null;
 
-        if (variable) this.executeJavascript(`window["${escaped_variable}"] = require("${escaped_path}");`);
-        else this.executeJavascript(`require("${escaped_path}");`);
+        if (variable) window.executeJavaScript(`window["${escaped_variable}"] = require("${escaped_path}");`);
+        else window.executeJavaScript(`require("${escaped_path}");`);
     }
 
-    events(event, callback) {
+    on(event, callback) {
         this.webContents.on(event, callback);
     }
 
@@ -211,7 +202,6 @@ class WindowUtils extends Module {
         channel = channel.startsWith('bd-') ? channel : `bd-${channel}`;
         this.webContents.send(channel, message);
     }
-
 }
 
 module.exports = {

@@ -3,6 +3,8 @@ import App from './ui/app.vue';
 
 import styles from './styles/index.scss';
 
+
+
 const instance = new Vue({
     el: '#app',
     components: { App },

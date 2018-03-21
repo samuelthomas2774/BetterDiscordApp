@@ -57,6 +57,7 @@
     import Destination from './destination.vue';
 
     import electron from 'electron';
+    const ipc = electron.ipcRenderer;
     import process from 'process';
     import path from 'path';
     import fs from 'fs';

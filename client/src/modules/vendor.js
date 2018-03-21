@@ -11,6 +11,7 @@
 import { WebpackModules } from './webpackmodules';
 import jQuery from 'jquery';
 import lodash from 'lodash';
+import Vue from 'vue';
 
 export { jQuery as $ };
 
@@ -33,6 +34,13 @@ export default class {
      */
     static get moment() {
         return WebpackModules.getModuleByName('Moment');
+    }
+
+    /**
+     * Vue
+     */
+    static get Vue() {
+        return Vue;
     }
 
 }

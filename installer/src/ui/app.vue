@@ -28,7 +28,7 @@
                     <Intro v-if="selectedPanel === 0" />
                     <License v-if="selectedPanel === 1" />
                     <Destination v-if="selectedPanel === 2" :paths="paths" :channel="currentChannel" @setChannel="setChannel" @askForDiscordPath="askForDiscordPath" :dataPath="dataPath" @askForDataPath="askForDataPath" />
-                    <Install v-if="selectedPanel === 3"/>
+                    <Install v-if="selectedPanel === 3" :paths="paths" :dataPath="dataPath" :channel="currentChannel"/>
                 </div>
                 <div class="separator-controls"></div>
                 <div class="controls">
@@ -41,6 +41,7 @@
                     </template>
                     <template v-if="selectedPanel === 2">
                         <button @click="back">Back</button>
+                        <button @click="next">Next</button>
                         <button class="disabled">Install</button>
                     </template>
                     <template v-if="selectedPanel === 3">
@@ -131,8 +132,8 @@
     export default {
         data() {
             return {
-                selectedIndex: 3,
-                selectedPanel: 3,
+                selectedIndex: 2,
+                selectedPanel: 2,
                 animating: false,
                 animatingr: false,
                 paths: {},

@@ -27,7 +27,7 @@ export default class {
             new SocketProxy(),
             new EventHook(),
             CssEditor,
-            new Updater()
+            Updater
         ]);
     }
 

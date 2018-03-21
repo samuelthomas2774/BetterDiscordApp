@@ -1,6 +1,5 @@
-const
-    path = require('path'),
-    webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 
 const jsLoader = {
     test: /\.(js|jsx)$/,
@@ -9,18 +8,18 @@ const jsLoader = {
     query: {
         presets: ['react']
     }
-}
+};
 
 const vueLoader = {
     test: /\.(vue)$/,
     loader: 'vue-loader'
-}
+};
 
 const scssLoader = {
     test: /\.scss$/,
     exclude: /node_modules/,
     loader: ['css-loader', 'sass-loader']
-}
+};
 
 module.exports = {
     entry: './src/index.js',
@@ -50,8 +49,13 @@ module.exports = {
             path.resolve('src', 'structs'),
             path.resolve('src', 'builtin')
         ]
+    },
+    node: {
+        process: false,
+        __filename: false,
+        __dirname: false
     }
-   /* resolve: {
+    /* resolve: {
         alias: {
             'momentjs': 'vendor/moment.min.js'
         },
@@ -60,5 +64,5 @@ module.exports = {
             path.resolve(__dirname, '..'),
             path.resolve(__dirname, '..', 'node_modules')
         ]
-    }*/
+    } */
 };

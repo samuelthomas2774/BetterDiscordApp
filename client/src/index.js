@@ -14,13 +14,17 @@ import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager,
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { EmoteModule } from 'builtin';
 import electron from 'electron';
+import path from 'path';
 
+const tests = true;
 const ignoreExternal = false;
-const DEV = true;
 
 class BetterDiscord {
 
     constructor() {
+        Logger.file = tests ? path.join(__dirname, '..', '..', 'tests', 'log.txt') : path.join(__dirname, 'log.txt');
+        Logger.log('main', 'BetterDiscord starting');
+
         this._bd = {
             DOM, BdUI, Modals, Reflection,
 

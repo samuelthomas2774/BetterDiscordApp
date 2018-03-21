@@ -4,6 +4,8 @@ dist
 etc
 release
 
+tests/log.txt
+
 # User data
 tests/data
 user.config.json

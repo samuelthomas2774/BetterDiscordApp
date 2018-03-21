@@ -13,7 +13,7 @@ import Globals from './globals';
 import { $ } from 'vendor';
 import { ClientLogger as Logger } from 'common';
 
-export default class {
+export default new class {
 
     constructor() {
         window.updater = this;

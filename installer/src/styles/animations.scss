@@ -65,3 +65,13 @@
         opacity: 0;
     }
 }
+
+@keyframes progress-bounce {
+    from {
+        flex-grow: 0;
+    }
+    50% { flex-grow: 1; }
+    to {
+        flex-grow: 0;
+    }
+}

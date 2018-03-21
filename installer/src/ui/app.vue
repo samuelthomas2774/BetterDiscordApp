@@ -28,6 +28,7 @@
                     <Intro v-if="selectedPanel === 0" />
                     <License v-if="selectedPanel === 1" />
                     <Destination v-if="selectedPanel === 2" :paths="paths" :channel="currentChannel" @setChannel="setChannel" @askForDiscordPath="askForDiscordPath" :dataPath="dataPath" @askForDataPath="askForDataPath" />
+                    <Install v-if="selectedPanel === 3"/>
                 </div>
                 <div class="separator-controls"></div>
                 <div class="controls">
@@ -42,7 +43,10 @@
                         <button @click="back">Back</button>
                         <button class="disabled">Install</button>
                     </template>
-                    <button @click="modalVisible = true">Cancel</button>
+                    <template v-if="selectedPanel === 3">
+                        <button>Exit</button>
+                    </template>
+                    <button v-if="selectedPanel !== 3" @click="modalVisible = true">Cancel</button>
                 </div>
                 <div class="border" v-if="platform === 'win32'"></div>
             </div>
@@ -55,25 +59,13 @@
     import Intro from './intro.vue';
     import License from './license.vue';
     import Destination from './destination.vue';
+    import Install from './install.vue';
 
     import electron from 'electron';
     const ipc = electron.ipcRenderer;
     import process from 'process';
     import path from 'path';
     import fs from 'fs';
-    import axios from 'axios';
-
-    import github from 'github-api';
-    const Github = new github();
-
-    Github.getLatestRelease = async function (user, repo) {
-        try {
-            const get = await this.getRepo(user, repo).getRelease('latest');
-            return get.data;
-        } catch (err) {
-            throw err;
-        }
-    }
 
     function checkDir(dir) {
         if (dir === null) return false;
@@ -139,8 +131,8 @@
     export default {
         data() {
             return {
-                selectedIndex: 2,
-                selectedPanel: 2,
+                selectedIndex: 3,
+                selectedPanel: 3,
                 animating: false,
                 animatingr: false,
                 paths: {},
@@ -154,7 +146,8 @@
             Sidebar,
             Intro,
             License,
-            Destination
+            Destination,
+            Install
         },
         methods: {
             next() {

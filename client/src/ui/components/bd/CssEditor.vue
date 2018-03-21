@@ -11,9 +11,9 @@
 <template>
     <SettingsWrapper headertext="CSS Editor">
         <div class="bd-css-editor">
-            <div v-if="CssEditor.error" class="bd-form-item">
+            <div v-if="error" class="bd-form-item">
                 <h5 style="margin-bottom: 10px;">Compiler error</h5>
-                <div class="bd-err bd-pre-wrap"><div class="bd-pre">{{ CssEditor.error.formatted }}</div></div>
+                <div class="bd-err bd-pre-wrap"><div class="bd-pre">{{ error.formatted }}</div></div>
                 <div class="bd-form-divider"></div>
             </div>
 

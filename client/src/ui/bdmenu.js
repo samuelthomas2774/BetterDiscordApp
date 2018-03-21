@@ -8,16 +8,21 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Events } from 'modules';
 import { Utils } from 'common';
 
 let items = 0;
 
-const BdMenuItems = new class {
+export const BdMenuItems = new class {
 
     constructor() {
         window.bdmenu = this;
 
         this.items = [];
+
+        const updater = this.add({category: 'Updates', contentid: 'updater', text: 'Updates available!', hidden: true});
+        Events.on('update-check-end', () => updater.hidden = true);
+        Events.on('updates-available', () => updater.hidden = false);
 
         this.addSettingsSet('Internal', 'core', 'Core');
         this.addSettingsSet('Internal', 'ui', 'UI');
@@ -82,5 +87,3 @@ const BdMenuItems = new class {
     }
 
 };
-
-export { BdMenuItems };

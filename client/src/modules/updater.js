@@ -16,8 +16,10 @@ import { ClientLogger as Logger } from 'common';
 export default new class {
 
     constructor() {
-        window.updater = this;
         this.updatesAvailable = false;
+        this.latestVersion = undefined;
+        this.error = undefined;
+
         this.init = this.init.bind(this);
         this.checkForUpdates = this.checkForUpdates.bind(this);
     }
@@ -37,9 +39,18 @@ export default new class {
      * Installs an update.
      * TODO
      */
-    update() {
-        this.updatesAvailable = false;
-        Events.emit('update-check-end');
+    async update() {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+
+            this.updatesAvailable = false;
+            this.latestVersion = Globals.version;
+            Events.emit('update-check-end');
+        } catch (err) {
+            this.error = err;
+            this.checkForUpdates();
+            throw err;
+        }
     }
 
     /**
@@ -58,10 +69,11 @@ export default new class {
                 cache: false,
                 success: e => {
                     try {
+                        this.latestVersion = e.version;
                         Events.emit('update-check-end');
-                        Logger.info('Updater', `Latest Version: ${e.version} - Current Version: ${Globals.getObject('version')}`);
+                        Logger.info('Updater', `Latest Version: ${e.version} - Current Version: ${Globals.version}`);
 
-                        if (e.version !== Globals.getObject('version')) {
+                        if (this.latestVersion !== Globals.version) {
                             this.updatesAvailable = true;
                             Events.emit('updates-available');
                             resolve(true);

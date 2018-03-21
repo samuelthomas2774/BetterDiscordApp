@@ -1,0 +1,12 @@
+export { default as BoolSetting } from './bool';
+export { default as StringSetting } from './text';
+export { default as NumberSetting } from './number';
+export { default as DropdownSetting } from './dropdown';
+export { default as RadioSetting } from './radio';
+export { default as SliderSetting } from './slider';
+export { default as ColourSetting } from './colour';
+export { default as KeybindSetting } from './keybind';
+export { default as FileSetting } from './file';
+export { default as GuildSetting } from './guild';
+export { default as ArraySetting } from './array';
+export { default as CustomSetting } from './custom';

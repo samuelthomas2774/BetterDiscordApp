@@ -13,6 +13,7 @@ import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { EmoteModule } from 'builtin';
+import electron from 'electron';
 
 const ignoreExternal = false;
 const DEV = true;
@@ -38,6 +39,14 @@ class BetterDiscord {
         developermode.on('setting-updated', event => {
             if (event.value) window._bd = this._bd;
             else if (window._bd) delete window._bd;
+        });
+
+        const debuggerkeybind = Settings.getSetting('core', 'advanced', 'debugger-keybind');
+        debuggerkeybind.on('keybind-activated', () => {
+            const currentWindow = electron.remote.getCurrentWindow();
+            if (currentWindow.isDevToolsOpened()) return eval('debugger;');
+            currentWindow.openDevTools();
+            setTimeout(() => eval('debugger;'), 1000);
         });
 
         DOM.injectStyle(BdCss, 'bdmain');

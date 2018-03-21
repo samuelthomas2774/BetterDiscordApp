@@ -24,8 +24,9 @@
 </template>
 
 <script>
-    import { shell } from 'electron';
+    import { KeybindSetting } from 'structs';
     import { ClientIPC, ClientLogger as Logger } from 'common';
+    import { shell } from 'electron';
     import Combokeys from 'combokeys';
     import CombokeysRecord from 'combokeys/plugins/record';
 
@@ -49,6 +50,7 @@
         },
         watch: {
             active(active) {
+                KeybindSetting.paused = active;
                 if (active) combokeys.record(this.recorded);
             }
         },

@@ -17,7 +17,7 @@ module.exports = {
     entry: './src/index.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'csseditor.js'
+        filename: 'csseditor-release.js'
     },
     module: {
         loaders: [vueLoader, scssLoader]

@@ -58,7 +58,8 @@ const index = function() {
 
 const cssEditor = function() {
     return pump([
-        gulp.src('./csseditor/dist/**/*'),
+        gulp.src('./csseditor/dist/csseditor-release.js'),
+        rename('csseditor.js'),
         copy('release/csseditor', { prefix: 2 })
     ]);
 };

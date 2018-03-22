@@ -12,7 +12,7 @@ import { ipcRenderer } from 'electron';
 
 const callbacks = new WeakMap();
 
-export default new class ClientIPC {
+const ClientIPC = new class ClientIPC {
 
     constructor() {
         this.on('ping', () => 'pong', true);
@@ -113,6 +113,8 @@ export default new class ClientIPC {
     }
 
 }
+
+export default ClientIPC;
 
 /**
  * An IPC event.

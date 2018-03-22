@@ -16,7 +16,7 @@ import { EmoteModule } from 'builtin';
 import electron from 'electron';
 import path from 'path';
 
-const tests = typeof PRODUCTION !== 'undefined';
+const tests = typeof PRODUCTION === 'undefined';
 const ignoreExternal = false;
 
 class BetterDiscord {

@@ -214,8 +214,7 @@ export default class {
                 }
             } catch (err) {
                 // We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config
-                Logger.info(this.moduleName, `Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`);
-                Logger.err(this.moduleName, err);
+                Logger.warn(this.moduleName, [`Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`, err]);
             }
 
             userConfig.config = defaultConfig.clone({ settings: userConfig.config });

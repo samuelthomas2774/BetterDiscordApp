@@ -61,7 +61,7 @@ export default new class Settings {
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
-            Logger.err('Settings', err);
+            Logger.warn('Settings', ['Failed to load internal settings', err]);
         }
     }
 

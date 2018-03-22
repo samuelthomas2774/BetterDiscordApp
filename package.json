@@ -38,6 +38,7 @@
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.0",
     "gulp-copy": "^1.1.0",
+    "gulp-inject-string": "^1.1.1",
     "gulp-merge": "^0.1.1",
     "gulp-npm-copy-deps": "^1.0.2",
     "gulp-plumber": "^1.2.0",
@@ -49,6 +50,7 @@
     "node-gyp": "^3.6.2",
     "pump": "^2.0.0",
     "sass-loader": "^6.0.6",
+    "uglifyjs-webpack-plugin": "^1.2.4",
     "v-tooltip": "^2.0.0-rc.30",
     "vue": "^2.5.13",
     "vue-codemirror": "^4.0.3",
@@ -71,6 +73,7 @@
     "lint": "eslint -f unix client/src core/src csseditor/src",
     "test": "npm run build && npm run lint",
     "build_node-sass": "node scripts/build-node-sass.js",
-    "release": "npm run lint && npm run build && gulp release"
+    "build_release": "npm run release --prefix client && npm run build --prefix core && npm run release --prefix csseditor && npm run build --prefix installer",
+    "release": "npm run lint && npm run build_release && gulp release"
   }
 }

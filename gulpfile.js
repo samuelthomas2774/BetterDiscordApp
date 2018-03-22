@@ -6,6 +6,7 @@ const
     merge = require('gulp-merge'),
     copy = require('gulp-copy'),
     rename = require('gulp-rename'),
+    inject = require('gulp-inject-string'),
     copydeps = require('gulp-npm-copy-deps');
 
 const mainpkg = require('./package.json');
@@ -22,7 +23,7 @@ const releasepkg = function() {
 
 const client = function() {
     return pump([
-        gulp.src('./client/dist/*.client.js'),
+        gulp.src('./client/dist/*.client-release.js'),
         rename(`client.${clientpkg.version}.js`),
         gulp.dest('./release')
     ]);
@@ -31,6 +32,7 @@ const client = function() {
 const core = function() {
     return pump([
         gulp.src('./core/dist/main.js'),
+        inject.after("'use strict';\n", 'const PRODUCTION = true;\n'),
         rename(`core.${corepkg.version}.js`),
         gulp.dest('./release')
     ]);

@@ -14,7 +14,7 @@ const { BrowserWindow, dialog } = require('electron');
 
 const { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
 
-const tests = true;
+const tests = typeof PRODUCTION === 'undefined';
 
 const _basePath = tests ? path.resolve(__dirname, '..', '..') : __dirname;
 const _baseDataPath = tests ? path.resolve(_basePath, 'tests') : _basePath;

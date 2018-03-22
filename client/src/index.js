@@ -16,13 +16,13 @@ import { EmoteModule } from 'builtin';
 import electron from 'electron';
 import path from 'path';
 
-const tests = true;
+const tests = typeof PRODUCTION !== 'undefined';
 const ignoreExternal = false;
 
 class BetterDiscord {
 
     constructor() {
-        Logger.file = tests ? path.join(__dirname, '..', '..', 'tests', 'log.txt') : path.join(__dirname, 'log.txt');
+        Logger.file = tests ? path.resolve(__dirname, '..', '..', 'tests', 'log.txt') : path.join(__dirname, 'log.txt');
         Logger.log('main', 'BetterDiscord starting');
 
         this._bd = {

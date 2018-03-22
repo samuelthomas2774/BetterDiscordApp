@@ -78,10 +78,9 @@ export default class Content {
      */
     async saveConfiguration() {
         try {
-            Database.insertOrUpdate({ type: 'contentconfig', $or: [{ id: this.id }, { name: this.name }] }, {
-                type: 'contentconfig',
+            Database.insertOrUpdate({ type: `${this.type}-config`, id: this.id }, {
+                type: `${this.type}-config`,
                 id: this.id,
-                name: this.name,
                 enabled: this.enabled,
                 config: this.settings.strip().settings,
                 data: this.data

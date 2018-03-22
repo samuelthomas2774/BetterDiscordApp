@@ -40,6 +40,27 @@ export default class {
     }
 
     /**
+     * The type of content this content manager manages.
+     */
+    static get contentType() {
+        return undefined;
+    }
+
+    /**
+     * The name of this content manager.
+     */
+    static get moduleName() {
+        return undefined;
+    }
+
+    /**
+     * The path used to store this content manager's content.
+     */
+    static get pathId() {
+        return undefined;
+    }
+
+    /**
      * Local path for content.
      * @return {String}
      */
@@ -100,7 +121,7 @@ export default class {
             const directories = await FileUtils.listDirectory(this.contentPath);
 
             for (let dir of directories) {
-                // If content is already loaded this should resolve.
+                // If content is already loaded this should resolve
                 if (this.getContentByDirName(dir)) continue;
 
                 try {
@@ -185,7 +206,7 @@ export default class {
 
             try {
                 const id = readConfig.info.id || readConfig.info.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
-                const readUserConfig = await Database.find({ type: 'contentconfig', id });
+                const readUserConfig = await Database.find({ type: `${this.contentType}-config`, id });
                 if (readUserConfig.length) {
                     userConfig.enabled = readUserConfig[0].enabled || false;
                     userConfig.config = readUserConfig[0].config;

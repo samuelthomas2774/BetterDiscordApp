@@ -8,27 +8,33 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { FileUtils, ClientLogger as Logger } from 'common';
 import { Events, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
 import { DOM, VueInjector, Reflection } from 'ui';
+import { FileUtils, ClientLogger as Logger } from 'common';
+import path from 'path';
 import EmoteComponent from './EmoteComponent.vue';
 
 let emotes = null;
 const emotesEnabled = true;
 
 export default class {
+
     static get searchCache() {
         return this._searchCache || (this._searchCache = {});
     }
+
     static get emoteDb() {
         return emotes;
     }
+
     static get React() {
         return WebpackModules.getModuleByName('React');
     }
+
     static get ReactDOM() {
         return WebpackModules.getModuleByName('ReactDOM');
     }
+
     static processMarkup(markup) {
         if (!emotesEnabled) return markup; // TODO Get it from setttings
         const newMarkup = [];
@@ -94,13 +100,20 @@ export default class {
     }
 
     static async observe() {
-        const dataPath = Globals.getObject('paths').find(path => path.id === 'data').path;
+        const dataPath = Globals.getPath('data');
         try {
-            emotes = await FileUtils.readJsonFromFile(dataPath + '/emotes.json');
+            emotes = await FileUtils.readJsonFromFile(path.join(dataPath, 'emotes.json'));
+        } catch (err) {
+            Logger.err('EmoteModule', [`Failed to load emote data. Make sure you've downloaded the emote data and placed it in ${dataPath}:`, err]);
+            return;
+        }
+
+        try {
             const Message = await ReactComponents.getComponent('Message');
             this.unpatchRender = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('render', (component, args, retVal) => {
                 try {
-                    const markup = this.findByProp(retVal, 'className', 'markup'); // First child has all the actual text content, second is the edited timestamp
+                    // First child has all the actual text content, second is the edited timestamp
+                    const markup = this.findByProp(retVal, 'className', 'markup');
                     if (!markup) return;
                     markup.children[0] = this.processMarkup(markup.children[0]);
                 } catch (err) {
@@ -180,4 +193,5 @@ export default class {
             }
         });
     }
+
 }

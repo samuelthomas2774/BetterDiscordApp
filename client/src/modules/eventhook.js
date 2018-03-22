@@ -52,7 +52,7 @@ export default class extends EventListener {
 
     /**
      * Discord emit overload
-     * @param {any} e
+     * @param {any} event
      * @param {any} action
      * @param {any} data
      */

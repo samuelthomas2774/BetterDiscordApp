@@ -91,7 +91,6 @@ const KnownModules = {
     UserActivityStore: Filters.byProperties(['getActivity']),
     UserNameResolver: Filters.byProperties(['getName']),
 
-
     /* Emoji Store and Utils */
     EmojiInfo: Filters.byProperties(['isEmojiDisabled']),
     EmojiUtils: Filters.byProperties(['getGuildEmoji']),
@@ -101,7 +100,6 @@ const KnownModules = {
     InviteStore: Filters.byProperties(["getInvites"]),
     InviteResolver: Filters.byProperties(['findInvite']),
     InviteActions: Filters.byProperties(['acceptInvite']),
-
 
     /* Discord Objects & Utils */
     DiscordConstants: Filters.byProperties(["Permissions", "ActivityTypes", "StatusTypes"]),
@@ -127,7 +125,6 @@ const KnownModules = {
     ExperimentStore: Filters.byProperties(['getExperimentOverrides']),
     ExperimentsManager: Filters.byProperties(['isDeveloper']),
     CurrentExperiment: Filters.byProperties(['getExperimentId']),
-
 
     /* Images, Avatars and Utils */
     ImageResolver: Filters.byProperties(["getUserAvatarURL"]),
@@ -181,7 +178,6 @@ const KnownModules = {
     /* URLs and Utils */
     URLParser: Filters.byProperties(['Url', 'parse']),
     ExtraURLs: Filters.byProperties(['getArticleURL']),
-
 
     /* DOM/React Components */
     /* ==================== */

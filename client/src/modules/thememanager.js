@@ -62,11 +62,11 @@ export default class ThemeManager extends ContentManager {
     }
 
     static enableTheme(theme) {
-        theme.enable();
+        return theme.enable();
     }
 
     static disableTheme(theme) {
-        theme.disable();
+        return theme.disable();
     }
 
     static get isTheme() { return this.isThisContent }

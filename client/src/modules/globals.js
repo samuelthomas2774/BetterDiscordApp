@@ -29,26 +29,24 @@ export default new class extends Module {
         this.getObject = this.getObject.bind(this);
     }
 
-    first() {
-        (async() => {
-            const config = await ClientIPC.send('getConfig');
-            this.setState({ config });
+    async first() {
+        const config = await ClientIPC.send('getConfig');
+        this.setState({ config });
 
-            // This is for Discord to stop error reporting :3
-            window.BetterDiscord = {
-                version: config.version,
-                v: config.version
-            };
-            window.jQuery = {};
+        // This is for Discord to stop error reporting :3
+        window.BetterDiscord = {
+            version: config.version,
+            v: config.version
+        };
+        window.jQuery = {};
 
-            if (sparkplug.bd) {
-                this.setState({ bd: sparkplug.bd });
-                sparkplug.bd.setWS = this.setWS;
-            }
+        if (sparkplug.bd) {
+            this.setState({ bd: sparkplug.bd });
+            sparkplug.bd.setWS = this.setWS;
+        }
 
-            Events.emit('global-ready');
-            Events.emit('socket-created', this.state.wsHook);
-        })();
+        Events.emit('global-ready');
+        Events.emit('socket-created', this.state.wsHook);
     }
 
     setWS(wSocket) {

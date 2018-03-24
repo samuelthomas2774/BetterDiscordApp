@@ -16,7 +16,7 @@ export default class {
      * Creates a new Vue object and mounts it in the passed element.
      * @param {HTMLElement} root The element to mount the new Vue object at
      * @param {Object} options Options to pass to Vue
-     * @param {BdNode} bdnode The element to append to
+     * @param {BdNode} bdnode The element to append
      * @return {Vue}
      */
     static inject(root, options, bdnode) {
@@ -24,7 +24,7 @@ export default class {
 
         const vue = new Vue(options);
 
-        vue.$mount(bdnode || root);
+        vue.$mount(bdnode ? bdnode.element : root);
         return vue;
     }
 

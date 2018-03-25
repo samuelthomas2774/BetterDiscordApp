@@ -76,12 +76,12 @@ export default class extends ContentManager {
     static async loadPlugin(paths, configs, info, main, dependencies, permissions) {
         if (permissions && permissions.length > 0) {
             for (let perm of permissions) {
-                console.log(`Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
+                Logger.log(this.moduleName, `Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
             }
             try {
                 const allowed = await Modals.permissions(`${info.name} wants to:`, info.name, permissions).promise;
             } catch (err) {
-                return null;
+                return;
             }
         }
 
@@ -90,15 +90,13 @@ export default class extends ContentManager {
             for (const [key, value] of Object.entries(dependencies)) {
                 const extModule = ExtModuleManager.findModule(key);
                 if (!extModule) {
-                    throw {
-                        'message': `Dependency: ${key}:${value} is not loaded`
-                    };
+                    throw {message: `Dependency ${key}:${value} is not loaded.`};
                 }
                 deps[key] = extModule.__require;
             }
         }
 
-        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor, deps);
+        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info, paths.contentPath), Vendor, deps);
         if (!(plugin.prototype instanceof Plugin))
             throw {message: `Plugin ${info.name} did not return a class that extends Plugin.`};
 
@@ -121,24 +119,24 @@ export default class extends ContentManager {
     static get unloadPlugin() { return this.unloadContent }
     static get reloadPlugin() { return this.reloadContent }
 
-    static stopPlugin(name) {
-        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
-        try {
-            if (plugin) return plugin.stop();
-        } catch (err) {
-           // Logger.err('PluginManager', err);
-        }
-        return true; //Return true anyways since plugin doesn't exist
+    /**
+     * Stops a plugin.
+     * @param {Plugin|String} plugin
+     * @return {Promise}
+     */
+    static stopPlugin(plugin) {
+        plugin = this.isPlugin(plugin) ? plugin : this.getPluginById(plugin);
+        return plugin.stop();
     }
 
-    static startPlugin(name) {
-        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
-        try {
-            if (plugin) return plugin.start();
-        } catch (err) {
-           // Logger.err('PluginManager', err);
-        }
-        return true; //Return true anyways since plugin doesn't exist
+    /**
+     * Starts a plugin.
+     * @param {Plugin|String} plugin
+     * @return {Promise}
+     */
+    static startPlugin(plugin) {
+        plugin = this.isPlugin(plugin) ? plugin : this.getPluginById(plugin);
+        return plugin.start();
     }
 
     static get isPlugin() { return this.isThisContent }

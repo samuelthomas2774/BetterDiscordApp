@@ -26,11 +26,6 @@
     import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension } from '../common';
 
     export default {
-        data() {
-            return {
-                settingsOpen: false
-            }
-        },
         props: ['theme', 'toggleTheme', 'reloadTheme', 'deleteTheme', 'showSettings'],
         components: {
             Card, Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
@@ -40,7 +35,7 @@
                 try {
                     shell.openItem(this.theme.themePath);
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('ThemeCard', [`Error opening theme directory ${this.theme.contentPath}:`, err]);
                 }
             }
         }

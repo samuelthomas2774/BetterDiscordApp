@@ -16,8 +16,9 @@ Vue.use(VTooltip, {
     defaultContainer: 'bd-tooltips',
     defaultClass: 'bd-tooltip',
     defaultTargetClass: 'bd-has-tooltip',
+    defaultArrowSelector: '.bd-tooltip-arrow',
     defaultInnerSelector: '.bd-tooltip-inner',
-    defaultTemplate: '<div class="bd-tooltip"><span class="bd-tooltip-inner"></span></div>',
+    defaultTemplate: '<div class="bd-tooltip"><div class="bd-tooltip-arrow"></div><span class="bd-tooltip-inner"></span></div>',
     defaultBoundariesElement: DOM.getElement('#app-mount')
 });
 

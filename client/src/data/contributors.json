@@ -1,0 +1,65 @@
+[
+    {
+        "__user": "Jiiks#5000",
+        "id": "81388395867156480",
+        "developer": true,
+        "webdev": true,
+        "contributor": true
+    },
+    {
+        "__user": "Pohky#0156",
+        "id": "98003542823944192",
+        "developer": true,
+        "webdev": false,
+        "contributor": true
+    },
+    {
+        "__user": "Hammock#3110",
+        "id": "138850472541814784",
+        "developer": false,
+        "webdev": true,
+        "contributor": true
+    },
+    {
+        "__user": "Zerebos#7790",
+        "id": "249746236008169473",
+        "developer": true,
+        "webdev": false,
+        "contributor": true
+    },
+    {
+        "__user": "Pierce#1337",
+        "id": "125367412370440192",
+        "developer": true,
+        "webdev": false,
+        "contributor": true
+    },
+    {
+        "__user": "Samuel Elliott#2764",
+        "id": "284056145272766465",
+        "developer": true,
+        "webdev": false,
+        "contributor": true
+    },
+    {
+        "__user": "Lilian Tedone#6223",
+        "id": "184021060562321419",
+        "developer": false,
+        "webdev": false,
+        "contributor": true
+    },
+    {
+        "__user": "samfun123#8972",
+        "id": "76052829285916672",
+        "developer": false,
+        "webdev": false,
+        "contributor": true
+    },
+    {
+        "__user": "samogot#4379",
+        "id": "171005991272316937",
+        "developer": false,
+        "webdev": false,
+        "contributor": true
+    }
+]

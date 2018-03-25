@@ -17,22 +17,37 @@ export default class ErrorEvent extends Event {
         this.showStack = false; // For error modal
     }
 
+    /**
+     * The module the error occured in.
+     */
     get module() {
         return this.args.module;
     }
 
+    /**
+     * A message describing the error.
+     */
     get message() {
         return this.args.message;
     }
 
+    /**
+     * The original error object.
+     */
     get err() {
         return this.args.err;
     }
 
+    /**
+     * A trace showing which functions were called when the error occured.
+     */
     get stackTrace() {
         return this.err.stack;
     }
 
+    /**
+     * The type of event.
+     */
     get __eventType() {
         return 'error';
     }

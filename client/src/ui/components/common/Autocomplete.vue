@@ -34,6 +34,7 @@
     import { EmoteModule } from 'builtin';
     import { Events } from 'modules';
     import { DOM } from 'ui';
+
     export default {
         data() {
             return {
@@ -44,7 +45,7 @@
                 open: false,
                 selectedIndex: 0,
                 sterm: ''
-            }
+            };
         },
         props: ['initial'],
         beforeMount() {

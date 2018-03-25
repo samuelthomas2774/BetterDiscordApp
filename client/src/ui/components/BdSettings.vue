@@ -49,6 +49,7 @@
                     <CssEditorView v-if="item.contentid === 'css'" />
                     <PluginsView v-if="item.contentid === 'plugins'" />
                     <ThemesView v-if="item.contentid === 'themes'" />
+                    <UpdaterView v-if="item.contentid === 'updater'" />
                 </div>
             </ContentColumn>
         </SidebarView>
@@ -60,7 +61,7 @@
     import { Settings } from 'modules';
     import { BdMenuItems } from 'ui';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView } from './bd';
+    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView } from './bd';
     import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
 
     export default {
@@ -79,7 +80,7 @@
         props: ['active', 'close'],
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView,
+            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView,
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         computed: {
@@ -131,7 +132,7 @@
                 this.timeout = setTimeout(() => {
                     this.animating = false;
                     this.lastActiveIndex = -1;
-					this.timeout = null;
+                    this.timeout = null;
                 }, 400);
             },
             openGithub() {

@@ -52,12 +52,12 @@
 
         .bd-settings-button-btn {
             background-image: $logoBigBw;
+            background-size: 100% 100%;
             filter: none;
             opacity: 1;
             width: 130px;
-            height: 80px;
-            background-size: 100% 100%;
-            margin-left: 20px;
+            height: 43px;
+            margin: 18px 0 17px 20px;
             cursor: default;
         }
     }

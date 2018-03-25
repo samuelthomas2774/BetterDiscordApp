@@ -6,7 +6,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 import { MonkeyPatch, Patcher } from './patcher';
@@ -19,6 +19,7 @@ class Helpers {
     static get plannedActions() {
         return this._plannedActions || (this._plannedActions = new Map());
     }
+
     static recursiveArray(parent, key, count = 1) {
         let index = 0;
         function* innerCall(parent, key) {
@@ -34,13 +35,15 @@ class Helpers {
 
         return innerCall(parent, key);
     }
+
     static recursiveArrayCount(parent, key) {
         let count = 0;
         // eslint-disable-next-line no-empty-pattern
-        for (let { } of this.recursiveArray(parent, key))
+        for (let {} of this.recursiveArray(parent, key))
             ++count;
         return this.recursiveArray(parent, key, count);
     }
+
     static get recursiveChildren() {
         return function* (parent, key, index = 0, count = 1) {
             const item = parent[key];
@@ -52,12 +55,14 @@ class Helpers {
             }
         }
     }
+
     static returnFirst(iterator, process) {
         for (let child of iterator) {
             const retVal = process(child);
             if (retVal !== undefined) return retVal;
         }
     }
+
     static getFirstChild(rootParent, rootKey, selector) {
         const getDirectChild = (item, selector) => {
             if (item && item.props && item.props.children) {
@@ -116,11 +121,13 @@ class Helpers {
         };
         return this.returnFirst(this.recursiveChildren(rootParent, rootKey), checkFilter.bind(null, selector)) || {};
     }
+
     static parseSelector(selector) {
         if (selector.startsWith('.')) return { className: selector.substr(1) }
         if (selector.startsWith('#')) return { id: selector.substr(1) }
         return {}
     }
+
     static findByProp(obj, what, value) {
         if (obj.hasOwnProperty(what) && obj[what] === value) return obj;
         if (obj.props && !obj.children) return this.findByProp(obj.props, what, value);
@@ -132,6 +139,7 @@ class Helpers {
         }
         return null;
     }
+
     static findProp(obj, what) {
         if (obj.hasOwnProperty(what)) return obj[what];
         if (obj.props && !obj.children) return this.findProp(obj.props, what);
@@ -144,6 +152,7 @@ class Helpers {
         }
         return null;
     }
+
     static get ReactDOM() {
         return WebpackModules.getModuleByName('ReactDOM');
     }
@@ -155,12 +164,15 @@ class ReactComponent {
         this._component = component;
         this._retVal = retVal;
     }
+
     get id() {
         return this._id;
     }
+
     get component() {
         return this._component;
     }
+
     get retVal() {
         return this._retVal;
     }

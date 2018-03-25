@@ -15,15 +15,15 @@ export default class Plugin extends Content {
 
     get type() { return 'plugin' }
 
-	// Don't use - these will eventually be removed!
-    get pluginPath() { return this.contentPath }
-    get pluginConfig() { return this.config }
-
     get start() { return this.enable }
-	get stop() { return this.disable }
+    get stop() { return this.disable }
+
+    reload() {
+        return PluginManager.reloadPlugin(this);
+    }
 
     unload() {
-        PluginManager.unloadPlugin(this);
+        return PluginManager.unloadPlugin(this);
     }
 
 }

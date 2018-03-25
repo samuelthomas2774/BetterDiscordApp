@@ -9,11 +9,10 @@
         data() {
             return {
                 favourite: false
-            }
+            };
         },
         props: ['src', 'name'],
-        methods: {
-        },
+        methods: {},
         beforeMount() {
             // Check favourite state
         }

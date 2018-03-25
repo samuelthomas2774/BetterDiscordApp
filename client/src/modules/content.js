@@ -59,6 +59,7 @@ export default class Content {
 
     /**
      * Opens a settings modal for this content.
+     * @return {Modal}
      */
     showSettingsModal() {
         return Modals.contentSettings(this);
@@ -73,27 +74,20 @@ export default class Content {
 
     /**
      * Saves the content's current configuration.
+     * @return {Promise}
      */
     async saveConfiguration() {
         try {
-            /*
-            await FileUtils.writeFile(`${this.contentPath}/user.config.json`, JSON.stringify({
-                enabled: this.enabled,
-                config: this.settings.strip().settings,
-                data: this.data
-            }));
-            */
-            Database.insertOrUpdate({ type: 'contentconfig', $or: [{ id: this.id }, { name: this.name }] }, {
-                type: 'contentconfig',
+            Database.insertOrUpdate({ type: `${this.type}-config`, id: this.id }, {
+                type: `${this.type}-config`,
                 id: this.id,
-                name: this.name,
                 enabled: this.enabled,
                 config: this.settings.strip().settings,
                 data: this.data
             });
-			this.settings.setSaved();
+            this.settings.setSaved();
         } catch (err) {
-			Logger.err(this.name, ['Failed to save configuration', err]);
+            Logger.err(this.name, ['Failed to save configuration', err]);
             throw err;
         }
     }
@@ -144,15 +138,6 @@ export default class Content {
     }
 
     /**
-     * Removes an event listener.
-     * @param {String} event The event to remove the listener from
-     * @param {Function} callback The bound callback (optional)
-     */
-    off(...args) {
-        return this.events.removeListener(...args);
-    }
-
-    /**
      * Adds an event listener that removes itself when called, therefore only being called once.
      * @param {String} event The event to add the listener to
      * @param {Function} callback The function to call when the event is emitted
@@ -160,6 +145,15 @@ export default class Content {
      */
     once(...args) {
         return this.events.once(...args);
+    }
+
+    /**
+     * Removes an event listener.
+     * @param {String} event The event to remove the listener from
+     * @param {Function} callback The bound callback (optional)
+     */
+    off(...args) {
+        return this.events.removeListener(...args);
     }
 
     /**

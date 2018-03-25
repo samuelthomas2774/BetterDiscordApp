@@ -1,5 +1,5 @@
 /**
- * BetterDiscord VUE Injector Module
+ * BetterDiscord Vue Injector Module
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -11,15 +11,21 @@
 import Vue from './vue';
 
 export default class {
-    
-    static inject(root, bdnode, components, template, replaceRoot) {
-        if(!replaceRoot) bdnode.appendTo(root);
 
-        return new Vue({
-            el: replaceRoot ? root : bdnode.element,
-            components,
-            template
-        });
+    /**
+     * Creates a new Vue object and mounts it in the passed element.
+     * @param {HTMLElement} root The element to mount the new Vue object at
+     * @param {Object} options Options to pass to Vue
+     * @param {BdNode} bdnode The element to append
+     * @return {Vue}
+     */
+    static inject(root, options, bdnode) {
+        if(bdnode) bdnode.appendTo(root);
+
+        const vue = new Vue(options);
+
+        vue.$mount(bdnode ? bdnode.element : root);
+        return vue;
     }
 
 }

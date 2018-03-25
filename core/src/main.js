@@ -10,48 +10,47 @@
 
 const path = require('path');
 const sass = require('node-sass');
-
-const { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
 const { BrowserWindow, dialog } = require('electron');
 
-const tests = true;
-const _basePath = __dirname;
+const { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
+
+const tests = typeof PRODUCTION === 'undefined';
+
+const _basePath = tests ? path.resolve(__dirname, '..', '..') : __dirname;
+const _baseDataPath = tests ? path.resolve(_basePath, 'tests') : _basePath;
+
+const sparkplug = path.resolve(__dirname, 'sparkplug.js');
+
 const _clientScript = tests
-    ? path.resolve(__dirname, '..', '..', 'client', 'dist', 'betterdiscord.client.js')
-    : path.resolve(__dirname, 'betterdiscord.client.js');
-const _dataPath = tests
-    ? path.resolve(__dirname, '..', '..', 'tests', 'data')
-    : path.resolve(__dirname, 'data');
-const _extPath = tests
-    ? path.resolve(__dirname, '..', '..', 'tests', 'ext')
-    : path.resolve(__dirname, 'ext');
-const _pluginPath = path.resolve(_extPath, 'plugins');
-const _themePath = path.resolve(_extPath, 'themes');
-const _modulePath = path.resolve(_extPath, 'modules');
+    ? path.resolve(_basePath, 'client', 'dist', 'betterdiscord.client.js')
+    : path.resolve(_basePath, 'betterdiscord.client.js');
 const _cssEditorPath = tests
     ? path.resolve(__dirname, '..', '..', 'csseditor', 'dist')
     : path.resolve(__dirname, 'csseditor');
 
+const _dataPath = path.resolve(_baseDataPath, 'data');
+const _extPath = path.resolve(_baseDataPath, 'ext');
+const _pluginPath = path.resolve(_extPath, 'plugins');
+const _themePath = path.resolve(_extPath, 'themes');
+const _modulePath = path.resolve(_extPath, 'modules');
+
+const version = require(path.resolve(_basePath, 'package.json')).version;
+
 const paths = [
-    { id: 'base', path: _basePath.replace(/\\/g, '/') },
-    { id: 'cs', path: _clientScript.replace(/\\/g, '/') },
-    { id: 'data', path: _dataPath.replace(/\\/g, '/') },
-    { id: 'ext', path: _extPath.replace(/\\/g, '/') },
-    { id: 'plugins', path: _pluginPath.replace(/\\/g, '/') },
-    { id: 'themes', path: _themePath.replace(/\\/g, '/') },
-    { id: 'modules', path: _modulePath.replace(/\\/g, '/') },
-    { id: 'csseditor', path: _cssEditorPath.replace(/\\/g, '/') }
+    { id: 'base', path: _basePath },
+    { id: 'cs', path: _clientScript },
+    { id: 'data', path: _dataPath },
+    { id: 'ext', path: _extPath },
+    { id: 'plugins', path: _pluginPath },
+    { id: 'themes', path: _themePath },
+    { id: 'modules', path: _modulePath },
+    { id: 'csseditor', path: _cssEditorPath }
 ];
 
-const sparkplug = path.resolve(__dirname, 'sparkplug.js').replace(/\\/g, '/');
-
-const Common = {};
 const globals = {
-    version: '2.0.0a',
+    version,
     paths
-}
-
-const dbInstance = new Database(paths.find(path => path.id === 'data').path);
+};
 
 class Comms {
 
@@ -61,65 +60,46 @@ class Comms {
     }
 
     initListeners() {
-        BDIpc.on('bd-getConfig', o => {
-            o.reply(Common.Config.config);
-        });
+        BDIpc.on('ping', () => 'pong', true);
 
-        BDIpc.on('bd-sendToDiscord', event => this.bd.windowUtils.send(event.args.channel, event.args.message));
+        BDIpc.on('bd-getConfig', () => this.bd.config.config, true);
 
-        BDIpc.on('bd-openCssEditor', o => this.bd.csseditor.openEditor(o));
-        // BDIpc.on('bd-setScss', o => this.bd.csseditor.setSCSS(o.args.scss));
-        BDIpc.on('bd-sendToCssEditor', o => this.bd.csseditor.send(o.args.channel, o.args.data));
+        BDIpc.on('bd-sendToDiscord', (event, m) => this.sendToDiscord(m.channel, m.message), true);
 
-        BDIpc.on('bd-readFile', this.readFile);
-        BDIpc.on('bd-readJson', o => this.readFile(o, true));
+        BDIpc.on('bd-openCssEditor', (event, options) => this.bd.csseditor.openEditor(options), true);
+        BDIpc.on('bd-sendToCssEditor', (event, m) => this.sendToCssEditor(m.channel, m.message), true);
 
-        BDIpc.on('bd-native-open', o => {
-            dialog.showOpenDialog(BrowserWindow.fromWebContents(o.ipcEvent.sender), o.args, filenames => {
-                o.reply(filenames);
+        BDIpc.on('bd-native-open', (event, options) => {
+            dialog.showOpenDialog(BrowserWindow.fromWebContents(event.ipcEvent.sender), options, filenames => {
+                event.reply(filenames);
             });
         });
 
-        BDIpc.on('bd-compileSass', o => {
-            if (!o.args.path && !o.args.data) return o.reply('');
-            if (typeof o.args.path === 'string' && typeof o.args.data === 'string') {
-                o.args.data = `${o.args.data} @import '${o.args.path.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}';`;
-                o.args.path = undefined;
+        BDIpc.on('bd-compileSass', (event, options) => {
+            if (typeof options.path === 'string' && typeof options.data === 'string') {
+                options.data = `${options.data} @import '${options.path.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}';`;
+                options.path = undefined;
             }
 
-            sass.render(o.args, (err, result) => {
-                if (err) {
-                    o.reply({ err });
-                    return;
-                }
-                o.reply(result);
+            sass.render(options, (err, result) => {
+                if (err) event.reject(err);
+                else event.reply(result);
             });
         });
 
-        BDIpc.on('bd-dba', o => {
-            (async () => {
-                try {
-                    const ret = await dbInstance.exec(o.args);
-                    o.reply(ret);
-                } catch (err) {
-                    o.reply({err});
-                }
-            })();
-        });
-    }
-
-    async readFile(o, json) {
-        const { path } = o.args;
-        try {
-            const readFile = json ? await FileUtils.readJsonFromFile(path) : await FileUtils.readFile(path);
-            o.reply(readFile);
-        } catch (err) {
-            o.reply(err);
-        }
+        BDIpc.on('bd-dba', (event, options) => this.bd.dbInstance.exec(options), true);
     }
 
     async send(channel, message) {
         BDIpc.send(channel, message);
+    }
+
+    async sendToDiscord(channel, message) {
+        return this.bd.windowUtils.send(channel, message);
+    }
+
+    async sendToCssEditor(channel, message) {
+        return this.bd.csseditor.send(channel, message);
     }
 
 }
@@ -135,23 +115,32 @@ class BetterDiscord {
 
         this.injectScripts = this.injectScripts.bind(this);
         this.ignite = this.ignite.bind(this);
-        Common.Config = new Config(globals);
+
+        this.config = new Config(args || globals);
+        this.dbInstance = new Database(this.config.getPath('data'));
         this.comms = new Comms(this);
+
         this.init();
     }
 
     async init() {
-        const window = await this.waitForWindow();
-        this.windowUtils = new WindowUtils({ window });
+        await this.waitForWindowUtils();
 
-        await FileUtils.ensureDirectory(paths.find(path => path.id === 'ext').path);
+        if (!tests) {
+            const basePath = this.config.getPath('base');
+            const files = await FileUtils.listDirectory(basePath);
+            const latestCs = FileUtils.resolveLatest(files, file => file.endsWith('.js') && file.startsWith('client.'), file => file.replace('client.', '').replace('.js', ''), 'client.', '.js');
+            this.config.getPath('cs', true).path = path.resolve(basePath, latestCs);
+        }
 
-        this.csseditor = new CSSEditor(this, paths.find(path => path.id === 'csseditor').path);
+        await FileUtils.ensureDirectory(this.config.getPath('ext'));
 
-        this.windowUtils.events('did-get-response-details', () => this.ignite(this.windowUtils.window));
-        this.windowUtils.events('did-finish-load', e => this.injectScripts(true));
+        this.csseditor = new CSSEditor(this, this.config.getPath('csseditor'));
 
-        this.windowUtils.events('did-navigate-in-page', (event, url, isMainFrame) => {
+        this.windowUtils.on('did-get-response-details', () => this.ignite());
+        this.windowUtils.on('did-finish-load', () => this.injectScripts(true));
+
+        this.windowUtils.on('did-navigate-in-page', (event, url, isMainFrame) => {
             this.windowUtils.send('did-navigate-in-page', { event, url, isMainFrame });
         });
 
@@ -166,10 +155,8 @@ class BetterDiscord {
             const defer = setInterval(() => {
                 const windows = BrowserWindow.getAllWindows();
 
-                if (windows.length > 0) {
-                    windows.forEach(window => {
-                        self.ignite(window);
-                    });
+                for (let window of windows) {
+                    if (window) BetterDiscord.ignite(window);
                 }
 
                 if (windows.length === 1 && windows[0].webContents.getURL().includes('discordapp.com')) {
@@ -180,22 +167,39 @@ class BetterDiscord {
         });
     }
 
-    ignite(window) {
-        //Hook things that Discord removes from global. These will be removed again in the client script
-        window.webContents.executeJavaScript(`require("${sparkplug}");`);
+    async waitForWindowUtils() {
+        if (this.windowUtils) return this.windowUtils;
+        const window = await this.waitForWindow();
+        return this.windowUtils = new WindowUtils({ window });
     }
 
+    get window() {
+        return this.windowUtils ? this.windowUtils.window : undefined;
+    }
+
+    /**
+     * Hooks things that Discord removes from global. These will be removed again in the client script.
+     */
+    ignite() {
+        return BetterDiscord.ignite(this.window);
+    }
+
+    /**
+     * Hooks things that Discord removes from global. These will be removed again in the client script.
+     * @param {BrowserWindow} window The window to inject the sparkplug script into
+     */
+    static ignite(window) {
+        return WindowUtils.injectScript(window, sparkplug);
+    }
+
+    /**
+     * Injects the client script into the main window.
+     * @param {Boolean} reload Whether the main window was reloaded
+     */
     async injectScripts(reload = false) {
         console.log(`RELOAD? ${reload}`);
-        if (!tests) {
-            const files = await FileUtils.listDirectory(paths.find(path => path.id === 'base').path);
-            const latestCs = FileUtils.resolveLatest(files, file => file.endsWith('.js') && file.startsWith('client.'), file => file.replace('client.', '').replace('.js', ''), 'client.', '.js');
-            paths.find(path => path.id === 'cs').path = path.resolve(paths.find(path => path.id === 'base').path, latestCs).replace(/\\/g, '/');
-        }
-        this.windowUtils.injectScript(paths.find(path => path.id === 'cs').path);
+        return this.windowUtils.injectScript(this.config.getPath('cs'));
     }
-
-    get fileUtils() { return FileUtils; }
 
 }
 

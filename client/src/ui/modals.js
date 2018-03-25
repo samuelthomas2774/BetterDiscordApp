@@ -209,7 +209,7 @@ export default class Modals {
                 ThemeManager._errors = [];
             }
 
-			return modal;
+            return modal;
         }
     }
 

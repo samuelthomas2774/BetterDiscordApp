@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { ClientLogger as Logger } from 'common';
 import EventListener from './eventlistener';
 
 export default class SocketProxy extends EventListener {
@@ -19,7 +20,7 @@ export default class SocketProxy extends EventListener {
 
     get eventBindings() {
         return [
-            { id: 'socket-created', 'callback': this.socketCreated }
+            { id: 'socket-created', callback: this.socketCreated }
         ];
     }
 
@@ -29,11 +30,11 @@ export default class SocketProxy extends EventListener {
 
     socketCreated(socket) {
         this.activeSocket = socket;
-       // socket.addEventListener('message', this.onMessage);
+        // socket.addEventListener('message', this.onMessage);
     }
 
     onMessage(e) {
-        console.info(e);
+        Logger.info('SocketProxy', e);
     }
 
 }

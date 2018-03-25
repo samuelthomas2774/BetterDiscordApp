@@ -15,35 +15,49 @@ export default class SettingsScheme {
     constructor(args) {
         this.args = args.args || args;
 
-        this.args.settings = this.settings.map(({ category, settings }) => ({
-            category, settings: settings.map(({ id, value }) => ({
-                id, value
-            }))
-        }));
-
         Object.freeze(this);
     }
 
+    /**
+     * The scheme's ID.
+     */
     get id() {
         return this.args.id;
     }
 
+    /**
+     * The URL of the scheme's icon. This should be a base64 encoded data URI.
+     */
     get icon_url() {
         return this.args.icon_url;
     }
 
+    /**
+     * The scheme's name.
+     */
     get name() {
         return this.args.name;
     }
 
+    /**
+     * A string to be displayed under the scheme.
+     */
     get hint() {
         return this.args.hint;
     }
 
+    /**
+     * An array of stripped settings categories this scheme manages.
+     */
     get settings() {
         return this.args.settings || [];
     }
 
+    /**
+     * Checks if this scheme's values are currently applied to a set.
+     * @param {SettingsSet} set The set to check
+     * @return {Boolean}
+     */
     isActive(set) {
         for (let schemeCategory of this.settings) {
             const category = set.categories.find(c => c.category === schemeCategory.category);
@@ -66,12 +80,13 @@ export default class SettingsScheme {
         return true;
     }
 
+    /**
+     * Applies this scheme's values to a set.
+     * @param {SettingsSet} set The set to merge this scheme's values into
+     * @return {Promise}
+     */
     applyTo(set) {
-        return set.merge({ settings: this.settings });
-    }
-
-    clone() {
-        return new SettingsScheme(Utils.deepclone(this.args));
+        return set.merge(this);
     }
 
 }

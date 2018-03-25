@@ -33,7 +33,7 @@
         methods: {
             editTheme() {
                 try {
-                    shell.openItem(this.theme.themePath);
+                    shell.openItem(this.theme.contentPath);
                 } catch (err) {
                     Logger.err('ThemeCard', [`Error opening theme directory ${this.theme.contentPath}:`, err]);
                 }

@@ -10,6 +10,7 @@
 
 import { Vendor } from 'modules';
 import { FileUtils } from './utils';
+import node_utils from 'node_utils';
 
 export const logLevels = {
     'log': 'log',
@@ -35,26 +36,15 @@ export default class Logger {
 
     log(module, message, level = 'log') {
         level = Logger.parseLevel(level);
-        if (typeof message === 'object' && !(message instanceof Array)) {
-            console[level]('[%cBetter%cDiscord:%s]', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, message);
-            let message_string = message.toString();
-            if (message_string === '[object Object]')
-                message_string += ' ' + JSON.stringify(message, null, 4);
-
-            this.logs.push(`${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message_string}${message_string === '[object Object]' ? ' ' + JSON.stringify(message, null, 4) : ''}`);
-
-            if (this.file)
-                FileUtils.appendToFile(this.file, `${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message_string}${message_string === '[object Object]' ? ' ' + JSON.stringify(message, null, 4) : ''}\n`);
-
-            return;
-        }
 
         message = typeof message === 'object' && message instanceof Array ? message : [message];
         console[level]('[%cBetter%cDiscord:%s]', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, ...message);
-        this.logs.push(`${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message.join(' ')}`);
+
+        const message_string = message.map(m => typeof m === 'string' ? m : node_utils.inspect(m)).join(' ');
+        this.logs.push(`${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message_string}`);
 
         if (this.file)
-            FileUtils.appendToFile(this.file, `${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message.join(' ')}\n`);
+            FileUtils.appendToFile(this.file, `${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message_string}\n`);
     }
 
     logError(err) {

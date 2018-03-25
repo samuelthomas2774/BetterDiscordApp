@@ -42,7 +42,7 @@ export default new class {
         ClientIPC.on('bd-save-scss', async (e, scss) => {
             await this.updateScss(scss);
             await this.save();
-        });
+        }, true);
 
         this.liveupdate = Settings.getSetting('css', 'default', 'live-update');
         this.liveupdate.on('setting-updated', event => {
@@ -98,18 +98,20 @@ export default new class {
 
     /**
      * Save css to file.
+     * @return {Promise}
      */
-    async save() {
-        Settings.saveSettings();
+    save() {
+        return Settings.saveSettings();
     }
 
     /**
      * Save current editor bounds.
      * @param {Rectangle} bounds Editor bounds
+     * @return {Promise}
      */
     saveEditorBounds(bounds) {
         this.editor_bounds = bounds;
-        Settings.saveSettings();
+        return Settings.saveSettings();
     }
 
     /**

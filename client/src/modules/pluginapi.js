@@ -416,12 +416,13 @@ export default class PluginApi {
             instead: this.patchInstead.bind(this),
             pushChildPatch: this.pushChildPatch.bind(this),
             unpatchAll: this.unpatchAll.bind(this),
+            monkeyPatch: this.monkeyPatch.bind(this)
         }, 'patches', {
             get: () => this.patches
         });
     }
-    get monkeyPatch() {
-        return module => MonkeyPatch(this.plugin.id, module);
+    monkeyPatch(module) {
+        return MonkeyPatch(this.plugin.id, module);
     }
 
 }

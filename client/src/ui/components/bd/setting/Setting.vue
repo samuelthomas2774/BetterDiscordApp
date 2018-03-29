@@ -17,7 +17,7 @@
         <StringSetting v-if="setting.type === 'text' && !setting.multiline" :setting="setting" :change="change" />
         <MultilineTextSetting v-if="setting.type === 'text' && setting.multiline" :setting="setting" />
         <SliderSetting v-if="setting.type === 'slider'" :setting="setting" :change="change" />
-        <ColourSetting v-if="setting.type === 'colour'" :setting="setting" :change="change" />
+        <ColourSetting v-if="setting.type === 'colour'" :setting="setting" />
         <KeybindSetting v-if="setting.type === 'keybind'" :setting="setting" />
         <FileSetting v-if="setting.type === 'file'" :setting="setting" :change="change" />
         <GuildSetting v-if="setting.type === 'guild'" :setting="setting" />

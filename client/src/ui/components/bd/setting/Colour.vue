@@ -9,74 +9,67 @@
 */
 
 <template>
-    <div ref="root" class="bd-form-colourpicker">
+    <div class="bd-form-colourpicker">
         <div class="bd-title">
             <h3 v-if="setting.text">{{setting.text}}</h3>
             <div class="bd-colourpicker-wrapper">
-                <button class="bd-colourpicker-swatch" :style="{backgroundColor: rgbaString}" @click="show"/>
+                <button ref="swatch" class="bd-colourpicker-swatch" :style="{backgroundColor: rgbaString}" @click="open = !open" />
             </div>
         </div>
-        <Picker ref="picker" v-model="colors" @input="pick" :class="{'bd-hidden': !open}" :style="{top: topOffset}"/>
+        <Picker ref="picker" v-model="colours" @input="pick" :class="{'bd-hide': !open}" :style="{top: topOffset}" />
         <div class="bd-hint">{{setting.hint}}</div>
     </div>
 </template>
 <script>
     import { Chrome as Picker } from 'vue-color';
+
     export default {
         data() {
             return {
                 open: false,
-                colors: '#FFF',
+                colours: '#fff',
                 topOffset: '35px'
             }
         },
         components: {
             Picker
         },
-        props: ['setting', 'change'],
+        props: ['setting'],
         computed: {
             hex() {
-                if (!this.$refs.picker || !this.$refs.picker.val) return this.colors;
+                if (!this.$refs.picker || !this.$refs.picker.val) return this.colours;
                 return this.$refs.picker.val.hex;
             },
             rgba() {
-                if (!this.$refs.picker || !this.$refs.picker.val) return this.colors;
+                if (!this.$refs.picker || !this.$refs.picker.val) return this.colours;
                 return this.$refs.picker.val.rgba;
             },
             hsva() {
-                if (!this.$refs.picker || !this.$refs.picker.val) return this.colors;
+                if (!this.$refs.picker || !this.$refs.picker.val) return this.colours;
                 return this.$refs.picker.val.hsv;
             },
             hsla() {
-                if (!this.$refs.picker || !this.$refs.picker.val) return this.colors;
+                if (!this.$refs.picker || !this.$refs.picker.val) return this.colours;
                 return this.$refs.picker.val.hsl;
             },
             rgbaString() {
-                if ('string' === typeof this.colors) return this.colors;
-                const { rgba } = this.colors;
-                return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
+                if (typeof this.colours === 'string') return this.colours;
+                const { r, g, b, a } = this.colours.rgba;
+                return `rgba(${r}, ${g}, ${b}, ${a})`;
             }
         },
         methods: {
-            show() {
-                const offset = window.innerHeight - this.$refs.root.getBoundingClientRect().top - 340;
-                if (offset >= 0) {
-                    this.topOffset = '35px';
-                } else {
-                    this.topOffset = 35 + offset > 35 ? '35px' : `${35 + offset}px`;
-                }
-                this.open = true;
-            },
             pick(c) {
-                this.change(this.rgbaString);
+                this.setting.value = this.rgbaString;
             },
             closePopup(e) {
-                if (!this.$refs.root.contains(e.target)) this.open = false;
+                if (!this.$refs.swatch.contains(e.target) && !this.$refs.picker.$el.contains(e.target))
+                    this.open = false;
             }
         },
         beforeMount() {
-            this.colors = this.setting.value;
-            window.addEventListener('click', this.closePopup);  
+            this.colours = this.setting.value;
+            window.addEventListener('click', this.closePopup);
         },
         destroyed() {
             window.removeEventListener('click', this.closePopup);
@@ -84,14 +77,18 @@
         watch: {
             setting(newVal, oldVal) {
                 if (newVal.value === oldVal.value) return;
-                this.colors = newVal.value;
+                this.colours = newVal.value;
                 this.open = false;
+            },
+            open(open) {
+                if (!open) return;
+                const offset = window.innerHeight - this.$el.getBoundingClientRect().top - 340;
+                if (offset >= 0) {
+                    this.topOffset = '35px';
+                } else {
+                    this.topOffset = 35 + offset > 35 ? '35px' : `${35 + offset}px`;
+                }
             }
         }
     }
 </script>
-<style>
-    .bd-hidden {
-        display: none;
-    }
-</style>

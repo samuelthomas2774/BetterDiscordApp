@@ -15,8 +15,8 @@
                 <div class="bd-modal-icon">
                     <slot name="icon" />
                 </div>
-                <span class="bd-modal-headertext">{{headerText}}</span>
-                <div class="bd-modal-x" @click="e => close(e.shiftKey, e)">
+                <span class="bd-modal-headertext">{{ headerText }}</span>
+                <div class="bd-modal-x" @click="$emit('close', $event.shiftKey, $event)">
                     <MiClose size="18" />
                 </div>
             </div>
@@ -39,7 +39,7 @@
     import { MiClose } from './MaterialIcon';
 
     export default {
-        props: ['headerText', 'close'],
+        props: ['headerText'],
         components: {
             MiClose
         },
@@ -56,9 +56,8 @@
         },
         methods: {
             keyupListener(e) {
-                if (e.which === 27) {
-                    this.close();
-                }
+                if (e.which === 27)
+                    this.$emit('close', false, e);
             }
         }
     }

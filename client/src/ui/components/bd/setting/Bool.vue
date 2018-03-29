@@ -12,16 +12,17 @@
     <div class="bd-setting-switch">
         <div class="bd-title">
             <h3>{{setting.text}}</h3>
-            <SettingSwitch :checked="setting.value" :change="change" />
+            <SettingSwitch v-model="setting.value" />
         </div>
         <div class="bd-hint">{{setting.hint}}</div>
     </div>
 </template>
+
 <script>
     import SettingSwitch from '../../common/SettingSwitch.vue';
 
     export default {
-        props: ['setting', 'change'],
+        props: ['setting'],
         components: {
             SettingSwitch
         }

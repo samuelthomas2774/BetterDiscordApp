@@ -18,6 +18,7 @@
         <BdSettings ref="settings" :active="active" :close="hideSettings" />
     </div>
 </template>
+
 <script>
     // Imports
     import { Events, Settings } from 'modules';

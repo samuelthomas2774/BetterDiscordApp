@@ -24,7 +24,7 @@
     import path from 'path';
 
     export default {
-        props: ['setting', 'change'],
+        props: ['setting'],
         components: {
             Drawer
         },
@@ -34,6 +34,7 @@
                     const component = window.require(path.join(this.setting.path, this.setting.file));
                     return this.setting.component ? component[this.setting.component] : component.default ? component.default : component;
                 }
+
                 if (typeof this.setting.function === 'string') {
                     const plugin = PluginManager.getPluginByPath(this.setting.path);
                     if (!plugin) return;
@@ -42,12 +43,14 @@
                         return this.componentFromHTMLElement(component, this.setting, this.change);
                     return component;
                 }
+
                 if (typeof this.setting.component === 'string') {
                     const plugin = PluginManager.getPluginByPath(this.setting.path);
                     if (!plugin) return;
                     const component = plugin[this.setting.component];
                     return component;
                 }
+
                 if (typeof this.setting.component === 'object') {
                     return this.setting.component;
                 }
@@ -62,6 +65,10 @@
                         this.$el.appendChild(htmlelement);
                     }
                 };
+            },
+            change(value, ignore_disabled) {
+                if (this.disabled && !ignore_disabled) return;
+                this.setting = value;
             }
         }
     }

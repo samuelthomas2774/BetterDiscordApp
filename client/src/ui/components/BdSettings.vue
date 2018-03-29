@@ -55,6 +55,7 @@
         </SidebarView>
     </div>
 </template>
+
 <script>
     // Imports
     import { shell } from 'electron';

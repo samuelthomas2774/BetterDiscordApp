@@ -20,6 +20,7 @@
         <div class="bd-hint">{{setting.hint}}</div>
     </div>
 </template>
+
 <script>
     import { Chrome as Picker } from 'vue-color';
 

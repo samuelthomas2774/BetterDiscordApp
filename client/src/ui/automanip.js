@@ -47,7 +47,7 @@ export default class extends EventListener {
             this.setIds();
             this.makeMutable();
         } catch (err) {
-            console.log(err);
+            Logger.err('AutoManip', err);
         }
     }
 

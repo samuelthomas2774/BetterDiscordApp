@@ -9,11 +9,12 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { EmoteModule } from 'builtin';
+import { Reflection } from 'ui';
+import { ClientLogger as Logger } from 'common';
 import { MonkeyPatch, Patcher } from './patcher';
 import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
-import { EmoteModule } from 'builtin';
-import { Reflection } from 'ui';
 
 class Helpers {
     static get plannedActions() {
@@ -209,7 +210,7 @@ export class ReactComponents {
         if (important) {
             const importantInterval = setInterval(() => {
                 if (this.components.find(c => c.id === name)) {
-                    console.info(`Important component ${name} already found`);
+                    Logger.info('ReactComponents', `Important component ${name} already found`);
                     clearInterval(importantInterval);
                     return;
                 }
@@ -218,11 +219,11 @@ export class ReactComponents {
                 const reflect = Reflection(select);
                 if (!reflect.component) {
                     clearInterval(importantInterval);
-                    console.error(`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select);
+                    Logger.error('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select]);
                     return;
                 }
                 if (!reflect.component.displayName) reflect.component.displayName = name;
-                console.info(`Found important component ${name} with reflection.`);
+                Logger.info('ReactComponents', `Found important component ${name} with reflection`);
                 this.push(reflect.component);
                 clearInterval(importantInterval);
             }, 50);

@@ -13,11 +13,18 @@ import BaseSetting from './types/basesetting';
 import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
-export default class SettingsCategory {
+export default class SettingsCategory extends AsyncEventEmitter {
 
     constructor(args, ...merge) {
-        this.emitter = new AsyncEventEmitter();
-        this.args = args.args || args;
+        super();
+
+        if (typeof args === 'string')
+            args = {id: args};
+        this.args = args.args || args || {};
+
+        this.args.id = this.args.id || this.args.category || 'default';
+        this.args.name = this.args.name || this.args.category_name || this.id;
+        this.type = this.args.type;
 
         this.args.settings = this.settings.map(setting => new Setting(setting));
 
@@ -56,12 +63,23 @@ export default class SettingsCategory {
         return this.name;
     }
 
+    set name(value) {
+        this.args.name = value;
+    }
+
     /**
      * Category type
      * Currently either "drawer", "static", or undefined.
      */
     get type() {
         return this.args.type;
+    }
+
+    set type(value) {
+        if (!value) this.args.type = undefined;
+        else if (value === 'drawer' || value === 'static')
+            this.args.type = value;
+        else throw {message: `Invalid category type ${value}`};
     }
 
     /**
@@ -275,9 +293,5 @@ export default class SettingsCategory {
             settings: this.settings.map(setting => setting.clone())
         }, ...merge);
     }
-
-    on(...args) { return this.emitter.on(...args); }
-    off(...args) { return this.emitter.removeListener(...args); }
-    emit(...args) { return this.emitter.emit(...args); }
 
 }

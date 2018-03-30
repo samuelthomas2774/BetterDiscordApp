@@ -12,16 +12,18 @@ import { Utils, FileUtils, ClientLogger as Logger, AsyncEventEmitter } from 'com
 import { Modals } from 'ui';
 import Database from './database';
 
-export default class Content {
+export default class Content extends AsyncEventEmitter {
 
     constructor(internals) {
+        super();
+
         Utils.deepfreeze(internals.info);
         Object.freeze(internals.paths);
 
         this.__internals = internals;
 
-        this.settings.on('setting-updated', event => this.events.emit('setting-updated', event));
-        this.settings.on('settings-updated', event => this.events.emit('settings-updated', event));
+        this.settings.on('setting-updated', event => this.emit('setting-updated', event));
+        this.settings.on('settings-updated', event => this.emit('settings-updated', event));
         this.settings.on('settings-updated', event => this.__settingsUpdated(event));
 
         // Add hooks
@@ -55,7 +57,6 @@ export default class Content {
     get settings() { return this.userConfig.config }
     get config() { return this.settings.categories }
     get data() { return this.userConfig.data || (this.userConfig.data = {}) }
-    get events() { return this.EventEmitter || (this.EventEmitter = new AsyncEventEmitter()) }
 
     /**
      * Opens a settings modal for this content.
@@ -126,44 +127,6 @@ export default class Content {
 
         this.userConfig.enabled = false;
         if (save) await this.saveConfiguration();
-    }
-
-    /**
-     * Adds an event listener.
-     * @param {String} event The event to add the listener to
-     * @param {Function} callback The function to call when the event is emitted
-     */
-    on(...args) {
-        return this.events.on(...args);
-    }
-
-    /**
-     * Adds an event listener that removes itself when called, therefore only being called once.
-     * @param {String} event The event to add the listener to
-     * @param {Function} callback The function to call when the event is emitted
-     * @return {Promise|undefined}
-     */
-    once(...args) {
-        return this.events.once(...args);
-    }
-
-    /**
-     * Removes an event listener.
-     * @param {String} event The event to remove the listener from
-     * @param {Function} callback The bound callback (optional)
-     */
-    off(...args) {
-        return this.events.removeListener(...args);
-    }
-
-    /**
-     * Emits an event.
-     * @param {String} event The event to emit
-     * @param {Any} data Data to be passed to listeners
-     * @return {Promise|undefined}
-     */
-    emit(...args) {
-        return this.events.emit(...args);
     }
 
 }

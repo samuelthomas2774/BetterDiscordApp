@@ -15,10 +15,10 @@ module.exports = (Plugin, Api, Vendor, Dependencies) => {
             Logger.log('onStart');
 
             Logger.log(`Plugin setting "default-0" value: ${this.settings.get('default-0')}`);
-            this.events.on('setting-updated', event => {
+            this.on('setting-updated', event => {
                 console.log('Received plugin setting update:', event);
             });
-            this.events.on('settings-updated', event => {
+            this.on('settings-updated', event => {
                 console.log('Received plugin settings update:', event);
             });
 

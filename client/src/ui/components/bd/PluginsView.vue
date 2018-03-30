@@ -13,11 +13,11 @@
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Installed</h3>
-                <RefreshBtn v-if="local" :onClick="refreshLocal" />
+                <RefreshBtn v-if="local" @click="refreshLocal" />
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
                 <h3>Browse</h3>
-                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
+                <RefreshBtn v-if="!local" @click="refreshOnline" />
             </div>
         </div>
 

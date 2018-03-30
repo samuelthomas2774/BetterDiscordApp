@@ -10,9 +10,9 @@
 
 <template>
     <div class="bd-message-badges-wrap">
-        <div v-if="developer" v-tooltip="'BetterDiscord Developer'" class="bd-message-badge bd-message-badge-developer" @click="onClick"></div>
-        <div v-else-if="webdev" v-tooltip="'BetterDiscord Web Developer'" class="bd-message-badge bd-message-badge-developer" @click="onClick"></div>
-        <div v-else-if="contributor" v-tooltip="'BetterDiscord Contributor'" class="bd-message-badge bd-message-badge-contributor" @click="onClick"></div>
+        <div v-if="developer" v-tooltip="'BetterDiscord Developer'" class="bd-message-badge bd-message-badge-developer" @click="click"></div>
+        <div v-else-if="webdev" v-tooltip="'BetterDiscord Web Developer'" class="bd-message-badge bd-message-badge-developer" @click="click"></div>
+        <div v-else-if="contributor" v-tooltip="'BetterDiscord Contributor'" class="bd-message-badge bd-message-badge-contributor" @click="click"></div>
     </div>
 </template>
 <script>
@@ -22,7 +22,7 @@
     export default {
         props: ['webdev', 'developer', 'contributor', 'hasBadges'],
         methods: {
-            onClick() {
+            click() {
                 if (this.developer) return shell.openExternal('https://github.com/JsSucks/BetterDiscordApp');
                 if (this.webdev) return shell.openExternal('https://betterdiscord.net');
                 if (this.contributor) return shell.openExternal('https://github.com/JsSucks/BetterDiscordApp/graphs/contributors');

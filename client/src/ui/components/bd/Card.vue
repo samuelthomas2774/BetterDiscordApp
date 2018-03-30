@@ -29,6 +29,7 @@
         </div>
     </div>
 </template>
+
 <script>
     // Imports
     import { MiExtension } from '../common';

@@ -18,7 +18,7 @@
                 </div>
                 <template v-for="(category, text) in sidebar">
                     <SidebarItem :item="{text, type: 'header'}" />
-                    <SidebarItem v-for="item in category" :item="item" :key="item.id" :onClick="itemOnClick" />
+                    <SidebarItem v-for="item in category" :item="item" :key="item.id" @click="itemOnClick(item.id)" />
                 </template>
             </Sidebar>
             <div slot="sidebarfooter" class="bd-info">

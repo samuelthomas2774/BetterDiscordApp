@@ -23,6 +23,7 @@
         </div>
     </div>
 </template>
+
 <script>
     // Imports
     import { ScrollerWrap } from '../common';

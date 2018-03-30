@@ -12,13 +12,14 @@
     <Card :item="plugin">
         <SettingSwitch v-if="plugin.type === 'plugin'" slot="toggle" :value="plugin.enabled" @input="togglePlugin" />
         <ButtonGroup slot="controls">
-            <Button v-tooltip="'Settings (shift + click to open settings without cloning the set)'" v-if="plugin.hasSettings" :onClick="e => showSettings(e.shiftKey)"><MiSettings size="18" /></Button>
-            <Button v-tooltip="'Reload'" :onClick="reloadPlugin"><MiRefresh size="18" /></Button>
-            <Button v-tooltip="'Edit'" :onClick="editPlugin"><MiPencil size="18" /></Button>
-            <Button v-tooltip="'Uninstall (shift + click to unload)'" :onClick="e => deletePlugin(e.shiftKey)" type="err"><MiDelete size="18" /></Button>
+            <Button v-tooltip="'Settings (shift + click to open settings without cloning the set)'" v-if="plugin.hasSettings" @click="e => showSettings(e.shiftKey)"><MiSettings size="18" /></Button>
+            <Button v-tooltip="'Reload'" @click="reloadPlugin"><MiRefresh size="18" /></Button>
+            <Button v-tooltip="'Edit'" @click="editPlugin"><MiPencil size="18" /></Button>
+            <Button v-tooltip="'Uninstall (shift + click to unload)'" @click="e => deletePlugin(e.shiftKey)" type="err"><MiDelete size="18" /></Button>
         </ButtonGroup>
     </Card>
 </template>
+
 <script>
     // Imports
     import { ClientLogger as Logger } from 'common';

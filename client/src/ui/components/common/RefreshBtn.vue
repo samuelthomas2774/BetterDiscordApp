@@ -1,11 +1,11 @@
 /**
- * BetterDiscord RefreshBtn
+ * BetterDiscord Refresh Button
  * Copyright (c) 2018 Lilian Tedone http://beard-design.com/
  * All rights reserved.
 */
 
 <template>
-    <div class="bd-refresh-button" :class="{'bd-refreshed': state === 'refreshed', 'bd-refreshing': state === 'refreshing'}" @click="onClick">
+    <div class="bd-refresh-button" :class="{'bd-refreshed': state === 'refreshed', 'bd-refreshing': state === 'refreshing'}" @click="$emit('click')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <g class="bd-svg-refresh">
                 <g class="bd-svg-circle">
@@ -24,8 +24,9 @@
         </svg>
     </div>
 </template>
+
 <script>
     export default {
-        props: ['state', 'onClick']
+        props: ['state']
     }
 </script>

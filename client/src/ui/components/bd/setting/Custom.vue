@@ -11,8 +11,17 @@
 <template>
     <div class="bd-form-customsetting" :class="{'bd-form-customsetting-debug': setting.debug}">
         <component :is="component" :setting="setting" :change="change"></component>
-        <Drawer class="bd-form-customsetting-value" label="Custom setting data" v-if="setting.debug">
+        <Drawer class="bd-form-customsetting-value bd-form-textarea" label="Custom setting data" v-if="setting.debug">
             <pre class="bd-pre-wrap"><div class="bd-pre">{{ JSON.stringify(setting, null, 4) }}</div></pre>
+
+            <div class="bd-form-textarea-details">
+                <div class="bd-title">
+                    <h3>Set value</h3>
+                </div>
+                <div class="bd-hint">Enter a JSON string to update the setting.</div>
+            </div>
+            <textarea ref="set_value_input" class="bd-textarea" @keyup.stop :value="JSON.stringify(setting.value, null, 4)"></textarea>
+            <Button @click="setting.value = JSON.parse($refs.set_value_input.value)">Update</Button>
         </Drawer>
     </div>
 </template>
@@ -21,12 +30,14 @@
     import { PluginManager } from 'modules';
     import SettingsPanel from '../SettingsPanel.vue';
     import Drawer from '../../common/Drawer.vue';
+    import Button from '../../common/Button.vue';
     import path from 'path';
 
     export default {
         props: ['setting'],
         components: {
-            Drawer
+            Drawer,
+            Button
         },
         computed: {
             component() {
@@ -68,7 +79,7 @@
             },
             change(value, ignore_disabled) {
                 if (this.disabled && !ignore_disabled) return;
-                this.setting = value;
+                this.setting.value = value;
             }
         }
     }

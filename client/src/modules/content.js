@@ -17,6 +17,10 @@ export default class Content extends AsyncEventEmitter {
     constructor(internals) {
         super();
 
+        internals.loaded = Date.now();
+        internals.started = undefined;
+        internals.stopped = undefined;
+
         Utils.deepfreeze(internals.info);
         Object.freeze(internals.paths);
 
@@ -51,6 +55,9 @@ export default class Content extends AsyncEventEmitter {
     get description() { return this.info.description }
     get authors() { return this.info.authors }
     get version() { return this.info.version }
+    get loadedTimestamp() { return this.__internals.loaded }
+    get startedTimestamp() { return this.__internals.started }
+    get stoppedTimestamp() { return this.__internals.stopped }
     get contentPath() { return this.paths.contentPath }
     get dirName() { return this.paths.dirName }
     get enabled() { return this.userConfig.enabled }
@@ -111,6 +118,8 @@ export default class Content extends AsyncEventEmitter {
         await this.emit('enable');
         await this.emit('start');
 
+        this.__internals.started = Date.now();
+        this.__internals.stopped = undefined;
         this.userConfig.enabled = true;
         if (save) await this.saveConfiguration();
     }
@@ -125,6 +134,8 @@ export default class Content extends AsyncEventEmitter {
         await this.emit('stop');
         await this.emit('disable');
 
+        this.__internals.started = undefined;
+        this.__internals.stopped = Date.now();
         this.userConfig.enabled = false;
         if (save) await this.saveConfiguration();
     }

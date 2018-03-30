@@ -10,12 +10,12 @@
 
 <template>
     <div class="bd-settings-wrapper" :class="[{active: active}, 'platform-' + this.platform]">
-        <div class="bd-settings-button" :class="{'bd-active': active, 'bd-animating': animating}" @click="showSettings">
+        <div class="bd-settings-button" :class="{'bd-active': active, 'bd-animating': animating}" @click="active = true">
             <div v-if="updating === 0" v-tooltip.right="'Checking for updates'" class="bd-settings-button-btn bd-loading"></div>
             <div v-else-if="updating === 2" v-tooltip.right="'Updates available!'" class="bd-settings-button-btn bd-updates"></div>
             <div v-else class="bd-settings-button-btn" :class="[{'bd-loading': !loaded}]"></div>
         </div>
-        <BdSettings ref="settings" :active="active" :close="hideSettings" />
+        <BdSettings ref="settings" :active="active" @close="active = false" />
     </div>
 </template>
 
@@ -34,27 +34,24 @@
                 animating: false,
                 timeout: null,
                 platform: global.process.platform
-            }
+            };
         },
         components: {
             BdSettings
         },
         methods: {
-            showSettings() {
-                if (!this.loaded) return;
-                this.active = true;
-            },
-            hideSettings() { this.active = false },
-            toggleSettings() { this.active = !this.active },
             keyupListener(e) {
                 if (Modals.stack.length || !this.active || e.which !== 27) return;
                 if (this.$refs.settings.activeIndex !== -1) this.$refs.settings.closeContent();
-                else this.hideSettings();
+                else this.active = false;
                 e.stopImmediatePropagation();
             }
         },
         watch: {
             active(active) {
+                if (active && !this.loaded)
+                    return this.active = false;
+
                 this.animating = true;
                 if (this.timeout) clearTimeout(this.timeout);
                 this.timeout = setTimeout(() => {

@@ -9,10 +9,10 @@
 */
 
 <template>
-    <div class="bd-settings" :class="{active: active, 'bd-settings-out': activeIndex === -1 && lastActiveIndex >= 0}" @keyup="close">
+    <div class="bd-settings" :class="{active: active, 'bd-settings-out': activeIndex === -1 && lastActiveIndex >= 0}" @keyup="$emit('close')">
         <SidebarView :contentVisible="this.activeIndex >= 0 || this.lastActiveIndex >= 0" :animating="this.animating" :class="{'bd-stop': !first}">
             <Sidebar slot="sidebar">
-                <div class="bd-settings-x" @click="close">
+                <div class="bd-settings-x" @click="$emit('close')">
                     <MiClose size="17"/>
                     <span class="bd-x-text">ESC</span>
                 </div>
@@ -76,9 +76,9 @@
                 Settings,
                 timeout: null,
                 SettingsWrapper
-            }
+            };
         },
-        props: ['active', 'close'],
+        props: ['active'],
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
             SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView,

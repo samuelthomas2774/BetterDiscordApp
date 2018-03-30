@@ -8,7 +8,6 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { PatchedFunction, Patch } from './monkeypatch';
 import path from 'path';
 import fs from 'fs';
 import _ from 'lodash';
@@ -21,90 +20,6 @@ export class Utils {
             orig(...args);
             cb(...args);
         }
-    }
-
-    /**
-     * Monkey-patches an object's method.
-     * @param {Object} object The object containing the function to monkey patch
-     * @param {String} methodName The name of the method to monkey patch
-     * @param {Object|String|Function} options Options to pass to the Patch constructor
-     * @param {Function} function If {options} is either "before" or "after", this function will be used as that hook
-     */
-    static monkeyPatch(object, methodName, options, f) {
-        const patchedFunction = new PatchedFunction(object, methodName);
-        const patch = new Patch(patchedFunction, options, f);
-        patchedFunction.addPatch(patch);
-        return patch;
-    }
-
-    /**
-     * Monkey-patches an object's method and returns a promise that will be resolved with the data object when the method is called.
-     * This can only be used to get the arguments and return data. If you want to change anything, call Utils.monkeyPatch with the once option set to true.
-     */
-    static monkeyPatchOnce(object, methodName) {
-        return new Promise((resolve, reject) => {
-            this.monkeyPatch(object, methodName, 'after', data => {
-                data.patch.cancel();
-                resolve(data);
-            });
-        });
-    }
-
-    /**
-     * Monkey-patches an object's method and returns a promise that will be resolved with the data object when the method is called.
-     * You will have to call data.callOriginalMethod() if you wants the original method to be called.
-     */
-    static monkeyPatchAsync(object, methodName, callback) {
-        return new Promise((resolve, reject) => {
-            this.monkeyPatch(object, methodName, data => {
-                data.patch.cancel();
-
-                data.promise = data.return = callback ? Promise.all(callback.call(global, data, ...data.arguments)) : new Promise((resolve, reject) => {
-                    data.resolve = resolve;
-                    data.reject = reject;
-                });
-
-                resolve(data);
-            });
-        });
-    }
-
-    /**
-     * Monkeypatch function that is compatible with samogot's Lib Discord Internals.
-     * Don't use this for writing new plugins as it will eventually be removed!
-     */
-    static compatibleMonkeyPatch(what, methodName, options) {
-        const { before, instead, after, once = false, silent = false } = options;
-        const cancelPatch = () => patch.cancel();
-
-        const compatible_function = _function => data => {
-            const compatible_data = {
-                thisObject: data.this,
-                methodArguments: data.arguments,
-                returnValue: data.return,
-                cancelPatch,
-                originalMethod: data.originalMethod,
-                callOriginalMethod: () => data.callOriginalMethod()
-            };
-            try {
-                _function(compatible_data);
-                data.arguments = compatible_data.methodArguments;
-                data.return = compatible_data.returnValue;
-            } catch (err) {
-                data.arguments = compatible_data.methodArguments;
-                data.return = compatible_data.returnValue;
-                throw err;
-            }
-        };
-
-        const patch = this.monkeyPatch(what, methodName, {
-            before: !instead && before ? compatible_function(before) : undefined,
-            instead: instead ? compatible_function(instead) : undefined,
-            after: !instead && after ? compatible_function(after) : undefined,
-            once
-        });
-
-        return cancelPatch;
     }
 
     /**

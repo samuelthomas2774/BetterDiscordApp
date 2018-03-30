@@ -83,14 +83,13 @@ export default class PluginApi {
     get Utils() {
         return {
             overload: () => Utils.overload.apply(Utils, arguments),
-            monkeyPatch: () => Utils.monkeyPatch.apply(Utils, arguments),
-            monkeyPatchOnce: () => Utils.monkeyPatchOnce.apply(Utils, arguments),
-            compatibleMonkeyPatch: () => Utils.monkeyPatchOnce.apply(Utils, arguments),
             tryParseJson: () => Utils.tryParseJson.apply(Utils, arguments),
             toCamelCase: () => Utils.toCamelCase.apply(Utils, arguments),
             compare: () => Utils.compare.apply(Utils, arguments),
             deepclone: () => Utils.deepclone.apply(Utils, arguments),
-            deepfreeze: () => Utils.deepfreeze.apply(Utils, arguments)
+            deepfreeze: () => Utils.deepfreeze.apply(Utils, arguments),
+            removeFromArray: () => Utils.removeFromArray.apply(Utils, arguments),
+            defineSoftGetter: () => Utils.defineSoftGetter.apply(Utils, arguments)
         };
     }
 

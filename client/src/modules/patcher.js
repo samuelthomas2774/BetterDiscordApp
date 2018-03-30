@@ -45,7 +45,7 @@ export class Patcher {
 
     static overrideFn(patch) {
         return function () {
-            let retVal = null;
+            let retVal = undefined;
             if (!patch.children) return patch.originalFunction.apply(this, arguments);
             for (const superPatch of patch.children.filter(c => c.type === 'before')) {
                 try {

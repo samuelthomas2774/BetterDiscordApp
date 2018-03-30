@@ -70,13 +70,13 @@
             }
         },
         created() {
-            this.modal.beforeClose = force => {
+            this.modal.on('close', force => {
                 if (this.changed && !force) {
                     this.warnclose = true;
                     setTimeout(() => this.warnclose = false, 400);
                     throw {message: 'Settings have been changed'};
                 }
-            };
+            });
 
             this.modal.settings.on('settings-updated', this.cloneSettings);
             this.cloneSettings();

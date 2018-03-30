@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Autocomplete Component
+ * BetterDiscord Emote Autocomplete Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -11,17 +11,17 @@
 <template>
     <div class="bd-autocomplete">
         <div v-if="emotes && emotes.length" class="bd-autocomplete-inner">
-            <div class="bd-autocompleteRow">
-                <div class="bd-autocompleteSelector">
-                    <div class="bd-autocompleteTitle">
+            <div class="bd-autocomplete-row">
+                <div class="bd-autocomplete-selector">
+                    <div class="bd-autocomplete-title">
                         Emotes Matching:
                         <strong>{{title}}</strong>
                     </div>
                 </div>
             </div>
-            <div v-for="(emote, index) in emotes" class="bd-autocompleteRow" :key="index">
-                <div class="bd-autocompleteSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}" @mouseover="() => { selected = emote.id }" @click="() => inject(emote)">
-                    <div class="bd-autocompleteField">
+            <div v-for="(emote, index) in emotes" class="bd-autocomplete-row" :key="index">
+                <div class="bd-autocomplete-selector bd-selectable" :class="{'bd-selected': index === selectedIndex}" @mouseover="() => { selected = emote.id }" @click="() => inject(emote)">
+                    <div class="bd-autocomplete-field">
                         <img :src="getEmoteSrc(emote)"/>
                         <div>{{emote.id}}</div>
                     </div>
@@ -30,6 +30,7 @@
         </div>
     </div>
 </template>
+
 <script>
     import { EmoteModule } from 'builtin';
     import { Events } from 'modules';

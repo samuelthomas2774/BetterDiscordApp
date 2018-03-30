@@ -8,6 +8,7 @@
     transform: translateX(-100%) translateY(-100%);
     opacity: 0;
     transition: all .4s ease-in-out;
+    pointer-events: none;
 
     &.active {
         width: 900px;
@@ -15,20 +16,10 @@
         opacity: 1;
     }
 
-    .bd-sidebar-view::after {
-        content: "";
-        height: 100%;
-        width: 310px;
-        background-color: #202225;
-        top: 100%;
-        display: block;
-        position: absolute;
-    }
-
     .bd-settings-x {
         position: absolute;
         top: 18px;
-        left: 250px;
+        left: 255px;
         border: 2px solid #6e6e6e;
         border-radius: 50%;
         width: 25px;
@@ -39,7 +30,7 @@
         cursor: pointer;
 
         .platform-darwin & {
-            top: 40px;
+            top: 43px;
         }
 
         .bd-x-text {
@@ -63,10 +54,6 @@
                 fill: #fff;
             }
         }
-    }
-
-    .bd-sidebar-region .bd-scroller {
-        padding-top: 0;
     }
 
     .bd-info {
@@ -108,6 +95,38 @@
         }
     }
 
+    .bd-sidebar-view {
+        &::after {
+            content: "";
+            height: 100%;
+            width: 310px;
+            background-color: #202225;
+            top: 100%;
+            display: block;
+            position: absolute;
+        }
+
+        .bd-sidebar-region .bd-scroller {
+            padding-top: 0;
+        }
+
+        .bd-content-region {
+            width: 590px;
+        }
+
+        &.active {
+            .bd-content-region {
+                transition: transform 0.4s ease-in-out, opacity 0.2s ease;
+                transform: none;
+                opacity: 1;
+            }
+        }
+
+        &.bd-stop .bd-content-region {
+            z-index: 3003;
+        }
+    }
+
     .platform-darwin & {
         top: 0px;
 
@@ -120,19 +139,7 @@
         top: 0;
     }
 
-    .bd-sidebar-view.bd-stop .bd-content-region {
-        z-index: 3003;
-    }
-
-    .bd-sidebar-view.active {
-        .bd-content-region {
-            transition: transform 0.4s ease-in-out, opacity 0.2s ease;
-            transform: none;
-            opacity: 1;
-        }
-    }
-
-    &:not(.active) .bd-sidebar-view.active,
+    &:not(.active) > .bd-sidebar-view.active,
     &.bd-settings-out .bd-sidebar-view.active {
         .bd-content-region {
             transform: translate(-600px, 0%);

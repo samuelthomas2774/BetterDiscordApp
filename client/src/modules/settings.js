@@ -8,8 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, FileUtils, ClientLogger as Logger } from 'common';
+import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingUpdatedEvent } from 'structs';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import Globals from './globals';
 import CssEditor from './csseditor';
@@ -47,7 +48,7 @@ export default new class Settings {
 
             const settingsPath = path.resolve(this.dataPath, 'user.settings.json');
             const user_config = await FileUtils.readJsonFromFile(settingsPath);
-            const { settings, scss, css, css_editor_files, scss_error, css_editor_bounds } = user_config;
+            const { settings, scss, css, css_editor_files, scss_error, css_editor_bounds, favourite_emotes } = user_config;
 
             for (let set of this.settings) {
                 const newSet = settings.find(s => s.id === set.id);
@@ -58,6 +59,7 @@ export default new class Settings {
 
             CssEditor.setState(scss, css, css_editor_files, scss_error);
             CssEditor.editor_bounds = css_editor_bounds || {};
+            EmoteModule.favourite_emotes = favourite_emotes;
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
@@ -79,7 +81,8 @@ export default new class Settings {
                 css: CssEditor.css,
                 css_editor_files: CssEditor.files,
                 scss_error: CssEditor.error,
-                css_editor_bounds: CssEditor.editor_bounds
+                css_editor_bounds: CssEditor.editor_bounds,
+                favourite_emotes: EmoteModule.favourite_emotes
             });
 
             for (let set of this.settings) {

@@ -76,7 +76,7 @@ class BetterDiscord {
 
             Events.emit('ready');
             Events.emit('discord-ready');
-            EmoteModule.observe();
+            EmoteModule.init();
         } catch (err) {
             Logger.err('main', ['FAILED TO LOAD!', err]);
         }

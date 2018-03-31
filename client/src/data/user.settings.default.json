@@ -5,7 +5,7 @@
         "headertext": "Core Settings",
         "settings": [
             {
-                "category": "default",
+                "id": "default",
                 "settings": [
                     {
                         "id": "test-setting",
@@ -40,8 +40,8 @@
                 ]
             },
             {
-                "category": "advanced",
-                "category_name": "Advanced",
+                "id": "advanced",
+                "name": "Advanced",
                 "type": "drawer",
                 "settings": [
                     {
@@ -74,7 +74,7 @@
         "headertext": "UI Settings",
         "settings": [
             {
-                "category": "default",
+                "id": "default",
                 "settings": [
                     {
                         "id": "hide-button",
@@ -92,14 +92,26 @@
         "id": "emotes",
         "text": "Emotes",
         "headertext": "Emote Settings",
-        "settings": []
+        "settings": [
+            {
+                "id": "default",
+                "settings": [
+                    {
+                        "id": "enable",
+                        "type": "bool",
+                        "text": "Enable emotes",
+                        "value": true
+                    }
+                ]
+            }
+        ]
     },
     {
         "id": "css",
         "text": "CSS Editor",
         "settings": [
             {
-                "category": "default",
+                "id": "default",
                 "settings": [
                     {
                         "id": "live-update",
@@ -123,8 +135,6 @@
         "id": "security",
         "text": "Security",
         "headertext": "Security Settings",
-        "settings": [
-
-        ]
+        "settings": []
     }
 ]

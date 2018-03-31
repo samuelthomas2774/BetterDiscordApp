@@ -24,6 +24,18 @@ export default new class EmoteModule {
         this.favourite_emotes = [];
     }
 
+    init() {
+        this.enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
+        this.enabledSetting.on('setting-updated', event => {
+            // Rerender all messages (or if we're disabling emotes, those that have emotes)
+            for (const message of document.querySelectorAll(event.value ? '.message' : '.bd-emote-outer')) {
+                Reflection(event.value ? message : message.closest('.message')).forceUpdate();
+            }
+        });
+
+        return this.observe();
+    }
+
     /**
      * Sets an emote as favourite.
      * @param {String} emote The name of the emote
@@ -66,7 +78,7 @@ export default new class EmoteModule {
     }
 
     processMarkup(markup, timestamp) {
-        if (!emotesEnabled) return markup; // TODO Get it from setttings
+        if (!this.enabledSetting.value) return markup;
 
         timestamp = timestamp.valueOf();
         const allowNoWrapper = timestamp < enforceWrapperFrom;

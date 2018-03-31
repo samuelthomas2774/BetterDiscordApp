@@ -21,9 +21,14 @@
         <div class="bd-card-body">
             <div class="bd-card-description">{{item.description}}</div>
             <div class="bd-card-footer">
-                <div class="bd-card-extra">v{{item.version}} by {{item.authors.join(', ').replace(/,(?!.*,)/gmi, ' and')}}</div>
+                <div class="bd-card-extra">
+                    v{{item.version}} by
+                    <template v-for="(author, i) in item.authors">
+                        <ContentAuthor :author="author" :after="i === item.authors.length - 1 ? '' : i === item.authors.length - 2 ? ' and' : ','" />
+                    </template>
+                </div>
                 <div class="bd-controls">
-                    <slot name="controls"/>
+                    <slot name="controls" />
                 </div>
             </div>
         </div>
@@ -33,10 +38,12 @@
 <script>
     // Imports
     import { MiExtension } from '../common';
+    import ContentAuthor from './ContentAuthor.vue';
 
     export default {
         props: ['item'],
         components: {
+            ContentAuthor,
             MiExtension
         }
     }

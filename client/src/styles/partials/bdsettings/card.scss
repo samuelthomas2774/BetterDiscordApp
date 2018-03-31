@@ -79,3 +79,22 @@
         }
     }
 }
+
+.bd-content-author {
+    .bd-content-author-link {
+        cursor: pointer;
+
+        &:hover {
+            color: $coldimwhite;
+        }
+    }
+}
+
+.bd-content-author-links {
+    padding: 3px 5px;
+
+    .bd-popover-inner > :first-child {
+        display: flex;
+        flex-direction: row;
+    }
+}

@@ -19,7 +19,15 @@ Vue.use(VTooltip, {
     defaultArrowSelector: '.bd-tooltip-arrow',
     defaultInnerSelector: '.bd-tooltip-inner',
     defaultTemplate: '<div class="bd-tooltip"><div class="bd-tooltip-arrow"></div><span class="bd-tooltip-inner"></span></div>',
-    defaultBoundariesElement: DOM.getElement('#app-mount')
+    defaultBoundariesElement: DOM.getElement('#app-mount'),
+    popover: {
+        defaultContainer: 'bd-tooltips',
+        defaultClass: 'bd-popover',
+        defaultWrapperClass: 'bd-popover-wrapper',
+        defaultInnerClass: 'bd-popover-inner',
+        defaultArrowClass: 'bd-popover-arrow',
+        defaultBoundariesElement: DOM.getElement('#app-mount')
+    }
 });
 
 export default Vue;

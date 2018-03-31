@@ -57,9 +57,9 @@ class PatchedBrowserWindow extends BrowserWindow {
         const options = Object.assign({}, originalOptions);
         options.webPreferences = Object.assign({}, options.webPreferences);
 
+        // Make sure Node integration is enabled
         options.webPreferences.nodeIntegration = true;
 
-        console.log('Creating new BrowserWindow with options', options, originalOptions);
         return new BrowserWindow(options);
     }
 }
@@ -211,6 +211,11 @@ class BetterDiscord {
         return this.windowUtils.injectScript(this.config.getPath('cs'));
     }
 
+    /**
+     * Patches Electron's BrowserWindow so all windows have Node integration enabled.
+     * This needs to be called only once before the main window is created (or BrowserWindow is put in a variable).
+     * Basically BetterDiscord needs to load before discord_desktop_core.
+     */
     static patchBrowserWindow() {
         const electron_path = require.resolve('electron');
         const browser_window_path = require.resolve(path.resolve(electron_path, '..', '..', 'browser-window.js'));

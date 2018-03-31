@@ -11,19 +11,18 @@
 </template>
 
 <script>
-    import electron from 'electron';
-    const ipc = electron.ipcRenderer;
+    import electron, { ipcRenderer as ipc } from 'electron';
 
     export default {
         data() {
             return {
                 lines: []
-            }
+            };
         },
         props: ['paths', 'dataPath', 'channel'],
         computed: {
             ta() {
-                return this.lines.join('\r\n')
+                return this.lines.join('\r\n');
             }
         },
         methods: {
@@ -41,7 +40,7 @@
                 });
 
                 ipc.on('installdone', e => {
-
+                    this.$emit('done');
                 });
 
                 (async () => {

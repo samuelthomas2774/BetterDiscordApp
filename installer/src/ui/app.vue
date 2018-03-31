@@ -13,7 +13,7 @@
                     <div class="modal-controls">
                         <div class="flex-spacer"></div>
                         <button @click="modalVisible = false">No</button>
-                        <button @click="cancel">Yes</button>
+                        <button @click="exit">Yes</button>
                     </div>
                 </div>
             </div>
@@ -28,7 +28,8 @@
                     <Intro v-if="selectedPanel === 0" />
                     <License v-if="selectedPanel === 1" />
                     <Destination v-if="selectedPanel === 2" :paths="paths" :channel="currentChannel" @setChannel="setChannel" @askForDiscordPath="askForDiscordPath" :dataPath="dataPath" @askForDataPath="askForDataPath" />
-                    <Install v-if="selectedPanel === 3" :paths="paths" :dataPath="dataPath" :channel="currentChannel"/>
+                    <Install v-if="selectedPanel === 3" :paths="paths" :dataPath="dataPath" :channel="currentChannel" @done="installFinished" />
+                    <Done v-if="selectedPanel === 4" />
                 </div>
                 <div class="separator-controls"></div>
                 <div class="controls">
@@ -45,9 +46,12 @@
                         <button class="disabled">Install</button>
                     </template>
                     <template v-if="selectedPanel === 3">
-                        <button>Exit</button>
+                        <button v-if="finished" @click="next">Next</button>
                     </template>
-                    <button v-if="selectedPanel !== 3" @click="modalVisible = true">Cancel</button>
+                    <template v-if="selectedPanel === 4">
+                        <button @click="exit">Close</button>
+                    </template>
+                    <button v-if="selectedPanel !== 4" @click="cancel">Cancel</button>
                 </div>
                 <div class="border" v-if="platform === 'win32'"></div>
             </div>
@@ -61,9 +65,9 @@
     import License from './license.vue';
     import Destination from './destination.vue';
     import Install from './install.vue';
+    import Done from './done.vue';
 
-    import electron from 'electron';
-    const ipc = electron.ipcRenderer;
+    import electron, { ipcRenderer as ipc } from 'electron';
     import process from 'process';
     import path from 'path';
     import fs from 'fs';
@@ -113,6 +117,7 @@
                 base: path.join(userPath, 'discordcanary')
             }
         };
+
         paths.stable.latest = findLatest(paths.stable.base);
         paths.ptb.latest = findLatest(paths.ptb.base);
         paths.canary.latest = findLatest(paths.canary.base);
@@ -120,6 +125,7 @@
         paths.stable.writable = checkDir(paths.stable.latest);
         paths.ptb.writable = checkDir(paths.ptb.latest);
         paths.canary.writable = checkDir(paths.canary.latest);
+
         console.log(paths);
         return paths;
     }
@@ -139,8 +145,9 @@
                 paths: {},
                 currentChannel: 'stable',
                 dataPath: '',
-                modalVisible: false
-            }
+                modalVisible: false,
+                finished: false
+            };
         },
         props: ['platform'],
         components: {
@@ -148,7 +155,8 @@
             Intro,
             License,
             Destination,
-            Install
+            Install,
+            Done
         },
         methods: {
             next() {
@@ -176,6 +184,9 @@
                 }, 500);
             },
             cancel() {
+                this.modalVisible = true;
+            },
+            exit() {
                 window.close();
             },
             setChannel(channel) {
@@ -207,6 +218,9 @@
             async askForDataPath() {
                 const path = await this.askForPath(this.dataPath);
                 this.dataPath = path;
+            },
+            installFinished() {
+                this.finished = true;
             }
         },
         beforeMount() {

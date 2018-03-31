@@ -25,10 +25,14 @@
 
                 &.bd-selectable {
                     cursor: pointer;
-                }
 
-                &.bd-selected {
-                    background-color: #36393f;
+                    &:hover {
+                        background-color: darken(#36393f, 5%);
+                    }
+
+                    &.bd-selected {
+                        background-color: #36393f;
+                    }
                 }
 
                 .bd-autocomplete-title {

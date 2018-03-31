@@ -169,11 +169,11 @@
                     background: #191a1f;
                     resize: none;
                     border: 1px solid #303030;
+                    user-select: all;
 
                     &:hover::-webkit-scrollbar-thumb {
                         background: $blue;
                     }
-
                 }
 
                 .progress {
@@ -192,6 +192,14 @@
                         position: relative;
                         width: 90px;
                         height: 20px;
+                    }
+
+                    &.progress-done {
+                        background-color: $colok;
+                    }
+
+                    &.progress-err {
+                        background-color: $colerr;
                     }
                 }
             }

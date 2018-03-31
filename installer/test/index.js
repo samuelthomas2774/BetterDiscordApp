@@ -1,10 +1,14 @@
 const { ipcMain, app, BrowserWindow } = require('electron');
 const path = require('path');
-const axios = require('axios');
 const fs = require('fs');
+const util = require('util');
+const axios = require('axios');
 const unzipStream = require('unzip-stream');
 const GitHub = require('github-api');
 const github = new GitHub();
+
+const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 
 github.getLatestRelease = async function (user, repo) {
     try {
@@ -35,7 +39,7 @@ async function install(paths, channel, dataPath, appendLog) {
     appendLog('Fetching release info');
     const release = await github.getLatestRelease('JsSucks', 'BetterDiscordApp');
 
-    appendLog(`Using release: ${release.id}, version ${release.tag_name}`);
+    appendLog(`Using release ${release.id}, version ${release.tag_name}`);
     const pkg = release.assets.find(asset => asset.name === 'full.zip');
     if (!pkg)
         throw {message: 'Release does not contain full package! Unable to continue.'};
@@ -52,22 +56,52 @@ async function install(paths, channel, dataPath, appendLog) {
     appendLog('Unpacking asset...');
     const unzip = await unzipStreamAsync(dl.data, bdPath);
 
+    appendLog(`Unpacking core...`);
+    await unzipStreamAsync(fs.createReadStream(path.join(bdPath, 'core.zip')), bdPath);
+
+    appendLog(`Unpacking client bundle...`);
+    await unzipStreamAsync(fs.createReadStream(path.join(bdPath, 'client.zip')), bdPath);
+
+    appendLog(`Unpacking CSS editor bundle...`);
+    await unzipStreamAsync(fs.createReadStream(path.join(bdPath, 'csseditor.zip')), bdPath);
+
     appendLog('Verifying assets');
+    // TODO: check everything was downloaded and unpacked properly
+
+    appendLog('Injecting loader into Discord');
+    const discord_desktop_core_path = path.join(discordPath, 'modules', 'discord_desktop_core');
+
+    appendLog('Writing new discord_desktop_core/index.js');
+
+    const relativeBdPath = bdPath.startsWith(process.env.HOME) ? path.relative(discord_desktop_core_path, bdPath) : bdPath;
+    const escapedPath = relativeBdPath.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
+    await writeFile(path.join(discord_desktop_core_path, 'index.js'), `try {
+        new (require("${escapedPath}")).BetterDiscord();
+    } catch (err) {
+        console.err('Error loading BetterDiscord:', err);
+    }
+    module.exports = require('./core.asar');
+    `);
+
+    appendLog('Done!');
 }
 
 ipcMain.on('install', async (e, args) => {
     function appendLog(message) {
+        console.log('Install progress:', message);
         e.sender.send('appendlog', message);
     }
 
     try {
         const { paths, channel, dataPath } = args;
         await install(paths, channel, dataPath, appendLog);
+
+        e.sender.send('installdone');
     } catch (err) {
         appendLog(err.message);
+        e.sender.send('installerror', err);
     }
-
-    e.sender.send('installdone');
 });
 
 app.on('window-all-closed', () => {

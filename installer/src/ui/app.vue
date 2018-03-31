@@ -28,7 +28,7 @@
                     <Intro v-if="selectedPanel === 0" />
                     <License v-if="selectedPanel === 1" />
                     <Destination v-if="selectedPanel === 2" :paths="paths" :channel="currentChannel" @setChannel="setChannel" @askForDiscordPath="askForDiscordPath" :dataPath="dataPath" @askForDataPath="askForDataPath" />
-                    <Install v-if="selectedPanel === 3" :paths="paths" :dataPath="dataPath" :channel="currentChannel" @done="installFinished" />
+                    <Install ref="installpanel" v-if="selectedPanel === 3" :paths="paths" :dataPath="dataPath" :channel="currentChannel" :done="finished || finishedWithError" :error="error" @started="installStarted" @done="installFinished" @error="installError" />
                     <Done v-if="selectedPanel === 4" />
                 </div>
                 <div class="separator-controls"></div>
@@ -47,11 +47,12 @@
                     </template>
                     <template v-if="selectedPanel === 3">
                         <button v-if="finished" @click="next">Next</button>
+                        <button v-if="finishedWithError" @click="retry">Retry</button>
                     </template>
                     <template v-if="selectedPanel === 4">
                         <button @click="exit">Close</button>
                     </template>
-                    <button v-if="selectedPanel !== 4" @click="cancel">Cancel</button>
+                    <button v-if="selectedPanel !== 4 && !finished" @click="cancel">Cancel</button>
                 </div>
                 <div class="border" v-if="platform === 'win32'"></div>
             </div>
@@ -146,7 +147,9 @@
                 currentChannel: 'stable',
                 dataPath: '',
                 modalVisible: false,
-                finished: false
+                finished: false,
+                finishedWithError: false,
+                error: undefined
             };
         },
         props: ['platform'],
@@ -219,8 +222,20 @@
                 const path = await this.askForPath(this.dataPath);
                 this.dataPath = path;
             },
+            installStarted() {
+                this.finished = false;
+                this.finishedWithError = false;
+                this.error = undefined;
+            },
             installFinished() {
                 this.finished = true;
+            },
+            installError(err) {
+                this.finishedWithError = true;
+                this.error = err;
+            },
+            retry() {
+                this.$refs.installpanel.retry();
             }
         },
         beforeMount() {

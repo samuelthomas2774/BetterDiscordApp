@@ -8,6 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { EmoteModule } from 'builtin';
+import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
+import { BdMenu, Modals, DOM, Reflection } from 'ui';
 import { Utils, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
@@ -16,8 +19,6 @@ import ThemeManager from './thememanager';
 import Events from './events';
 import EventsWrapper from './eventswrapper';
 import { WebpackModules } from './webpackmodules';
-import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenu, Modals, DOM, Reflection } from 'ui';
 import DiscordApi from './discordapi';
 import { ReactComponents } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
@@ -286,6 +287,52 @@ export default class PluginApi {
             },
             baseComponent: {
                 get: () => this.baseModalComponent
+            }
+        });
+    }
+
+    /**
+     * Emotes
+     */
+
+    get emotes() {
+        return EmoteModule.emotes;
+    }
+    get favourite_emotes() {
+        return EmoteModule.favourite_emotes;
+    }
+    setFavouriteEmote(emote, favourite) {
+        return EmoteModule.setFavourite(emote, favourite);
+    }
+    addFavouriteEmote(emote) {
+        return EmoteModule.addFavourite(emote);
+    }
+    removeFavouriteEmote(emote) {
+        return EmoteModule.addFavourite(emote);
+    }
+    isFavouriteEmote(emote) {
+        return EmoteModule.isFavourite(emote);
+    }
+    getEmote(emote) {
+        return EmoteModule.getEmote(emote);
+    }
+    filterEmotes(regex, limit, start = 0) {
+        return EmoteModule.filterEmotes(regex, limit, start);
+    }
+    get Emotes() {
+        return Object.defineProperties({
+            setFavourite: this.setFavouriteEmote.bind(this),
+            addFavourite: this.addFavouriteEmote.bind(this),
+            removeFavourite: this.removeFavouriteEmote.bind(this),
+            isFavourite: this.isFavouriteEmote.bind(this),
+            getEmote: this.getEmote.bind(this),
+            filter: this.filterEmotes.bind(this)
+        }, {
+            emotes: {
+                get: () => this.emotes
+            },
+            favourite_emotes: {
+                get: () => this.favourite_emotes
             }
         });
     }

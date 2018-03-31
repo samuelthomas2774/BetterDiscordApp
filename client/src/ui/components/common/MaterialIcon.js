@@ -13,3 +13,4 @@ export { default as MiChevronDown } from './materialicons/ChevronDown.vue';
 export { default as MiExtension } from './materialicons/Extension.vue';
 export { default as MiError } from './materialicons/Error.vue';
 export { default as MiDiscord } from './materialicons/Discord.vue';
+export { default as MiStar } from './materialicons/Star.vue';

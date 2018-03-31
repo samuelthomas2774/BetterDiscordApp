@@ -52,8 +52,19 @@ const globals = {
     paths
 };
 
-class Comms {
+class PatchedBrowserWindow extends BrowserWindow {
+    constructor(originalOptions) {
+        const options = Object.assign({}, originalOptions);
+        options.webPreferences = Object.assign({}, options.webPreferences);
 
+        options.webPreferences.nodeIntegration = true;
+
+        console.log('Creating new BrowserWindow with options', options, originalOptions);
+        return new BrowserWindow(options);
+    }
+}
+
+class Comms {
     constructor(bd) {
         this.bd = bd;
         this.initListeners();
@@ -101,7 +112,6 @@ class Comms {
     async sendToCssEditor(channel, message) {
         return this.bd.csseditor.send(channel, message);
     }
-
 }
 
 class BetterDiscord {
@@ -201,7 +211,17 @@ class BetterDiscord {
         return this.windowUtils.injectScript(this.config.getPath('cs'));
     }
 
+    static patchBrowserWindow() {
+        const electron_path = require.resolve('electron');
+        const browser_window_path = require.resolve(path.resolve(electron_path, '..', '..', 'browser-window.js'));
+        const browser_window_module = require.cache[browser_window_path];
+
+        browser_window_module.exports = PatchedBrowserWindow;
+    }
+
 }
+
+BetterDiscord.patchBrowserWindow();
 
 module.exports = {
     BetterDiscord

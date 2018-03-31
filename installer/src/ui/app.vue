@@ -1,7 +1,7 @@
 <template>
     <div id="mount">
         <div class="root">
-            <div class="modal" :class="{visible: modalVisible}">
+            <div class="modal" :class="{visible: modalVisible || modalClosing, 'modal-out': modalClosing}">
                 <div class="modal-inner">
                     <div class="modal-title">Exit Setup?</div>
                     <div class="modal-body">
@@ -147,6 +147,7 @@
                 currentChannel: 'stable',
                 dataPath: '',
                 modalVisible: false,
+                modalClosing: false,
                 finished: false,
                 finishedWithError: false,
                 error: undefined
@@ -236,6 +237,13 @@
             },
             retry() {
                 this.$refs.installpanel.retry();
+            }
+        },
+        watch: {
+            modalVisible(modalVisible) {
+                if (modalVisible) return;
+                this.modalClosing = true;
+                setTimeout(() => this.modalClosing = false, 200);
             }
         },
         beforeMount() {

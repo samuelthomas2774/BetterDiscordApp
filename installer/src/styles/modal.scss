@@ -6,19 +6,26 @@
     bottom: 0;
     background: rgba(0, 0, 0, .5);
     z-index: 3;
-    transition: all .3s ease-in-out;
+    transition: opacity .3s ease-in-out;
     opacity: 0;
-    pointer-events: none;
+    height: 100%;
+    margin-top: -100%;
+    border-radius: 5px;
 
     &.visible {
+        margin-top: 0;
         opacity: 1;
-        pointer-events: all;
 
         .modal-inner {
-            transform: scale(1);
-            height: 200px;
-            margin-top: -100px;
-            border-radius: 5px;
+            animation: bd-modal-in 0.22s ease;
+        }
+    }
+
+    &.modal-out {
+        opacity: 0;
+
+        .modal-inner {
+            animation: bd-modal-out 0.22s ease;
         }
     }
 
@@ -26,32 +33,34 @@
         position: absolute;
         display: flex;
         flex-direction: column;
-        width: 600px;
-        height: 300px;
+        width: 500px;
+        height: 250px;
         background: $bg;
         top: 50%;
         left: 50%;
-        margin-left: -300px;
-        margin-top: -150px;
-        transition: all .3s ease-in-out;
-        transform: scale(0);
+        margin-left: -250px;
+        margin-top: -125px;
 
         .modal-title {
-            padding: 5px;
-            background: lighten($bg, 2%);
-            border-radius: 5px 5px 0;
+            display: flex;
+            flex: 0 0 auto;
+            padding: 15px;
+            transition: box-shadow .1s ease-out;
+            color: #fff;
+            font-weight: 700;
+            line-height: 18px;
         }
 
         .modal-body {
-            padding: 5px;
-            flex: 1 1 auto;
-            padding: 10px;
+            display: flex;
+            flex: 1 0;
+            padding: 0 15px;
         }
 
         .modal-controls {
-            padding: 5px;
-            background: lighten($bg, 2%);
             display: flex;
+            flex: 0 0 auto;
+            padding: 15px;
             border-radius: 0 0 5px 5px;
 
             .flex-spacer {
@@ -83,4 +92,17 @@
             }
         }
     }
+}
+
+@keyframes bd-modal-in {
+    0% { transform: scale(0.8); opacity: 0; }
+    90% { transform: scale(1.01); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bd-modal-out {
+    0% { transform: scale(1); opacity: 1; }
+    10% { transform: scale(1.01); opacity: 1; }
+    90% { opacity: 0; }
+    100% { transform: scale(0.8); opacity: 0; }
 }

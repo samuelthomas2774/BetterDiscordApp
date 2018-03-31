@@ -17,7 +17,7 @@ import Events from './events';
 import EventsWrapper from './eventswrapper';
 import { WebpackModules } from './webpackmodules';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenuItems, Modals, DOM, Reflection } from 'ui';
+import { BdMenu, Modals, DOM, Reflection } from 'ui';
 import DiscordApi from './discordapi';
 import { ReactComponents } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
@@ -137,6 +137,9 @@ export default class PluginApi {
 
     get BdMenu() {
         return {
+            open: BdMenu.open.bind(BdMenu),
+            close: BdMenu.close.bind(BdMenu),
+            items: this.BdMenuItems,
             BdMenuItems: this.BdMenuItems
         };
     }
@@ -149,23 +152,23 @@ export default class PluginApi {
         return this._menuItems || (this._menuItems = []);
     }
     addMenuItem(item) {
-        return BdMenuItems.add(item);
+        return BdMenu.items.add(item);
     }
     addMenuSettingsSet(category, set, text) {
-        const item = BdMenuItems.addSettingsSet(category, set, text);
+        const item = BdMenu.items.addSettingsSet(category, set, text);
         return this.menuItems.push(item);
     }
     addMenuVueComponent(category, text, component) {
-        const item = BdMenuItems.addVueComponent(category, text, component);
+        const item = BdMenu.items.addVueComponent(category, text, component);
         return this.menuItems.push(item);
     }
     removeMenuItem(item) {
-        BdMenuItems.remove(item);
+        BdMenu.items.remove(item);
         Utils.removeFromArray(this.menuItems, item);
     }
     removeAllMenuItems() {
         for (let item of this.menuItems)
-            BdMenuItems.remove(item);
+            BdMenu.items.remove(item);
     }
     get BdMenuItems() {
         return Object.defineProperty({

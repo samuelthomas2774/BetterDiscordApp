@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, WebpackModules, DiscordApi } from 'modules';
+import { Events, WebpackModules, DiscordApi, MonkeyPatch } from 'modules';
 import { Utils } from 'common';
 import { remote } from 'electron';
 import DOM from './dom';
@@ -30,10 +30,10 @@ export default class {
             if (!this.profilePopupModule) return;
             clearInterval(defer);
 
-            /*Utils.monkeyPatch(this.profilePopupModule, 'open', 'after', (data, userid) => Events.emit('ui-event', {
+            MonkeyPatch('BdUI', this.profilePopupModule).after('open', (context, [userid]) => Events.emit('ui-event', {
                 event: 'profile-popup-open',
                 data: { userid }
-            }));*/
+            }));
         }, 100);
 
         const ehookInterval = setInterval(() => {

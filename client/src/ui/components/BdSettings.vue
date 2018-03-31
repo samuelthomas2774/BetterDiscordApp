@@ -58,9 +58,9 @@
 
 <script>
     // Imports
-    import { shell } from 'electron';
-    import { Settings } from 'modules';
+    import { Events, Settings } from 'modules';
     import { BdMenuItems } from 'ui';
+    import { shell } from 'electron';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView } from './bd';
     import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
@@ -151,6 +151,9 @@
                 if (active) return;
                 this.closeContent();
             }
+        },
+        created() {
+            Events.on('bd-open-menu', item => item && this.itemOnClick(this.sidebarItems.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
         }
     }
 </script>

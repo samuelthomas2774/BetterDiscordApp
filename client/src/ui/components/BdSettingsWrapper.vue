@@ -62,6 +62,8 @@
         },
         created() {
             Events.on('ready', e => this.loaded = true);
+            Events.on('bd-open-menu', item => this.active = true);
+            Events.on('bd-close-menu', () => this.active = false);
             Events.on('update-check-start', e => this.updating = 0);
             Events.on('update-check-end', e => this.updating = 1);
             Events.on('updates-available', e => this.updating = 2);

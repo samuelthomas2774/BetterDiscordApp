@@ -20,6 +20,7 @@
     "nedb": "^1.8.0"
   },
   "devDependencies": {
+    "archiver": "^2.1.1",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
@@ -47,6 +48,7 @@
     "html-webpack-plugin": "^3.0.6",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
+    "mkdirp": "^0.5.1",
     "node-gyp": "^3.6.2",
     "pump": "^2.0.0",
     "sass-loader": "^6.0.6",
@@ -74,6 +76,7 @@
     "test": "npm run build && npm run lint",
     "build_node-sass": "node scripts/build-node-sass.js",
     "build_release": "npm run release --prefix client && npm run build --prefix core && npm run release --prefix csseditor",
-    "release": "npm run lint && npm run build_release && gulp release"
+    "package_release": "node scripts/package-release.js",
+    "release": "npm run lint && npm run build_release && gulp release && npm run package_release"
   }
 }

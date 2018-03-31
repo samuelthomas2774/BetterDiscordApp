@@ -29,7 +29,7 @@
     "combokeys": "^3.0.0",
     "css-loader": "^0.28.9",
     "del": "^3.0.0",
-    "electron": "^1.6.15",
+    "electron": "1.6.15",
     "electron-rebuild": "^1.7.3",
     "eslint": "^4.16.0",
     "eslint-plugin-vue": "^4.3.0",

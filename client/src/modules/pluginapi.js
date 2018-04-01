@@ -470,8 +470,8 @@ export default class PluginApi {
             get: () => this.patches
         });
     }
-    monkeyPatch(module) {
-        return MonkeyPatch(this.plugin.id, module);
+    get monkeyPatch() {
+        return m => MonkeyPatch(this.plugin.id, m);
     }
 
 }

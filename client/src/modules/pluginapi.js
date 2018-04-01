@@ -402,14 +402,23 @@ export default class PluginApi {
     getWebpackModuleByName(name, fallback) {
         return WebpackModules.getModuleByName(name, fallback);
     }
-    getWebpackModuleByRegex(regex, first = true) {
-        return WebpackModules.getModuleByRegex(regex, first);
+    getWebpackModuleByRegex(regex) {
+        return WebpackModules.getModuleByRegex(regex, true);
     }
-    getWebpackModuleByProperties(props, first = true) {
-        return WebpackModules.getModuleByProps(props, first);
+    getWebpackModulesByRegex(regex) {
+        return WebpackModules.getModuleByRegex(regex, false);
     }
-    getWebpackModuleByPrototypeFields(props, first = true) {
-        return WebpackModules.getModuleByPrototypes(props, first);
+    getWebpackModuleByProperties(...props) {
+        return WebpackModules.getModuleByProps(props, true);
+    }
+    getWebpackModuleByPrototypeFields(...props) {
+        return WebpackModules.getModuleByPrototypes(props, true);
+    }
+    getWebpackModulesByProperties(...props) {
+        return WebpackModules.getModuleByProps(props, false);
+    }
+    getWebpackModulesByPrototypeFields(...props) {
+        return WebpackModules.getModuleByPrototypes(props, false);
     }
     get WebpackModules() {
         return Object.defineProperty({
@@ -417,8 +426,11 @@ export default class PluginApi {
             getModuleByName: this.getWebpackModuleByName.bind(this),
             getModuleByDisplayName: this.getWebpackModuleByName.bind(this),
             getModuleByRegex: this.getWebpackModuleByRegex.bind(this),
+            getModulesByRegex: this.getWebpackModulesByRegex.bind(this),
             getModuleByProperties: this.getWebpackModuleByProperties.bind(this),
-            getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this)
+            getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this),
+            getModulesByProperties: this.getWebpackModulesByProperties.bind(this),
+            getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this)
         }, 'require', {
             get: () => this.webpackRequire
         });

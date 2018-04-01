@@ -9,6 +9,7 @@
 */
 
 import { EventListener, ReactComponents, ReactHelpers, MonkeyPatch } from 'modules';
+import { Reflection } from 'ui';
 import { ClientLogger as Logger } from 'common';
 import DOM from './dom';
 import { BdBadge, BdMessageBadge } from './components/bd';
@@ -25,17 +26,10 @@ export default class extends EventListener {
 
     bindings() {
         this.uiEvent = this.uiEvent.bind(this);
-        // this.messageBadge = this.messageBadge.bind(this);
-        // this.badges = this.badges.bind(this);
     }
 
     get eventBindings() {
         return [
-            // { id: 'discord:MESSAGE_CREATE', callback: this.messageBadge },
-            // { id: 'discord:MESSAGE_UPDATE', callback: this.messageBadge },
-            // { id: 'server-switch', callback: this.badges },
-            // { id: 'channel-switch', callback: this.badges },
-            // { id: 'ui:loadedmore', callback: this.badges },
             { id: 'ui-event', callback: this.uiEvent }
         ];
     }
@@ -109,6 +103,11 @@ export default class extends EventListener {
             if (!element) return;
             this.injectMessageBadges(element);
         });
+
+        // Rerender all messages
+        for (const message of document.querySelectorAll('.message')) {
+            Reflection(message).forceUpdate();
+        }
     }
 
     /**
@@ -140,7 +139,7 @@ export default class extends EventListener {
         const ProfileBadges = this;
         const NameTag = await ReactComponents.getComponent('NameTag', {selector: '.nameTag-26T3kW'});
 
-        return this.PatchedNameTag = class extends NameTag.component {
+        this.PatchedNameTag = class extends NameTag.component {
             render() {
                 const retVal = NameTag.component.prototype.render.call(this, arguments);
                 try {
@@ -173,6 +172,13 @@ export default class extends EventListener {
                 ProfileBadges.injectMessageBadges(element);
             }
         };
+
+        // Rerender all channel members
+        for (const channelMember of document.querySelectorAll('.member-2FrNV0')) {
+            Reflection(channelMember).forceUpdate();
+        }
+
+        return this.PatchedNameTag;
     }
 
     injectMessageBadges(element) {

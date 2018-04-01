@@ -62,18 +62,15 @@ export default class PluginApi {
      * Logger
      */
 
-    loggerLog(...message) { Logger.log(this.plugin.name, message) }
-    loggerErr(...message) { Logger.err(this.plugin.name, message) }
-    loggerWarn(...message) { Logger.warn(this.plugin.name, message) }
-    loggerInfo(...message) { Logger.info(this.plugin.name, message) }
-    loggerDbg(...message) { Logger.dbg(this.plugin.name, message) }
     get Logger() {
         return {
-            log: this.loggerLog.bind(this),
-            err: this.loggerErr.bind(this),
-            warn: this.loggerWarn.bind(this),
-            info: this.loggerInfo.bind(this),
-            dbg: this.loggerDbg.bind(this)
+            log: (...message) => Logger.log(this.plugin.name, message),
+            error: (...message) => Logger.err(this.plugin.name, message),
+            err: (...message) => Logger.err(this.plugin.name, message),
+            warn: (...message) => Logger.warn(this.plugin.name, message),
+            info: (...message) => Logger.info(this.plugin.name, message),
+            debug: (...message) => Logger.dbg(this.plugin.name, message),
+            dbg: (...message) => Logger.dbg(this.plugin.name, message)
         };
     }
 
@@ -83,14 +80,15 @@ export default class PluginApi {
 
     get Utils() {
         return {
-            overload: () => Utils.overload.apply(Utils, arguments),
-            tryParseJson: () => Utils.tryParseJson.apply(Utils, arguments),
-            toCamelCase: () => Utils.toCamelCase.apply(Utils, arguments),
-            compare: () => Utils.compare.apply(Utils, arguments),
-            deepclone: () => Utils.deepclone.apply(Utils, arguments),
-            deepfreeze: () => Utils.deepfreeze.apply(Utils, arguments),
-            removeFromArray: () => Utils.removeFromArray.apply(Utils, arguments),
-            defineSoftGetter: () => Utils.defineSoftGetter.apply(Utils, arguments)
+            overload: (...args) => Utils.overload.apply(Utils, args),
+            tryParseJson: (...args) => Utils.tryParseJson.apply(Utils, args),
+            toCamelCase: (...args) => Utils.toCamelCase.apply(Utils, args),
+            compare: (...args) => Utils.compare.apply(Utils, args),
+            deepclone: (...args) => Utils.deepclone.apply(Utils, args),
+            deepfreeze: (...args) => Utils.deepfreeze.apply(Utils, args),
+            removeFromArray: (...args) => Utils.removeFromArray.apply(Utils, args),
+            defineSoftGetter: (...args) => Utils.defineSoftGetter.apply(Utils, args),
+            until: (...args) => Utils.until.apply(Utils, args)
         };
     }
 

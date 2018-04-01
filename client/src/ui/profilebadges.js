@@ -8,7 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { EventListener } from 'modules';
+import { EventListener, ReactComponents, ReactComponentHelpers as Helpers, MonkeyPatch } from 'modules';
+import { ClientLogger as Logger } from 'common';
 import DOM from './dom';
 import { BdBadge, BdMessageBadge } from './components/bd';
 import VueInjector from './vueinjector';
@@ -16,11 +17,15 @@ import contributors from '../data/contributors';
 
 export default class extends EventListener {
 
+    init() {
+        this.patchChannelMember();
+        this.patchNameTag();
+    }
+
     bindings() {
         this.uiEvent = this.uiEvent.bind(this);
         this.messageBadge = this.messageBadge.bind(this);
         this.badges = this.badges.bind(this);
-        this.userlistBadge = this.userlistBadge.bind(this);
     }
 
     get eventBindings() {
@@ -30,7 +35,6 @@ export default class extends EventListener {
             { id: 'server-switch', callback: this.badges },
             { id: 'channel-switch', callback: this.badges },
             { id: 'ui:loadedmore', callback: this.badges },
-            { id: 'ui:useridset', callback: this.userlistBadge },
             { id: 'ui-event', callback: this.uiEvent }
         ];
     }
@@ -71,20 +75,6 @@ export default class extends EventListener {
         });
     }
 
-    userlistBadge(e) {
-        const c = contributors.find(c => c.id === e.dataset.userId);
-        if (!c) return;
-        const memberUsername = e.querySelector('.member-username');
-        if (!memberUsername) return;
-        const root = document.createElement('span');
-        memberUsername.append(root);
-        VueInjector.inject(root, {
-            components: { BdMessageBadge },
-            data: { c },
-            template: '<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />'
-        });
-    }
-
     inject(userid) {
         const c = contributors.find(c => c.id === userid);
         if (!c) return;
@@ -108,6 +98,89 @@ export default class extends EventListener {
 
     get contributors() {
         return contributors;
+    }
+
+    /**
+     * Patches ChannelMember to use the extended NameTag.
+     * This is because NameTag is also used in places we don't really want any badges.
+     */
+    async patchChannelMember() {
+        const ChannelMember = await ReactComponents.getComponent('ChannelMember');
+
+        this.unpatchChannelMemberRender = MonkeyPatch('ProfileBadges', ChannelMember.component.prototype).after('render', (component, args, retVal) => {
+            if (!retVal.props || !retVal.props.children) return;
+
+            const user = Helpers.findProp(component, 'user');
+            if (!user) return;
+            const c = contributors.find(c => c.id === user.id);
+            if (!c) return;
+
+            const nameTag = retVal.props.children.props.children[1].props.children[0];
+            nameTag.type = this.PatchedNameTag || nameTag.type;
+        });
+    }
+
+    /**
+     * Creates an extended NameTag component that renders message badges.
+     */
+    async patchNameTag() {
+        if (this.PatchedNameTag) return this.PatchedNameTag;
+
+        const ProfileBadges = this;
+        const NameTag = await ReactComponents.getComponent('NameTag', {selector: '.nameTag-26T3kW'});
+
+        return this.PatchedNameTag = class extends NameTag.component {
+            render() {
+                const retVal = NameTag.component.prototype.render.call(this, arguments);
+                try {
+                    if (!retVal.props || !retVal.props.children) return;
+
+                    const user = Helpers.findProp(this, 'user');
+                    if (!user) return;
+                    const c = contributors.find(c => c.id === user.id);
+                    if (!c) return;
+
+                    retVal.props.children.push(ReactHelpers.React.createElement('span', {
+                        className: 'bd-badge-outer',
+                        'data-userid': user.id
+                    }));
+                } catch (err) {
+                    Logger.err('ProfileBadges', ['Error thrown while rendering a NameTag', err]);
+                }
+                return retVal;
+            }
+
+            componentDidMount() {
+                const element = Helpers.ReactDOM.findDOMNode(this);
+                if (!element) return;
+                ProfileBadges.injectMessageBadges(element);
+            }
+
+            componentDidUpdate() {
+                const element = Helpers.ReactDOM.findDOMNode(this);
+                if (!element) return;
+                // ProfileBadges.injectMessageBadges(element);
+            }
+        };
+    }
+
+    injectMessageBadges(element) {
+        for (const beo of element.getElementsByClassName('bd-badge-outer')) this.injectNameTagBadge(beo);
+    }
+
+    injectMessageBadge(root) {
+        const { userid } = root.dataset;
+        if (!userid) return;
+
+        const c = contributors.find(c => c.id === userid);
+        if (!c) return;
+
+        VueInjector.inject(root, {
+            components: { BdMessageBadge },
+            data: { c },
+            template: '<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />'
+        }, DOM.createElement('span'));
+        root.classList.add('bd-has-badge');
     }
 
 }

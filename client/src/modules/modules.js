@@ -16,7 +16,7 @@ export { default as Vendor } from './vendor';
 
 export * from './webpackmodules';
 export * from './patcher';
-export * from './reactcomponents';
+export { ReactComponents, ReactAutoPatcher, Helpers as ReactComponentHelpers } from './reactcomponents';
 export { default as EventListener } from './eventlistener';
 export { default as SocketProxy } from './socketproxy';
 export { default as EventHook } from './eventhook';

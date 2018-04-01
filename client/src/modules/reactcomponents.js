@@ -16,7 +16,7 @@ import { MonkeyPatch, Patcher } from './patcher';
 import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
 
-class Helpers {
+export class Helpers {
     static get plannedActions() {
         return this._plannedActions || (this._plannedActions = new Map());
     }
@@ -154,6 +154,10 @@ class Helpers {
         return null;
     }
 
+    static get React() {
+        return WebpackModules.getModuleByName('React');
+    }
+
     static get ReactDOM() {
         return WebpackModules.getModuleByName('ReactDOM');
     }
@@ -223,7 +227,7 @@ export class ReactComponents {
                     return;
                 }
                 if (!reflect.component.displayName) reflect.component.displayName = name;
-                Logger.info('ReactComponents', `Found important component ${name} with reflection`);
+                Logger.info('ReactComponents', [`Found important component ${name} with reflection`, reflect.component, reflect]);
                 this.push(reflect.component);
                 clearInterval(importantInterval);
             }, 50);
@@ -320,9 +324,10 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannelMember() {
-        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member.member-status' });
+        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member-2FrNV0' });
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
-            if (!retVal.props || !retVal.props.children || !retVal.props.children.length) return;
+            // Logger.log('ReactComponents', ['Rendering ChannelMember', component, args, retVal]);
+            if (!retVal.props || !retVal.props.children) return;
             const user = Helpers.findProp(component, 'user');
             if (!user) return;
             retVal.props['data-user-id'] = user.id;
@@ -360,7 +365,7 @@ export class ReactAutoPatcher {
     }
 
     static forceUpdate() {
-        for (const e of document.querySelectorAll('.message,.message-group,.guild,.containerDefault-7RImuF,.channel-members .member')) {
+        for (const e of document.querySelectorAll('.message, .message-group, .guild, .containerDefault-7RImuF, .channel-members .member-2FrNV0')) {
             Reflection(e).forceUpdate();
         }
     }

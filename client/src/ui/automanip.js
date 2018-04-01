@@ -125,7 +125,7 @@ export default class extends EventListener {
     }
 
     setUserIds() {
-        for (let user of document.querySelectorAll('.channel-members-wrap .member')) {
+        for (let user of document.querySelectorAll('.channel-members-wrap .member, .channel-members-wrap .member-2FrNV0')) {
             this.setUserId(user);
         }
     }

@@ -159,6 +159,17 @@ export class Utils {
             enumerable: true
         });
     }
+
+    static async until(check, time = 0) {
+        let value, i;
+        do {
+            // Wait for the next tick
+            await new Promise(resolve => setTimeout(resolve, time));
+            value = check(i);
+            i++;
+        } while (!value);
+        return value;
+    }
 }
 
 export class FileUtils {

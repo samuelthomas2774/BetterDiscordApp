@@ -1,7 +1,11 @@
 .bd-profile-badges-wrap {
-    display: flex;
+    display: inline-flex;
     margin-top: 8px;
     flex: 1 1 auto;
+
+    + [class*="profileBadges"] {
+        display: inline-flex;
+    }
 }
 
 .bd-profile-badges {

@@ -229,7 +229,7 @@ export class ReactComponents {
                     return;
                 }
                 if (!reflect.component.displayName) reflect.component.displayName = name;
-                Logger.info('ReactComponents', [`Found important component ${name} with reflection`, reflect.component, reflect]);
+                Logger.info('ReactComponents', [`Found important component ${name} with reflection`, reflect]);
                 this.push(reflect.component);
                 clearInterval(importantInterval);
             }, 50);
@@ -240,7 +240,7 @@ export class ReactComponents {
             listeners: []
         });
         return new Promise(resolve => {
-            this.listeners.find(l => l.id === name).listeners.push(c => resolve(c));
+            this.listeners.find(l => l.id === name).listeners.push(resolve);
         });
     }
 

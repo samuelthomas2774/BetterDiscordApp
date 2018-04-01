@@ -8,60 +8,21 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { EventListener, ReactComponents, ReactHelpers, MonkeyPatch } from 'modules';
+import { Module, ReactComponents, ReactHelpers, MonkeyPatch, WebpackModules } from 'modules';
 import { Reflection } from 'ui';
-import { ClientLogger as Logger } from 'common';
+import { Utils, ClientLogger as Logger } from 'common';
 import DOM from './dom';
 import { BdBadge, BdMessageBadge } from './components/bd';
 import VueInjector from './vueinjector';
 import contributors from '../data/contributors';
 
-export default class extends EventListener {
+export default class extends Module {
 
     init() {
         this.patchMessage();
         this.patchChannelMember();
         this.patchNameTag();
-    }
-
-    bindings() {
-        this.uiEvent = this.uiEvent.bind(this);
-    }
-
-    get eventBindings() {
-        return [
-            { id: 'ui-event', callback: this.uiEvent }
-        ];
-    }
-
-    uiEvent(e) {
-        const { event, data } = e;
-        if (event !== 'profile-popup-open') return;
-        const { userid } = data;
-        if (!userid) return;
-
-        this.inject(userid);
-    }
-
-    inject(userid) {
-        const c = contributors.find(c => c.id === userid);
-        if (!c) return;
-
-        setTimeout(() => {
-            let hasBadges = false;
-            let root = document.querySelector('[class*="profileBadges"]');
-            if (root) {
-                hasBadges = true;
-            } else {
-                root = document.querySelector('[class*="headerInfo"]');
-            }
-
-            VueInjector.inject(root, {
-                components: { BdBadge },
-                data: { hasBadges, c },
-                template: '<BdBadge :hasBadges="hasBadges" :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />',
-            }, DOM.createElement('div', null, 'bdprofilebadges'));
-        }, 400);
+        this.patchUserProfileModals();
     }
 
     get contributors() {
@@ -182,7 +143,8 @@ export default class extends EventListener {
     }
 
     injectMessageBadges(element) {
-        for (const beo of element.getElementsByClassName('bd-badge-outer')) this.injectMessageBadge(beo);
+        for (const beo of element.getElementsByClassName('bd-badge-outer'))
+            this.injectMessageBadge(beo);
     }
 
     injectMessageBadge(root) {
@@ -202,6 +164,36 @@ export default class extends EventListener {
             template: '<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />'
         }, DOM.createElement('span'));
         root.classList.add('bd-has-badge');
+    }
+
+    /**
+     * Patches UserProfileModals to inject profile badges into the modal once opened.
+     * TODO: just patch the modal component
+     */
+    async patchUserProfileModals() {
+        const UserProfileModals = WebpackModules.getModuleByName('UserProfileModals');
+
+        MonkeyPatch('BdUI', UserProfileModals).after('open', async (context, [userid]) => {
+            const c = contributors.find(c => c.id === userid);
+            if (!c) return;
+
+            const root = await Utils.until(() => document.querySelector('[class*="headerInfo"]'));
+            const el = DOM.createElement('div', null, 'bdprofilebadges');
+            root.insertBefore(el.element, root.firstChild.nextSibling);
+
+            this.injectProfileBadge(userid, el.element);
+        });
+    }
+
+    injectProfileBadge(userid, root) {
+        const c = contributors.find(c => c.id === userid);
+        if (!c) return;
+
+        VueInjector.inject(root, {
+            components: { BdBadge },
+            data: { c },
+            template: '<BdBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />',
+        });
     }
 
 }

@@ -16,7 +16,7 @@ import { MonkeyPatch, Patcher } from './patcher';
 import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
 
-export class Helpers {
+class Helpers {
     static get plannedActions() {
         return this._plannedActions || (this._plannedActions = new Map());
     }
@@ -162,6 +162,8 @@ export class Helpers {
         return WebpackModules.getModuleByName('ReactDOM');
     }
 }
+
+export { Helpers as ReactHelpers };
 
 class ReactComponent {
     constructor(id, component, retVal) {

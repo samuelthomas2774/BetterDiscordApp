@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { EventListener, ReactComponents, ReactComponentHelpers as Helpers, MonkeyPatch } from 'modules';
+import { EventListener, ReactComponents, ReactHelpers, MonkeyPatch } from 'modules';
 import { ClientLogger as Logger } from 'common';
 import DOM from './dom';
 import { BdBadge, BdMessageBadge } from './components/bd';
@@ -110,7 +110,7 @@ export default class extends EventListener {
         this.unpatchChannelMemberRender = MonkeyPatch('ProfileBadges', ChannelMember.component.prototype).after('render', (component, args, retVal) => {
             if (!retVal.props || !retVal.props.children) return;
 
-            const user = Helpers.findProp(component, 'user');
+            const user = ReactHelpers.findProp(component, 'user');
             if (!user) return;
             const c = contributors.find(c => c.id === user.id);
             if (!c) return;
@@ -135,7 +135,7 @@ export default class extends EventListener {
                 try {
                     if (!retVal.props || !retVal.props.children) return;
 
-                    const user = Helpers.findProp(this, 'user');
+                    const user = ReactHelpers.findProp(this, 'user');
                     if (!user) return;
                     const c = contributors.find(c => c.id === user.id);
                     if (!c) return;
@@ -151,24 +151,28 @@ export default class extends EventListener {
             }
 
             componentDidMount() {
-                const element = Helpers.ReactDOM.findDOMNode(this);
+                const element = ReactHelpers.ReactDOM.findDOMNode(this);
                 if (!element) return;
                 ProfileBadges.injectMessageBadges(element);
             }
 
             componentDidUpdate() {
-                const element = Helpers.ReactDOM.findDOMNode(this);
+                const element = ReactHelpers.ReactDOM.findDOMNode(this);
                 if (!element) return;
-                // ProfileBadges.injectMessageBadges(element);
+                ProfileBadges.injectMessageBadges(element);
             }
         };
     }
 
     injectMessageBadges(element) {
-        for (const beo of element.getElementsByClassName('bd-badge-outer')) this.injectNameTagBadge(beo);
+        for (const beo of element.getElementsByClassName('bd-badge-outer')) this.injectMessageBadge(beo);
     }
 
     injectMessageBadge(root) {
+        while (root.firstChild) {
+            root.removeChild(root.firstChild);
+        }
+
         const { userid } = root.dataset;
         if (!userid) return;
 

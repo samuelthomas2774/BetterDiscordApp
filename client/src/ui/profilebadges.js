@@ -18,23 +18,24 @@ import contributors from '../data/contributors';
 export default class extends EventListener {
 
     init() {
+        this.patchMessage();
         this.patchChannelMember();
         this.patchNameTag();
     }
 
     bindings() {
         this.uiEvent = this.uiEvent.bind(this);
-        this.messageBadge = this.messageBadge.bind(this);
-        this.badges = this.badges.bind(this);
+        // this.messageBadge = this.messageBadge.bind(this);
+        // this.badges = this.badges.bind(this);
     }
 
     get eventBindings() {
         return [
-            { id: 'discord:MESSAGE_CREATE', callback: this.messageBadge },
-            { id: 'discord:MESSAGE_UPDATE', callback: this.messageBadge },
-            { id: 'server-switch', callback: this.badges },
-            { id: 'channel-switch', callback: this.badges },
-            { id: 'ui:loadedmore', callback: this.badges },
+            // { id: 'discord:MESSAGE_CREATE', callback: this.messageBadge },
+            // { id: 'discord:MESSAGE_UPDATE', callback: this.messageBadge },
+            // { id: 'server-switch', callback: this.badges },
+            // { id: 'channel-switch', callback: this.badges },
+            // { id: 'ui:loadedmore', callback: this.badges },
             { id: 'ui-event', callback: this.uiEvent }
         ];
     }
@@ -46,33 +47,6 @@ export default class extends EventListener {
         if (!userid) return;
 
         this.inject(userid);
-    }
-
-    badges() {
-        for (const messageGroup of document.querySelectorAll('.message-group')) {
-            this.messageBadge({ element: messageGroup });
-        }
-    }
-
-    messageBadge(e) {
-        if (!e.element) return;
-        const msgGroup = e.element.closest('.message-group');
-        if (msgGroup.dataset.hasBadges) return;
-        msgGroup.setAttribute('data-has-badges', true);
-        if (!msgGroup.dataset.authorId) return;
-        const c = contributors.find(c => c.id === msgGroup.dataset.authorId);
-        if (!c) return;
-        const root = document.createElement('span');
-        const usernameWrapper = msgGroup.querySelector('.username-wrapper');
-        if (!usernameWrapper) return;
-        const wrapperParent = usernameWrapper.parentElement;
-        if (!wrapperParent || wrapperParent.children.length < 2) return;
-        wrapperParent.insertBefore(root, wrapperParent.children[1]);
-        VueInjector.inject(root, {
-            components: { BdMessageBadge },
-            data: { c },
-            template: '<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />'
-        });
     }
 
     inject(userid) {
@@ -98,6 +72,43 @@ export default class extends EventListener {
 
     get contributors() {
         return contributors;
+    }
+
+    /**
+     * Patches Message to use the extended NameTag.
+     * This is because NameTag is also used in places we don't really want any badges.
+     */
+    async patchMessage() {
+        const Message = await ReactComponents.getComponent('Message');
+
+        this.unpatchMessageRender = MonkeyPatch('ProfileBadges', Message.component.prototype).after('render', (component, args, retVal) => {
+            if (!retVal.props || !retVal.props.children) return;
+
+            const message = ReactHelpers.findProp(component, 'message');
+            if (!message || !message.author) return;
+            const user = message.author;
+            const c = contributors.find(c => c.id === user.id);
+            if (!c) return;
+
+            const username = ReactHelpers.findByProp(retVal, 'type', 'h2');
+            if (!username) return;
+            username.props.children.splice(1, 0, ReactHelpers.React.createElement('span', {
+                className: 'bd-badge-outer',
+                'data-userid': user.id
+            }));
+        });
+
+        this.unpatchMessageMount = MonkeyPatch('ProfileBadges', Message.component.prototype).after('componentDidMount', component => {
+            const element = ReactHelpers.ReactDOM.findDOMNode(component);
+            if (!element) return;
+            this.injectMessageBadges(element);
+        });
+
+        this.unpatchMessageUpdate = MonkeyPatch('ProfileBadges', Message.component.prototype).after('componentDidUpdate', component => {
+            const element = ReactHelpers.ReactDOM.findDOMNode(component);
+            if (!element) return;
+            this.injectMessageBadges(element);
+        });
     }
 
     /**

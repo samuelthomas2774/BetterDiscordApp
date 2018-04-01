@@ -4,7 +4,7 @@
         <div className="separator"></div>
         <span>The setup will install BetterDiscord on your computer.</span>
         <span>Click "Next" to continue or "Cancel" to exit the setup.</span>
-        <span>For support join the official BetterDiscord <a href="https://v2.betterdiscord.net/discord/support" @click="openLink">#support</a> channel in Discord.</span>
+        <span>For support join the official BetterDiscord <a href="https://v2.betterdiscord.net/discord/support" @click="openLink">#support</a> channel on Discord.</span>
     </div>
 </template>
 

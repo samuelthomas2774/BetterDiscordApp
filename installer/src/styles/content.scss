@@ -71,6 +71,7 @@
             &.introduction-block {
                 span {
                     margin: 2px 0;
+                    font-size: 15px;
 
                     &.alert {
                         font-size: 12px;
@@ -91,12 +92,22 @@
             }
 
             &.license-block {
+                display: flex;
+
                 .license-text {
                     overflow-y: scroll;
                     white-space: pre-line;
                     font-family: "Inconsolata";
-                    height: 92px;
+                    height: 105px;
                     font-size: 13px;
+                }
+
+                .separator {
+                    margin-bottom: 0;
+                }
+
+                .separator ~ .separator {
+                    margin-top: 0;
                 }
             }
 
@@ -110,7 +121,7 @@
                     }
 
                     span {
-                        font-size: 12px;
+                        font-size: 14px;
                     }
 
                     button {

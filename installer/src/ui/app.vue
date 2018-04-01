@@ -42,8 +42,7 @@
                     </template>
                     <template v-if="selectedPanel === 2">
                         <button @click="back">Back</button>
-                        <button @click="next">Next</button>
-                        <button class="disabled">Install</button>
+                        <button @click="next">Install</button>
                     </template>
                     <template v-if="selectedPanel === 3">
                         <button v-if="finished" @click="next">Next</button>
@@ -139,8 +138,8 @@
     export default {
         data() {
             return {
-                selectedIndex: 2,
-                selectedPanel: 2,
+                selectedIndex: 0,
+                selectedPanel: 0,
                 animating: false,
                 animatingr: false,
                 paths: {},

@@ -1,6 +1,6 @@
 <template>
     <div class="content-block license-block">
-        <h3>License &amp; TOS</h3>
+        <h3>License &amp; ToS</h3>
         <div class="separator"></div>
         <div class="license-text">
             The MIT License (MIT)

@@ -150,7 +150,7 @@ export default class extends EventListener {
                     const c = contributors.find(c => c.id === user.id);
                     if (!c) return;
 
-                    retVal.props.children.push(ReactHelpers.React.createElement('span', {
+                    retVal.props.children.splice(1, 0, ReactHelpers.React.createElement('span', {
                         className: 'bd-badge-outer',
                         'data-userid': user.id
                     }));

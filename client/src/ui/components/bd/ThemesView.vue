@@ -13,17 +13,17 @@
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Installed</h3>
-                <RefreshBtn v-if="local" :onClick="refreshLocal"/>
+                <RefreshBtn v-if="local" @click="refreshLocal"/>
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
                 <h3>Browse</h3>
-                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
+                <RefreshBtn v-if="!local" @click="refreshOnline" />
             </div>
         </div>
 
         <div class="bd-flex bd-flex-col bd-themesview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">
-                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="reload => reloadTheme(theme, reload)" :showSettings="dont_clone => showSettings(theme, dont_clone)" :deleteTheme="unload => deleteTheme(theme, unload)" />
+                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :data-theme-id="theme.id" @toggle-theme="toggleTheme(theme)" @reload-theme="reload => reloadTheme(theme, reload)" @show-settings="dont_clone => showSettings(theme, dont_clone)" @delete-theme="unload => deleteTheme(theme, unload)" />
             </div>
             <div v-if="!local" class="bd-online-ph">
                 <h3>Coming Soon</h3>

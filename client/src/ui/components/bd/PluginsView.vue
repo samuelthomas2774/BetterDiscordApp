@@ -13,17 +13,17 @@
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Installed</h3>
-                <RefreshBtn v-if="local" :onClick="refreshLocal" />
+                <RefreshBtn v-if="local" @click="refreshLocal" />
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
                 <h3>Browse</h3>
-                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
+                <RefreshBtn v-if="!local" @click="refreshOnline" />
             </div>
         </div>
 
         <div class="bd-flex bd-flex-col bd-pluginsview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
-                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :deletePlugin="unload => deletePlugin(plugin, unload)" :showSettings="dont_clone => showSettings(plugin, dont_clone)" />
+                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :data-plugin-id="plugin.id" @toggle-plugin="togglePlugin(plugin)" @reload-plugin="reloadPlugin(plugin)" @delete-plugin="unload => deletePlugin(plugin, unload)" @show-settings="dont_clone => showSettings(plugin, dont_clone)" />
             </div>
             <div v-if="!local" class="bd-online-ph">
                 <h3>Coming Soon</h3>

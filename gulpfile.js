@@ -1,5 +1,6 @@
 const
     fs = require('fs'),
+    mkdirp = require('mkdirp'),
     gulp = require('gulp'),
     del = require('del'),
     pump = require('pump'),
@@ -18,6 +19,7 @@ const releasepkg = function() {
     delete mainpkg.main;
     delete mainpkg.devDependencies;
     delete mainpkg.scripts;
+    mkdirp.sync('./release');
     return fs.writeFileSync('./release/package.json', JSON.stringify(mainpkg, null, 2));
 };
 

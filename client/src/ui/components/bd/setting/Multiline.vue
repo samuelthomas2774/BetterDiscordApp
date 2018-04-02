@@ -19,6 +19,7 @@
         <textarea class="bd-textarea" ref="textarea" @keyup.stop v-model="setting.value" :disabled="setting.disabled"></textarea>
     </div>
 </template>
+
 <script>
     export default {
         props: ['setting'],

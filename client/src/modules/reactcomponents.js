@@ -9,11 +9,12 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { EmoteModule } from 'builtin';
+import { Reflection } from 'ui';
+import { ClientLogger as Logger } from 'common';
 import { MonkeyPatch, Patcher } from './patcher';
 import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
-import { EmoteModule } from 'builtin';
-import { Reflection } from 'ui';
 
 class Helpers {
     static get plannedActions() {
@@ -153,10 +154,16 @@ class Helpers {
         return null;
     }
 
+    static get React() {
+        return WebpackModules.getModuleByName('React');
+    }
+
     static get ReactDOM() {
         return WebpackModules.getModuleByName('ReactDOM');
     }
 }
+
+export { Helpers as ReactHelpers };
 
 class ReactComponent {
     constructor(id, component, retVal) {
@@ -209,7 +216,7 @@ export class ReactComponents {
         if (important) {
             const importantInterval = setInterval(() => {
                 if (this.components.find(c => c.id === name)) {
-                    console.info(`Important component ${name} already found`);
+                    Logger.info('ReactComponents', `Important component ${name} already found`);
                     clearInterval(importantInterval);
                     return;
                 }
@@ -218,11 +225,11 @@ export class ReactComponents {
                 const reflect = Reflection(select);
                 if (!reflect.component) {
                     clearInterval(importantInterval);
-                    console.error(`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select);
+                    Logger.error('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select]);
                     return;
                 }
                 if (!reflect.component.displayName) reflect.component.displayName = name;
-                console.info(`Found important component ${name} with reflection.`);
+                Logger.info('ReactComponents', [`Found important component ${name} with reflection`, reflect]);
                 this.push(reflect.component);
                 clearInterval(importantInterval);
             }, 50);
@@ -233,7 +240,7 @@ export class ReactComponents {
             listeners: []
         });
         return new Promise(resolve => {
-            this.listeners.find(l => l.id === name).listeners.push(c => resolve(c));
+            this.listeners.find(l => l.id === name).listeners.push(resolve);
         });
     }
 
@@ -319,9 +326,10 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannelMember() {
-        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member.member-status' });
+        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member-2FrNV0' });
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
-            if (!retVal.props || !retVal.props.children || !retVal.props.children.length) return;
+            // Logger.log('ReactComponents', ['Rendering ChannelMember', component, args, retVal]);
+            if (!retVal.props || !retVal.props.children) return;
             const user = Helpers.findProp(component, 'user');
             if (!user) return;
             retVal.props['data-user-id'] = user.id;
@@ -359,7 +367,7 @@ export class ReactAutoPatcher {
     }
 
     static forceUpdate() {
-        for (const e of document.querySelectorAll('.message,.message-group,.guild,.containerDefault-7RImuF,.channel-members .member')) {
+        for (const e of document.querySelectorAll('.message, .message-group, .guild, .containerDefault-7RImuF, .channel-members .member-2FrNV0')) {
             Reflection(e).forceUpdate();
         }
     }

@@ -16,12 +16,12 @@
         </div>
         <div class="bd-hint">{{ setting.hint }}</div>
         <div class="bd-selected-files">
-            <div class="bd-selected-file" v-for="file_path in this.setting.value">
+            <div class="bd-selected-file" v-for="file_path in setting.value">
                 <!-- Maybe add a preview here later? -->
                 <!-- For now just show the selected file path -->
                 <span class="bd-file-path">{{ file_path }}</span>
                 <span class="bd-file-open" @click="() => openItem(file_path)"><MiOpenInNew /></span>
-                <span class="bd-file-remove" @click="() => removeItem(file_path)"><MiMinus /></span>
+                <span class="bd-file-remove" :class="{'bd-disabled': setting.disabled}" @click="() => removeItem(file_path)"><MiMinus /></span>
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@
     import path from 'path';
 
     export default {
-        props: ['setting', 'change'],
+        props: ['setting'],
         components: {
             MiOpenInNew, MiMinus
         },
@@ -44,13 +44,14 @@
 
                 const filenames = await ClientIPC.send('bd-native-open', this.setting.dialogOptions);
                 if (filenames)
-                    this.change(filenames);
+                    this.setting.value = filenames;
             },
             openItem(file_path) {
                 shell.openItem(path.resolve(this.setting.path, file_path));
             },
             removeItem(file_path) {
-                this.change(this.setting.value.filter(f => f !== file_path));
+                if (this.setting.disabled) return;
+                this.setting = this.setting.value.filter(f => f !== file_path);
             }
         }
     }

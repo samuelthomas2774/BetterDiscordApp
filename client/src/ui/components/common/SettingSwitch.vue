@@ -9,13 +9,14 @@
 */
 
 <template>
-    <label class="bd-switch-wrapper" @click="() => change(!checked)">
+    <label class="bd-switch-wrapper" @click="$emit('input', !value)">
         <input type="checkbox" class="bd-switch-checkbox" />
-        <div class="bd-switch" :class="{'bd-checked': checked}" />
+        <div class="bd-switch" :class="{'bd-checked': value}" />
     </label>
 </template>
+
 <script>
     export default {
-        props: ['checked', 'change']
+        props: ['value']
     }
 </script>

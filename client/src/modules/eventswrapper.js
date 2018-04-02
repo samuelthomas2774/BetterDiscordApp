@@ -23,14 +23,14 @@ export default class EventsWrapper {
     get on() { return this.subscribe }
     subscribe(event, callback) {
         if (this.eventSubs.find(e => e.event === event && e.callback === callback)) return;
-        const boundCallback = () => callback.apply(this.bind, arguments);
+        const boundCallback = (...args) => callback.apply(this.bind, args);
         this.eventSubs.push({ event, callback, boundCallback });
         eventemitters.get(this).on(event, boundCallback);
     }
 
     once(event, callback) {
         if (this.eventSubs.find(e => e.event === event && e.callback === callback)) return;
-        const boundCallback = () => this.off(event, callback) && callback.apply(this.bind, arguments);
+        const boundCallback = (...args) => this.off(event, callback) && callback.apply(this.bind, args);
         this.eventSubs.push({ event, callback, boundCallback });
         eventemitters.get(this).on(event, boundCallback);
     }
@@ -50,4 +50,5 @@ export default class EventsWrapper {
         }
         this.eventSubs.splice(0, this.eventSubs.length);
     }
+
 }

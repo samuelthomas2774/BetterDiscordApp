@@ -11,10 +11,25 @@
 import { Events } from 'modules';
 import { Utils } from 'common';
 
+export default new class {
+
+    open(item) {
+        Events.emit('bd-open-menu', item);
+    }
+
+    close() {
+        Events.emit('bd-close-menu');
+    }
+
+    get items() {
+        return BdMenuItems;
+    }
+
+}
+
 let items = 0;
 
 export const BdMenuItems = new class {
-
     constructor() {
         window.bdmenu = this;
 
@@ -85,5 +100,4 @@ export const BdMenuItems = new class {
     remove(item) {
         Utils.removeFromArray(this.items, item);
     }
-
 };

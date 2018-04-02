@@ -9,7 +9,7 @@
 */
 
 <template>
-    <Modal :class="['bd-modal-basic', {'bd-modal-out': modal.closing}]" :headerText="modal.title" :close="modal.close">
+    <Modal :class="['bd-modal-basic', {'bd-modal-out': modal.closing}]" :headerText="modal.title" @close="modal.close">
         <div slot="body" class="bd-modal-basic-body">
             <div v-for="(perm, i) in permissions" :key="`perm-${i}`" class="bd-perm-scope">
                 <div class="bd-perm-allow">

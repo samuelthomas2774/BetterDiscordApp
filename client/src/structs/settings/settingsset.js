@@ -14,11 +14,18 @@ import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { Modals } from 'ui';
 
-export default class SettingsSet {
+export default class SettingsSet extends AsyncEventEmitter {
 
     constructor(args, ...merge) {
-        this.emitter = new AsyncEventEmitter();
-        this.args = args.args || args;
+        super();
+
+        if (typeof args === 'string')
+            args = {id: args};
+        this.args = args.args || args || {};
+
+        this.args.id = this.args.id || undefined;
+        this.args.text = this.args.text || undefined;
+        this.args.headertext = this.args.headertext || undefined;
 
         this.args.categories = this.categories.map(category => new SettingsCategory(category));
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
@@ -54,6 +61,10 @@ export default class SettingsSet {
         return this.args.text;
     }
 
+    set text(value) {
+        this.args.text = value;
+    }
+
     /**
      * Text to be displayed with the set.
      */
@@ -63,14 +74,6 @@ export default class SettingsSet {
 
     set headertext(headertext) {
         this.args.headertext = headertext;
-    }
-
-    /**
-     * Whether this set should be displayed.
-     * Currently only used in the settings menu.
-     */
-    get hidden() {
-        return this.args.hidden || false;
     }
 
     /**
@@ -449,9 +452,5 @@ export default class SettingsSet {
             schemes: this.schemes
         }, ...merge);
     }
-
-    on(...args) { return this.emitter.on(...args); }
-    off(...args) { return this.emitter.removeListener(...args); }
-    emit(...args) { return this.emitter.emit(...args); }
 
 }

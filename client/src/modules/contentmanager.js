@@ -245,10 +245,9 @@ export default class {
             if (!reload && this.getContentById(content.id))
                 throw {message: `A ${this.contentType} with the ID ${content.id} already exists.`};
 
-            if (reload) this.localContent[index] = content;
+            if (reload) this.localContent.splice(index, 1, content);
             else this.localContent.push(content);
             return content;
-
         } catch (err) {
             throw err;
         }

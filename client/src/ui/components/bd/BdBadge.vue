@@ -9,22 +9,23 @@
 */
 
 <template>
-    <div :class="{'bd-profile-badges-wrap': !hasBadges}">
+    <div class="bd-profile-badges-wrap">
         <div class="bd-profile-badges">
-            <div v-if="developer" v-tooltip="'BetterDiscord Developer'" class="bd-profile-badge bd-profile-badge-developer" @click="onClick"></div>
-            <div v-else-if="webdev" v-tooltip="'BetterDiscord Web Developer'" class="bd-profile-badge bd-profile-badge-developer" @click="onClick"></div>
-            <div v-else-if="contributor" v-tooltip="'BetterDiscord Contributor'" class="bd-profile-badge bd-profile-badge-contributor" @click="onClick"></div>
+            <div v-if="developer" v-tooltip="'BetterDiscord Developer'" class="bd-profile-badge bd-profile-badge-developer" @click="click"></div>
+            <div v-else-if="webdev" v-tooltip="'BetterDiscord Web Developer'" class="bd-profile-badge bd-profile-badge-developer" @click="click"></div>
+            <div v-else-if="contributor" v-tooltip="'BetterDiscord Contributor'" class="bd-profile-badge bd-profile-badge-contributor" @click="click"></div>
         </div>
     </div>
 </template>
+
 <script>
     // Imports
     import { shell } from 'electron';
 
     export default {
-        props: ['webdev', 'developer', 'contributor', 'hasBadges'],
+        props: ['webdev', 'developer', 'contributor'],
         methods: {
-            onClick() {
+            click() {
                 if (this.developer) return shell.openExternal('https://github.com/JsSucks/BetterDiscordApp');
                 if (this.webdev) return shell.openExternal('https://betterdiscord.net');
                 if (this.contributor) return shell.openExternal('https://github.com/JsSucks/BetterDiscordApp/graphs/contributors');

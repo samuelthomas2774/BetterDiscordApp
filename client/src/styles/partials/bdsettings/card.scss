@@ -4,13 +4,13 @@
     flex-grow: 1;
     background: transparent;
     border-bottom: 1px solid rgba(114, 118, 126, 0.3);
-    padding: 10px 5px;
     min-height: 150px;
     color: #b9bbbe;
-    margin-top: 10px;
+    margin-top: 20px;
+    padding-bottom: 20px;
 
     .bd-card-header {
-        padding-bottom: 5px;
+        margin-bottom: 15px;
         display: flex;
         flex-grow: 0;
         font-weight: 700;
@@ -37,20 +37,16 @@
 
         .bd-card-description {
             flex-grow: 1;
-            overflow-y: auto;
-            max-height: 60px;
             min-height: 60px;
             color: #8a8c90;
             font-size: 12px;
             font-weight: 600;
-            padding: 5px;
-            border-radius: 8px;
-            margin-top: 5px;
+            margin-bottom: 5px;
+            white-space: pre-wrap;
         }
 
         .bd-card-footer {
             display: flex;
-            flex-grow: 1;
             align-items: flex-end;
 
             .bd-card-extra {
@@ -61,9 +57,11 @@
             }
 
             .bd-controls {
+                margin-left: 15px;
+
                 .bd-button-group {
                     .bd-button {
-                        fill: #FFF;
+                        fill: #fff;
                         width: 30px;
                         height: 30px;
                     }
@@ -80,5 +78,24 @@
             width: 14px;
             height: 14px;
         }
+    }
+}
+
+.bd-content-author {
+    .bd-content-author-link {
+        cursor: pointer;
+
+        &:hover {
+            color: $coldimwhite;
+        }
+    }
+}
+
+.bd-content-author-links {
+    padding: 3px 5px;
+
+    .bd-popover-inner > :first-child {
+        display: flex;
+        flex-direction: row;
     }
 }

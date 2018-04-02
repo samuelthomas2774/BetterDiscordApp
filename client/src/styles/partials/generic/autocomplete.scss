@@ -14,24 +14,28 @@
         padding-bottom: 8px;
         white-space: nowrap;
 
-        .bd-autocompleteRow {
+        .bd-autocomplete-row {
             padding: 0 8px;
             font-size: 14px;
             line-height: 16px;
 
-            .bd-autocompleteSelector {
+            .bd-autocomplete-selector {
                 border-radius: 3px;
                 padding: 8px;
 
                 &.bd-selectable {
                     cursor: pointer;
+
+                    &:hover {
+                        background-color: darken(#36393f, 5%);
+                    }
+
+                    &.bd-selected {
+                        background-color: #36393f;
+                    }
                 }
 
-                &.bd-selected {
-                    background-color: #36393f;
-                }
-
-                .bd-autocompleteTitle {
+                .bd-autocomplete-title {
                     color: #72767d;
                     padding: 4px 0;
                     text-transform: uppercase;
@@ -46,7 +50,7 @@
                     }
                 }
 
-                .bd-autocompleteField {
+                .bd-autocomplete-field {
                     display: flex;
                     flex: 1 1 auto;
                     color: #f6f6f7;

@@ -58,4 +58,11 @@ export default class AsyncEventEmitter extends EventEmitter {
         });
     }
 
+    /**
+     * Unbinds an event listener.
+     */
+    off(event, callback) {
+        this.removeListener(event, callback);
+    }
+
 }

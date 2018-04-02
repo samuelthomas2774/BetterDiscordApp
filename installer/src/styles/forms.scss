@@ -1,6 +1,9 @@
 .radio-group {
+    font-size: 12px;
+    margin-top: 5px;
+
     label {
-        margin-left: 5px;
+        margin-right: 5px;
     }
 }
 
@@ -10,13 +13,14 @@ label {
 }
 
 input[type="radio"] {
-    height: .9em;
-    width: .9em;
-    background: #FFF;
+    height: .8em;
+    width: .8em;
+    background: #fff;
     -webkit-appearance: none;
     border-radius: 1em;
     border: none;
     outline: none;
+    vertical-align: -3px;
 }
 
 input[type="radio"]:hover {

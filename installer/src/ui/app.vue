@@ -1,7 +1,7 @@
 <template>
     <div id="mount">
         <div class="root">
-            <div class="modal" :class="{visible: modalVisible}">
+            <div class="modal" :class="{visible: modalVisible || modalClosing, 'modal-out': modalClosing}">
                 <div class="modal-inner">
                     <div class="modal-title">Exit Setup?</div>
                     <div class="modal-body">
@@ -13,7 +13,7 @@
                     <div class="modal-controls">
                         <div class="flex-spacer"></div>
                         <button @click="modalVisible = false">No</button>
-                        <button @click="cancel">Yes</button>
+                        <button @click="exit">Yes</button>
                     </div>
                 </div>
             </div>
@@ -28,7 +28,8 @@
                     <Intro v-if="selectedPanel === 0" />
                     <License v-if="selectedPanel === 1" />
                     <Destination v-if="selectedPanel === 2" :paths="paths" :channel="currentChannel" @setChannel="setChannel" @askForDiscordPath="askForDiscordPath" :dataPath="dataPath" @askForDataPath="askForDataPath" />
-                    <Install v-if="selectedPanel === 3" :paths="paths" :dataPath="dataPath" :channel="currentChannel"/>
+                    <Install ref="installpanel" v-if="selectedPanel === 3" :paths="paths" :dataPath="dataPath" :channel="currentChannel" :done="finished || finishedWithError" :error="error" @started="installStarted" @done="installFinished" @error="installError" />
+                    <Done v-if="selectedPanel === 4" />
                 </div>
                 <div class="separator-controls"></div>
                 <div class="controls">
@@ -41,13 +42,16 @@
                     </template>
                     <template v-if="selectedPanel === 2">
                         <button @click="back">Back</button>
-                        <button @click="next">Next</button>
-                        <button class="disabled">Install</button>
+                        <button @click="next">Install</button>
                     </template>
                     <template v-if="selectedPanel === 3">
-                        <button>Exit</button>
+                        <button v-if="finished" @click="next">Next</button>
+                        <button v-if="finishedWithError" @click="retry">Retry</button>
                     </template>
-                    <button v-if="selectedPanel !== 3" @click="modalVisible = true">Cancel</button>
+                    <template v-if="selectedPanel === 4">
+                        <button @click="exit">Close</button>
+                    </template>
+                    <button v-if="selectedPanel !== 4 && !finished" @click="cancel">Cancel</button>
                 </div>
                 <div class="border" v-if="platform === 'win32'"></div>
             </div>
@@ -61,9 +65,9 @@
     import License from './license.vue';
     import Destination from './destination.vue';
     import Install from './install.vue';
+    import Done from './done.vue';
 
-    import electron from 'electron';
-    const ipc = electron.ipcRenderer;
+    import electron, { ipcRenderer as ipc } from 'electron';
     import process from 'process';
     import path from 'path';
     import fs from 'fs';
@@ -113,6 +117,7 @@
                 base: path.join(userPath, 'discordcanary')
             }
         };
+
         paths.stable.latest = findLatest(paths.stable.base);
         paths.ptb.latest = findLatest(paths.ptb.base);
         paths.canary.latest = findLatest(paths.canary.base);
@@ -120,6 +125,7 @@
         paths.stable.writable = checkDir(paths.stable.latest);
         paths.ptb.writable = checkDir(paths.ptb.latest);
         paths.canary.writable = checkDir(paths.canary.latest);
+
         console.log(paths);
         return paths;
     }
@@ -132,15 +138,19 @@
     export default {
         data() {
             return {
-                selectedIndex: 2,
-                selectedPanel: 2,
+                selectedIndex: 0,
+                selectedPanel: 0,
                 animating: false,
                 animatingr: false,
                 paths: {},
                 currentChannel: 'stable',
                 dataPath: '',
-                modalVisible: false
-            }
+                modalVisible: false,
+                modalClosing: false,
+                finished: false,
+                finishedWithError: false,
+                error: undefined
+            };
         },
         props: ['platform'],
         components: {
@@ -148,7 +158,8 @@
             Intro,
             License,
             Destination,
-            Install
+            Install,
+            Done
         },
         methods: {
             next() {
@@ -176,6 +187,9 @@
                 }, 500);
             },
             cancel() {
+                this.modalVisible = true;
+            },
+            exit() {
                 window.close();
             },
             setChannel(channel) {
@@ -207,6 +221,28 @@
             async askForDataPath() {
                 const path = await this.askForPath(this.dataPath);
                 this.dataPath = path;
+            },
+            installStarted() {
+                this.finished = false;
+                this.finishedWithError = false;
+                this.error = undefined;
+            },
+            installFinished() {
+                this.finished = true;
+            },
+            installError(err) {
+                this.finishedWithError = true;
+                this.error = err;
+            },
+            retry() {
+                this.$refs.installpanel.retry();
+            }
+        },
+        watch: {
+            modalVisible(modalVisible) {
+                if (modalVisible) return;
+                this.modalClosing = true;
+                setTimeout(() => this.modalClosing = false, 200);
             }
         },
         beforeMount() {

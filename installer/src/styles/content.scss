@@ -55,7 +55,8 @@
             padding: 5px;
 
             h3 {
-                margin-bottom: 0;
+                margin-bottom: 10px;
+                font-size: 20px;
             }
 
             .separator {
@@ -70,6 +71,7 @@
             &.introduction-block {
                 span {
                     margin: 2px 0;
+                    font-size: 15px;
 
                     &.alert {
                         font-size: 12px;
@@ -90,12 +92,22 @@
             }
 
             &.license-block {
+                display: flex;
+
                 .license-text {
                     overflow-y: scroll;
                     white-space: pre-line;
                     font-family: "Inconsolata";
-                    height: 92px;
+                    height: 105px;
                     font-size: 13px;
+                }
+
+                .separator {
+                    margin-bottom: 0;
+                }
+
+                .separator ~ .separator {
+                    margin-top: 0;
                 }
             }
 
@@ -109,7 +121,7 @@
                     }
 
                     span {
-                        font-size: 12px;
+                        font-size: 14px;
                     }
 
                     button {
@@ -168,11 +180,11 @@
                     background: #191a1f;
                     resize: none;
                     border: 1px solid #303030;
+                    user-select: all;
 
                     &:hover::-webkit-scrollbar-thumb {
                         background: $blue;
                     }
-                    
                 }
 
                 .progress {
@@ -191,6 +203,14 @@
                         position: relative;
                         width: 90px;
                         height: 20px;
+                    }
+
+                    &.progress-done {
+                        background-color: $colok;
+                    }
+
+                    &.progress-err {
+                        background-color: $colerr;
                     }
                 }
             }

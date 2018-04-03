@@ -1,0 +1,106 @@
+{
+    "info": {
+        "id": "example-plugin-4",
+        "name": "Example Plugin 4",
+        "authors": [
+            {
+                "name": "Samuel Elliott",
+                "url": "https://samuelelliott.ml",
+                "discord_id": "284056145272766465",
+                "github_username": "samuelthomas2774",
+                "twitter_username": "_samuelelliott"
+            }
+        ],
+        "version": 1.0,
+        "description": "Plugin for testing array setting events as the first example plugin has a lot of stuff in it now."
+    },
+    "main": "index.js",
+    "type": "plugin",
+    "defaultConfig": [
+        {
+            "category": "default",
+            "settings": [
+                {
+                    "id": "array-1",
+                    "type": "array",
+                    "text": "Test settings array",
+                    "settings": [
+                        {
+                            "category": "default",
+                            "settings": [
+                                {
+                                    "id": "default-0",
+                                    "type": "bool",
+                                    "value": false,
+                                    "text": "Bool Test Setting 3",
+                                    "hint": "Bool Test Setting Hint 3"
+                                },
+                                {
+                                    "id": "default-1",
+                                    "type": "text",
+                                    "value": "defaultValue",
+                                    "text": "Text Test Setting",
+                                    "hint": "Text Test Setting Hint"
+                                }
+                            ]
+                        }
+                    ],
+                    "schemes": [
+                        {
+                            "id": "scheme-1",
+                            "name": "Test scheme",
+                            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "default-0",
+                                            "value": true
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "scheme-2",
+                            "name": "Another test scheme",
+                            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "default-0",
+                                            "value": false
+                                        },
+                                        {
+                                            "id": "default-1",
+                                            "value": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "keybind-1",
+                    "type": "keybind",
+                    "value": "mod+.",
+                    "text": "Test Keybind Setting 1",
+                    "hint": "Test Keybind Setting Hint 1"
+                },
+                {
+                    "id": "guild-1",
+                    "type": "guild",
+                    "value": [
+                        "280806472928198656"
+                    ],
+                    "text": "Test guild setting",
+                    "hint": "Test guild setting hint"
+                }
+            ]
+        }
+    ]
+}

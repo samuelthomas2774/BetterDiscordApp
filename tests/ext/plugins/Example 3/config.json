@@ -1,0 +1,24 @@
+{
+    "info": {
+        "id": "example-plugin-3",
+        "name": "Example Plugin 3",
+        "authors": [
+            {
+                "name": "Samuel Elliott",
+                "url": "https://samuelelliott.ml",
+                "discord_id": "284056145272766465",
+                "github_username": "samuelthomas2774",
+                "twitter_username": "_samuelelliott"
+            },
+            {
+                "name": "Jiiks",
+                "discord_id": "81388395867156480",
+                "github_username": "Jiiks",
+                "twitter_username": "Jiiksi"
+            }
+        ],
+        "version": 1.0,
+        "description": "A plugin for testing BetterDiscord plugin bridge."
+    },
+    "main": "index.js"
+}

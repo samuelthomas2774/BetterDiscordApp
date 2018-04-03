@@ -16,18 +16,23 @@
             </div>
             <div class="bd-hint">{{ setting.hint }}</div>
         </div>
-        <div class="bd-form-textarea-wrap">
-            <div contenteditable="true" @keyup.stop @input="input">{{ setting.value }}</div>
-        </div>
+        <textarea class="bd-textarea" ref="textarea" @keyup.stop v-model="setting.value" :disabled="setting.disabled"></textarea>
     </div>
 </template>
+
 <script>
     export default {
-        props: ['setting', 'change'],
+        props: ['setting'],
         methods: {
-            input(e) {
-                this.change(e.target.textContent);
+            recalculateHeight() {
+                const { textarea } = this.$refs;
+                textarea.style.height = '1px';
+                textarea.style.height = textarea.scrollHeight + 2 + 'px';
             }
+        },
+        mounted() {
+            this.$watch('setting.value', this.recalculateHeight);
+            this.recalculateHeight();
         }
     }
 </script>

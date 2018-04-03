@@ -8,51 +8,92 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI, Modals } from 'ui';
+import { DOM, BdUI, BdMenu, Modals, Reflection } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, ExtModuleManager, PluginManager, ThemeManager, ModuleManager, WebpackModules, Settings } from 'modules';
-import { ClientLogger as Logger, ClientIPC } from 'common';
+import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
+import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
+import { EmoteModule } from 'builtin';
+import electron from 'electron';
+import path from 'path';
+
+const tests = typeof PRODUCTION === 'undefined';
+const ignoreExternal = false;
 
 class BetterDiscord {
 
     constructor() {
-        window.bdglobals = Globals;
-        window.ClientIPC = ClientIPC;
-        window.css = CssEditor;
-        window.pm = PluginManager;
-        window.tm = ThemeManager;
-        window.events = Events;
-        window.wpm = WebpackModules;
-        window.bdsettings = Settings;
-        window.bdmodals = Modals;
-        window.bdlogs = Logger;
+        Logger.file = tests ? path.resolve(__dirname, '..', '..', 'tests', 'log.txt') : path.join(__dirname, 'log.txt');
+        Logger.log('main', 'BetterDiscord starting');
+
+        this._bd = {
+            DOM, BdUI, BdMenu, Modals, Reflection,
+
+            Events, CssEditor, Globals, Settings, Database, Updater,
+            ModuleManager, PluginManager, ThemeManager, ExtModuleManager,
+            Vendor,
+
+            WebpackModules, Patcher, MonkeyPatch, ReactComponents, DiscordApi,
+            EmoteModule,
+
+            Logger, ClientIPC, Utils
+        };
+
+        const developermode = Settings.getSetting('core', 'advanced', 'developer-mode');
+        if (developermode.value) window._bd = this._bd;
+        developermode.on('setting-updated', event => {
+            if (event.value) window._bd = this._bd;
+            else if (window._bd) delete window._bd;
+        });
+
+        const debuggerkeybind = Settings.getSetting('core', 'advanced', 'debugger-keybind');
+        debuggerkeybind.on('keybind-activated', () => {
+            const currentWindow = electron.remote.getCurrentWindow();
+            if (currentWindow.isDevToolsOpened()) return eval('debugger;');
+            currentWindow.openDevTools();
+            setTimeout(() => eval('debugger;'), 1000);
+        });
 
         DOM.injectStyle(BdCss, 'bdmain');
-        Events.on('global-ready', this.globalReady.bind(this));
+        this.globalReady = this.globalReady.bind(this);
+        Events.on('global-ready', this.globalReady);
+        Globals.initg();
     }
 
     async init() {
-        await Settings.loadSettings();
-        await ModuleManager.initModules();
-        await ExtModuleManager.loadAllModules(true);
-        await PluginManager.loadAllPlugins(true);
-        await ThemeManager.loadAllThemes(true);
-        Modals.showContentManagerErrors();
-        Events.emit('ready');
-        Events.emit('discord-ready');
+        try {
+            await Database.init();
+            await Settings.loadSettings();
+            await ModuleManager.initModules();
+
+            if (!ignoreExternal) {
+                await ExtModuleManager.loadAllModules(true);
+                await PluginManager.loadAllPlugins(true);
+                await ThemeManager.loadAllThemes(true);
+            }
+
+            if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
+                Modals.showContentManagerErrors();
+
+            Events.emit('ready');
+            Events.emit('discord-ready');
+            EmoteModule.init();
+        } catch (err) {
+            Logger.err('main', ['FAILED TO LOAD!', err]);
+        }
     }
 
     globalReady() {
         BdUI.initUiEvents();
         this.vueInstance = BdUI.injectUi();
-        (async () => {
-            this.init();
-        })();
+        this.init();
     }
+
 }
 
 if (window.BetterDiscord) {
     Logger.log('main', 'Attempting to inject again?');
 } else {
-    let bdInstance = new BetterDiscord();
+    let instance;
+    Events.on('autopatcher', () => instance = new BetterDiscord());
+    ReactAutoPatcher.autoPatch().then(() => Events.emit('autopatcher'));
 }

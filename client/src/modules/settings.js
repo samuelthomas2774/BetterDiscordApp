@@ -8,53 +8,68 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import defaultSettings from '../data/user.settings.default';
+import { EmoteModule } from 'builtin';
+import { SettingsSet, SettingUpdatedEvent } from 'structs';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
+import path from 'path';
 import Globals from './globals';
 import CssEditor from './csseditor';
 import Events from './events';
-import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { SettingsSet, SettingUpdatedEvent } from 'structs';
-import path from 'path';
+import defaultSettings from '../data/user.settings.default';
 
 export default new class Settings {
+
     constructor() {
-        this.settings = [];
+        this.settings = defaultSettings.map(_set => {
+            const set = new SettingsSet(_set);
+
+            set.on('setting-updated', event => {
+                const { category, setting, value, old_value } = event;
+                Logger.log('Settings', [`${set.id}/${category.id}/${setting.id} was changed from`, old_value, 'to', value]);
+                Events.emit('setting-updated', event);
+                Events.emit(`setting-updated-${set.id}_${category.id}_${setting.id}`, event);
+            });
+
+            set.on('settings-updated', async (event) => {
+                await this.saveSettings();
+                Events.emit('settings-updated', event);
+            });
+
+            return set;
+        });
     }
 
+    /**
+     * Loads BetterDiscord's settings.
+     */
     async loadSettings() {
         try {
             await FileUtils.ensureDirectory(this.dataPath);
 
             const settingsPath = path.resolve(this.dataPath, 'user.settings.json');
             const user_config = await FileUtils.readJsonFromFile(settingsPath);
-            const { settings, scss, css, css_editor_files, scss_error, css_editor_bounds } = user_config;
+            const { settings, scss, css, css_editor_files, scss_error, css_editor_bounds, favourite_emotes } = user_config;
 
-            this.settings = defaultSettings.map(set => {
-                const newSet = new SettingsSet(set);
-                newSet.merge(settings.find(s => s.id === newSet.id));
-                newSet.setSaved();
-                newSet.on('setting-updated', event => {
-                    const { category, setting, value, old_value } = event;
-                    Logger.log('Settings', `${newSet.id}/${category.id}/${setting.id} was changed from ${old_value} to ${value}`);
-                    Events.emit('setting-updated', event);
-                    Events.emit(`setting-updated-${newSet.id}_${category.id}_${setting.id}`, event);
-                });
-                newSet.on('settings-updated', async (event) => {
-                    await this.saveSettings();
-                    Events.emit('settings-updated', event);
-                });
-                return newSet;
-            });
+            for (let set of this.settings) {
+                const newSet = settings.find(s => s.id === set.id);
+                if (!newSet) continue;
+                await set.merge(newSet);
+                set.setSaved();
+            }
 
             CssEditor.setState(scss, css, css_editor_files, scss_error);
             CssEditor.editor_bounds = css_editor_bounds || {};
+            EmoteModule.favourite_emotes = favourite_emotes;
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
-            Logger.err('Settings', err);
+            Logger.warn('Settings', ['Failed to load internal settings', err]);
         }
     }
 
+    /**
+     * Saves BetterDiscord's settings including CSS editor data.
+     */
     async saveSettings() {
         try {
             await FileUtils.ensureDirectory(this.dataPath);
@@ -66,15 +81,11 @@ export default new class Settings {
                 css: CssEditor.css,
                 css_editor_files: CssEditor.files,
                 scss_error: CssEditor.error,
-                css_editor_bounds: {
-                    width: CssEditor.editor_bounds.width,
-                    height: CssEditor.editor_bounds.height,
-                    x: CssEditor.editor_bounds.x,
-                    y: CssEditor.editor_bounds.y
-                }
+                css_editor_bounds: CssEditor.editor_bounds,
+                favourite_emotes: EmoteModule.favourite_emotes
             });
 
-            for (let set of this.getSettings) {
+            for (let set of this.settings) {
                 set.setSaved();
             }
         } catch (err) {
@@ -84,8 +95,13 @@ export default new class Settings {
         }
     }
 
+    /**
+     * Finds one of BetterDiscord's settings sets.
+     * @param {String} set_id The ID of the set to find
+     * @return {SettingsSet}
+     */
     getSet(set_id) {
-        return this.getSettings.find(s => s.id === set_id);
+        return this.settings.find(s => s.id === set_id);
     }
 
     get core() { return this.getSet('core') }
@@ -94,39 +110,46 @@ export default new class Settings {
     get css() { return this.getSet('css') }
     get security() { return this.getSet('security') }
 
+    /**
+     * Finds a category in one of BetterDiscord's settings sets.
+     * @param {String} set_id The ID of the set to look in
+     * @param {String} category_id The ID of the category to find
+     * @return {SettingsCategory}
+     */
     getCategory(set_id, category_id) {
         const set = this.getSet(set_id);
         return set ? set.getCategory(category_id) : undefined;
     }
 
+    /**
+     * Finds a setting in one of BetterDiscord's settings sets.
+     * @param {String} set_id The ID of the set to look in
+     * @param {String} category_id The ID of the category to look in
+     * @param {String} setting_id The ID of the setting to find
+     * @return {Setting}
+     */
     getSetting(set_id, category_id, setting_id) {
         const set = this.getSet(set_id);
         return set ? set.getSetting(category_id, setting_id) : undefined;
     }
 
+    /**
+     * Returns a setting's value in one of BetterDiscord's settings sets.
+     * @param {String} set_id The ID of the set to look in
+     * @param {String} category_id The ID of the category to look in
+     * @param {String} setting_id The ID of the setting to find
+     * @return {Any}
+     */
     get(set_id, category_id, setting_id) {
         const set = this.getSet(set_id);
         return set ? set.get(category_id, setting_id) : undefined;
     }
 
-    async mergeSettings(set_id, newSettings) {
-        const set = this.getSet(set_id);
-        if (!set) return;
-
-        return await set.merge(newSettings);
-    }
-
-    setSetting(set_id, category_id, setting_id, value) {
-        const setting = this.getSetting(set_id, category_id, setting_id);
-        if (!setting) throw {message: `Tried to set ${set_id}/${category_id}/${setting_id}, which doesn't exist`};
-        setting.value = value;
-    }
-
-    get getSettings() {
-        return this.settings;
-    }
-
+    /**
+     * The path to store user data in.
+     */
     get dataPath() {
-        return this._dataPath ? this._dataPath : (this._dataPath = Globals.getObject('paths').find(p => p.id === 'data').path);
+        return Globals.getPath('data');
     }
+
 }

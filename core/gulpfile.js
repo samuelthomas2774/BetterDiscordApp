@@ -5,7 +5,7 @@ const
     plumber = require('gulp-plumber'),
     watch = require('gulp-watch');
 
-const task_babel = function () {
+const task_build = function () {
     return pump([
         gulp.src('src/**/*js'),
         plumber(),
@@ -14,7 +14,7 @@ const task_babel = function () {
     ]);
 }
 
-const watch_babel = function () {
+const task_watch = function () {
     return pump([
         watch('src/**/*js'),
         plumber(),
@@ -23,5 +23,5 @@ const watch_babel = function () {
     ]);
 }
 
-gulp.task('build', task_babel);
-gulp.task('watch', watch_babel);
+gulp.task('build', task_build);
+gulp.task('watch', task_watch);

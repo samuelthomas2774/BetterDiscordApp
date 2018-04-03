@@ -9,14 +9,17 @@
 */
 
 <template>
-    <div class="bd-settings" :class="{active: active, 'bd-settings-out': activeIndex === -1 && lastActiveIndex >= 0}" @keyup="close">
+    <div class="bd-settings" :class="{active: active, 'bd-settings-out': activeIndex === -1 && lastActiveIndex >= 0}" @keyup="$emit('close')">
         <SidebarView :contentVisible="this.activeIndex >= 0 || this.lastActiveIndex >= 0" :animating="this.animating" :class="{'bd-stop': !first}">
             <Sidebar slot="sidebar">
-                <div class="bd-settings-x" @click="close">
+                <div class="bd-settings-x" @click="$emit('close')">
                     <MiClose size="17"/>
                     <span class="bd-x-text">ESC</span>
                 </div>
-                <SidebarItem v-for="item in sidebarItems" :item="item" :key="item.id" :onClick="itemOnClick" />
+                <template v-for="(category, text) in sidebar">
+                    <SidebarItem :item="{text, type: 'header'}" />
+                    <SidebarItem v-for="item in category" :item="item" :key="item.id" @click="itemOnClick(item.id)" />
+                </template>
             </Sidebar>
             <div slot="sidebarfooter" class="bd-info">
                 <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
@@ -31,62 +34,70 @@
                 </div>
             </div>
             <ContentColumn slot="content">
-                <div v-for="set in Settings.settings" v-if="!set.hidden && activeContent(set.id) || animatingContent(set.id)" :class="{active: activeContent(set.id), animating: animatingContent(set.id)}">
-                    <SettingsWrapper :headertext="set.headertext">
-                        <SettingsPanel :settings="set" :schemes="set.schemes" />
+                <div v-for="item in sidebarItems" v-if="activeContent(item.contentid) || animatingContent(item.contentid)" :class="{active: activeContent(item.contentid), animating: animatingContent(item.contentid)}">
+                    <template v-if="item.component">
+                        <component :is="item.component" :SettingsWrapper="SettingsWrapper" />
+                    </template>
+
+                    <SettingsWrapper v-if="typeof item.set === 'string'" :headertext="Settings.getSet(item.set).headertext">
+                        <SettingsPanel :settings="Settings.getSet(item.set)" :schemes="Settings.getSet(item.set).schemes" />
                     </SettingsWrapper>
-                </div>
-                <div v-if="activeContent('css') || animatingContent('css')" :class="{active: activeContent('css'), animating: animatingContent('css')}">
-                    <CssEditorView />
-                </div>
-                <div v-if="activeContent('plugins') || animatingContent('plugins')" :class="{active: activeContent('plugins'), animating: animatingContent('plugins')}">
-                    <PluginsView />
-                </div>
-                <div v-if="activeContent('themes') || animatingContent('themes')" :class="{active: activeContent('themes'), animating: animatingContent('themes')}">
-                    <ThemesView />
+                    <SettingsWrapper v-else-if="item.set" :headertext="item.set.headertext">
+                        <SettingsPanel :settings="item.set" :schemes="item.set.schemes" />
+                    </SettingsWrapper>
+
+                    <CssEditorView v-if="item.contentid === 'css'" />
+                    <PluginsView v-if="item.contentid === 'plugins'" />
+                    <ThemesView v-if="item.contentid === 'themes'" />
+                    <UpdaterView v-if="item.contentid === 'updater'" />
                 </div>
             </ContentColumn>
         </SidebarView>
     </div>
 </template>
+
 <script>
     // Imports
+    import { Events, Settings } from 'modules';
+    import { BdMenuItems } from 'ui';
     import { shell } from 'electron';
-    import { Settings } from 'modules';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView } from './bd';
+    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView } from './bd';
     import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
     import { ClientIPC } from 'common';
-
-    // Constants
-    const sidebarItems = [
-        { text: 'Internal', _type: 'header' },
-        { id: 0, contentid: "core", text: 'Core', active: false, _type: 'button' },
-        { id: 1, contentid: "ui", text: 'UI', active: false, _type: 'button' },
-        { id: 2, contentid: "emotes", text: 'Emotes', active: false, _type: 'button' },
-        { id: 3, contentid: "css", text: 'CSS Editor', active: false, _type: 'button' },
-        { text: 'External', _type: 'header' },
-        { id: 4, contentid: "plugins", text: 'Plugins', active: false, _type: 'button' },
-        { id: 5, contentid: "themes", text: 'Themes', active: false, _type: 'button' }
-    ];
 
     export default {
         data() {
             return {
-                sidebarItems,
+                BdMenuItems,
                 activeIndex: -1,
                 lastActiveIndex: -1,
                 animating: false,
                 first: true,
                 Settings,
-                timeout: null
-            }
+                timeout: null,
+                SettingsWrapper
+            };
         },
-        props: ['active', 'close'],
+        props: ['active'],
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView,
+            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView,
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
+        },
+        computed: {
+            sidebarItems() {
+                return this.BdMenuItems.items;
+            },
+            sidebar() {
+                const categories = {};
+                for (let item of this.sidebarItems) {
+                    if (item.hidden) continue;
+                    const category = categories[item.category] || (categories[item.category] = []);
+                    category.push(item);
+                }
+                return categories;
+            }
         },
         methods: {
             itemOnClick(id) {
@@ -104,14 +115,6 @@
                     this.lastActiveIndex = -1;
                     this.timeout = null;
                 }, 400);
-            },
-            activateContent(s) {
-                const item = this.sidebarItems.find(item => item.contentid === s);
-                if (item.active) return;
-                this.itemOnClick(item.id);
-            },
-            ipcShowMenu(e, content) {
-                this.activateContent(content);
             },
             activeContent(s) {
                 const item = this.sidebarItems.find(item => item.contentid === s);
@@ -131,7 +134,7 @@
                 this.timeout = setTimeout(() => {
                     this.animating = false;
                     this.lastActiveIndex = -1;
-					this.timeout = null;
+                    this.timeout = null;
                 }, 400);
             },
             openGithub() {
@@ -151,10 +154,7 @@
             }
         },
         created() {
-            ClientIPC.on('bd-show-menu', this.ipcShowMenu);
-        },
-        destroyed() {
-            ClientIPC.off('bd-show-menu', this.ipcShowMenu);
+            Events.on('bd-open-menu', item => item && this.itemOnClick(this.sidebarItems.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
         }
     }
 </script>

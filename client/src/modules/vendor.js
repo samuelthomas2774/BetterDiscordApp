@@ -8,32 +8,39 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import WebpackModules from './webpackmodules';
+import { WebpackModules } from './webpackmodules';
 import jQuery from 'jquery';
 import lodash from 'lodash';
+import Vue from 'vue';
 
 export { jQuery as $ };
 
 export default class {
 
-    static get jQuery() {
-        return jQuery;
-    }
+    /**
+     * jQuery
+     */
+    static get jQuery() { return jQuery }
+    static get $() { return this.jQuery }
 
-    static get $() {
-        return this.jQuery;
-    }
+    /**
+     * Lodash
+     */
+    static get lodash() { return lodash }
+    static get _() { return this.lodash }
 
-    static get lodash() {
-        return lodash;
-    }
-
-    static get _() {
-        return this.lodash;
-    }
-
+    /**
+     * Moment
+     */
     static get moment() {
         return WebpackModules.getModuleByName('Moment');
+    }
+
+    /**
+     * Vue
+     */
+    static get Vue() {
+        return Vue;
     }
 
 }

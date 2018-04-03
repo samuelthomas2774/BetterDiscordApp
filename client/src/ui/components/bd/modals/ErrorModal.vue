@@ -1,5 +1,5 @@
 <template>
-    <Modal :headerText="modal.event.header" :close="modal.close"
+    <Modal :headerText="modal.event.header" @close="modal.close"
            :class="[{'bd-err': modal.event.type && modal.event.type === 'err'}, {'bd-modal-out': modal.closing}]">
         <MiError v-if="modal.event.type === 'err'" slot="icon" size="20"/>
         <div slot="body">

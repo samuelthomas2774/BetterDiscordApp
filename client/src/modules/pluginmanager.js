@@ -41,11 +41,13 @@ export default class extends ContentManager {
         const loadAll = await this.loadAllContent(true);
         this.loaded = true;
         for (let plugin of this.localPlugins) {
+            if (!plugin.enabled) continue;
+            plugin.userConfig.enabled = false;
+
             try {
-                if (plugin.enabled) plugin.start();
+                plugin.start(false);
             } catch (err) {
                 // Disable the plugin but don't save it - the next time BetterDiscord is started the plugin will attempt to start again
-                plugin.userConfig.enabled = false;
                 this.errors.push(new ErrorEvent({
                     module: this.moduleName,
                     message: `Failed to start ${plugin.name}`,
@@ -72,15 +74,14 @@ export default class extends ContentManager {
 
     static get loadContent() { return this.loadPlugin }
     static async loadPlugin(paths, configs, info, main, dependencies, permissions) {
-
         if (permissions && permissions.length > 0) {
             for (let perm of permissions) {
-                console.log(`Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
+                Logger.log(this.moduleName, `Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
             }
             try {
                 const allowed = await Modals.permissions(`${info.name} wants to:`, info.name, permissions).promise;
             } catch (err) {
-                return null;
+                return;
             }
         }
 
@@ -89,15 +90,16 @@ export default class extends ContentManager {
             for (const [key, value] of Object.entries(dependencies)) {
                 const extModule = ExtModuleManager.findModule(key);
                 if (!extModule) {
-                    throw {
-                        'message': `Dependency: ${key}:${value} is not loaded`
-                    };
+                    throw {message: `Dependency ${key}:${value} is not loaded.`};
                 }
                 deps[key] = extModule.__require;
             }
         }
 
-        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info), Vendor, deps);
+        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info, paths.contentPath), Vendor, deps);
+        if (!(plugin.prototype instanceof Plugin))
+            throw {message: `Plugin ${info.name} did not return a class that extends Plugin.`};
+
         const instance = new plugin({
             configs, info, main,
             paths: {
@@ -107,31 +109,34 @@ export default class extends ContentManager {
             }
         });
 
-        if (instance.enabled && this.loaded) instance.start();
+        if (instance.enabled && this.loaded) {
+            instance.userConfig.enabled = false;
+            instance.start(false);
+        }
         return instance;
     }
 
     static get unloadPlugin() { return this.unloadContent }
     static get reloadPlugin() { return this.reloadContent }
 
-    static stopPlugin(name) {
-        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
-        try {
-            if (plugin) return plugin.stop();
-        } catch (err) {
-           // Logger.err('PluginManager', err);
-        }
-        return true; //Return true anyways since plugin doesn't exist
+    /**
+     * Stops a plugin.
+     * @param {Plugin|String} plugin
+     * @return {Promise}
+     */
+    static stopPlugin(plugin) {
+        plugin = this.isPlugin(plugin) ? plugin : this.getPluginById(plugin);
+        return plugin.stop();
     }
 
-    static startPlugin(name) {
-        const plugin = name instanceof Plugin ? name : this.getPluginByName(name);
-        try {
-            if (plugin) return plugin.start();
-        } catch (err) {
-           // Logger.err('PluginManager', err);
-        }
-        return true; //Return true anyways since plugin doesn't exist
+    /**
+     * Starts a plugin.
+     * @param {Plugin|String} plugin
+     * @return {Promise}
+     */
+    static startPlugin(plugin) {
+        plugin = this.isPlugin(plugin) ? plugin : this.getPluginById(plugin);
+        return plugin.start();
     }
 
     static get isPlugin() { return this.isThisContent }

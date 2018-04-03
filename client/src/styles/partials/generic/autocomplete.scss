@@ -1,0 +1,80 @@
+.bd-autocomplete {
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    z-index: 3;
+    bottom: 100%;
+    left: 0;
+    position: absolute;
+    right: 0;
+    background-color: #2f3136;
+
+    .bd-autocomplete-inner {
+        padding-bottom: 8px;
+        white-space: nowrap;
+
+        .bd-autocomplete-row {
+            padding: 0 8px;
+            font-size: 14px;
+            line-height: 16px;
+
+            .bd-autocomplete-selector {
+                border-radius: 3px;
+                padding: 8px;
+
+                &.bd-selectable {
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: darken(#36393f, 5%);
+                    }
+
+                    &.bd-selected {
+                        background-color: #36393f;
+                    }
+                }
+
+                .bd-autocomplete-title {
+                    color: #72767d;
+                    padding: 4px 0;
+                    text-transform: uppercase;
+                    font-weight: 600;
+                    line-height: 16px;
+                    font-size: 12px;
+
+                    strong {
+                        color: #fff;
+                        text-transform: none;
+                        font-weight: 500;
+                    }
+                }
+
+                .bd-autocomplete-field {
+                    display: flex;
+                    flex: 1 1 auto;
+                    color: #f6f6f7;
+                    min-height: 16px;
+                    -webkit-box-direction: normal;
+                    -webkit-box-orient: horizontal;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    -webkit-box-pack: start;
+                    justify-content: flex-start;
+                    -webkit-box-align: center;
+                    align-items: center;
+
+                    img {
+                        min-width: 16px;
+                        width: 16px;
+                    }
+
+                    div {
+                        margin-left: 8px;
+                        color: #f6f6f7;
+                    }
+                }
+            }
+        }
+    }
+}

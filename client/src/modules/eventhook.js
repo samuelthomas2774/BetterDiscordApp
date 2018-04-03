@@ -1,5 +1,5 @@
 /**
- * BetterDiscord WebpackModules Module
+ * BetterDiscord Event Hook
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -8,20 +8,23 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import EventListener from './eventlistener';
-import { Utils } from 'common';
+import { Utils, ClientLogger as Logger } from 'common';
+import { WebpackModules } from './webpackmodules';
 import Events from './events';
+import EventListener from './eventlistener';
 
-import {
-    MESSAGE_CREATE
-} from '../structs/socketstructs';
-
+import * as SocketStructs from '../structs/socketstructs';
 
 /**
  * Discord socket event hook
  * @extends {EventListener}
  */
 export default class extends EventListener {
+
+    init() {
+        Logger.log('EventHook', SocketStructs);
+        this.hook();
+    }
 
     bindings() {
         this.hook = this.hook.bind(this);
@@ -33,13 +36,23 @@ export default class extends EventListener {
         ];
     }
 
-    hook() {}
+    hook() {
+        const self = this;
+        const orig = this.eventsModule.prototype.emit;
+        this.eventsModule.prototype.emit = function (...args) {
+            orig.call(this, ...args);
+            self.wsc = this;
+            self.emit(...args);
+        };
+    }
 
-    get eventsModule() {}
+    get eventsModule() {
+        return WebpackModules.getModuleByName('Events');
+    }
 
     /**
      * Discord emit overload
-     * @param {any} e
+     * @param {any} event
      * @param {any} action
      * @param {any} data
      */
@@ -52,40 +65,18 @@ export default class extends EventListener {
 
     /**
      * Emit callback
-     * @param {any} e Event Action
-     * @param {any} d Event Args
+     * @param {any} event Event
+     * @param {any} data Event data
      */
     dispatch(e, d) {
-
         Events.emit('raw-event', { type: e, data: d });
-
-        switch (e) {
-            case this.actions.READ:
-                Events.emit('discord-ready');
-                break;
-            case this.actions.RESUMED:
-                Events.emit('discord-resumed');
-                break;
-            case this.actions.TYPING_START:
-                Events.emit('discord-event', {
-                    type: e,
-                    channelId: d.channel_id,
-                    userId: d.user_id
-                });
-                break;
-            case this.actions.MESSAGE_CREATE:
-                Events.emit('discord-event', { type: e, data: new MESSAGE_CREATE(d) });
-                break;
-            case 'k':
-                Events.emit('discord-event', {
-
-                });
-                break;
-            case this.actions.ACTIVITY_START:
-                Events.emit('discord-event', this.construct(e, d));
-                break;
-
+        if (e === this.actions.READY || e === this.actions.RESUMED) {
+            Events.emit(e, d);
+            return;
         }
+        if (!Object.keys(SocketStructs).includes(e)) return;
+        const evt = new SocketStructs[e](d);
+        Events.emit(`discord:${e}`, evt);
     }
 
     /**
@@ -151,7 +142,7 @@ export default class extends EventListener {
             LFG_LISTING_CREATE: 'LFG_LISTING_CREATE', // No groups here
             LFG_LISTING_DELETE: 'LFG_LISTING_DELETE', // Thank you
             BRAINTREE_POPUP_BRIDGE_CALLBACK: 'BRAINTREE_POPUP_BRIDGE_CALLBACK' // What
-        }
+        };
     }
 
 }

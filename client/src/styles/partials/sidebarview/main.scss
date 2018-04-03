@@ -19,6 +19,7 @@
         z-index: 5;
         max-width: 310px;
         min-width: 310px;
+        pointer-events: all;
 
         .bd-scroller {
             padding: 10px 10px 0 0;
@@ -32,6 +33,7 @@
         box-shadow: 0 0 4px #202225;
         backface-visibility: hidden;
         transition: transform 0.6s ease;
+        pointer-events: all;
     }
 
     &.bd-stop {

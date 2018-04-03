@@ -32,24 +32,24 @@ export default new class {
     }
 
     /**
-     * Init css editor
+     * Init css editor.
      */
     init() {
-        ClientIPC.on('bd-get-scss', () => this.sendToEditor('set-scss', { scss: this.scss }));
+        ClientIPC.on('bd-get-scss', () => this.scss, true);
         ClientIPC.on('bd-update-scss', (e, scss) => this.updateScss(scss));
         ClientIPC.on('bd-save-csseditor-bounds', (e, bounds) => this.saveEditorBounds(bounds));
 
         ClientIPC.on('bd-save-scss', async (e, scss) => {
             await this.updateScss(scss);
             await this.save();
-        });
+        }, true);
 
         this.liveupdate = Settings.getSetting('css', 'default', 'live-update');
         this.liveupdate.on('setting-updated', event => {
             this.sendToEditor('set-liveupdate', event.value);
         });
 
-        ClientIPC.on('bd-get-liveupdate', () => this.sendToEditor('set-liveupdate', this.liveupdate.value));
+        ClientIPC.on('bd-get-liveupdate', () => this.liveupdate.value, true);
         ClientIPC.on('bd-set-liveupdate', (e, value) => this.liveupdate.value = value);
 
         this.watchfilessetting = Settings.getSetting('css', 'default', 'watch-files');
@@ -60,20 +60,20 @@ export default new class {
     }
 
     /**
-     * Show css editor, flashes if already visible
+     * Show css editor, flashes if already visible.
      */
     async show() {
         await ClientIPC.send('openCssEditor', this.editor_bounds);
     }
 
     /**
-     * Update css in client
-     * @param {String} scss scss to compile
-     * @param {bool} sendSource send to css editor instance
+     * Update css in client.
+     * @param {String} scss SCSS to compile
+     * @param {bool} sendSource Whether to send to css editor instance
      */
     async updateScss(scss, sendSource) {
         if (sendSource)
-            this.sendToEditor('set-scss', { scss });
+            this.sendToEditor('set-scss', scss);
 
         if (!scss) {
             this._scss = this.css = '';
@@ -97,24 +97,26 @@ export default new class {
     }
 
     /**
-     * Save css to file
+     * Save css to file.
+     * @return {Promise}
      */
-    async save() {
-        Settings.saveSettings();
+    save() {
+        return Settings.saveSettings();
     }
 
     /**
-     * Save current editor bounds
-     * @param {Rectangle} bounds editor bounds
+     * Save current editor bounds.
+     * @param {Rectangle} bounds Editor bounds
+     * @return {Promise}
      */
     saveEditorBounds(bounds) {
         this.editor_bounds = bounds;
-        Settings.saveSettings();
+        return Settings.saveSettings();
     }
 
     /**
-     * Send scss to core for compilation
-     * @param {String} scss scss string
+     * Send SCSS to core for compilation.
+     * @param {String} scss SCSS string
      */
     async compile(scss) {
         return await ClientIPC.send('bd-compileSass', {
@@ -124,7 +126,7 @@ export default new class {
     }
 
     /**
-     * Recompile the current SCSS
+     * Recompile the current SCSS.
      * @return {Promise}
      */
     async recompile() {
@@ -132,16 +134,18 @@ export default new class {
     }
 
     /**
-     * Send data to open editor
-     * @param {any} channel
-     * @param {any} data
+     * Send data to open editor.
+     * @param {String} channel
+     * @param {Any} data
+     * @return {Promise}
      */
     async sendToEditor(channel, data) {
-        return await ClientIPC.send('sendToCssEditor', { channel, data });
+        return ClientIPC.sendToCssEditor(channel, data);
     }
 
     /**
-     * Opens an SCSS file in a system editor
+     * Opens an SCSS file in a system editor.
+     * @return {Promise}
      */
     async openSystemEditor() {
         try {
@@ -160,7 +164,8 @@ export default new class {
             throw {message: 'Failed to open system editor.'};
     }
 
-    /** Set current state
+    /**
+     * Set current state
      * @param {String} scss Current uncompiled SCSS
      * @param {String} css Current compiled CSS
      * @param {String} files Files imported in the SCSS
@@ -168,36 +173,35 @@ export default new class {
      */
     setState(scss, css, files, err) {
         this._scss = scss;
-        this.sendToEditor('set-scss', { scss });
+        this.sendToEditor('set-scss', scss);
         this.css = css;
         this.files = files;
         this.error = err;
     }
 
     /**
-     * Current uncompiled scss
+     * Current uncompiled scss.
      */
     get scss() {
         return this._scss || '';
     }
 
     /**
-     * Set current scss
+     * Set current scss.
      */
     set scss(scss) {
         this.updateScss(scss, true);
     }
 
     /**
-     * Current compiled css
+     * Current compiled css.
      */
     get css() {
         return this._css || '';
     }
 
     /**
-     * Inject compiled css to head
-     * {DOM}
+     * Inject compiled css to head.
      */
     set css(css) {
         this._css = css;
@@ -205,15 +209,14 @@ export default new class {
     }
 
     /**
-     * Current error
+     * Current error.
      */
     get error() {
         return this._error || undefined;
     }
 
     /**
-     * Set current error
-     * {DOM}
+     * Set current error.
      */
     set error(err) {
         this._error = err;
@@ -293,7 +296,7 @@ export default new class {
 
     /**
      * Checks if the system editor's file exists.
-     * @return {Boolean}
+     * @return {Promise}
      */
     async fileExists() {
         try {

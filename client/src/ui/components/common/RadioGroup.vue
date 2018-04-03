@@ -10,16 +10,19 @@
 
 <template>
     <div class="bd-radio-group" :class="{'bd-disabled': disabled}">
-        <label class="bd-radio" v-for="option in options" :class="{'bd-radio-selected': selected === option.value}" @click="change(option.value)">
+        <label class="bd-radio" v-for="option in options" :class="{'bd-radio-selected': value === option.value}" @click="$emit('input', option.value)">
             <div class="bd-radio-control-wrap">
-                <svg class="bd-radio-control" name="Checkmark" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><polyline stroke="#3e82e5" stroke-width="2" points="3.5 9.5 7 13 15 5"></polyline></g></svg>
+                <svg class="bd-radio-control" name="Checkmark" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="none" fill-rule="evenodd"><polyline stroke="#3e82e5" stroke-width="2" points="3.5 9.5 7 13 15 5"></polyline></g>
+                </svg>
             </div>
-            <div class="bd-radio-text">{{option.text}}</div>
+            <div class="bd-radio-text">{{ option.text }}</div>
         </label>
     </div>
 </template>
+
 <script>
     export default {
-        props: ['options', 'selected', 'disabled', 'change']
+        props: ['options', 'value', 'disabled']
     }
 </script>

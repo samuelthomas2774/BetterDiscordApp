@@ -50,11 +50,13 @@
         }
     }
 
-    &.bd-drawer-open {
+    &.bd-animating {
         > .bd-drawer-contents-wrap {
-            overflow: visible;
+            overflow: hidden;
         }
+    }
 
+    &.bd-drawer-open {
         > .bd-drawer-header .bd-drawer-open-button {
             .bd-chevron-1 {
                 svg {

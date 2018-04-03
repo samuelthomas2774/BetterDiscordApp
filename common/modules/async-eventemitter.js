@@ -10,33 +10,59 @@
 
 import EventEmitter from 'events';
 
+/**
+ * Extends Node.js' EventEmitter to trigger event listeners asyncronously.
+ */
 export default class AsyncEventEmitter extends EventEmitter {
 
-    emit(event, ...data) {
-        return new Promise(async (resolve, reject) => {
-            let listeners = this._events[event] || [];
-            listeners = Array.isArray(listeners) ? listeners : [listeners];
+    /**
+     * Emits an event.
+     * @param {String} event The event to emit
+     * @param {Any} ...data Data to be passed to event listeners
+     * @return {Promise}
+     */
+    async emit(event, ...data) {
+        let listeners = this._events[event] || [];
+        listeners = Array.isArray(listeners) ? listeners : [listeners];
 
-            // Special treatment of internal newListener and removeListener events
-            if(event === 'newListener' || event === 'removeListener') {
-                data = [{
-                    event: data,
-                    fn: err => {
-                        if (err) throw err;
-                    }
-                }];
-            }
-
-            for (let listener of listeners) {
-                try {
-                    await listener.call(this, ...data);
-                } catch (err) {
-                    return reject(err);
+        // Special treatment of internal newListener and removeListener events
+        if(event === 'newListener' || event === 'removeListener') {
+            data = [{
+                event: data,
+                fn: err => {
+                    if (err) throw err;
                 }
-            }
+            }];
+        }
 
-            resolve();
+        for (let listener of listeners) {
+            await listener.apply(this, data);
+        }
+    }
+
+    /**
+     * Adds an event listener that will be removed when it is called and therefore only be called once.
+     * If a callback is not specified a promise that is resolved once the event is triggered is returned.
+     */
+    once(event, callback) {
+        if (callback) {
+            // If a callback was specified add this event as normal
+            return EventEmitter.prototype.once.apply(this, arguments);
+        }
+
+        // Otherwise return a promise that is resolved once this event is triggered
+        return new Promise((resolve, reject) => {
+            EventEmitter.prototype.once.call(this, event, data => {
+                return resolve(data);
+            });
         });
+    }
+
+    /**
+     * Unbinds an event listener.
+     */
+    off(event, callback) {
+        this.removeListener(event, callback);
     }
 
 }

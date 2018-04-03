@@ -13,15 +13,20 @@ import Globals from './globals';
 import { $ } from 'vendor';
 import { ClientLogger as Logger } from 'common';
 
-export default class {
+export default new class {
 
     constructor() {
-        window.updater = this;
         this.updatesAvailable = false;
+        this.latestVersion = undefined;
+        this.error = undefined;
+
         this.init = this.init.bind(this);
         this.checkForUpdates = this.checkForUpdates.bind(this);
     }
 
+    /**
+     * The interval to wait before checking for updates.
+     */
     get interval() {
         return 60 * 1000 * 30;
     }
@@ -30,34 +35,61 @@ export default class {
         this.updateInterval = setInterval(this.checkForUpdates, this.interval);
     }
 
-    update() {
-        // TODO
-        this.updatesAvailable = false;
-        Events.emit('update-check-end');
+    /**
+     * Installs an update.
+     * TODO
+     */
+    async update() {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+
+            this.updatesAvailable = false;
+            this.latestVersion = Globals.version;
+            Events.emit('update-check-end');
+        } catch (err) {
+            this.error = err;
+            this.checkForUpdates();
+            throw err;
+        }
     }
 
+    /**
+     * Checks for updates.
+     * @return {Promise}
+     */
     checkForUpdates() {
-        if (this.updatesAvailable) return;
-        Events.emit('update-check-start');
-        Logger.info('Updater', 'Checking for updates');
-        $.ajax({
-            type: 'GET',
-            url: 'https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json',
-            cache: false,
-            success: e => {
-                try {
-                    Events.emit('update-check-end');
-                    Logger.info('Updater',
-                        `Latest Version: ${e.version} - Current Version: ${Globals.getObject('version')}`);
-                    if (e.version !== Globals.getObject('version')) {
-                        this.updatesAvailable = true;
-                        Events.emit('updates-available');
+        return new Promise((resolve, reject) => {
+            if (this.updatesAvailable) return resolve(true);
+            Events.emit('update-check-start');
+            Logger.info('Updater', 'Checking for updates');
+
+            $.ajax({
+                type: 'GET',
+                url: 'https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json',
+                cache: false,
+                success: e => {
+                    try {
+                        this.latestVersion = e.version;
+                        Events.emit('update-check-end');
+                        Logger.info('Updater', `Latest Version: ${e.version} - Current Version: ${Globals.version}`);
+
+                        if (this.latestVersion !== Globals.version) {
+                            this.updatesAvailable = true;
+                            Events.emit('updates-available');
+                            resolve(true);
+                        }
+
+                        resolve(false);
+                    } catch (err) {
+                        Events.emit('update-check-fail', err);
+                        reject(err);
                     }
-                } catch (err) {
+                },
+                fail: err => {
                     Events.emit('update-check-fail', err);
+                    reject(err);
                 }
-            },
-            fail: e => Events.emit('update-check-fail', e)
+            });
         });
     }
 

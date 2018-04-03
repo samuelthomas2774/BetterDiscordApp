@@ -45,8 +45,10 @@ export default class ThemeManager extends ContentManager {
                     mainPath: paths.mainPath
                 }
             });
-            if (!instance.css) instance.recompile();
-            else if (instance.enabled) instance.enable();
+            if (instance.enabled) {
+                instance.userConfig.enabled = false;
+                instance.enable();
+            }
             return instance;
         } catch (err) {
             throw err;
@@ -60,11 +62,11 @@ export default class ThemeManager extends ContentManager {
     }
 
     static enableTheme(theme) {
-        theme.enable();
+        return theme.enable();
     }
 
     static disableTheme(theme) {
-        theme.disable();
+        return theme.disable();
     }
 
     static get isTheme() { return this.isThisContent }
@@ -72,6 +74,11 @@ export default class ThemeManager extends ContentManager {
         return theme instanceof Theme;
     }
 
+    /**
+     * Returns a representation of a settings set's values in SCSS.
+     * @param {SettingsSet} settingsset The set to convert to SCSS
+     * @return {Promise}
+     */
     static async getConfigAsSCSS(settingsset) {
         const variables = [];
 
@@ -85,6 +92,11 @@ export default class ThemeManager extends ContentManager {
         return variables.join('\n');
     }
 
+    /**
+     * Returns a representation of a settings set's values as an SCSS map.
+     * @param {SettingsSet} settingsset The set to convert to an SCSS map
+     * @return {Promise}
+     */
     static async getConfigAsSCSSMap(settingsset) {
         const variables = [];
 
@@ -98,6 +110,11 @@ export default class ThemeManager extends ContentManager {
         return '(' + variables.join(', ') + ')';
     }
 
+    /**
+     * Returns a setting's name and value as a string that can be included in SCSS.
+     * @param {Setting} setting The setting to convert to SCSS
+     * @return {Promise}
+     */
     static async parseSetting(setting) {
         const { type, id, value } = setting;
         const name = id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
@@ -106,6 +123,11 @@ export default class ThemeManager extends ContentManager {
         if (scss) return [name, scss];
     }
 
+    /**
+     * Escapes a string so it can be included in SCSS.
+     * @param {String} value The string to escape
+     * @return {String}
+     */
     static toSCSSString(value) {
         if (typeof value !== 'string' && value.toString) value = value.toString();
         return `'${typeof value === 'string' ? value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') : ''}'`;

@@ -13,17 +13,17 @@
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Installed</h3>
-                <RefreshBtn v-if="local" :onClick="refreshLocal"/>
+                <RefreshBtn v-if="local" @click="refreshLocal"/>
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
                 <h3>Browse</h3>
-                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
+                <RefreshBtn v-if="!local" @click="refreshOnline" />
             </div>
         </div>
 
         <div class="bd-flex bd-flex-col bd-themesview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-themes-container bd-local-themes">
-                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :toggleTheme="() => toggleTheme(theme)" :reloadTheme="e => reloadTheme(theme, e.shiftKey)" :showSettings="() => showSettings(theme)" :deleteTheme="e => deleteTheme(theme, e.shiftKey)" />
+                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :data-theme-id="theme.id" @toggle-theme="toggleTheme(theme)" @reload-theme="reload => reloadTheme(theme, reload)" @show-settings="dont_clone => showSettings(theme, dont_clone)" @delete-theme="unload => deleteTheme(theme, unload)" />
             </div>
             <div v-if="!local" class="bd-online-ph">
                 <h3>Coming Soon</h3>
@@ -37,17 +37,19 @@
     // Imports
     import { ThemeManager } from 'modules';
     import { Modals } from 'ui';
-    import { SettingsWrapper } from './';
+    import { ClientLogger as Logger } from 'common';
     import { MiRefresh } from '../common';
+    import SettingsWrapper from './SettingsWrapper.vue';
     import ThemeCard from './ThemeCard.vue';
     import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
             return {
+                ThemeManager,
                 local: true,
                 localThemes: ThemeManager.localThemes
-            }
+            };
         },
         components: {
             SettingsWrapper, ThemeCard,
@@ -62,59 +64,38 @@
                 this.local = false;
             },
             async refreshLocal() {
-                await ThemeManager.refreshThemes();
+                await this.ThemeManager.refreshThemes();
             },
             async refreshOnline() {
-
+                // TODO
             },
             async toggleTheme(theme) {
-                // TODO Display error if theme fails to enable/disable
+                // TODO: display error if theme fails to enable/disable
                 try {
-                    await theme.enabled ? ThemeManager.disableTheme(theme) : ThemeManager.enableTheme(theme);
-                    this.$forceUpdate();
+                    await theme.enabled ? this.ThemeManager.disableTheme(theme) : this.ThemeManager.enableTheme(theme);
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('ThemesView', [`Error ${enabled ? 'stopp' : 'start'}ing theme ${theme.name}:`, err]);
                 }
             },
             async reloadTheme(theme, reload) {
                 try {
-                    if (reload) await ThemeManager.reloadTheme(theme);
-                    else await theme.recompile();
-                    this.$forceUpdate();
+                    await reload ? this.ThemeManager.reloadTheme(theme) : theme.recompile();
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('ThemesView', [`Error ${reload ? 'reload' : 'recompil'}ing theme ${theme.name}:`, err]);
                 }
             },
             async deleteTheme(theme, unload) {
                 try {
-                    if (unload) await ThemeManager.unloadTheme(theme);
-                    else await ThemeManager.deleteTheme(theme);
-                    this.$forceUpdate();
+                    await unload ? this.ThemeManager.unloadTheme(theme) : this.ThemeManager.deleteTheme(theme);
                 } catch (err) {
-                    console.error(err);
+                    Logger.err('ThemesView', [`Error ${unload ? 'unload' : 'delet'}ing theme ${theme.name}:`, err]);
                 }
             },
-            showSettings(theme) {
-                return Modals.contentSettings(theme);
+            showSettings(theme, dont_clone) {
+                return Modals.contentSettings(theme, null, {
+                    dont_clone
+                });
             }
         }
     }
 </script>
-
-<style>
-.bd-online-ph {
-    display: flex;
-    flex-direction: column;
-}
-.bd-online-ph h3 {
-    color: #FFF;
-    font-weight: 700;
-    font-size: 20px;
-    text-align: center;
-    padding: 20px;
-}
-.bd-online-ph a {
-    padding: 20px;
-    text-align: center;
-}
-</style>

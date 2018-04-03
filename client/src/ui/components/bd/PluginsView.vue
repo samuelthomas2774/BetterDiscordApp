@@ -13,17 +13,17 @@
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Installed</h3>
-                <RefreshBtn v-if="local" :onClick="refreshLocal" />
+                <RefreshBtn v-if="local" @click="refreshLocal" />
             </div>
             <div class="bd-button" :class="{'bd-active': !local}" @click="showOnline">
                 <h3>Browse</h3>
-                <RefreshBtn v-if="!local" :onClick="refreshOnline" />
+                <RefreshBtn v-if="!local" @click="refreshOnline" />
             </div>
         </div>
 
         <div class="bd-flex bd-flex-col bd-pluginsview">
             <div v-if="local" class="bd-flex bd-flex-grow bd-flex-col bd-plugins-container bd-local-plugins">
-                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :togglePlugin="() => togglePlugin(plugin)" :reloadPlugin="() => reloadPlugin(plugin)" :deletePlugin="e => deletePlugin(plugin, e.shiftKey)" :showSettings="() => showSettings(plugin)" />
+                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :data-plugin-id="plugin.id" @toggle-plugin="togglePlugin(plugin)" @reload-plugin="reloadPlugin(plugin)" @delete-plugin="unload => deletePlugin(plugin, unload)" @show-settings="dont_clone => showSettings(plugin, dont_clone)" />
             </div>
             <div v-if="!local" class="bd-online-ph">
                 <h3>Coming Soon</h3>
@@ -37,17 +37,19 @@
     // Imports
     import { PluginManager } from 'modules';
     import { Modals } from 'ui';
-    import { SettingsWrapper } from './';
-    import PluginCard from './PluginCard.vue';
+    import { ClientLogger as Logger } from 'common';
     import { MiRefresh } from '../common';
+    import SettingsWrapper from './SettingsWrapper.vue';
+    import PluginCard from './PluginCard.vue';
     import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
             return {
+                PluginManager,
                 local: true,
                 localPlugins: PluginManager.localPlugins
-            }
+            };
         },
         components: {
             SettingsWrapper, PluginCard,
@@ -62,39 +64,38 @@
                 this.local = false;
             },
             async refreshLocal() {
-                await PluginManager.refreshPlugins();
+                await this.PluginManager.refreshPlugins();
             },
             async refreshOnline() {
-
+                // TODO
             },
             async togglePlugin(plugin) {
-                // TODO Display error if plugin fails to start/stop
+                // TODO: display error if plugin fails to start/stop
+                const enabled = plugin.enabled;
                 try {
-                    await plugin.enabled ? PluginManager.stopPlugin(plugin) : PluginManager.startPlugin(plugin);
-                    this.$forceUpdate();
+                    await enabled ? this.PluginManager.stopPlugin(plugin) : this.PluginManager.startPlugin(plugin);
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('PluginsView', [`Error ${enabled ? 'stopp' : 'start'}ing plugin ${plugin.name}:`, err]);
                 }
             },
             async reloadPlugin(plugin) {
                 try {
-                    await PluginManager.reloadPlugin(plugin);
-                    this.$forceUpdate();
+                    await this.PluginManager.reloadPlugin(plugin);
                 } catch (err) {
-                    console.log(err);
+                    Logger.err('PluginsView', [`Error reloading plugin ${plugin.name}:`, err]);
                 }
             },
             async deletePlugin(plugin, unload) {
                 try {
-                    if (unload) await PluginManager.unloadPlugin(plugin);
-                    else await PluginManager.deletePlugin(plugin);
-                    this.$forceUpdate();
+                    await unload ? this.PluginManager.unloadPlugin(plugin) : this.PluginManager.deletePlugin(plugin);
                 } catch (err) {
-                    console.error(err);
+                    Logger.err('PluginsView', [`Error ${unload ? 'unload' : 'delet'}ing plugin ${plugin.name}:`, err]);
                 }
             },
-            showSettings(plugin) {
-                return Modals.contentSettings(plugin);
+            showSettings(plugin, dont_clone) {
+                return Modals.contentSettings(plugin, null, {
+                    dont_clone
+                });
             }
         }
     }

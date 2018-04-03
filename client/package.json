@@ -2,24 +2,22 @@
   "name": "bdclient",
   "description": "BetterDiscord client package",
   "author": "Jiiks",
-  "version": "0.4.0",
+  "version": "2.0.0b",
   "homepage": "https://betterdiscord.net",
   "license": "MIT",
-  "main": "index.js",
+  "main": "dist/betterdiscord.client.js",
   "contributors": [
     "Jiiks",
     "Pohky"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Jiiks/BetterDiscordApp.git"
+    "url": "https://github.com/JsSucks/BetterDiscordApp.git"
   },
   "private": false,
-  "devDependencies": {
-    
-  },
   "scripts": {
     "build": "webpack --progress --colors",
-    "watch": "webpack --progress --colors --watch"
+    "watch": "webpack --progress --colors --watch",
+    "release": "webpack --progress --colors --config=webpack.production.config.js"
   }
 }

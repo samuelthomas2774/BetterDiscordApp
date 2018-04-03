@@ -1,0 +1,328 @@
+{
+    "info": {
+        "id": "example-plugin",
+        "name": "Example Plugin",
+        "authors": [
+            {
+                "name": "Jiiks",
+                "discord_id": "81388395867156480",
+                "github_username": "Jiiks",
+                "twitter_username": "Jiiksi"
+            },
+            {
+                "name": "Samuel Elliott",
+                "url": "https://samuelelliott.ml",
+                "discord_id": "284056145272766465",
+                "github_username": "samuelthomas2774",
+                "twitter_username": "_samuelelliott"
+            },
+            {
+                "name": "Mioni",
+                "discord_id": "418494039050944513"
+            },
+            "Just a string"
+        ],
+        "version": 1.0,
+        "description": "Example Plugin Description.\n\nDescriptions are preformatted (you can use newlines).",
+        "icon": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FscXVlXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjAwMCAyMDAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyMDAwIDIwMDAiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnPjxwYXRoIGZpbGw9IiMzRTgyRTUiIGQ9Ik0xNDAyLjIsNjMxLjdjLTkuNy0zNTMuNC0yODYuMi00OTYtNjQyLjYtNDk2SDY4LjR2NzE0LjFsNDQyLDM5OFY0OTAuN2gyNTdjMjc0LjUsMCwyNzQuNSwzNDQuOSwwLDM0NC45SDU5Ny42djMyOS41aDE2OS44YzI3NC41LDAsMjc0LjUsMzQ0LjgsMCwzNDQuOGgtNjk5djM1NC45aDY5MS4yYzM1Ni4zLDAsNjMyLjgtMTQyLjYsNjQyLjYtNDk2YzAtMTYyLjYtNDQuNS0yODQuMS0xMjIuOS0zNjguNkMxMzU3LjcsOTE1LjgsMTQwMi4yLDc5NC4zLDE0MDIuMiw2MzEuN3oiLz48cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMTI2Mi41LDEzNS4yTDEyNjIuNSwxMzUuMmwtNzYuOCwwYzI2LjYsMTMuMyw1MS43LDI4LjEsNzUsNDQuM2M3MC43LDQ5LjEsMTI2LjEsMTExLjUsMTY0LjYsMTg1LjNjMzkuOSw3Ni42LDYxLjUsMTY1LjYsNjQuMywyNjQuNmwwLDEuMnYxLjJjMCwxNDEuMSwwLDU5Ni4xLDAsNzM3LjF2MS4ybDAsMS4yYy0yLjcsOTktMjQuMywxODgtNjQuMywyNjQuNmMtMzguNSw3My44LTkzLjgsMTM2LjItMTY0LjYsMTg1LjNjLTIyLjYsMTUuNy00Ni45LDMwLjEtNzIuNiw0My4xaDcyLjVjMzQ2LjIsMS45LDY3MS0xNzEuMiw2NzEtNTY3LjlWNzE2LjdDMTkzMy41LDMxMi4yLDE2MDguNywxMzUuMiwxMjYyLjUsMTM1LjJ6Ii8+PC9nPjwvc3ZnPg=="
+    },
+    "main": "index.js",
+    "dependencies": {
+        "Example Module": "1.0"
+    },
+    "defaultConfig": [
+        {
+            "category_default_comment": "default category has no header and is always displayed first",
+            "id": "default",
+            "settings": [
+                {
+                    "id": "array-1",
+                    "type": "array",
+                    "value": null,
+                    "text": "Test settings array",
+                    "hint": "Just a test. Inline should be left as false here in most cases. (Only set it to true if there's only one setting otherwise it takes up too much space. Or you could put it in a drawer.)",
+                    "inline": false,
+                    "min": 0,
+                    "max": 5,
+                    "settings": [
+                        {
+                            "category_default_comment": "default category has no header and is always displayed first",
+                            "category": "default",
+                            "settings": [
+                                {
+                                    "id": "default-0",
+                                    "type": "bool",
+                                    "value": false,
+                                    "text": "Bool Test Setting 3",
+                                    "hint": "Bool Test Setting Hint 3"
+                                },
+                                {
+                                    "id": "default-1",
+                                    "type": "text",
+                                    "value": "defaultValue",
+                                    "text": "Text Test Setting",
+                                    "hint": "Text Test Setting Hint"
+                                }
+                            ]
+                        }
+                    ],
+                    "schemes": [
+                        {
+                            "id": "scheme-1",
+                            "name": "Test scheme",
+                            "hint": "Can even use schemes here.",
+                            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "default-0",
+                                            "value": true
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "scheme-2",
+                            "name": "Another test scheme",
+                            "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg",
+                            "settings": [
+                                {
+                                    "category": "default",
+                                    "settings": [
+                                        {
+                                            "id": "default-0",
+                                            "value": false
+                                        },
+                                        {
+                                            "id": "default-1",
+                                            "value": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "default-0",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                },
+                {
+                    "id": "default-1",
+                    "type": "text",
+                    "value": "defaultValue",
+                    "text": "Text Test Setting",
+                    "hint": "Text Test Setting Hint"
+                },
+                {
+                    "id": "default-2",
+                    "type": "dropdown",
+                    "value": "opt1",
+                    "text": "Dropdown Test Setting",
+                    "hint": "Dropdown Test Setting Hint",
+                    "options": [
+                        {"id": "opt1", "value": "opt1", "text": "Option 1"},
+                        {"id": "opt2", "value": "opt2", "text": "Option 2"},
+                        {"id": "opt3", "value": "opt3", "text": "Option 3"},
+                        {"id": "opt4", "value": "opt4", "text": "Option 4"},
+                        {"id": "opt5", "value": "opt5", "text": "Option 5"}
+                    ]
+                },
+                {
+                    "id": "default-5",
+                    "type": "radio",
+                    "value": "opt1",
+                    "text": "Radio Test Setting",
+                    "hint": "Radio Test Setting Hint",
+                    "options": [
+                        {"id": "opt1", "value": "opt1", "text": "Option 1"},
+                        {"id": "opt2", "value": "opt2", "text": "Option 2"},
+                        {"id": "opt3", "value": "opt3", "text": "Option 3"},
+                        {"id": "opt4", "value": "opt4", "text": "Option 4"},
+                        {"id": "opt5", "value": "opt5", "text": "Option 5"}
+                    ],
+                    "fullwidth": true
+                },
+                {
+                    "id": "default-6",
+                    "type": "number",
+                    "value": 0,
+                    "text": "Number Test Setting",
+                    "hint": "Number Test Setting Hint"
+                },
+                {
+                    "id": "test-multiline-1",
+                    "type": "text",
+                    "multiline": true,
+                    "text": "Multiline Text Test Setting",
+                    "hint": "Multiline Text Test Setting Hint"
+                },
+                {
+                    "id": "test-slider-1",
+                    "type": "slider",
+                    "value": 0,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "unit": "%",
+                    "text": "Slider Test Setting",
+                    "hint": "Slider Test Setting Hint"
+                },
+                {
+                    "id": "test-slider-2",
+                    "type": "slider",
+                    "value": 0,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "unit": "%",
+                    "points": {
+                        "0": "0%",
+                        "100": "100%"
+                    },
+                    "text": "Slider Test Setting",
+                    "hint": "Slider with two points."
+                },
+                {
+                    "id": "default-3",
+                    "type": "file",
+                    "value": null,
+                    "text": "Test File Setting 1",
+                    "hint": "File selector with the default options."
+                },
+                {
+                    "id": "default-4",
+                    "type": "file",
+                    "value": null,
+                    "text": "Test File Setting 2",
+                    "hint": "File selector with custom button text and the ability to open directories and multiple items.",
+                    "dialogOptions": {
+                        "buttonLabel": "Select",
+                        "properties": [
+                            "openFile",
+                            "openDirectory",
+                            "multiSelections"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "custom-settings",
+            "name": "Custom settings",
+            "type": "drawer",
+            "settings": [
+                {
+                    "id": "custom-1",
+                    "type": "custom",
+                    "value": false,
+                    "component": {
+                        "template": "<div style=\"margin-bottom: 15px; background-color: rgba(0, 0, 0, 0.2); border: 1px dashed rgba(255, 255, 255, 0.2); padding: 10px; color: #f6f6f7; font-weight: 500; font-size: 15px;\">Test custom setting {{ setting.id }}. This is included inline with the plugin/theme's config. (Which means it can't use any functions, but can still bind functions to events.) <button class=\"bd-button bd-button-primary\" style=\"display: inline-block; margin-left: 10px;\" @click=\"change(1)\">Set value to 1</button> <button class=\"bd-button bd-button-primary\" style=\"display: inline-block; margin-left: 10px;\" @click=\"change(2)\">Set value to 2</button></div>",
+                        "props": [
+                            "setting",
+                            "change"
+                        ]
+                    },
+                    "debug": true
+                },
+                {
+                    "id": "custom-2",
+                    "type": "custom",
+                    "value": false,
+                    "file": "component.js"
+                },
+                {
+                    "id": "custom-3",
+                    "type": "custom",
+                    "value": false,
+                    "component": "settingscomponent"
+                },
+                {
+                    "id": "custom-4",
+                    "type": "custom",
+                    "value": false,
+                    "function": "getSettingsComponent"
+                },
+                {
+                    "id": "custom-5",
+                    "type": "custom",
+                    "value": false,
+                    "function": "getSettingsComponentHTMLElement",
+                    "debug": true
+                },
+                {
+                    "id": "custom-6",
+                    "type": "custom",
+                    "value": false,
+                    "class_file": "component.js",
+                    "class": "CustomSetting"
+                }
+            ]
+        },
+        {
+            "category_header_comment": "Setting a category other than default has a header with category name as the text",
+            "id": "test-category",
+            "name": "Test Category",
+            "drawer_type_comment": "// Drawer type will create an expandable drawer for the settings",
+            "type": "drawer",
+            "settings": [
+                {
+                    "id": "drawer-0",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                },
+                {
+                    "id": "drawer-1",
+                    "type": "text",
+                    "value": "defaultValue",
+                    "text": "Text Test Setting",
+                    "hint": "Text Test Setting Hint"
+                },
+                {
+                    "id": "drawer-2",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                }
+            ]
+        },
+        {
+            "id": "test-category-2",
+            "name": "Test Category 2 (static with header)",
+            "static_type_comment": "Static type will behave like default but will have a header",
+            "type": "static",
+            "settings": [
+                {
+                    "id": "static-0",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                },
+                {
+                    "id": "static-1",
+                    "type": "text",
+                    "value": "defaultValue",
+                    "text": "Text Test Setting",
+                    "hint": "Text Test Setting Hint"
+                },
+                {
+                    "id": "static-2",
+                    "type": "bool",
+                    "value": false,
+                    "text": "Bool Test Setting 3",
+                    "hint": "Bool Test Setting Hint 3"
+                }
+            ]
+        }
+    ]
+}

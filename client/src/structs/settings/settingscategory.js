@@ -9,14 +9,22 @@
  */
 
 import Setting from './setting';
+import BaseSetting from './types/basesetting';
 import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
-export default class SettingsCategory {
+export default class SettingsCategory extends AsyncEventEmitter {
 
     constructor(args, ...merge) {
-        this.emitter = new AsyncEventEmitter();
-        this.args = args.args || args;
+        super();
+
+        if (typeof args === 'string')
+            args = {id: args};
+        this.args = args.args || args || {};
+
+        this.args.id = this.args.id || this.args.category || 'default';
+        this.args.name = this.args.name || this.args.category_name || this.id;
+        this.type = this.args.type;
 
         this.args.settings = this.settings.map(setting => new Setting(setting));
 
@@ -24,17 +32,12 @@ export default class SettingsCategory {
             this._merge(newCategory);
         }
 
+        this.__settingUpdated = this.__settingUpdated.bind(this);
+        this.__settingsUpdated = this.__settingsUpdated.bind(this);
+
         for (let setting of this.settings) {
-            setting.on('setting-updated', ({ value, old_value }) => this.emit('setting-updated', new SettingUpdatedEvent({
-                category: this, category_id: this.id,
-                setting, setting_id: setting.id,
-                value, old_value
-            })));
-            setting.on('settings-updated', ({ updatedSettings }) => this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
-                    category: this, category_id: this.id
-                }, updatedSetting)))
-            })));
+            setting.on('setting-updated', this.__settingUpdated);
+            setting.on('settings-updated', this.__settingsUpdated);
         }
     }
 
@@ -53,11 +56,15 @@ export default class SettingsCategory {
      * Category name
      */
     get name() {
-        return this.args.category_name;
+        return this.args.name || this.args.category_name;
     }
 
     get category_name() {
         return this.name;
+    }
+
+    set name(value) {
+        this.args.name = value;
     }
 
     /**
@@ -66,6 +73,13 @@ export default class SettingsCategory {
      */
     get type() {
         return this.args.type;
+    }
+
+    set type(value) {
+        if (!value) this.args.type = undefined;
+        else if (value === 'drawer' || value === 'static')
+            this.args.type = value;
+        else throw {message: `Invalid category type ${value}`};
     }
 
     /**
@@ -81,6 +95,82 @@ export default class SettingsCategory {
     get changed() {
         if (this.settings.find(setting => setting.changed)) return true;
         return false;
+    }
+
+    /**
+     * Setting event listeners.
+     * This only exists for use by the constructor and settingscategory.addSetting.
+     */
+    __settingUpdated({ setting, value, old_value }) {
+        return this.emit('setting-updated', new SettingUpdatedEvent({
+            category: this, category_id: this.id,
+            setting, setting_id: setting.id,
+            value, old_value
+        }));
+    }
+
+    __settingsUpdated({ updatedSettings }) {
+        return this.emit('settings-updated', new SettingsUpdatedEvent({
+            updatedSettings: updatedSettings.map(updatedSetting => new SettingUpdatedEvent(Object.assign({
+                category: this, category_id: this.id
+            }, updatedSetting)))
+        }));
+    }
+
+    /**
+     * Dynamically adds a setting to this category.
+     * @param {Setting} category The setting to add to this category
+     * @param {Number} index The index to add the setting at (optional)
+     * @return {Promise}
+     */
+    async addSetting(setting, index) {
+        if (this.settings.find(s => s === setting)) return;
+
+        if (!(setting instanceof BaseSetting))
+            setting = new Setting(setting);
+
+        if (this.getSetting(setting.id))
+            throw {message: 'A setting with this ID already exists.'};
+
+        setting.on('setting-updated', this.__settingUpdated);
+        setting.on('settings-updated', this.__settingsUpdated);
+
+        if (index === undefined) index = this.settings.length;
+        this.settings.splice(index, 0, setting);
+
+        const event = {
+            category: this, category_id: this.id,
+            setting, setting_id: setting.id,
+            at_index: index
+        };
+
+        await setting.emit('added-to', event);
+        await this.emit('added-setting', event);
+        return setting;
+    }
+
+    /**
+     * Dynamically removes a setting from this category.
+     * @param {Setting} setting The setting to remove from this category
+     * @return {Promise}
+     */
+    async removeSetting(setting) {
+        setting.off('setting-updated', this.__settingUpdated);
+        setting.off('settings-updated', this.__settingsUpdated);
+
+        let index;
+        while ((index = this.settings.findIndex(s => s === setting)) > -1) {
+            this.settings.splice(index, 0);
+        }
+
+        const event = {
+            set: this, set_id: this.id,
+            category: this, category_id: this.id,
+            from_index: index
+        };
+
+        await setting.emit('removed-from', event);
+        await this.emit('removed-category', event);
     }
 
     /**
@@ -107,7 +197,7 @@ export default class SettingsCategory {
      * @return {Setting}
      */
     getSetting(id) {
-        return this.findSetting(setting => setting.id === id);
+        return this.find(setting => setting.id === id);
     }
 
     /**
@@ -203,9 +293,5 @@ export default class SettingsCategory {
             settings: this.settings.map(setting => setting.clone())
         }, ...merge);
     }
-
-    on(...args) { return this.emitter.on(...args); }
-    off(...args) { return this.emitter.removeListener(...args); }
-    emit(...args) { return this.emitter.emit(...args); }
 
 }

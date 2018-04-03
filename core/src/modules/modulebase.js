@@ -8,17 +8,16 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-/*
-Base Module that every non-static module should extend
-*/
-
+/**
+ * Base Module that every non-static module should extend.
+ */
 class Module {
 
     constructor(args) {
         this.__ = {
             state: args || {},
             args
-        }
+        };
         this.init();
     }
 

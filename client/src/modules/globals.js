@@ -8,14 +8,18 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import sparkplug from 'sparkplug';
+import { ClientIPC } from 'common';
 import Module from './module';
 import Events from './events';
-import { ClientIPC } from 'bdipc';
 
 export default new class extends Module {
 
     constructor(args) {
         super(args);
+    }
+
+    initg() {
         this.first();
     }
 
@@ -25,28 +29,24 @@ export default new class extends Module {
         this.getObject = this.getObject.bind(this);
     }
 
-    first() {
-        (async() => {
-            const config = await ClientIPC.send('getConfig');
-            this.setState(config);
+    async first() {
+        const config = await ClientIPC.send('getConfig');
+        this.setState({ config });
 
-            // This is for Discord to stop error reporting :3
-            window.BetterDiscord = {
-                'version': config.version,
-                'v': config.version
-            };
-            window.jQuery = {};
+        // This is for Discord to stop error reporting :3
+        window.BetterDiscord = {
+            version: config.version,
+            v: config.version
+        };
+        window.jQuery = {};
 
-            if (window.__bd) {
-                this.setState(window.__bd);
-                window.__bd = {
-                    setWS: this.setWS
-                }
-            }
+        if (sparkplug.bd) {
+            this.setState({ bd: sparkplug.bd });
+            sparkplug.bd.setWS = this.setWS;
+        }
 
-            Events.emit('global-ready');
-            Events.emit('socket-created', this.state.wsHook);
-        })();
+        Events.emit('global-ready');
+        Events.emit('socket-created', this.state.wsHook);
     }
 
     setWS(wSocket) {
@@ -57,7 +57,43 @@ export default new class extends Module {
     }
 
     getObject(name) {
-        return this.state[name];
+        return this.config[name] || this.bd[name];
+    }
+
+    get bd() {
+        return this.state.bd;
+    }
+
+    get localStorage() {
+        return this.bd.localStorage;
+    }
+
+    get webSocket() {
+        return this.bd.wsHook;
+    }
+
+    get WebSocket() {
+        return this.bd.wsOrig;
+    }
+
+    get ignited() {
+        return this.bd.ignited;
+    }
+
+    get config() {
+        return this.state.config;
+    }
+
+    get paths() {
+        return this.config.paths;
+    }
+
+    getPath(id) {
+        return this.paths.find(path => path.id === id).path;
+    }
+
+    get version() {
+        return this.config.version;
     }
 
 }

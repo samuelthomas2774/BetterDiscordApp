@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-class Filters {
+export class Filters {
     static byProperties(props, selector = m => m) {
         return module => {
             const component = selector(module);
@@ -51,6 +51,8 @@ const KnownModules = {
     React: Filters.byProperties(['createElement', 'cloneElement']),
     ReactDOM: Filters.byProperties(['render', 'findDOMNode']),
 
+    Events: Filters.byPrototypeFields(['setMaxListeners', 'emit']),
+
     /* Guild Info, Stores, and Utilities */
     GuildStore: Filters.byProperties(['getGuild']),
     SortedGuildStore: Filters.byProperties(['getSortedGuilds']),
@@ -68,6 +70,8 @@ const KnownModules = {
     ChannelStore: Filters.byProperties(['getChannels', 'getDMFromUserId']),
     SelectedChannelStore: Filters.byProperties(['getLastSelectedChannelId']),
     ChannelActions: Filters.byProperties(["selectChannel"]),
+    PrivateChannelActions: Filters.byProperties(["openPrivateChannel"]),
+    ChannelSelector: Filters.byProperties(["selectGuild", "selectChannel"]),
 
     /* Current User Info, State and Settings */
     UserInfoStore: Filters.byProperties(["getToken"]),
@@ -77,6 +81,7 @@ const KnownModules = {
     OnlineWatcher: Filters.byProperties(['isOnline']),
     CurrentUserIdle: Filters.byProperties(['getIdleTime']),
     RelationshipStore: Filters.byProperties(['isBlocked']),
+    RelationshipManager: Filters.byProperties(['addRelationship']),
     MentionStore: Filters.byProperties(["getMentions"]),
 
     /* User Stores and Utils */
@@ -86,17 +91,15 @@ const KnownModules = {
     UserActivityStore: Filters.byProperties(['getActivity']),
     UserNameResolver: Filters.byProperties(['getName']),
 
-
     /* Emoji Store and Utils */
     EmojiInfo: Filters.byProperties(['isEmojiDisabled']),
-    EmojiUtils: Filters.byProperties(['diversitySurrogate']),
+    EmojiUtils: Filters.byProperties(['getGuildEmoji']),
     EmojiStore: Filters.byProperties(['getByCategory', 'EMOJI_NAME_RE']),
 
     /* Invite Store and Utils */
     InviteStore: Filters.byProperties(["getInvites"]),
     InviteResolver: Filters.byProperties(['findInvite']),
     InviteActions: Filters.byProperties(['acceptInvite']),
-
 
     /* Discord Objects & Utils */
     DiscordConstants: Filters.byProperties(["Permissions", "ActivityTypes", "StatusTypes"]),
@@ -106,9 +109,10 @@ const KnownModules = {
     ClassResolver: Filters.byProperties(["getClass"]),
     ButtonData: Filters.byProperties(["ButtonSizes"]),
     IconNames: Filters.byProperties(["IconNames"]),
+    NavigationUtils: Filters.byProperties(['transitionTo', 'replaceWith', 'getHistory']),
 
     /* Discord Messages */
-    HistoryUtils: Filters.byProperties(['transitionTo', 'replaceWith', 'getHistory']),
+    MessageStore: Filters.byProperties(['getMessages']),
     MessageActions: Filters.byProperties(['jumpToMessage', '_sendMessage']),
     MessageQueue: Filters.byProperties(['enqueue']),
     MessageParser: Filters.byProperties(['createMessage', 'parse', 'unparse']),
@@ -121,7 +125,6 @@ const KnownModules = {
     ExperimentStore: Filters.byProperties(['getExperimentOverrides']),
     ExperimentsManager: Filters.byProperties(['isDeveloper']),
     CurrentExperiment: Filters.byProperties(['getExperimentId']),
-
 
     /* Images, Avatars and Utils */
     ImageResolver: Filters.byProperties(["getUserAvatarURL"]),
@@ -176,7 +179,6 @@ const KnownModules = {
     URLParser: Filters.byProperties(['Url', 'parse']),
     ExtraURLs: Filters.byProperties(['getArticleURL']),
 
-
     /* DOM/React Components */
     /* ==================== */
     UserSettingsWindow: Filters.byProperties(['open', 'updateAccount']),
@@ -201,31 +203,14 @@ const KnownModules = {
     ExternalLink: Filters.byCode(/\.trusted\b/)
 };
 
-export default class {
-    /* Synchronous */
-    static getModuleByName(name, fallback) {
-        if (Cache.hasOwnProperty(name)) return Cache[name];
-        if (KnownModules.hasOwnProperty(name)) fallback = KnownModules[name];
-        if (!fallback) return null;
-        return Cache[name] = this.getModule(fallback, true);
-    }
+export class WebpackModules {
 
-    static getModuleByDisplayName(name) {
-        return this.getModule(Filters.byDisplayName(name), true);
-    }
-
-    static getModuleByRegex(regex, first = true) {
-        return this.getModule(Filters.byCode(regex), first);
-    }
-
-    static getModuleByPrototypes(prototypes, first = true) {
-        return this.getModule(Filters.byPrototypeFields(prototypes), first);
-    }
-
-    static getModuleByProps(props, first = true) {
-        return this.getModule(Filters.byProperties(props), first);
-    }
-
+    /**
+     * Finds a module using a filter function.
+     * @param {Function} filter A function to use to filter modules
+     * @param {Boolean} first Whether to return only the first matching module
+     * @return {Any}
+     */
     static getModule(filter, first = true) {
         const modules = this.getAllModules();
         const rm = [];
@@ -242,19 +227,90 @@ export default class {
             if (first) return foundModule;
             rm.push(foundModule);
         }
-        return first || rm.length == 0 ? null : rm;
+        return first || rm.length == 0 ? undefined : rm;
     }
 
-    static getAllModules() {
+    /**
+     * Finds a module by it's name.
+     * @param {String} name The name of the module
+     * @param {Function} fallback A function to use to filter modules if not finding a known module
+     * @return {Any}
+     */
+    static getModuleByName(name, fallback) {
+        if (Cache.hasOwnProperty(name)) return Cache[name];
+        if (KnownModules.hasOwnProperty(name)) fallback = KnownModules[name];
+        if (!fallback) return undefined;
+        const module = this.getModule(fallback, true);
+        return module ? Cache[name] = module : undefined;
+    }
+
+    /**
+     * Finds a module by it's display name.
+     * @param {String} name The display name of the module
+     * @return {Any}
+     */
+    static getModuleByDisplayName(name) {
+        return this.getModule(Filters.byDisplayName(name), true);
+    }
+
+    /**
+     * Finds a module using it's code.
+     * @param {RegEx} regex A regular expression to use to filter modules
+     * @param {Boolean} first Whether to return the only the first matching module
+     * @return {Any}
+     */
+    static getModuleByRegex(regex, first = true) {
+        return this.getModule(Filters.byCode(regex), first);
+    }
+
+    /**
+     * Finds a module using properties on it's prototype.
+     * @param {Array} props Properties to use to filter modules
+     * @param {Boolean} first Whether to return only the first matching module
+     * @return {Any}
+     */
+    static getModuleByPrototypes(prototypes, first = true) {
+        return this.getModule(Filters.byPrototypeFields(prototypes), first);
+    }
+
+    /**
+     * Finds a module using it's own properties.
+     * @param {Array} props Properties to use to filter modules
+     * @param {Boolean} first Whether to return only the first matching module
+     * @return {Any}
+     */
+    static getModuleByProps(props, first = true) {
+        return this.getModule(Filters.byProperties(props), first);
+    }
+
+    /**
+     * Discord's __webpack_require__ function.
+     */
+    static get require() {
+        if (this._require) return this._require;
         const id = 'bd-webpackmodules';
-        const __webpack_require__ = window['webpackJsonp'](
-            [],
-            {
-                [id]: (module, exports, __webpack_require__) => exports.default = __webpack_require__
-            },
-            [id]).default;
+        const __webpack_require__ = window['webpackJsonp']([], {
+            [id]: (module, exports, __webpack_require__) => exports.default = __webpack_require__
+        }, [id]).default;
         delete __webpack_require__.m[id];
         delete __webpack_require__.c[id];
-        return __webpack_require__.c;
+        return this._require = __webpack_require__;
     }
+
+    /**
+     * Returns all loaded modules.
+     * @return {Array}
+     */
+    static getAllModules() {
+        return this.require.c;
+    }
+
+    /**
+     * Returns an array of known modules.
+     * @return {Array}
+     */
+    static listKnownModules() {
+        return Object.keys(KnownModules);
+    }
+
 }

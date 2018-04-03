@@ -1,12 +1,14 @@
+.bd-setting-switch,
 .bd-form-textinput,
 .bd-form-textarea,
-.bd-form-fileinput,
+.bd-form-numberinput,
 .bd-form-dropdown,
 .bd-form-radio,
-.bd-form-numberinput,
 .bd-form-slider,
 .bd-form-colourpicker,
-.bd-setting-switch,
+.bd-form-keybind,
+.bd-form-fileinput,
+.bd-form-guildinput,
 .bd-form-settingsarray {
     .bd-title {
         display: flex;
@@ -43,7 +45,18 @@
         margin-top: 0;
     }
 
-    > .bd-drawer {
+    > .bd-form-customsetting-value {
         margin-bottom: 0;
+
+        .bd-form-textarea-details {
+            margin-top: 15px;
+        }
+
+        .bd-button {
+            margin-top: 10px;
+            padding: 5px 8px;
+            border-radius: 2px;
+            font-size: 14px;
+        }
     }
 }

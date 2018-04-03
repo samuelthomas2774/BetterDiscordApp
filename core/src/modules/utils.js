@@ -8,43 +8,38 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const
-    path = require('path'),
-    fs = require('fs');
+// TODO Use common
+
+const path = require('path');
+const fs = require('fs');
 
 const { Module } = require('./modulebase');
+const { BDIpc } = require('./bdipc');
 
 class Utils {
-
     static async tryParseJson(jsonString) {
         try {
             return JSON.parse(jsonString);
-        }catch(err) {
+        } catch (err) {
             throw ({
-                'message': 'Failed to parse json',
+                message: 'Failed to parse json',
                 err
             });
         }
     }
-
-    static get timestamp() {
-        return 'Timestamp';
-    }
-
 }
 
 class FileUtils {
-
     static async fileExists(path) {
         return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if(err) return reject({
-                    'message': `No such file or directory: ${err.path}`,
+                    message: `No such file or directory: ${err.path}`,
                     err
                 });
 
                 if(!stats.isFile()) return reject({
-                    'message': `Not a file: ${path}`,
+                    message: `Not a file: ${path}`,
                     stats
                 });
 
@@ -57,12 +52,12 @@ class FileUtils {
         return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
                 if(err) return reject({
-                    'message': `Directory does not exist: ${path}`,
+                    message: `Directory does not exist: ${path}`,
                     err
                 });
 
                 if(!stats.isDirectory()) return reject({
-                    'message': `Not a directory: ${path}`,
+                    message: `Not a directory: ${path}`,
                     stats
                 });
 
@@ -74,14 +69,14 @@ class FileUtils {
     static async readFile(path) {
         try {
             await this.fileExists(path);
-        } catch(err) {
-            throw(err);
+        } catch (err) {
+            throw err;
         }
 
         return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf-8', (err, data) => {
-                if(err) reject({
-                    'message': `Could not read file: ${path}`,
+                if(err) return reject({
+                    message: `Could not read file: ${path}`,
                     err
                 });
 
@@ -95,20 +90,75 @@ class FileUtils {
         try {
             readFile = await this.readFile(path);
         } catch(err) {
-            throw(err);
+            throw err;
         }
 
         try {
-            const parsed = await Utils.tryParseJson(readFile);
-            return parsed;
-        } catch(err) {
-            throw(Object.assign(err, { path }));
+            return await Utils.tryParseJson(readFile);
+        } catch (err) {
+            throw Object.assign(err, { path });
+        }
+    }
+
+    static async listDirectory(path) {
+        try {
+            await this.directoryExists(path);
+            return new Promise((resolve, reject) => {
+                fs.readdir(path, (err, files) => {
+                    if (err) reject(err);
+                    else resolve(files);
+                });
+            });
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    static filterFiles(files, filter, map) {
+        if (!map) return files.filter(filter);
+        return files.filter(filter).map(map);
+    }
+
+    static resolveLatest(files, filter, map, prefix, suffix) {
+        let latest = null;
+        for (const file of this.filterFiles(files, filter, map)) {
+            const [major, minor, revision] = file.split('.');
+            if (!major || !minor || !revision) continue;
+            if (!latest) {
+                latest = file;
+                continue;
+            }
+
+            latest = file > latest ? file : latest;
+        }
+        return (prefix && suffix) ? `${prefix}${latest}${suffix}` : latest;
+    }
+
+    static async createDirectory(path) {
+        return new Promise((resolve, reject) => {
+            fs.mkdir(path, err => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
+    static async ensureDirectory(path) {
+        try {
+            await this.directoryExists(path);
+            return true;
+        } catch (err) {
+            try {
+                await this.createDirectory(path);
+                return true;
+            } catch (err) {
+                throw err;
+            }
         }
     }
 }
 
 class WindowUtils extends Module {
-
     bindings() {
         this.openDevTools = this.openDevTools.bind(this);
         this.executeJavascript = this.executeJavascript.bind(this);
@@ -128,28 +178,32 @@ class WindowUtils extends Module {
     }
 
     executeJavascript(script) {
-        this.webContents.executeJavaScript(script);
+        return this.webContents.executeJavaScript(script);
     }
 
     injectScript(fpath, variable) {
-        console.log(`Injecting: ${fpath}`);
+        return WindowUtils.injectScript(this.window, fpath, variable);
+    }
+
+    static injectScript(window, fpath, variable) {
+        window = window.webContents || window;
+        if (!window) return;
+        // console.log(`Injecting: ${fpath} to`, window);
 
         const escaped_path = fpath.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
         const escaped_variable = variable ? variable.replace(/\\/g, '\\\\').replace(/"/g, '\\"') : null;
 
-        if (variable) this.executeJavascript(`window["${escaped_variable}"] = require("${escaped_path}");`);
-        else this.executeJavascript(`require("${escaped_path}");`);
+        if (variable) return window.executeJavaScript(`window["${escaped_variable}"] = require("${escaped_path}");`);
+        else return window.executeJavaScript(`require("${escaped_path}");`);
     }
 
-    events(event, callback) {
+    on(event, callback) {
         this.webContents.on(event, callback);
     }
 
     send(channel, message) {
-        channel = channel.startsWith('bd-') ? channel : `bd-${channel}`;
-        this.webContents.send(channel, message);
+        return BDIpc.send(this.window, channel, message);
     }
-
 }
 
 module.exports = {

@@ -17,13 +17,14 @@
             </span>
         </div>
         <div class="bd-dropdown-options bd-flex bd-flex-col" ref="options" v-if="active">
-            <div class="bd-dropdown-option" v-for="option in options" :class="{'bd-dropdown-option-selected': selected === option.value}" @click="change(option.value); active = false">{{ option.text }}</div>
+            <div class="bd-dropdown-option" v-for="option in options" :class="{'bd-dropdown-option-selected': selected === option.value}" @click="select(option)">{{ option.text }}</div>
         </div>
     </div>
 </template>
+
 <script>
     export default {
-        props: ['options', 'selected', 'disabled', 'change'],
+        props: ['options', 'value', 'disabled'],
         data() {
             return {
                 active: false
@@ -33,10 +34,14 @@
             getSelectedText() {
                 const selected_option = this.options.find(option => option.value === this.selected);
                 return selected_option ? selected_option.text : this.selected;
+            },
+            select(option) {
+                this.$emit('input', option.value);
+                this.active = false;
             }
         },
         mounted() {
-            document.addEventListener("click", e => {
+            document.addEventListener('click', e => {
                 let options = this.$refs.options;
                 if (options && !options.contains(e.target) && options !== e.target) {
                     this.active = false;

@@ -17,14 +17,23 @@ export default class Event {
         };
     }
 
+    /**
+     * An object containing information about the event.
+     */
     get event() {
         return this.__eventInfo;
     }
 
+    /**
+     * The first argument that was passed to the constructor, which contains information about the event.
+     */
     get args() {
         return this.event.args[0];
     }
 
-    get __eventType() { return null; }
+    /**
+     * The type of event.
+     */
+    get __eventType() { return undefined; }
 
 }

@@ -1,0 +1,67 @@
+.bd-profile-badges-wrap {
+    display: inline-flex;
+    margin-top: 8px;
+    flex: 1 1 auto;
+
+    + [class*="profileBadges"] {
+        display: inline-flex;
+    }
+}
+
+.bd-profile-badges {
+    display: flex;
+}
+
+.bd-profile-badge {
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    cursor: pointer;
+    height: 16px;
+    margin-right: 6px;
+}
+
+.bd-profile-badge-developer,
+.bd-profile-badge-contributor,
+.bd-message-badge-developer,
+.bd-message-badge-contributor {
+    background-image: $logoSmallBw;
+    width: 16px;
+    filter: brightness(10);
+    cursor: pointer;
+}
+
+.theme-light [class*="topSectionNormal-"] .bd-profile-badge-developer,
+.theme-light [class*="topSectionNormal-"] .bd-profile-badge-contributor,
+.theme-light .bd-message-badge-developer,
+.theme-light .bd-message-badge-contributor {
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FscXVlXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjAwMCAyMDAwIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyMDAwIDIwMDAiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnPjxwYXRoIGZpbGw9IiMzRTgyRTUiIGQ9Ik0xNDAyLjIsNjMxLjdjLTkuNy0zNTMuNC0yODYuMi00OTYtNjQyLjYtNDk2SDY4LjR2NzE0LjFsNDQyLDM5OFY0OTAuN2gyNTdjMjc0LjUsMCwyNzQuNSwzNDQuOSwwLDM0NC45SDU5Ny42djMyOS41aDE2OS44YzI3NC41LDAsMjc0LjUsMzQ0LjgsMCwzNDQuOGgtNjk5djM1NC45aDY5MS4yYzM1Ni4zLDAsNjMyLjgtMTQyLjYsNjQyLjYtNDk2YzAtMTYyLjYtNDQuNS0yODQuMS0xMjIuOS0zNjguNkMxMzU3LjcsOTE1LjgsMTQwMi4yLDc5NC4zLDE0MDIuMiw2MzEuN3oiLz48cGF0aCBmaWxsPSIjYmJiYmJiIiBkPSJNMTI2Mi41LDEzNS4yTDEyNjIuNSwxMzUuMmwtNzYuOCwwYzI2LjYsMTMuMyw1MS43LDI4LjEsNzUsNDQuM2M3MC43LDQ5LjEsMTI2LjEsMTExLjUsMTY0LjYsMTg1LjNjMzkuOSw3Ni42LDYxLjUsMTY1LjYsNjQuMywyNjQuNmwwLDEuMnYxLjJjMCwxNDEuMSwwLDU5Ni4xLDAsNzM3LjF2MS4ybDAsMS4yYy0yLjcsOTktMjQuMywxODgtNjQuMywyNjQuNmMtMzguNSw3My44LTkzLjgsMTM2LjItMTY0LjYsMTg1LjNjLTIyLjYsMTUuNy00Ni45LDMwLjEtNzIuNiw0My4xaDcyLjVjMzQ2LjIsMS45LDY3MS0xNzEuMiw2NzEtNTY3LjlWNzE2LjdDMTkzMy41LDMxMi4yLDE2MDguNywxMzUuMiwxMjYyLjUsMTM1LjJ6Ii8+PC9nPjwvc3ZnPg==');
+    filter: none;
+}
+
+.bd-message-badges-wrap {
+    display: inline-block;
+    margin-left: 6px;
+    height: 11px;
+
+    .bd-message-badge-developer,
+    .bd-message-badge-contributor {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+.member-username .bd-message-badges-wrap {
+    display: inline-block;
+    height: 17px;
+    width: 14px;
+
+    .bd-message-badge-developer,
+    .bd-message-badge-contributor {
+        width: 14px;
+        height: 16px;
+        background-position: center;
+        background-size: 12px 12px;
+        background-repeat: no-repeat;
+    }
+}

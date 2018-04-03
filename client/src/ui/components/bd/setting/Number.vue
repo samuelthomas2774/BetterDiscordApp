@@ -13,29 +13,30 @@
         <div class="bd-title">
             <h3 v-if="setting.text">{{setting.text}}</h3>
             <div class="bd-number">
-                <input type="number" :value="setting.value / setting.multi" :min="setting.min" :max="setting.max" :step="setting.step" @keyup.stop @input="input"/>
+                <input type="number" :value="setting.value / setting.multi" :min="setting.min" :max="setting.max" :step="setting.step" @keyup.stop @input="input" />
                 <div class="bd-number-spinner bd-flex bd-flex-col">
-                    <div class="bd-arrow" @click="changeBy(true)"><div class="bd-up-arrow"></div></div>
-                    <div class="bd-arrow" @click="changeBy(false)"><div class="bd-down-arrow"></div></div>
+                    <div class="bd-arrow" @click="changeBy(1)"><div class="bd-up-arrow"></div></div>
+                    <div class="bd-arrow" @click="changeBy(-1)"><div class="bd-down-arrow"></div></div>
                 </div>
             </div>
         </div>
         <div class="bd-hint">{{setting.hint}}</div>
     </div>
 </template>
+
 <script>
     export default {
-        props: ['setting', 'change'],
+        props: ['setting'],
         methods: {
             input(e) {
                 let number = parseFloat(e.target.value)
                 if (Number.isNaN(number)) return;
 
-                this.change(number * this.setting.multi);
+                this.setting.value = number * this.setting.multi;
             },
-            changeBy(positive) {
-                let step = this.setting.step == undefined ? 1 : this.settings.step;
-                this.change((this.setting.value + (positive ? step : -step)) * this.setting.multi);
+            changeBy(change) {
+                let step = this.setting.step === undefined ? 1 : this.settings.step;
+                this.setting.value = (this.setting.value + (change * step)) * this.setting.multi;
             },
             handleWheel() {} // No idea why this works but it does
         },

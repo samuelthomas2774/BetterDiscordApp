@@ -162,29 +162,29 @@ class AppMenu extends Module {
                 {type: 'separator'},
                 {
                     label: 'Show Core Settings',
-                    click: () => this.focusAndSend('bd-show-menu', 'core')
+                    click: () => this.focusAndSend('bd-open-menu', 'core')
                 },
                 {
                     label: 'Show UI Settings',
-                    click: () => this.focusAndSend('bd-show-menu', 'ui')
+                    click: () => this.focusAndSend('bd-open-menu', 'ui')
                 },
                 {
                     label: 'Show Emote Settings',
-                    click: () => this.focusAndSend('bd-show-menu', 'emotes')
+                    click: () => this.focusAndSend('bd-open-menu', 'emotes')
                 },
                 {
                     label: 'Show CSS Editor',
-                    click: () => this.focusAndSend('bd-show-menu', 'css'),
+                    click: () => this.focusAndSend('bd-open-menu', 'css'),
                     accelerator: process.platform === 'darwin' ? 'Cmd+S' : 'Ctrl+S'
                 },
                 {type: 'separator'},
                 {
                     label: 'Show Plugins',
-                    click: () => this.focusAndSend('bd-show-menu', 'plugins')
+                    click: () => this.focusAndSend('bd-open-menu', 'plugins')
                 },
                 {
                     label: 'Show Themes',
-                    click: () => this.focusAndSend('bd-show-menu', 'themes')
+                    click: () => this.focusAndSend('bd-open-menu', 'themes')
                 }
             ]
         });
@@ -262,11 +262,15 @@ class AppMenu extends Module {
 
     focusAndSend(event, data) {
         this.webContents.focus();
-        this.webContents.send(event, data);
+        return BDIpc.send(this.window, event, data);
     }
 
     get windowUtils() {
         return this.state.windowUtils;
+    }
+
+    get window() {
+        return this.windowUtils.window;
     }
 
     get webContents() {

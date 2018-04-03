@@ -63,6 +63,7 @@
         },
         created() {
             Events.on('ready', e => this.loaded = true);
+            Events.on('bd-toggle-menu', () => this.active = !this.active);
             Events.on('bd-open-menu', item => this.active = true);
             Events.on('bd-close-menu', () => this.active = false);
             Events.on('update-check-start', e => this.updating = 0);

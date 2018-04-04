@@ -34,13 +34,7 @@ export default new class EmoteModule {
 
         const dataPath = Globals.getPath('data');
         try {
-            const emotes = await FileUtils.readJsonFromFile(path.join(dataPath, 'emotes.json'));
-            for (let emote of emotes) {
-                const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
-                emote.name = emote.id;
-                emote.src = uri.replace(':id', emote.value.id || emote.value);
-                this.emotes.set(emote.id, emote);
-            }
+            await this.load(path.join(dataPath));
         } catch (err) {
             Logger.err('EmoteModule', [`Failed to load emote data. Make sure you've downloaded the emote data and placed it in ${dataPath}:`, err]);
             return;
@@ -50,6 +44,20 @@ export default new class EmoteModule {
             await this.observe();
         } catch (err) {
             Logger.err('EmoteModule', ['Error patching Message', err]);
+        }
+    }
+
+    async load(dataPath) {
+        const emotes = await FileUtils.readJsonFromFile(path.join(dataPath, 'emotes.json'));
+        for (let [index, emote] of emotes.entries()) {
+            // Pause every 10000 emotes so the window doesn't freeze
+            if ((index % 10000) === 0)
+                await new Promise(r => setTimeout(r, 0));
+
+            const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
+            emote.name = emote.id;
+            emote.src = uri.replace(':id', emote.value.id || emote.value);
+            this.emotes.set(emote.id, emote);
         }
     }
 

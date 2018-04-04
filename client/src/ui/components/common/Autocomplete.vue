@@ -113,11 +113,11 @@
             traverse(e) {
                 if (!this.open) return;
                 if (e.key === 'ArrowUp') {
-                    this.selectedIndex = (this.selectedIndex - 1) < 0 ? 9 : this.selectedIndex - 1;
+                    this.selectedIndex = (this.selectedIndex - 1) < 0 ? Math.min(this.emotes.length, 10) - 1 : this.selectedIndex - 1;
                     return;
                 }
                 if (e.key === 'ArrowDown') {
-                    this.selectedIndex = (this.selectedIndex + 1) >= 10 ? 0 : this.selectedIndex + 1;
+                    this.selectedIndex = (this.selectedIndex + 1) >= Math.min(this.emotes.length, 10) ? 0 : this.selectedIndex + 1;
                     return;
                 }
                 return;

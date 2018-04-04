@@ -36,7 +36,7 @@
 
 <script>
     import { EmoteModule } from 'builtin';
-    import { Events } from 'modules';
+    import { Events, Settings } from 'modules';
     import { DOM } from 'ui';
     import { MiStar } from './MaterialIcon';
 
@@ -62,20 +62,33 @@
             // this.open = this.emotes.length;
         },
         created() {
-            window.addEventListener('keydown', this.prevents);
-            const ta = document.querySelector('.chat textarea');
-            if(!ta) return;
-            ta.addEventListener('keydown', this.setCaret);
-            ta.addEventListener('keyup', this.searchEmotes);
+            const enabled = Settings.getSetting('emotes', 'default', 'enable');
+            enabled.on('setting-updated', event => {
+                if (event.value) return this.addEventListeners();
+                this.removeEventListeners();
+                this.reset();
+            });
+
+            if (enabled.value) this.addEventListeners();
         },
         destroyed() {
-            window.removeEventListener('keydown', this.prevents);
-            const ta = document.querySelector('.chat textarea');
-            if (!ta) return;
-            ta.removeEventListener('keydown', this.setCaret);
-            ta.removeEventListener('keyup', this.searchEmotes);
+            this.removeEventListeners();
         },
         methods: {
+            addEventListeners() {
+                window.addEventListener('keydown', this.prevents);
+                const ta = document.querySelector('.chat textarea');
+                if (!ta) return;
+                ta.addEventListener('keydown', this.setCaret);
+                ta.addEventListener('keyup', this.searchEmotes);
+            },
+            removeEventListeners() {
+                window.removeEventListener('keydown', this.prevents);
+                const ta = document.querySelector('.chat textarea');
+                if (!ta) return;
+                ta.removeEventListener('keydown', this.setCaret);
+                ta.removeEventListener('keyup', this.searchEmotes);
+            },
             prevents(e) {
                 if (!this.open) return;
                 if (e.which === 27) this.reset();

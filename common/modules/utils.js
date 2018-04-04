@@ -32,7 +32,7 @@ export class Utils {
             return JSON.parse(jsonString);
         } catch (err) {
             throw ({
-                'message': 'Failed to parse json',
+                message: 'Failed to parse json',
                 err
             });
         }
@@ -158,6 +158,10 @@ export class Utils {
             configurable: true,
             enumerable: true
         });
+    }
+
+    static wait(time = 0) {
+        return new Promise(resolve => setTimeout(resolve, time));
     }
 
     static async until(check, time = 0) {

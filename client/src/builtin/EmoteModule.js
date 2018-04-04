@@ -61,6 +61,7 @@ export default new class EmoteModule {
      * @return {Promise}
      */
     setFavourite(emote, favourite, save = true) {
+        emote = emote.id || emote;
         if (favourite && !this.favourite_emotes.includes(emote)) this.favourite_emotes.push(emote);
         if (!favourite) Utils.removeFromArray(this.favourite_emotes, emote);
         if (save) return Settings.saveSettings();
@@ -75,6 +76,7 @@ export default new class EmoteModule {
     }
 
     isFavourite(emote) {
+        emote = emote.id || emote;
         return this.favourite_emotes.includes(emote);
     }
 

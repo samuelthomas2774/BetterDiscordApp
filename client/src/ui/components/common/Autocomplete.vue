@@ -20,10 +20,13 @@
                 </div>
             </div>
             <div v-for="(emote, index) in emotes" class="bd-autocomplete-row" :key="index">
-                <div class="bd-autocomplete-selector bd-selectable" :class="{'bd-selected': index === selectedIndex}" @mouseover="() => { selected = emote.id }" @click="() => inject(emote)">
+                <div class="bd-autocomplete-selector bd-selectable" :class="{'bd-selected': index === selectedIndex, 'bd-emote-favourite': isFavourite(emote)}" @mouseover="selected = emote.id" @click="inject(emote)">
                     <div class="bd-autocomplete-field">
-                        <img :src="getEmoteSrc(emote)"/>
-                        <div>{{emote.id}}</div>
+                        <img :src="emote.src" :alt="emote.name" />
+                        <div class="bd-flex-grow">{{emote.id}}</div>
+                        <div class="bd-emote-favourite-button" :class="{'bd-active': isFavourite(emote)}" @click.stop="toggleFavourite(emote)">
+                            <MiStar :size="16" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -35,10 +38,15 @@
     import { EmoteModule } from 'builtin';
     import { Events } from 'modules';
     import { DOM } from 'ui';
+    import { MiStar } from './MaterialIcon';
 
     export default {
+        components: {
+            MiStar
+        },
         data() {
             return {
+                EmoteModule,
                 emotes: [],
                 title: '',
                 selIndex: 0,
@@ -70,8 +78,9 @@
         methods: {
             prevents(e) {
                 if (!this.open) return;
-                if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Tab' && e.key !== 'Enter') return;
-                this.traverse(e);
+                if (e.which === 27) this.reset();
+                else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') this.traverse(e);
+                else if (e.key !== 'Tab' && e.key !== 'Enter') return;
                 e.stopPropagation();
                 e.preventDefault();
             },
@@ -84,8 +93,14 @@
                 const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
                 return uri.replace(':id', value);
             },
+            isFavourite(emote) {
+                return EmoteModule.isFavourite(emote);
+            },
+            toggleFavourite(emote) {
+                return EmoteModule.setFavourite(emote, !this.isFavourite(emote));
+            },
             searchEmotes(e) {
-                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') return;
+                if (e.which === 27 || e.key === 'ArrowDown' || e.key === 'ArrowUp') return;
                 if (e.key === 'Tab' || e.key === 'Enter' && this.open) {
                     const selected = this.emotes[this.selectedIndex];
                     if (!selected) return;

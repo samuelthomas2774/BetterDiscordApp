@@ -21,7 +21,10 @@
         vertical-align: -.4em;
         max-height: 32px;
     }
+}
 
+.bd-emotewrapper,
+.bd-autocomplete-selector {
     .bd-emote-favourite-button {
         display: none;
         width: 16px;
@@ -46,7 +49,20 @@
         }
     }
 
+    &.bd-selected .bd-emote-favourite-button,
     &:hover .bd-emote-favourite-button {
         display: block;
+    }
+}
+
+.bd-autocomplete-selector {
+    .bd-emote-favourite-button {
+        margin-left: 8px;
+        margin-right: 0;
+        opacity: .5;
+
+        &.bd-active {
+            display: block;
+        }
     }
 }

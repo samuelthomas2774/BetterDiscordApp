@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-autocomplete">
+    <div class="bd-autocomplete" :class="{'bd-active': emotes && emotes.length}">
         <div v-if="emotes && emotes.length" class="bd-autocomplete-inner">
             <div class="bd-autocomplete-row">
                 <div class="bd-autocomplete-selector">

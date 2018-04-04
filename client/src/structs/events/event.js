@@ -25,6 +25,13 @@ export default class Event {
     }
 
     /**
+     * Extra data associated with this event.
+     */
+    get data() {
+        return this.args.data;
+    }
+
+    /**
      * The first argument that was passed to the constructor, which contains information about the event.
      */
     get args() {

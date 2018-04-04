@@ -30,8 +30,8 @@ export default new class Settings {
                 Events.emit(`setting-updated-${set.id}_${category.id}_${setting.id}`, event);
             });
 
-            set.on('settings-updated', async (event) => {
-                await this.saveSettings();
+            set.on('settings-updated', async event => {
+                if (!event.data || !event.data.dont_save) await this.saveSettings();
                 Events.emit('settings-updated', event);
             });
 
@@ -43,6 +43,8 @@ export default new class Settings {
      * Loads BetterDiscord's settings.
      */
     async loadSettings() {
+        Logger.log('Settings', ['Loading settings']);
+
         try {
             await FileUtils.ensureDirectory(this.dataPath);
 
@@ -53,7 +55,7 @@ export default new class Settings {
             for (let set of this.settings) {
                 const newSet = settings.find(s => s.id === set.id);
                 if (!newSet) continue;
-                await set.merge(newSet);
+                await set.merge(newSet, {dont_save: true});
                 set.setSaved();
             }
 
@@ -71,6 +73,8 @@ export default new class Settings {
      * Saves BetterDiscord's settings including CSS editor data.
      */
     async saveSettings() {
+        Logger.log('Settings', ['Saving settings']);
+
         try {
             await FileUtils.ensureDirectory(this.dataPath);
 

@@ -412,7 +412,8 @@ export default class SettingsSet extends AsyncEventEmitter {
 
         if (emit_multi)
             await this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings
+                updatedSettings,
+                data: typeof emit_multi !== 'boolean' ? emit_multi : undefined
             }));
 
         return updatedSettings;

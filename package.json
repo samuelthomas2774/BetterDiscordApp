@@ -50,7 +50,7 @@
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
     "node-gyp": "^3.6.2",
-    "pump": "^2.0.0",
+    "pump": "^3.0.0",
     "sass-loader": "^6.0.6",
     "uglifyjs-webpack-plugin": "^1.2.4",
     "v-tooltip": "^2.0.0-rc.30",

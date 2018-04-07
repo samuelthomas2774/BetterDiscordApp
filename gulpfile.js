@@ -78,5 +78,5 @@ const node_sass_bindings = function() {
 };
 
 gulp.task('release', function () {
-    del(['./release/**/*']).then(() => merge(releasepkg(), client(), core(), sparkplug(), core_modules(), index(), cssEditor(), deps(), node_sass_bindings()));
+    return del(['./release/**/*']).then(() => merge(releasepkg(), client(), core(), sparkplug(), core_modules(), index(), cssEditor(), deps(), node_sass_bindings()));
 });

@@ -75,7 +75,7 @@ export default new class {
         if (sendSource)
             this.sendToEditor('set-scss', scss);
 
-        if (!scss) {
+        if (!scss && !await this.fileExists()) {
             this._scss = this.css = '';
             this.sendToEditor('scss-error', null);
             return;

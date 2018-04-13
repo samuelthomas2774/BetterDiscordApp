@@ -21,4 +21,4 @@ export { default as Module } from './module';
 export { default as EventListener } from './eventlistener';
 export { default as SocketProxy } from './socketproxy';
 export { default as EventHook } from './eventhook';
-export { default as DiscordApi } from './discordapi';
+export { default as DiscordApi, Modules as DiscordApiModules } from './discordapi';

@@ -3,9 +3,14 @@ import { DiscordApi, DiscordApiModules as Modules } from 'modules';
 import { Channel } from './channel';
 import { User } from './user';
 
+const messages = new WeakMap();
+
 export class Message {
 
     constructor(data) {
+        if (messages.has(data)) return messages.get(data);
+        messages.set(data, this);
+
         this.discordObject = data;
     }
 
@@ -61,7 +66,7 @@ export class Message {
      * @param {Boolean} parse Whether to parse the message or update it as it is
      */
     edit(content, parse = false) {
-        if (this.author.id !== DiscordApi.currentUser.id)
+        if (this.author !== DiscordApi.currentUser)
             throw new Error('Cannot edit messages sent by other users.');
         if (parse) Modules.MessageActions.editMessage(this.channel_id, this.id, Modules.MessageParser.parse(this.discordObject, content));
         else Modules.MessageActions.editMessage(this.channel_id, this.id, {content});
@@ -71,7 +76,7 @@ export class Message {
      * Start the edit mode of the UI.
      */
     startEdit() {
-        if (this.author.id !== DiscordApi.currentUser.id)
+        if (this.author !== DiscordApi.currentUser)
             throw new Error('Cannot edit messages sent by other users.');
         Modules.MessageActions.startEditMessage(this.channel_id, this.id, this.content);
     }

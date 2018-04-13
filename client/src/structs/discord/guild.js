@@ -4,9 +4,14 @@ import { List } from 'structs';
 import { Channel } from './channel';
 import { GuildMember } from './user';
 
+const guilds = new WeakMap();
+
 export class Guild {
 
     constructor(data) {
+        if (guilds.has(data)) return guilds.get(data);
+        guilds.set(data, this);
+
         this.discordObject = data;
     }
 

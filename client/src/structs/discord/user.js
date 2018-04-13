@@ -4,9 +4,15 @@ import { List, InsufficientPermissions } from 'structs';
 import { Guild } from './guild';
 import { PrivateChannel } from './channel';
 
+const users = new WeakMap();
+
 export class User {
 
-    constructor(data) {
+    constructor(data, _wm) {
+        if (!_wm) _wm = users;
+        if (_wm.has(data)) return _wm.get(data);
+        _wm.set(data, this);
+
         this.discordObject = data;
     }
 
@@ -74,11 +80,13 @@ export class User {
 
 }
 
+const guild_members = new WeakMap();
+
 // TODO: don't extend User
 export class GuildMember extends User {
     constructor(data, guild_id) {
         const user = Modules.UserStore.getUser(data.userId);
-        super(user);
+        super(user, guild_members);
 
         this.member_data = data;
         this.guild_id = guild_id;

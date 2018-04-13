@@ -5,9 +5,14 @@ import { Guild } from './guild';
 import { Message } from './message';
 import { User, GuildMember } from './user';
 
+const channels = new WeakMap();
+
 export class Channel {
 
     constructor(data) {
+        if (channels.has(data)) return channels.get(data);
+        channels.set(data, this);
+
         this.discordObject = data;
     }
 

@@ -35,7 +35,11 @@ class BetterDiscord {
             WebpackModules, Patcher, MonkeyPatch, ReactComponents, DiscordApi,
             EmoteModule,
 
-            Logger, ClientIPC, Utils
+            Logger, ClientIPC, Utils,
+
+            plugins: PluginManager.localContent,
+            themes: ThemeManager.localContent,
+            extmodules: ExtModuleManager.localContent
         };
 
         const developermode = Settings.getSetting('core', 'advanced', 'developer-mode');

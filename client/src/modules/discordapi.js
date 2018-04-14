@@ -33,11 +33,16 @@ export const Modules = {
     get UserStore() { return this._getModule('UserStore'); },
     get RelationshipStore() { return this._getModule('RelationshipStore'); },
     get RelationshipManager() { return this._getModule('RelationshipManager'); },
+    get ChangeNicknameModal() { return this._getModule('ChangeNicknameModal'); },
     get UserSettingsStore() { return this._getModule('UserSettingsStore'); },
     get UserSettingsWindow() { return this._getModule('UserSettingsWindow'); },
     get UserStatusStore() { return this._getModule('UserStatusStore'); },
     get ChannelSettingsWindow() { return this._getModule('ChannelSettingsWindow'); },
     get GuildSettingsWindow() { return this._getModule('GuildSettingsWindow'); },
+    get CreateChannelModal() { return this._getModule('CreateChannelModal'); },
+    get PruneMembersModal() { return this._getModule('PruneMembersModal'); },
+    get NotificationSettingsModal() { return this._getModule('NotificationSettingsModal'); },
+    get PrivacySettingsModal() { return this._getModule('PrivacySettingsModal'); },
 
     get DiscordPermissions() { return this.DiscordConstants.Permissions; }
 };

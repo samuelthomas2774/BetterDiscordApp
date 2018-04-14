@@ -182,6 +182,36 @@ export class Guild {
         Modules.GuildSettingsWindow.setSection(section);
     }
 
+    /**
+     * Kicks members who don't have any roles and haven't been seen in the number of days passed.
+     * @param {Number} days
+     */
+    pruneMembers(days) {
+        Modules.PruneMembersModal.prune(this.id, days);
+    }
+
+    openPruneMumbersModal() {
+        Modules.PruneMembersModal.open(this.id);
+    }
+
+    /**
+     * Opens the create channel modal for this guild.
+     * @param {Number} type The type of channel to create - either 0 (text), 2 (voice) or 4 (category)
+     * @param {ChannelCategory} category The category to create the channel in
+     * @param {GuildChannel} clone A channel to clone permissions of
+     */
+    openCreateChannelModal(type = 0, category, clone) {
+        Modules.CreateChannelModal.open(type, this.id, category ? category.id : undefined, clone ? clone.id : undefined);
+    }
+
+    openNotificationSettingsModal() {
+        Modules.NotificationSettingsModal.open(this.id);
+    }
+
+    openPrivacySettingsModal() {
+        Modules.PrivacySettingsModal.open(this.id);
+    }
+
     nsfwAgree() {
         Modules.GuildActions.nsfwAgree(this.id);
     }

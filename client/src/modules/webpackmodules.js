@@ -188,8 +188,14 @@ const KnownModules = {
 
     /* Modals */
     ModalStack: Filters.byProperties(['push', 'update', 'pop', 'popWithKey']),
-    UserProfileModals: Filters.byProperties(['fetchMutualFriends', 'setSection']),
     ConfirmModal: Filters.byPrototypeFields(['handleCancel', 'handleSubmit', 'handleMinorConfirm']),
+    UserProfileModals: Filters.byProperties(['fetchMutualFriends', 'setSection']),
+    ChangeNicknameModal: Filters.byProperties(['open', 'changeNickname']),
+    CreateChannelModal: Filters.byProperties(['open', 'createChannel']),
+    PruneMembersModal: Filters.byProperties(['open', 'prune']),
+    NotificationSettingsModal: Filters.byProperties(['open', 'updateNotificationSettings']),
+    PrivacySettingsModal: Filters.byCode(/PRIVACY_SETTINGS_MODAL_OPEN/, m => m.open),
+    CreateInviteModal: Filters.byProperties(['open', 'createInvite']),
 
     /* Popouts */
     PopoutStack: Filters.byProperties(['open', 'close', 'closeAll']),

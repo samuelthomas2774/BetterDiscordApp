@@ -142,6 +142,14 @@ export class GuildMember extends User {
     }
 
     /**
+     * Opens the modal to change this user's nickname.
+     */
+    openChangeNicknameModal() {
+        if (DiscordApi.currentUser.id !== this.id) this.assertPermissions('MANAGE_NICKNAMES', Modules.DiscordPermissions.MANAGE_NICKNAMES);
+        Modules.ChangeNicknameModal.open(this.guild_id, this.id);
+    }
+
+    /**
      * Kicks this user from the guild.
      * @param {String} reason A reason to attach to the audit log entry
      * @return {Promise}

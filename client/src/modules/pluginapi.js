@@ -88,6 +88,7 @@ export default class PluginApi {
             deepfreeze: (...args) => Utils.deepfreeze.apply(Utils, args),
             removeFromArray: (...args) => Utils.removeFromArray.apply(Utils, args),
             defineSoftGetter: (...args) => Utils.defineSoftGetter.apply(Utils, args),
+            wait: (...args) => Utils.wait.apply(Utils, args),
             until: (...args) => Utils.until.apply(Utils, args)
         };
     }

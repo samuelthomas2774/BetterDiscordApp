@@ -4,6 +4,37 @@ import { List } from 'structs';
 import { Channel } from './channel';
 import { GuildMember } from './user';
 
+const roles = new WeakMap();
+
+export class Role {
+    constructor(data, guild_id) {
+        if (roles.has(data)) return roles.get(data);
+        roles.set(data, this);
+
+        this.discordObject = data;
+        this.guild_id = guild_id;
+    }
+
+    get id() { return this.discordObject.id }
+    get name() { return this.discordObject.name }
+    get position() { return this.discordObject.position }
+    get original_position() { return this.discordObject.originalPosition }
+    get permissions() { return this.discordObject.permissions }
+    get managed() { return this.discordObject.managed }
+    get mentionable() { return this.discordObject.mentionable }
+    get hoist() { return this.discordObject.hoist }
+    get colour() { return this.discordObject.color }
+    get colour_string() { return this.discordObject.colorString }
+
+    get guild() {
+        return Guild.fromId(this.guild_id);
+    }
+
+    get members() {
+        return this.guild.members.filter(m => m.roles.includes(this));
+    }
+}
+
 const guilds = new WeakMap();
 
 export class Guild {
@@ -20,8 +51,10 @@ export class Guild {
         if (guild) return new Guild(guild);
     }
 
+    static get Role() { return Role }
+
     get id() { return this.discordObject.id }
-    get owner_id() { return this.discordObject.owner_id }
+    get owner_id() { return this.discordObject.ownerId }
     get application_id() { return this.discordObject.application_id }
     get system_channel_id() { return this.discordObject.systemChannelId }
     get name() { return this.discordObject.name }
@@ -42,6 +75,11 @@ export class Guild {
 
     get owner() {
         return this.members.find(m => m.id === this.owner_id);
+    }
+
+    get roles() {
+        return List.from(Object.entries(this.discordObject.roles), ([i, r]) => new Role(r, this.id))
+            .sort((r1, r2) => r1.position === r2.position ? 0 : r1.position > r2.position ? 1 : -1);
     }
 
     get channels() {

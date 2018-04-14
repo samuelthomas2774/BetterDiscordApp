@@ -43,6 +43,10 @@ export class User {
     get is_local_bot() { return this.discordObject.isLocalBot() }
     get is_phone_verified() { return this.discordObject.isPhoneVerified() }
 
+    get guilds() {
+        return DiscordApi.guilds.filter(g => g.members.find(m => m.id === this.id));
+    }
+
     async ensurePrivateChannel() {
         if (DiscordApi.currentUser.id === this.id)
             throw new Error('Cannot create a direct message channel to the current user.');
@@ -103,6 +107,15 @@ export class GuildMember extends User {
 
     get guild() {
         return Guild.fromId(this.guild_id);
+    }
+
+    get roles() {
+        return List.from(this.member_data.roles, id => this.guild.roles.find(r => r.id === id))
+            .sort((r1, r2) => r1.position === r2.position ? 0 : r1.position > r2.position ? 1 : -1);
+    }
+
+    get hoist_role() {
+        return this.guild.roles.find(r => r.id === this.hoist_role_id);
     }
 
     checkPermissions(perms) {

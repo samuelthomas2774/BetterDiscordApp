@@ -144,7 +144,8 @@ export class Guild {
     }
 
     getMember(id) {
-        return new GuildMember(Modules.GuildMemberStore.getMember(this.id, id));
+        const member = Modules.GuildMemberStore.getMember(this.id, id);
+        if (member) return new GuildMember(member, this.id);
     }
 
     isMember(id) {

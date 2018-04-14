@@ -36,6 +36,8 @@ export const Modules = {
     get UserSettingsStore() { return this._getModule('UserSettingsStore'); },
     get UserSettingsWindow() { return this._getModule('UserSettingsWindow'); },
     get UserStatusStore() { return this._getModule('UserStatusStore'); },
+    get ChannelSettingsWindow() { return this._getModule('ChannelSettingsWindow'); },
+    get GuildSettingsWindow() { return this._getModule('GuildSettingsWindow'); },
 
     get DiscordPermissions() { return this.DiscordConstants.Permissions; }
 };

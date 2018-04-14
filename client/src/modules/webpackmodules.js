@@ -181,8 +181,10 @@ const KnownModules = {
 
     /* DOM/React Components */
     /* ==================== */
-    UserSettingsWindow: Filters.byProperties(['open', 'updateAccount']),
     LayerManager: Filters.byProperties(['popLayer', 'pushLayer']),
+    UserSettingsWindow: Filters.byProperties(['open', 'updateAccount']),
+    ChannelSettingsWindow: Filters.byProperties(['open', 'updateChannel']),
+    GuildSettingsWindow: Filters.byProperties(['open', 'updateGuild']),
 
     /* Modals */
     ModalStack: Filters.byProperties(['push', 'update', 'pop', 'popWithKey']),
@@ -312,5 +314,8 @@ export class WebpackModules {
     static listKnownModules() {
         return Object.keys(KnownModules);
     }
+
+    static get Filters() { return Filters }
+    static get KnownModules() { return KnownModules }
 
 }

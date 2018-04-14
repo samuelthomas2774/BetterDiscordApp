@@ -173,6 +173,15 @@ export class Guild {
         Modules.GuildActions.selectGuild(this.id);
     }
 
+    /**
+     * Opens this guild's settings window.
+     * @param {String} section The section to open (see DiscordConstants.GuildSettingsSections)
+     */
+    openSettings(section = 'OVERVIEW') {
+        Modules.GuildSettingsWindow.open(this.id);
+        Modules.GuildSettingsWindow.setSection(section);
+    }
+
     nsfwAgree() {
         Modules.GuildActions.nsfwAgree(this.id);
     }

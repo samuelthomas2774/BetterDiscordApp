@@ -153,6 +153,13 @@ export class Guild {
     }
 
     /**
+     * Whether the user has not restricted direct messages from members of this guild.
+     */
+    get allow_dms() {
+        return !DiscordApi.UserPreferences.restricted_guild_ids.includes(this.id);
+    }
+
+    /**
      * Marks all messages in the guild as read.
      */
     markAsRead() {

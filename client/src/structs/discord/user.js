@@ -11,7 +11,7 @@
 import { DiscordApi, DiscordApiModules as Modules } from 'modules';
 import { List, InsufficientPermissions } from 'structs';
 import { Guild } from './guild';
-import { PrivateChannel } from './channel';
+import { Channel } from './channel';
 
 const users = new WeakMap();
 

@@ -1,3 +1,12 @@
+/**
+ * BetterDiscord List
+ * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
+ * All rights reserved.
+ * https://betterdiscord.net
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+*/
 
 export default class List extends Array {
 
@@ -16,12 +25,6 @@ export default class List extends Array {
             }
             return true;
         });
-    }
-
-    from(array, map) {
-        for (const value of array) {
-            returnUsers.push(map ? map(value) : value);
-        }
     }
 
 }

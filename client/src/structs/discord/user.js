@@ -127,6 +127,10 @@ export class GuildMember {
         return User.fromId(this.user_id);
     }
 
+    get name() {
+        return this.nickname || this.user.username;
+    }
+
     get guild() {
         return Guild.fromId(this.guild_id);
     }

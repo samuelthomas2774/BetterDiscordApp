@@ -1,3 +1,12 @@
+/**
+ * BetterDiscord Discord API
+ * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
+ * All rights reserved.
+ * https://betterdiscord.net
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+*/
 
 import { List, InsufficientPermissions } from 'structs';
 import { User, Channel, Guild, Message } from 'discordstructs';
@@ -185,6 +194,7 @@ export class UserSettings {
     static get friend_source_everyone() { return this.friend_source_flags.include('all') }
     static get friend_source_mutual_friends() { return this.friend_source_flags.include('all') || this.friend_source_flags.include('mutual_friends') }
     static get friend_source_mutual_guilds() { return this.friend_source_flags.include('all') || this.friend_source_flags.include('mutual_guilds') }
+    static get friend_source_anyone() { return this.friend_source_flags.length > 0 }
 
     /**
      * Whether to automatically add accounts from other platforms running on the user's computer.

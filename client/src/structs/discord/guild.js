@@ -1,3 +1,12 @@
+/**
+ * BetterDiscord Guild Struct
+ * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
+ * All rights reserved.
+ * https://betterdiscord.net
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+*/
 
 import { DiscordApi, DiscordApiModules as Modules } from 'modules';
 import { List } from 'structs';
@@ -183,7 +192,7 @@ export class Guild {
      * Whether the user has not restricted direct messages from members of this guild.
      */
     get allow_dms() {
-        return !DiscordApi.UserPreferences.restricted_guild_ids.includes(this.id);
+        return !DiscordApi.UserSettings.restricted_guild_ids.includes(this.id);
     }
 
     /**

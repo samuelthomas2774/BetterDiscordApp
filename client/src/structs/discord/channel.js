@@ -101,11 +101,58 @@ export class Channel {
 
 }
 
+export class PermissionOverwrite {
+    constructor(data, channel_id) {
+        this.discordObject = data;
+        this.channel_id = channel_id;
+    }
+
+    static from(data, channel_id) {
+        switch (data.type) {
+            default: return new PermissionOverwrite(data, channel_id);
+            case 'role': return new RolePermissionOverwrite(data, channel_id);
+            case 'member': return new MemberPermissionOverwrite(data, channel_id);
+        }
+    }
+
+    static get RolePermissionOverwrite() { return RolePermissionOverwrite }
+    static get MemberPermissionOverwrite() { return MemberPermissionOverwrite }
+
+    get type() { return this.discordObject.type }
+    get allow() { return this.discordObject.allow }
+    get deny() { return this.discordObject.deny }
+
+    get channel() {
+        return Channel.fromId(this.channel_id);
+    }
+
+    get guild() {
+        if (this.channel) return this.channel.guild;
+    }
+}
+
+export class RolePermissionOverwrite extends PermissionOverwrite {
+    get role_id() { return this.discordObject.id }
+
+    get role() {
+        if (this.guild) return this.guild.roles.find(r => r.id === this.role_id);
+    }
+}
+
+export class MemberPermissionOverwrite extends PermissionOverwrite {
+    get member_id() { return this.discordObject.id }
+
+    get member() {
+        return GuildMember.fromId(this.member_id);
+    }
+}
+
 export class GuildChannel extends Channel {
+    static get PermissionOverwrite() { return PermissionOverwrite }
+
     get guild_id() { return this.discordObject.guild_id }
     get parent_id() { return this.discordObject.parent_id } // Channel category
     get position() { return this.discordObject.position }
-    get permission_overwrites() { return this.discordObject.permissionOverwrites }
     get nicks() { return this.discordObject.nicks }
 
     checkPermissions(perms) {
@@ -123,6 +170,10 @@ export class GuildChannel extends Channel {
 
     get permissions() {
         return Modules.GuildPermissions.getChannelPermissions(this.id);
+    }
+
+    get permission_overwrites() {
+        return List.from(Object.entries(this.discordObject.permissionOverwrites), ([i, p]) => PermissionOverwrite.from(p, this.id));
     }
 
     get guild() {

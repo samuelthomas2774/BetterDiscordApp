@@ -122,7 +122,7 @@ export class Guild {
     }
 
     get currentUser() {
-        return this.members.find(m => m.id === DiscordApi.currentUser.id);
+        return this.members.find(m => m.user === DiscordApi.currentUser);
     }
 
     /**

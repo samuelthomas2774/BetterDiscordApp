@@ -8,10 +8,9 @@ const users = new WeakMap();
 
 export class User {
 
-    constructor(data, _wm) {
-        if (!_wm) _wm = users;
-        if (_wm.has(data)) return _wm.get(data);
-        _wm.set(data, this);
+    constructor(data) {
+        if (users.has(data)) return users.get(data);
+        users.set(data, this);
 
         this.discordObject = data;
     }
@@ -44,7 +43,7 @@ export class User {
     get is_phone_verified() { return this.discordObject.isPhoneVerified() }
 
     get guilds() {
-        return DiscordApi.guilds.filter(g => g.members.find(m => m.id === this.id));
+        return DiscordApi.guilds.filter(g => g.members.find(m => m.user === this));
     }
 
     get status() {
@@ -100,23 +99,23 @@ export class User {
 
 const guild_members = new WeakMap();
 
-// TODO: don't extend User
-export class GuildMember extends User {
+export class GuildMember {
     constructor(data, guild_id) {
-        const user = Modules.UserStore.getUser(data.userId);
-        super(user, guild_members);
+        if (guild_members.has(data)) return guild_members.get(data);
+        guild_members.set(data, this);
 
-        this.member_data = data;
+        this.discordObject = data;
         this.guild_id = guild_id;
     }
 
-    get nickname() { return this.member_data.nick }
-    get colour_string() { return this.member_data.colorString }
-    get hoist_role_id() { return this.member_data.hoistRoleId }
-    get role_ids() { return this.member_data.roles }
+    get user_id() { return this.discordObject.userId }
+    get nickname() { return this.discordObject.nick }
+    get colour_string() { return this.discordObject.colorString }
+    get hoist_role_id() { return this.discordObject.hoistRoleId }
+    get role_ids() { return this.discordObject.roles }
 
     get user() {
-        return User.fromId(this.id);
+        return User.fromId(this.user_id);
     }
 
     get guild() {
@@ -124,7 +123,7 @@ export class GuildMember extends User {
     }
 
     get roles() {
-        return List.from(this.member_data.roles, id => this.guild.roles.find(r => r.id === id))
+        return List.from(this.role_ids, id => this.guild.roles.find(r => r.id === id))
             .sort((r1, r2) => r1.position === r2.position ? 0 : r1.position > r2.position ? 1 : -1);
     }
 
@@ -133,7 +132,7 @@ export class GuildMember extends User {
     }
 
     checkPermissions(perms) {
-        return Modules.PermissionUtils.can(perms, DiscordApi.currentUser, Modules.GuildStore.getGuild(this.guild_id));
+        return Modules.PermissionUtils.can(perms, DiscordApi.currentUser.discordObject, this.guild.discordObject);
     }
 
     assertPermissions(name, perms) {

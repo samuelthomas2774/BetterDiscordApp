@@ -104,7 +104,7 @@ export default class DiscordApi {
     }
 
     /**
-     * An array of guild ID in the order they appear in the server list.
+     * An array of guild IDs in the order they appear in the server list.
      */
     static get guildPositions() {
         return Modules.SortedGuildStore.guildPositions;

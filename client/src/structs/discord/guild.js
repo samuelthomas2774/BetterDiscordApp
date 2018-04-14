@@ -161,6 +161,9 @@ export class Guild {
         return List.from(members, m => new GuildMember(m, this.id));
     }
 
+    /**
+     * The current user as a GuildMember of this guild.
+     */
     get currentUser() {
         return this.members.find(m => m.user === DiscordApi.currentUser);
     }
@@ -179,6 +182,9 @@ export class Guild {
         return List.from(Modules.EmojiUtils.getGuildEmoji(this.id), e => new Emoji(e, this.id));
     }
 
+    /**
+     * The current user's permissions on this guild.
+     */
     get permissions() {
         return Modules.GuildPermissions.getGuildPermissions(this.id);
     }
@@ -211,6 +217,13 @@ export class Guild {
      */
     select() {
         Modules.GuildActions.selectGuild(this.id);
+    }
+
+    /**
+     * Whether this channel is currently selected.
+     */
+    get selected() {
+        return DiscordApi.currentGuild === this;
     }
 
     /**

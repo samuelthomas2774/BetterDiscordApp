@@ -217,10 +217,10 @@ export class DefaultMessage extends Message {
     /**
      * Start the edit mode of the UI.
      */
-    startEdit() {
+    startEdit(content) {
         if (this.author !== DiscordApi.currentUser)
             throw new Error('Cannot edit messages sent by other users.');
-        Modules.MessageActions.startEditMessage(this.channel_id, this.id, this.content);
+        Modules.MessageActions.startEditMessage(this.channel_id, this.id, content || this.content);
     }
 
     /**

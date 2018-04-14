@@ -74,7 +74,7 @@ export class User {
     }
 
     async ensurePrivateChannel() {
-        if (DiscordApi.currentUser.id === this.id)
+        if (DiscordApi.currentUser === this)
             throw new Error('Cannot create a direct message channel to the current user.');
         return Channel.from(await Modules.PrivateChannelActions.ensurePrivateChannel(DiscordApi.currentUser.id, this.id));
     }
@@ -161,7 +161,7 @@ export class GuildMember {
      * Opens the modal to change this user's nickname.
      */
     openChangeNicknameModal() {
-        if (DiscordApi.currentUser.id !== this.id) this.assertPermissions('MANAGE_NICKNAMES', Modules.DiscordPermissions.MANAGE_NICKNAMES);
+        if (DiscordApi.currentUser !== this) this.assertPermissions('MANAGE_NICKNAMES', Modules.DiscordPermissions.MANAGE_NICKNAMES);
         Modules.ChangeNicknameModal.open(this.guild_id, this.id);
     }
 

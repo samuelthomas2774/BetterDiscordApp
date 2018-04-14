@@ -109,6 +109,13 @@ export class Channel {
     }
 
     /**
+     * Whether this channel is currently selected.
+     */
+    get selected() {
+        return DiscordApi.currentChannel === this;
+    }
+
+    /**
      * Opens this channel's settings window.
      * @param {String} section The section to open (see DiscordConstants.ChannelSettingsSections)
      */
@@ -186,6 +193,9 @@ export class GuildChannel extends Channel {
         return Channel.fromId(this.parent_id);
     }
 
+    /**
+     * The current user's permissions on this channel.
+     */
     get permissions() {
         return Modules.GuildPermissions.getChannelPermissions(this.id);
     }
@@ -199,6 +209,9 @@ export class GuildChannel extends Channel {
         if (guild) return Guild.from(guild);
     }
 
+    /**
+     * Whether this channel is the guild's default channel.
+     */
     get default_channel() {
         return Modules.GuildChannelsStore.getDefaultChannel(this.guild_id).id === this.id;
     }

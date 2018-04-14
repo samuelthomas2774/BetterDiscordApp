@@ -33,6 +33,7 @@ export const Modules = {
     get UserStore() { return this._getModule('UserStore'); },
     get RelationshipStore() { return this._getModule('RelationshipStore'); },
     get RelationshipManager() { return this._getModule('RelationshipManager'); },
+    get UserStatusStore() { return this._getModule('UserStatusStore'); },
 
     get DiscordPermissions() { return this.DiscordConstants.Permissions; }
 };

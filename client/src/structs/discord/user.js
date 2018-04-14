@@ -47,6 +47,20 @@ export class User {
         return DiscordApi.guilds.filter(g => g.members.find(m => m.id === this.id));
     }
 
+    get status() {
+        return Modules.UserStatusStore.getStatus(this.id);
+    }
+
+    get activity() {
+        // type can be either 0 (normal/rich presence game), 1 (streaming) or 2 (listening to Spotify)
+        // (3 appears as watching but is undocumented)
+        return Modules.UserStatusStore.getActivity(this.id);
+    }
+
+    get direct_messages() {
+        return DiscordApi.channels.find(c => c.type === 'DM' && c.recipient_id === this.id);
+    }
+
     async ensurePrivateChannel() {
         if (DiscordApi.currentUser.id === this.id)
             throw new Error('Cannot create a direct message channel to the current user.');

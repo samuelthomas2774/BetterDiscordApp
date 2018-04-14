@@ -97,38 +97,43 @@ export class Message {
         this.discordObject = data;
     }
 
+    static from(data) {
+        switch (data.type) {
+            default: return new Message(data);
+            case 0: return new DefaultMessage(data);
+            case 1: return new RecipientAddMessage(data);
+            case 2: return new RecipientRemoveMessage(data);
+            case 3: return new CallMessage(data);
+            case 4: return new GroupChannelNameChangeMessage(data);
+            case 5: return new GroupChannelIconChangeMessage(data);
+            case 6: return new MessagePinnedMessage(data);
+            case 7: return new GuildMemberJoinMessage(data);
+        }
+    }
+
+    static get DefaultMessage() { return DefaultMessage }
+    static get RecipientAddMessage() { return RecipientAddMessage }
+    static get RecipientRemoveMessage() { return RecipientRemoveMessage }
+    static get CallMessage() { return CallMessage }
+    static get GroupChannelNameChangeMessage() { return GroupChannelNameChangeMessage }
+    static get GroupChannelIconChangeMessage() { return GroupChannelIconChangeMessage }
+    static get MessagePinnedMessage() { return MessagePinnedMessage }
+    static get GuildMemberJoinMessage() { return GuildMemberJoinMessage }
     static get Reaction() { return Reaction }
     static get Embed() { return Embed }
 
     get id() { return this.discordObject.id }
     get channel_id() { return this.discordObject.channel_id }
-    get webhook_id() { return this.discordObject.webhookId }
     get nonce() { return this.discordObject.nonce }
     get type() { return this.discordObject.type }
-    get content() { return this.discordObject.content }
-    get content_parsed() { return this.discordObject.contentParsed }
-    get invite_codes() { return this.discordObject.invites }
-    get attachments() { return this.discordObject.attachments }
-    get mentions() { return this.discordObject.mentions }
-    get mention_roles() { return this.discordObject.mentionRoles }
-    get mention_everyone() { return this.discordObject.mentionEveryone }
     get timestamp() { return this.discordObject.timestamp }
-    get edited_timestamp() { return this.discordObject.editedTimestamp }
     get state() { return this.discordObject.state }
-    get tts() { return this.discordObject.tts }
-    get mentioned() { return this.discordObject.mentioned }
-    get bot() { return this.discordObject.bot }
-    get blocked() { return this.discordObject.blocked }
-    get pinned() { return this.discordObject.pinned }
     get nick() { return this.discordObject.nick }
     get colour_string() { return this.discordObject.colorString }
-    get application() { return this.discordObject.application }
-    get activity() { return this.discordObject.activity }
-    get call() { return this.discordObject.call }
 
     get author() {
-        if (this.discordObject.author)
-            return new User(this.discordObject.author);
+        if (this.webhook_id) return this.discordObject.author;
+        if (this.discordObject.author) return User.from(this.discordObject.author);
     }
 
     get channel() {
@@ -137,6 +142,51 @@ export class Message {
 
     get guild() {
         if (this.channel) return this.channel.guild;
+    }
+
+    /**
+     * Deletes the message.
+     * TODO: how do we know if the message was deleted successfully?
+     */
+    delete() {
+        Modules.MessageActions.deleteMessage(this.channel_id, this.id);
+    }
+
+    /**
+     * Jumps to the message.
+     */
+    jumpTo(flash = true) {
+        Modules.MessageActions.jumpToMessage(this.channel_id, this.id, flash);
+    }
+
+}
+
+export class DefaultMessage extends Message {
+    get webhook_id() { return this.discordObject.webhookId }
+    get type() { return 'DEFAULT' }
+    get content() { return this.discordObject.content }
+    get content_parsed() { return this.discordObject.contentParsed }
+    get invite_codes() { return this.discordObject.invites }
+    // get embeds() { return this.discordObject.embeds }
+    get attachments() { return this.discordObject.attachments }
+    get mention_ids() { return this.discordObject.mentions }
+    get mention_role_ids() { return this.discordObject.mentionRoles }
+    get mention_everyone() { return this.discordObject.mentionEveryone }
+    get edited_timestamp() { return this.discordObject.editedTimestamp }
+    get tts() { return this.discordObject.tts }
+    get mentioned() { return this.discordObject.mentioned }
+    get bot() { return this.discordObject.bot }
+    get blocked() { return this.discordObject.blocked }
+    get pinned() { return this.discordObject.pinned }
+    get activity() { return this.discordObject.activity }
+    get application() { return this.discordObject.application }
+
+    get mentions() {
+        return List.from(this.mention_ids, id => User.fromId(id));
+    }
+
+    get mention_roles() {
+        return List.from(this.mention_role_ids, id => this.guild.roles.find(r => r.id === id));
     }
 
     get embeds() {
@@ -179,20 +229,59 @@ export class Message {
     endEdit() {
         Modules.MessageActions.endEditMessage();
     }
+}
 
-    /**
-     * Deletes the message.
-     * TODO: how do we know if the message was deleted successfully?
-     */
-    delete() {
-        Modules.MessageActions.deleteMessage(this.channel_id, this.id);
+export class RecipientAddMessage extends Message {
+    get type() { return 'RECIPIENT_ADD' }
+    get added_user_id() { return this.discordObject.mentions[0] }
+
+    get added_user() {
+        return User.fromId(this.added_user_id);
+    }
+}
+
+export class RecipientRemoveMessage extends Message {
+    get type() { return 'RECIPIENT_REMOVE' }
+    get removed_user_id() { return this.discordObject.mentions[0] }
+
+    get removed_user() {
+        return User.fromId(this.removed_user_id);
     }
 
-    /**
-     * Jumps to the message.
-     */
-    jumpTo(flash = true) {
-        Modules.MessageActions.jumpToMessage(this.channel_id, this.id, flash);
+    get user_left() {
+        return this.author === this.removed_user;
+    }
+}
+
+export class CallMessage extends Message {
+    get type() { return 'CALL' }
+    get mention_ids() { return this.discordObject.mentions }
+    get call() { return this.discordObject.call }
+
+    get ended_timestamp() { return this.call.endedTimestamp }
+
+    get mentions() {
+        return List.from(this.mention_ids, id => User.fromId(id));
     }
 
+    get participants() {
+        return List.from(this.call.participants, id => User.fromId(id));
+    }
+}
+
+export class GroupChannelNameChangeMessage extends Message {
+    get type() { return 'CHANNEL_NAME_CHANGE' }
+    get new_name() { return this.discordObject.content }
+}
+
+export class GroupChannelIconChangeMessage extends Message {
+    get type() { return 'CHANNEL_ICON_CHANGE' }
+}
+
+export class MessagePinnedMessage extends Message {
+    get type() { return 'CHANNEL_PINNED_MESSAGE' }
+}
+
+export class GuildMemberJoinMessage extends Message {
+    get type() { return 'GUILD_MEMBER_JOIN' }
 }

@@ -65,7 +65,7 @@ export class Channel {
         let response = {};
         if (parse) response = await Modules.MessageActions._sendMessage(this.id, Modules.MessageParser.parse(this.discordObject, content));
         else response = await Modules.MessageActions._sendMessage(this.id, {content});
-        return new Message(Modules.MessageStore.getMessage(this.id, response.body.id));
+        return Message.from(Modules.MessageStore.getMessage(this.id, response.body.id));
     }
 
     /**
@@ -73,7 +73,7 @@ export class Channel {
      */
     get messages() {
         const messages = Modules.MessageStore.getMessages(this.id).toArray();
-        return List.from(messages, m => new Message(m));
+        return List.from(messages, m => Message.from(m));
     }
 
     /**
@@ -97,7 +97,7 @@ export class Channel {
     async sendInvite(code) {
         if (this.assertPermissions) this.assertPermissions('SEND_MESSAGES', Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES);
         const response = Modules.MessageActions.sendInvite(this.id, code);
-        return new Message(Modules.MessageStore.getMessage(this.id, response.body.id));
+        return Message.from(Modules.MessageStore.getMessage(this.id, response.body.id));
     }
 
     /**
@@ -196,7 +196,7 @@ export class GuildChannel extends Channel {
 
     get guild() {
         const guild = Modules.GuildStore.getGuild(this.guild_id);
-        if (guild) return new Guild(guild);
+        if (guild) return Guild.from(guild);
     }
 
     get default_channel() {

@@ -24,9 +24,13 @@ export class User {
         this.discordObject = data;
     }
 
+    static from(data) {
+        return new User(data);
+    }
+
     static fromId(id) {
         const user = Modules.UserStore.getUser(id);
-        if (user) return new User(user);
+        if (user) return User.from(user);
     }
 
     get id() { return this.discordObject.id }

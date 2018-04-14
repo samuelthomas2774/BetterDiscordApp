@@ -69,7 +69,7 @@ export default class DiscordApi {
      */
     static get guilds() {
         const guilds = Modules.GuildStore.getGuilds();
-        return List.from(Object.entries(guilds), ([i, g]) => new Guild(g));
+        return List.from(Object.entries(guilds), ([i, g]) => Guild.from(g));
     }
 
     /**
@@ -85,7 +85,7 @@ export default class DiscordApi {
      */
     static get users() {
         const users = Modules.UserStore.getUsers();
-        return List.from(Object.entries(users), ([i, u]) => new User(u));
+        return List.from(Object.entries(users), ([i, u]) => User.from(u));
     }
 
     /**
@@ -100,7 +100,7 @@ export default class DiscordApi {
      */
     static get sortedGuilds() {
         const guilds = Modules.SortedGuildStore.getSortedGuilds();
-        return List.from(guilds, g => new Guild(g));
+        return List.from(guilds, g => Guild.from(g));
     }
 
     /**
@@ -115,7 +115,7 @@ export default class DiscordApi {
      */
     static get currentGuild() {
         const guild = Modules.GuildStore.getGuild(Modules.SelectedGuildStore.getGuildId());
-        if (guild) return new Guild(guild);
+        if (guild) return Guild.from(guild);
     }
 
     /**
@@ -131,7 +131,7 @@ export default class DiscordApi {
      */
     static get currentUser() {
         const user = Modules.UserStore.getCurrentUser();
-        if (user) return new User(user);
+        if (user) return User.from(user);
     }
 
     /**

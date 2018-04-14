@@ -81,9 +81,13 @@ export class Guild {
         this.discordObject = data;
     }
 
+    static from(data) {
+        return new Guild(data);
+    }
+
     static fromId(id) {
         const guild = Modules.GuildStore.getGuild(id);
-        if (guild) return new Guild(guild);
+        if (guild) return Guild.from(guild);
     }
 
     static get Role() { return Role }

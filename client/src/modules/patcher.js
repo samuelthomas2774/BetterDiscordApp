@@ -70,7 +70,7 @@ export class Patcher {
 
             for (const slavePatch of patch.children.filter(c => c.type === 'after')) {
                 try {
-                    slavePatch.callback(this, arguments, retVal);
+                    slavePatch.callback(this, arguments, retVal, r => retVal = r);
                 } catch (err) {
                     Logger.err(`Patcher:${patch.id}`, err);
                 }

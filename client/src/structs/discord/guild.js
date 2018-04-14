@@ -35,6 +35,32 @@ export class Role {
     }
 }
 
+const emojis = new WeakMap();
+
+export class Emoji {
+    constructor(data, guild_id) {
+        if (emojis.has(data)) return emojis.get(data);
+        emojis.set(data, this);
+
+        this.discordObject = data;
+        // this.guild_id = guild_id;
+    }
+
+    get id() { return this.discordObject.id }
+    get guild_id() { return this.discordObject.guild_id }
+    get name() { return this.discordObject.name }
+    get managed() { return this.discordObject.managed }
+    get animated() { return this.discordObject.animated }
+    get all_names_string() { return this.discordObject.allNamesString }
+    get require_colons() { return this.discordObject.require_colons }
+    get url() { return this.discordObject.url }
+    get roles() { return this.discordObject.roles }
+
+    get guild() {
+        return Guild.fromId(this.guild_id);
+    }
+}
+
 const guilds = new WeakMap();
 
 export class Guild {
@@ -52,6 +78,7 @@ export class Guild {
     }
 
     static get Role() { return Role }
+    static get Emoji() { return Emoji }
 
     get id() { return this.discordObject.id }
     get owner_id() { return this.discordObject.ownerId }
@@ -136,7 +163,7 @@ export class Guild {
      * An array of the guild's custom emojis.
      */
     get emojis() {
-        return Modules.EmojiUtils.getGuildEmoji(this.id);
+        return List.from(Modules.EmojiUtils.getGuildEmoji(this.id), e => new Emoji(e, this.id));
     }
 
     get permissions() {

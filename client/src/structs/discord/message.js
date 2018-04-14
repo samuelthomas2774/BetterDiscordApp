@@ -47,6 +47,45 @@ export class Reaction {
     }
 }
 
+const embeds = new WeakMap();
+
+export class Embed {
+    constructor(data, message_id, channel_id) {
+        if (embeds.has(data)) return embeds.get(data);
+        embeds.set(data, this);
+
+        this.discordObject = data;
+        this.message_id = message_id;
+        this.channel_id = channel_id;
+    }
+
+    get title() { return this.discordObject.title }
+    get type() { return this.discordObject.type }
+    get description() { return this.discordObject.description }
+    get url() { return this.discordObject.url }
+    get timestamp() { return this.discordObject.timestamp }
+    get colour() { return this.discordObject.color }
+    get footer() { return this.discordObject.footer }
+    get image() { return this.discordObject.image }
+    get thumbnail() { return this.discordObject.thumbnail }
+    get video() { return this.discordObject.video }
+    get provider() { return this.discordObject.provider }
+    get author() { return this.discordObject.author }
+    get fields() { return this.discordObject.fields }
+
+    get channel() {
+        return Channel.fromId(this.channel_id);
+    }
+
+    get message() {
+        if (this.channel) return this.channel.messages.find(m => m.id === this.message_id);
+    }
+
+    get guild() {
+        if (this.channel) return this.channel.guild;
+    }
+}
+
 const messages = new WeakMap();
 
 export class Message {
@@ -59,6 +98,7 @@ export class Message {
     }
 
     static get Reaction() { return Reaction }
+    static get Embed() { return Embed }
 
     get id() { return this.discordObject.id }
     get channel_id() { return this.discordObject.channel_id }
@@ -68,7 +108,6 @@ export class Message {
     get content() { return this.discordObject.content }
     get content_parsed() { return this.discordObject.contentParsed }
     get invite_codes() { return this.discordObject.invites }
-    get embeds() { return this.discordObject.embeds }
     get attachments() { return this.discordObject.attachments }
     get mentions() { return this.discordObject.mentions }
     get mention_roles() { return this.discordObject.mentionRoles }
@@ -98,6 +137,10 @@ export class Message {
 
     get guild() {
         if (this.channel) return this.channel.guild;
+    }
+
+    get embeds() {
+        return List.from(this.discordObject.embeds, r => new Embed(r, this.id, this.channel_id));
     }
 
     get reactions() {

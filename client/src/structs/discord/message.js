@@ -9,8 +9,43 @@
 */
 
 import { DiscordApi, DiscordApiModules as Modules } from 'modules';
+import { List } from 'structs';
 import { Channel } from './channel';
 import { User } from './user';
+
+const reactions = new WeakMap();
+
+export class Reaction {
+    constructor(data, message_id, channel_id) {
+        if (reactions.has(data)) return reactions.get(data);
+        reactions.set(data, this);
+
+        this.discordObject = data;
+        this.message_id = message_id;
+        this.channel_id = channel_id;
+    }
+
+    get emoji() {
+        const id = this.discordObject.emoji.id;
+        if (!id || !this.guild) return this.discordObject.emoji;
+        return this.guild.emojis.find(e => e.id === id);
+    }
+
+    get count() { return this.discordObject.count }
+    get me() { return this.discordObject.me }
+
+    get channel() {
+        return Channel.fromId(this.channel_id);
+    }
+
+    get message() {
+        if (this.channel) return this.channel.messages.find(m => m.id === this.message_id);
+    }
+
+    get guild() {
+        if (this.channel) return this.channel.guild;
+    }
+}
 
 const messages = new WeakMap();
 
@@ -22,6 +57,8 @@ export class Message {
 
         this.discordObject = data;
     }
+
+    static get Reaction() { return Reaction }
 
     get id() { return this.discordObject.id }
     get channel_id() { return this.discordObject.channel_id }
@@ -36,7 +73,6 @@ export class Message {
     get mentions() { return this.discordObject.mentions }
     get mention_roles() { return this.discordObject.mentionRoles }
     get mention_everyone() { return this.discordObject.mentionEveryone }
-    get reactions() { return this.discordObject.reactions }
     get timestamp() { return this.discordObject.timestamp }
     get edited_timestamp() { return this.discordObject.editedTimestamp }
     get state() { return this.discordObject.state }
@@ -62,6 +98,10 @@ export class Message {
 
     get guild() {
         if (this.channel) return this.channel.guild;
+    }
+
+    get reactions() {
+        return List.from(this.discordObject.reactions, r => new Reaction(r, this.id, this.channel_id));
     }
 
     get edited() {

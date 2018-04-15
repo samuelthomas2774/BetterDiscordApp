@@ -52,6 +52,7 @@ export const Modules = {
     get PruneMembersModal() { return this._getModule('PruneMembersModal'); },
     get NotificationSettingsModal() { return this._getModule('NotificationSettingsModal'); },
     get PrivacySettingsModal() { return this._getModule('PrivacySettingsModal'); },
+    get UserProfileModal() { return this._getModule('UserProfileModal'); },
 
     get DiscordPermissions() { return this.DiscordConstants.Permissions; }
 };

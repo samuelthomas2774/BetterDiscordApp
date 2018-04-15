@@ -108,6 +108,15 @@ export class User {
         Modules.RelationshipManager.removeRelationship(this.id, {location: 'Context Menu'});
     }
 
+    /**
+     * Opens the profile modal for this user.
+     * @param {String} section The section to open (see DiscordConstants.UserProfileSections)
+     */
+    openUserProfileModal(section = 'USER_INFO') {
+        Modules.UserProfileModal.open(this.id);
+        Modules.UserProfileModal.setSection(section);
+    }
+
 }
 
 const guild_members = new WeakMap();

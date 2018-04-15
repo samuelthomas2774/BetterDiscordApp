@@ -22,7 +22,7 @@ export default class extends Module {
         this.patchMessage();
         this.patchChannelMember();
         this.patchNameTag();
-        this.patchUserProfileModals();
+        this.patchUserProfileModal();
     }
 
     get contributors() {
@@ -167,13 +167,13 @@ export default class extends Module {
     }
 
     /**
-     * Patches UserProfileModals to inject profile badges into the modal once opened.
+     * Patches UserProfileModal to inject profile badges into the modal once opened.
      * TODO: just patch the modal component
      */
-    async patchUserProfileModals() {
-        const UserProfileModals = WebpackModules.getModuleByName('UserProfileModals');
+    async patchUserProfileModal() {
+        const UserProfileModal = WebpackModules.getModuleByName('UserProfileModal');
 
-        MonkeyPatch('BdUI', UserProfileModals).after('open', async (context, [userid]) => {
+        MonkeyPatch('BdUI', UserProfileModal).after('open', async (context, [userid]) => {
             const c = contributors.find(c => c.id === userid);
             if (!c) return;
 

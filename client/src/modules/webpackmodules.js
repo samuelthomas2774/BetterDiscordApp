@@ -189,7 +189,7 @@ const KnownModules = {
     /* Modals */
     ModalStack: Filters.byProperties(['push', 'update', 'pop', 'popWithKey']),
     ConfirmModal: Filters.byPrototypeFields(['handleCancel', 'handleSubmit', 'handleMinorConfirm']),
-    UserProfileModals: Filters.byProperties(['fetchMutualFriends', 'setSection']),
+    UserProfileModal: Filters.byProperties(['fetchMutualFriends', 'setSection']),
     ChangeNicknameModal: Filters.byProperties(['open', 'changeNickname']),
     CreateChannelModal: Filters.byProperties(['open', 'createChannel']),
     PruneMembersModal: Filters.byProperties(['open', 'prune']),

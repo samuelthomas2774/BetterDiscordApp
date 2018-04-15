@@ -171,7 +171,7 @@ export class GuildMember {
      */
     openChangeNicknameModal() {
         if (DiscordApi.currentUser !== this) this.assertPermissions('MANAGE_NICKNAMES', Modules.DiscordPermissions.MANAGE_NICKNAMES);
-        Modules.ChangeNicknameModal.open(this.guild_id, this.id);
+        Modules.ChangeNicknameModal.open(this.guild_id, this.user_id);
     }
 
     /**
@@ -181,7 +181,7 @@ export class GuildMember {
      */
     kick(reason = '') {
         this.assertPermissions('KICK_MEMBERS', Modules.DiscordPermissions.KICK_MEMBERS);
-        return Modules.GuildActions.kickUser(this.guild_id, this.id, reason);
+        return Modules.GuildActions.kickUser(this.guild_id, this.user_id, reason);
     }
 
     /**
@@ -192,7 +192,7 @@ export class GuildMember {
      */
     ban(daysToDelete = 1, reason = '') {
         this.assertPermissions('BAN_MEMBERS', Modules.DiscordPermissions.BAN_MEMBERS);
-        return Modules.GuildActions.banUser(this.guild_id, this.id, daysToDelete, reason);
+        return Modules.GuildActions.banUser(this.guild_id, this.user_id, daysToDelete, reason);
     }
 
     /**
@@ -201,7 +201,7 @@ export class GuildMember {
      */
     unban() {
         this.assertPermissions('BAN_MEMBERS', Modules.DiscordPermissions.BAN_MEMBERS);
-        return Modules.GuildActions.unbanUser(this.guild_id, this.id);
+        return Modules.GuildActions.unbanUser(this.guild_id, this.user_id);
     }
 
     /**
@@ -210,7 +210,7 @@ export class GuildMember {
      */
     move(channel) {
         this.assertPermissions('MOVE_MEMBERS', Modules.DiscordPermissions.MOVE_MEMBERS);
-        Modules.GuildActions.setChannel(this.guild_id, this.id, channel.id);
+        Modules.GuildActions.setChannel(this.guild_id, this.user_id, channel.id);
     }
 
     /**
@@ -218,7 +218,7 @@ export class GuildMember {
      */
     mute(active = true) {
         this.assertPermissions('MUTE_MEMBERS', Modules.DiscordPermissions.MUTE_MEMBERS);
-        Modules.GuildActions.setServerMute(this.guild_id, this.id, active);
+        Modules.GuildActions.setServerMute(this.guild_id, this.user_id, active);
     }
 
     /**
@@ -233,7 +233,7 @@ export class GuildMember {
      */
     deafen(active = true) {
         this.assertPermissions('DEAFEN_MEMBERS', Modules.DiscordPermissions.DEAFEN_MEMBERS);
-        Modules.GuildActions.setServerDeaf(this.guild_id, this.id, active);
+        Modules.GuildActions.setServerDeaf(this.guild_id, this.user_id, active);
     }
 
     /**

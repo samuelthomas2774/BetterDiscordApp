@@ -231,8 +231,8 @@ export class Guild {
      * @param {String} section The section to open (see DiscordConstants.GuildSettingsSections)
      */
     openSettings(section = 'OVERVIEW') {
-        Modules.GuildSettingsWindow.open(this.id);
         Modules.GuildSettingsWindow.setSection(section);
+        Modules.GuildSettingsWindow.open(this.id);
     }
 
     /**

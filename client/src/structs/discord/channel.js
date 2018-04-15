@@ -120,8 +120,8 @@ export class Channel {
      * @param {String} section The section to open (see DiscordConstants.ChannelSettingsSections)
      */
     openSettings(section = 'OVERVIEW') {
-        Modules.ChannelSettingsWindow.open(this.id);
         Modules.ChannelSettingsWindow.setSection(section);
+        Modules.ChannelSettingsWindow.open(this.id);
     }
 
 }

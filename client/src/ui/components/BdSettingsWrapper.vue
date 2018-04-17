@@ -45,6 +45,10 @@
                 if (this.$refs.settings.activeIndex !== -1) this.$refs.settings.closeContent();
                 else this.active = false;
                 e.stopImmediatePropagation();
+            },
+            prevent(e) {
+                if (this.active && e.which === 27)
+                    e.stopImmediatePropagation();
             }
         },
         watch: {
@@ -68,12 +72,14 @@
             Events.on('update-check-end', e => this.updating = 1);
             Events.on('updates-available', e => this.updating = 2);
             window.addEventListener('keyup', this.keyupListener);
+            window.addEventListener('keydown', this.prevent, true);
 
             const menuKeybind = Settings.getSetting('core', 'default', 'menu-keybind');
             menuKeybind.on('keybind-activated', () => this.active = !this.active);
         },
         destroyed() {
             window.removeEventListener('keyup', this.keyupListener);
+            window.removeEventListener('keydown', this.prevent);
         }
     }
 </script>

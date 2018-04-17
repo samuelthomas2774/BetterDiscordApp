@@ -34,13 +34,7 @@ export default new class EmoteModule {
 
         const dataPath = Globals.getPath('data');
         try {
-            const emotes = await FileUtils.readJsonFromFile(path.join(dataPath, 'emotes.json'));
-            for (let emote of emotes) {
-                const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
-                emote.name = emote.id;
-                emote.src = uri.replace(':id', emote.value.id || emote.value);
-                this.emotes.set(emote.id, emote);
-            }
+            await this.load(path.join(dataPath, 'emotes.json'));
         } catch (err) {
             Logger.err('EmoteModule', [`Failed to load emote data. Make sure you've downloaded the emote data and placed it in ${dataPath}:`, err]);
             return;
@@ -53,6 +47,20 @@ export default new class EmoteModule {
         }
     }
 
+    async load(dataPath) {
+        const emotes = await FileUtils.readJsonFromFile(dataPath);
+        for (let [index, emote] of emotes.entries()) {
+            // Pause every 10000 emotes so the window doesn't freeze
+            if ((index % 10000) === 0)
+                await Utils.wait();
+
+            const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
+            emote.name = emote.id;
+            emote.src = uri.replace(':id', emote.value.id || emote.value);
+            this.emotes.set(emote.id, emote);
+        }
+    }
+
     /**
      * Sets an emote as favourite.
      * @param {String} emote The name of the emote
@@ -61,6 +69,7 @@ export default new class EmoteModule {
      * @return {Promise}
      */
     setFavourite(emote, favourite, save = true) {
+        emote = emote.id || emote;
         if (favourite && !this.favourite_emotes.includes(emote)) this.favourite_emotes.push(emote);
         if (!favourite) Utils.removeFromArray(this.favourite_emotes, emote);
         if (save) return Settings.saveSettings();
@@ -75,6 +84,7 @@ export default new class EmoteModule {
     }
 
     isFavourite(emote) {
+        emote = emote.id || emote;
         return this.favourite_emotes.includes(emote);
     }
 

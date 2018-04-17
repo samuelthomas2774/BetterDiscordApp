@@ -17,7 +17,7 @@
             </span>
         </div>
         <div class="bd-dropdown-options bd-flex bd-flex-col" ref="options" v-if="active">
-            <div class="bd-dropdown-option" v-for="option in options" :class="{'bd-dropdown-option-selected': selected === option.value}" @click="select(option)">{{ option.text }}</div>
+            <div class="bd-dropdown-option" v-for="option in options" :class="{'bd-dropdown-option-selected': value === option.value}" @click="select(option)">{{ option.text }}</div>
         </div>
     </div>
 </template>
@@ -32,8 +32,8 @@
         },
         methods: {
             getSelectedText() {
-                const selected_option = this.options.find(option => option.value === this.selected);
-                return selected_option ? selected_option.text : this.selected;
+                const selected_option = this.options.find(option => option.value === this.value);
+                return selected_option ? selected_option.text : this.value;
             },
             select(option) {
                 this.$emit('input', option.value);

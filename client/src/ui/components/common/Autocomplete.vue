@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-autocomplete">
+    <div class="bd-autocomplete" :class="{'bd-active': emotes && emotes.length}">
         <div v-if="emotes && emotes.length" class="bd-autocomplete-inner">
             <div class="bd-autocomplete-row">
                 <div class="bd-autocomplete-selector">
@@ -20,10 +20,13 @@
                 </div>
             </div>
             <div v-for="(emote, index) in emotes" class="bd-autocomplete-row" :key="index">
-                <div class="bd-autocomplete-selector bd-selectable" :class="{'bd-selected': index === selectedIndex}" @mouseover="() => { selected = emote.id }" @click="() => inject(emote)">
+                <div class="bd-autocomplete-selector bd-selectable" :class="{'bd-selected': index === selectedIndex, 'bd-emote-favourite': isFavourite(emote)}" @mouseover="selected = emote.id" @click="inject(emote)">
                     <div class="bd-autocomplete-field">
-                        <img :src="getEmoteSrc(emote)"/>
-                        <div>{{emote.id}}</div>
+                        <img :src="emote.src" :alt="emote.name" />
+                        <div class="bd-flex-grow">{{emote.id}}</div>
+                        <div class="bd-emote-favourite-button" :class="{'bd-active': isFavourite(emote)}" @click.stop="toggleFavourite(emote)">
+                            <MiStar :size="16" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -33,12 +36,17 @@
 
 <script>
     import { EmoteModule } from 'builtin';
-    import { Events } from 'modules';
+    import { Events, Settings } from 'modules';
     import { DOM } from 'ui';
+    import { MiStar } from './MaterialIcon';
 
     export default {
+        components: {
+            MiStar
+        },
         data() {
             return {
+                EmoteModule,
                 emotes: [],
                 title: '',
                 selIndex: 0,
@@ -54,24 +62,38 @@
             // this.open = this.emotes.length;
         },
         created() {
-            window.addEventListener('keydown', this.prevents);
-            const ta = document.querySelector('.chat textarea');
-            if(!ta) return;
-            ta.addEventListener('keydown', this.setCaret);
-            ta.addEventListener('keyup', this.searchEmotes);
+            const enabled = Settings.getSetting('emotes', 'default', 'enable');
+            enabled.on('setting-updated', event => {
+                if (event.value) return this.addEventListeners();
+                this.removeEventListeners();
+                this.reset();
+            });
+
+            if (enabled.value) this.addEventListeners();
         },
         destroyed() {
-            window.removeEventListener('keydown', this.prevents);
-            const ta = document.querySelector('.chat textarea');
-            if (!ta) return;
-            ta.removeEventListener('keydown', this.setCaret);
-            ta.removeEventListener('keyup', this.searchEmotes);
+            this.removeEventListeners();
         },
         methods: {
+            addEventListeners() {
+                window.addEventListener('keydown', this.prevents);
+                const ta = document.querySelector('.chat textarea');
+                if (!ta) return;
+                ta.addEventListener('keydown', this.setCaret);
+                ta.addEventListener('keyup', this.searchEmotes);
+            },
+            removeEventListeners() {
+                window.removeEventListener('keydown', this.prevents);
+                const ta = document.querySelector('.chat textarea');
+                if (!ta) return;
+                ta.removeEventListener('keydown', this.setCaret);
+                ta.removeEventListener('keyup', this.searchEmotes);
+            },
             prevents(e) {
                 if (!this.open) return;
-                if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Tab' && e.key !== 'Enter') return;
-                this.traverse(e);
+                if (e.which === 27) this.reset();
+                else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') this.traverse(e);
+                else if (e.key !== 'Tab' && e.key !== 'Enter') return;
                 e.stopPropagation();
                 e.preventDefault();
             },
@@ -84,8 +106,14 @@
                 const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
                 return uri.replace(':id', value);
             },
+            isFavourite(emote) {
+                return EmoteModule.isFavourite(emote);
+            },
+            toggleFavourite(emote) {
+                return EmoteModule.setFavourite(emote, !this.isFavourite(emote));
+            },
             searchEmotes(e) {
-                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') return;
+                if (e.which === 27 || e.key === 'ArrowDown' || e.key === 'ArrowUp') return;
                 if (e.key === 'Tab' || e.key === 'Enter' && this.open) {
                     const selected = this.emotes[this.selectedIndex];
                     if (!selected) return;
@@ -113,11 +141,11 @@
             traverse(e) {
                 if (!this.open) return;
                 if (e.key === 'ArrowUp') {
-                    this.selectedIndex = (this.selectedIndex - 1) < 0 ? 9 : this.selectedIndex - 1;
+                    this.selectedIndex = (this.selectedIndex - 1) < 0 ? Math.min(this.emotes.length, 10) - 1 : this.selectedIndex - 1;
                     return;
                 }
                 if (e.key === 'ArrowDown') {
-                    this.selectedIndex = (this.selectedIndex + 1) >= 10 ? 0 : this.selectedIndex + 1;
+                    this.selectedIndex = (this.selectedIndex + 1) >= Math.min(this.emotes.length, 10) ? 0 : this.selectedIndex + 1;
                     return;
                 }
                 return;

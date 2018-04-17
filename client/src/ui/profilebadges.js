@@ -89,6 +89,13 @@ export default class extends Module {
             const nameTag = retVal.props.children.props.children[1].props.children[0];
             nameTag.type = this.PatchedNameTag || nameTag.type;
         });
+
+        // Rerender all channel members
+        if (this.PatchedNameTag) {
+            for (const channelMember of document.querySelectorAll('.member-2FrNV0')) {
+                Reflection(channelMember).forceUpdate();
+            }
+        }
     }
 
     /**
@@ -135,8 +142,10 @@ export default class extends Module {
         };
 
         // Rerender all channel members
-        for (const channelMember of document.querySelectorAll('.member-2FrNV0')) {
-            Reflection(channelMember).forceUpdate();
+        if (this.unpatchChannelMemberRender) {
+            for (const channelMember of document.querySelectorAll('.member-2FrNV0')) {
+                Reflection(channelMember).forceUpdate();
+            }
         }
 
         return this.PatchedNameTag;

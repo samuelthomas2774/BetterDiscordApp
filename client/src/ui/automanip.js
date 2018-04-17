@@ -185,7 +185,7 @@ export default class extends EventListener {
         const root = document.createElement('span');
         const parent = document.querySelector('[class*="channelTextArea"] > [class*="inner"]');
         if (!parent) return;
-        parent.append(root);
+        parent.parentElement.insertBefore(root, parent);
         VueInjector.inject(root, {
             components: { Autocomplete },
             data: { initial: e.target.value },

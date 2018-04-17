@@ -148,6 +148,8 @@ export default class Theme extends Content {
      * @param {Array} files Files to watch
      */
     set watchfiles(files) {
+        if (!files) files = [];
+
         for (let file of files) {
             if (!this.watchfiles.includes(file)) {
                 this.filewatcher.add(file);

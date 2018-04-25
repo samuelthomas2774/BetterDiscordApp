@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-radio-group" :class="{'bd-disabled': disabled}">
-        <label class="bd-radio" v-for="option in options" :class="{'bd-radio-selected': value === option.value}" @click="$emit('input', option.value)">
+        <label class="bd-radio" v-for="option in options" :class="{'bd-radio-selected': isSelected(option.value)}" @click="toggleOption(option.value)">
             <div class="bd-radio-control-wrap">
                 <svg class="bd-radio-control" name="Checkmark" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
                     <g fill="none" fill-rule="evenodd"><polyline stroke="#3e82e5" stroke-width="2" points="3.5 9.5 7 13 15 5"></polyline></g>
@@ -22,7 +22,32 @@
 </template>
 
 <script>
+    import { Utils } from 'common';
+
     export default {
-        props: ['options', 'value', 'disabled']
+        props: ['options', 'value', 'multi', 'min', 'max', 'disabled'],
+        methods: {
+            toggleOption(value) {
+                if (!this.multi)
+                    return this.$emit('input', value);
+
+                const values = this.value instanceof Array ? this.value : [this.value];
+
+                if (values.find(v => Utils.compare(v, value))) {
+                    if (this.min && (values.length - 1) <= this.min) return;
+                    this.$emit('input', values.filter(v => !Utils.compare(v, value)));
+                } else {
+                    if (this.max && values.length > this.max) return;
+                    this.$emit('input', values.concat([value]));
+                }
+            },
+            isSelected(value) {
+                if (!this.multi)
+                    return Utils.compare(this.value, value);
+
+                const values = this.value instanceof Array ? this.value : [this.value];
+                return values.find(v => Utils.compare(v, value));
+            }
+        }
     }
 </script>

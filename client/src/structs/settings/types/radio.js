@@ -53,6 +53,28 @@ export default class RadioSetting extends Setting {
     }
 
     /**
+     * Whether the user should be allowed to choose multiple options.
+     */
+    get multi() {
+        return this.args.multi;
+    }
+
+    /**
+     * The minimum number of options the user may select if a multi select group.
+     * This only restricts deselecting options when there is less or equal options selected than this, and does not ensure that this number of options are actually selected.
+     */
+    get min() {
+        return this.multi ? this.args.min || 0 : 1;
+    }
+
+    /**
+     * The maximum number of options the user may select if a multi select group.
+     */
+    get max() {
+        return this.multi ? this.args.max || 0 : 1;
+    }
+
+    /**
      * Returns a representation of this setting's value in SCSS.
      * @return {String}
      */

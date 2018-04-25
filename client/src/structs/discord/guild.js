@@ -21,22 +21,22 @@ export class Role {
         roles.set(data, this);
 
         this.discordObject = data;
-        this.guild_id = guild_id;
+        this.guildId = guild_id;
     }
 
     get id() { return this.discordObject.id }
     get name() { return this.discordObject.name }
     get position() { return this.discordObject.position }
-    get original_position() { return this.discordObject.originalPosition }
+    get originalPosition() { return this.discordObject.originalPosition }
     get permissions() { return this.discordObject.permissions }
     get managed() { return this.discordObject.managed }
     get mentionable() { return this.discordObject.mentionable }
     get hoist() { return this.discordObject.hoist }
     get colour() { return this.discordObject.color }
-    get colour_string() { return this.discordObject.colorString }
+    get colourString() { return this.discordObject.colorString }
 
     get guild() {
-        return Guild.fromId(this.guild_id);
+        return Guild.fromId(this.guildId);
     }
 
     get members() {
@@ -47,26 +47,25 @@ export class Role {
 const emojis = new WeakMap();
 
 export class Emoji {
-    constructor(data, guild_id) {
+    constructor(data) {
         if (emojis.has(data)) return emojis.get(data);
         emojis.set(data, this);
 
         this.discordObject = data;
-        // this.guild_id = guild_id;
     }
 
     get id() { return this.discordObject.id }
-    get guild_id() { return this.discordObject.guild_id }
+    get guildId() { return this.discordObject.guild_id }
     get name() { return this.discordObject.name }
     get managed() { return this.discordObject.managed }
     get animated() { return this.discordObject.animated }
-    get all_names_string() { return this.discordObject.allNamesString }
-    get require_colons() { return this.discordObject.require_colons }
+    get allNamesString() { return this.discordObject.allNamesString }
+    get requireColons() { return this.discordObject.require_colons }
     get url() { return this.discordObject.url }
     get roles() { return this.discordObject.roles }
 
     get guild() {
-        return Guild.fromId(this.guild_id);
+        return Guild.fromId(this.guildId);
     }
 }
 
@@ -94,27 +93,27 @@ export class Guild {
     static get Emoji() { return Emoji }
 
     get id() { return this.discordObject.id }
-    get owner_id() { return this.discordObject.ownerId }
-    get application_id() { return this.discordObject.application_id }
-    get system_channel_id() { return this.discordObject.systemChannelId }
+    get ownerId() { return this.discordObject.ownerId }
+    get applicationId() { return this.discordObject.application_id }
+    get systemChannelId() { return this.discordObject.systemChannelId }
     get name() { return this.discordObject.name }
     get acronym() { return this.discordObject.acronym }
     get icon() { return this.discordObject.icon }
-    get joined_at() { return this.discordObject.joinedAt }
-    get verification_level() { return this.discordObject.verificationLevel }
-    get mfa_level() { return this.discordObject.mfaLevel }
+    get joinedAt() { return this.discordObject.joinedAt }
+    get verificationLevel() { return this.discordObject.verificationLevel }
+    get mfaLevel() { return this.discordObject.mfaLevel }
     get large() { return this.discordObject.large }
     get lazy() { return this.discordObject.lazy }
-    get voice_region() { return this.discordObject.region }
-    get afk_channel_id() { return this.discordObject.afkChannelId }
-    get afk_timeout() { return this.discordObject.afkTimeout }
-    get explicit_content_filter() { return this.discordObject.explicitContentFilter }
-    get default_message_notifications() { return this.discordObject.defaultMessageNotifications }
+    get voiceRegion() { return this.discordObject.region }
+    get afkChannelId() { return this.discordObject.afkChannelId }
+    get afkTimeout() { return this.discordObject.afkTimeout }
+    get explicitContentFilter() { return this.discordObject.explicitContentFilter }
+    get defaultMessageNotifications() { return this.discordObject.defaultMessageNotifications }
     get splash() { return this.discordObject.splash }
     get features() { return this.discordObject.features }
 
     get owner() {
-        return this.members.find(m => m.user_id === this.owner_id);
+        return this.members.find(m => m.userId === this.ownerId);
     }
 
     get roles() {
@@ -142,15 +141,22 @@ export class Guild {
     /**
      * Channels that don't have a parent. (Channel categories and any text/voice channel not in one.)
      */
-    get main_channels() {
-        return this.channels.filter(c => !c.parent_id);
+    get mainChannels() {
+        return this.channels.filter(c => !c.parentId);
     }
 
     /**
      * The guild's default channel. (Usually the first in the list.)
      */
-    get default_channel() {
+    get defaultChannel() {
         return Channel.from(Modules.GuildChannelsStore.getDefaultChannel(this.id));
+    }
+
+    /**
+     * The guild's AFK channel.
+     */
+    get afkChannel() {
+        if (this.afkChannelId) return Channel.fromId(this.afkChannelId);
     }
 
     /**
@@ -171,7 +177,7 @@ export class Guild {
     /**
      * The total number of members in the guild.
      */
-    get member_count() {
+    get memberCount() {
         return Modules.MemberCountStore.getMemberCount(this.id);
     }
 
@@ -201,8 +207,8 @@ export class Guild {
     /**
      * Whether the user has not restricted direct messages from members of this guild.
      */
-    get allow_dms() {
-        return !DiscordApi.UserSettings.restricted_guild_ids.includes(this.id);
+    get allowPrivateMessages() {
+        return !DiscordApi.UserSettings.restrictedGuildIds.includes(this.id);
     }
 
     /**
@@ -222,7 +228,7 @@ export class Guild {
     /**
      * Whether this channel is currently selected.
      */
-    get selected() {
+    get isSelected() {
         return DiscordApi.currentGuild === this;
     }
 

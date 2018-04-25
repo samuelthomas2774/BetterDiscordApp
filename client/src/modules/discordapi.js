@@ -169,22 +169,22 @@ export class UserSettings {
      * 0 == off, 1 == everyone except friends, 2 == everyone
      * Configurable in the privacy and safety panel.
      */
-    static get explicit_content_filter() { return Modules.UserSettingsStore.explicitContentFilter }
+    static get explicitContentFilter() { return Modules.UserSettingsStore.explicitContentFilter }
 
     /**
      * Whether to disallow direct messages from server members by default.
      */
-    static get default_guilds_restricted() { return Modules.UserSettingsStore.defaultGuildsRestricted }
+    static get defaultGuildsRestricted() { return Modules.UserSettingsStore.defaultGuildsRestricted }
 
     /**
      * An array of guilds to disallow direct messages from their members.
      * This is bypassed if the member is has another mutual guild with this disabled, or the member is friends with the current user.
      * Configurable in each server's privacy settings.
      */
-    static get restricted_guild_ids() { return Modules.UserSettingsStore.restrictedGuilds }
+    static get restrictedGuildIds() { return Modules.UserSettingsStore.restrictedGuilds }
 
-    static get restricted_guilds() {
-        return List.from(this.restricted_guild_ids, id => Guild.fromId(id) || id);
+    static get restrictedGuilds() {
+        return List.from(this.restrictedGuildIds, id => Guild.fromId(id) || id);
     }
 
     /**
@@ -192,77 +192,77 @@ export class UserSettings {
      * If everyone is checked, this will only have one item, "all". Otherwise it has either "mutual_friends", "mutual_guilds", both or neither.
      * Configurable in the privacy and safety panel.
      */
-    static get friend_source_flags() { return Object.keys(Modules.UserSettingsStore.friendSourceFlags) }
-    static get friend_source_everyone() { return this.friend_source_flags.include('all') }
-    static get friend_source_mutual_friends() { return this.friend_source_flags.include('all') || this.friend_source_flags.include('mutual_friends') }
-    static get friend_source_mutual_guilds() { return this.friend_source_flags.include('all') || this.friend_source_flags.include('mutual_guilds') }
-    static get friend_source_anyone() { return this.friend_source_flags.length > 0 }
+    static get friendSourceFlags() { return Object.keys(Modules.UserSettingsStore.friendSourceFlags) }
+    static get friendSourceEveryone() { return this.friend_source_flags.include('all') }
+    static get friendSourceMutual_friends() { return this.friend_source_flags.include('all') || this.friend_source_flags.include('mutual_friends') }
+    static get friendSourceMutual_guilds() { return this.friend_source_flags.include('all') || this.friend_source_flags.include('mutual_guilds') }
+    static get friendSourceAnyone() { return this.friend_source_flags.length > 0 }
 
     /**
      * Whether to automatically add accounts from other platforms running on the user's computer.
      * Configurable in the connections panel.
      */
-    static get detect_platform_accounts() { return Modules.UserSettingsStore.detectPlatformAccounts }
+    static get detectPlatformAccounts() { return Modules.UserSettingsStore.detectPlatformAccounts }
 
     /**
      * The number of seconds Discord will wait for activity before sending mobile push notifications.
      * Configurable in the notifications panel.
      */
-    static get afk_timeout() { return Modules.UserSettingsStore.afkTimeout }
+    static get afkTimeout() { return Modules.UserSettingsStore.afkTimeout }
 
     /**
      * Whether to display the currently running game as a status message.
      * Configurable in the games panel.
      */
-    static get show_current_game() { return Modules.UserSettingsStore.showCurrentGame }
+    static get showCurrentGame() { return Modules.UserSettingsStore.showCurrentGame }
 
     /**
      * Whether to show images uploaded directly to Discord.
      * Configurable in the text and images panel.
      */
-    static get inline_attachment_media() { return Modules.UserSettingsStore.inlineAttachmentMedia }
+    static get inlineAttachmentMedia() { return Modules.UserSettingsStore.inlineAttachmentMedia }
 
     /**
      * Whether to show images linked in Discord.
      * Configurable in the text and images panel.
      */
-    static get inline_embed_media() { return Modules.UserSettingsStore.inlineEmbedMedia }
+    static get inlineEmbedMedia() { return Modules.UserSettingsStore.inlineEmbedMedia }
 
     /**
      * Whether to automatically play GIFs when the Discord window is active without having to hover the mouse over the image.
      * Configurable in the text and images panel.
      */
-    static get autoplay_gifs() { return Modules.UserSettingsStore.gifAutoPlay }
+    static get autoplayGifs() { return Modules.UserSettingsStore.gifAutoPlay }
 
     /**
      * Whether to show content from HTTP[s] links as embeds.
      * Configurable in the text and images panel.
      */
-    static get show_embeds() { return Modules.UserSettingsStore.renderEmbeds }
+    static get showEmbeds() { return Modules.UserSettingsStore.renderEmbeds }
 
     /**
      * Whether to show a message's reactions.
      * Configurable in the text and images panel.
      */
-    static get show_reactions() { return Modules.UserSettingsStore.renderReactions }
+    static get showReactions() { return Modules.UserSettingsStore.renderReactions }
 
     /**
      * Whether to play animated emoji.
      * Configurable in the text and images panel.
      */
-    static get animate_emoji() { return Modules.UserSettingsStore.animateEmoji }
+    static get animateEmoji() { return Modules.UserSettingsStore.animateEmoji }
 
     /**
      * Whether to convert ASCII emoticons to emoji.
      * Configurable in the text and images panel.
      */
-    static get convert_emoticons() { return Modules.UserSettingsStore.convertEmoticons }
+    static get convertEmoticons() { return Modules.UserSettingsStore.convertEmoticons }
 
     /**
      * Whether to allow playing text-to-speech messages.
      * Configurable in the text and images panel.
      */
-    static get enable_tts() { return Modules.UserSettingsStore.enableTTSCommand }
+    static get allowTts() { return Modules.UserSettingsStore.enableTTSCommand }
 
     /**
      * The user's selected theme. Either "dark" or "light".
@@ -275,14 +275,14 @@ export class UserSettings {
      * `true` if compact mode is enabled, `false` if cozy mode is enabled.
      * Configurable in the appearance panel.
      */
-    static get display_compact() { return Modules.UserSettingsStore.messageDisplayCompact }
+    static get displayCompact() { return Modules.UserSettingsStore.messageDisplayCompact }
 
     /**
      * Whether the user has enabled developer mode.
      * Currently only adds a "Copy ID" option to the context menu on users, guilds and channels.
      * Configurable in the appearance panel.
      */
-    static get developer_mode() { return Modules.UserSettingsStore.developerMode }
+    static get developerMode() { return Modules.UserSettingsStore.developerMode }
 
     /**
      * The user's selected language code.
@@ -294,5 +294,5 @@ export class UserSettings {
      * The user's timezone offset in hours.
      * This is not configurable.
      */
-    static get timezone_offset() { return Modules.UserSettingsStore.timezoneOffset }
+    static get timezoneOffset() { return Modules.UserSettingsStore.timezoneOffset }
 }

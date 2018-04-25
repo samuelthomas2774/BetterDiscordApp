@@ -35,25 +35,25 @@ export class User {
 
     get id() { return this.discordObject.id }
     get username() { return this.discordObject.username }
-    get username_lower_case() { return this.discordObject.usernameLowerCase }
+    get usernameLowerCase() { return this.discordObject.usernameLowerCase }
     get discriminator() { return this.discordObject.discriminator }
     get avatar() { return this.discordObject.avatar }
     get email() { return undefined }
     get phone() { return undefined }
     get flags() { return this.discordObject.flags }
-    get bot() { return this.discordObject.bot }
+    get isBot() { return this.discordObject.bot }
     get premium() { return this.discordObject.premium }
     get verified() { return this.discordObject.verified }
-    get mfa_enabled() { return this.discordObject.mfaEnabled }
+    get mfaEnabled() { return this.discordObject.mfaEnabled }
     get mobile() { return this.discordObject.mobile }
 
     get tag() { return this.discordObject.tag }
-    get avatar_url() { return this.discordObject.avatarURL }
-    get created_at() { return this.discordObject.createdAt }
+    get avatarUrl() { return this.discordObject.avatarURL }
+    get createdAt() { return this.discordObject.createdAt }
 
-    get is_clamied() { return this.discordObject.isClaimed() }
-    get is_local_bot() { return this.discordObject.isLocalBot() }
-    get is_phone_verified() { return this.discordObject.isPhoneVerified() }
+    get isClamied() { return this.discordObject.isClaimed() }
+    get isLocalBot() { return this.discordObject.isLocalBot() }
+    get isPhoneVerified() { return this.discordObject.isPhoneVerified() }
 
     get guilds() {
         return DiscordApi.guilds.filter(g => g.members.find(m => m.user === this));
@@ -69,14 +69,14 @@ export class User {
         return Modules.UserStatusStore.getActivity(this.id);
     }
 
-    get direct_messages() {
-        return DiscordApi.channels.find(c => c.type === 'DM' && c.recipient_id === this.id);
+    get privateChannel() {
+        return DiscordApi.channels.find(c => c.type === 'DM' && c.recipientId === this.id);
     }
 
     async ensurePrivateChannel() {
         if (DiscordApi.currentUser === this)
             throw new Error('Cannot create a direct message channel to the current user.');
-        return Channel.from(await Modules.PrivateChannelActions.ensurePrivateChannel(DiscordApi.currentUser.id, this.id));
+        return Channel.fromId(await Modules.PrivateChannelActions.ensurePrivateChannel(DiscordApi.currentUser.id, this.id));
     }
 
     async sendMessage(content, parse = true) {
@@ -84,11 +84,11 @@ export class User {
         return channel.sendMessage(content, parse);
     }
 
-    get is_friend() {
+    get isFriend() {
         return Modules.RelationshipStore.isFriend(this.id);
     }
 
-    get is_blocked() {
+    get isBlocked() {
         return Modules.RelationshipStore.isBlocked(this.id);
     }
 
@@ -127,17 +127,17 @@ export class GuildMember {
         guild_members.set(data, this);
 
         this.discordObject = data;
-        this.guild_id = guild_id;
+        this.guildId = guild_id;
     }
 
-    get user_id() { return this.discordObject.userId }
+    get userId() { return this.discordObject.userId }
     get nickname() { return this.discordObject.nick }
-    get colour_string() { return this.discordObject.colorString }
-    get hoist_role_id() { return this.discordObject.hoistRoleId }
-    get role_ids() { return this.discordObject.roles }
+    get colourString() { return this.discordObject.colorString }
+    get hoistRoleId() { return this.discordObject.hoistRoleId }
+    get roleIds() { return this.discordObject.roles }
 
     get user() {
-        return User.fromId(this.user_id);
+        return User.fromId(this.userId);
     }
 
     get name() {
@@ -145,16 +145,16 @@ export class GuildMember {
     }
 
     get guild() {
-        return Guild.fromId(this.guild_id);
+        return Guild.fromId(this.guildId);
     }
 
     get roles() {
-        return List.from(this.role_ids, id => this.guild.roles.find(r => r.id === id))
+        return List.from(this.roleIds, id => this.guild.roles.find(r => r.id === id))
             .sort((r1, r2) => r1.position === r2.position ? 0 : r1.position > r2.position ? 1 : -1);
     }
 
-    get hoist_role() {
-        return this.guild.roles.find(r => r.id === this.hoist_role_id);
+    get hoistRole() {
+        return this.guild.roles.find(r => r.id === this.hoistRoleId);
     }
 
     checkPermissions(perms) {
@@ -162,8 +162,7 @@ export class GuildMember {
     }
 
     assertPermissions(name, perms) {
-        if (!this.checkPermissions(perms))
-            throw new InsufficientPermissions(name);
+        if (!this.checkPermissions(perms)) throw new InsufficientPermissions(name);
     }
 
     /**
@@ -174,7 +173,7 @@ export class GuildMember {
             this.assertPermissions('CHANGE_NICKNAME', Modules.DiscordPermissions.CHANGE_NICKNAME);
         else this.assertPermissions('MANAGE_NICKNAMES', Modules.DiscordPermissions.MANAGE_NICKNAMES);
 
-        Modules.ChangeNicknameModal.open(this.guild_id, this.user_id);
+        Modules.ChangeNicknameModal.open(this.guildId, this.userId);
     }
 
     /**
@@ -188,7 +187,7 @@ export class GuildMember {
         else this.assertPermissions('MANAGE_NICKNAMES', Modules.DiscordPermissions.MANAGE_NICKNAMES);
 
         return Modules.APIModule.patch({
-            url: `${Modules.DiscordConstants.Endpoints.GUILD_MEMBERS(this.guild_id)}/${DiscordApi.currentUser === this.user ? '@me/nick' : this.user_id}`,
+            url: `${Modules.DiscordConstants.Endpoints.GUILD_MEMBERS(this.guild_id)}/${DiscordApi.currentUser === this.user ? '@me/nick' : this.userId}`,
             body: { nick }
         });
     }
@@ -200,7 +199,7 @@ export class GuildMember {
      */
     kick(reason = '') {
         this.assertPermissions('KICK_MEMBERS', Modules.DiscordPermissions.KICK_MEMBERS);
-        return Modules.GuildActions.kickUser(this.guild_id, this.user_id, reason);
+        return Modules.GuildActions.kickUser(this.guildId, this.userId, reason);
     }
 
     /**
@@ -211,7 +210,7 @@ export class GuildMember {
      */
     ban(daysToDelete = 1, reason = '') {
         this.assertPermissions('BAN_MEMBERS', Modules.DiscordPermissions.BAN_MEMBERS);
-        return Modules.GuildActions.banUser(this.guild_id, this.user_id, daysToDelete, reason);
+        return Modules.GuildActions.banUser(this.guildId, this.userId, daysToDelete, reason);
     }
 
     /**
@@ -220,7 +219,7 @@ export class GuildMember {
      */
     unban() {
         this.assertPermissions('BAN_MEMBERS', Modules.DiscordPermissions.BAN_MEMBERS);
-        return Modules.GuildActions.unbanUser(this.guild_id, this.user_id);
+        return Modules.GuildActions.unbanUser(this.guildId, this.userId);
     }
 
     /**
@@ -229,7 +228,7 @@ export class GuildMember {
      */
     move(channel) {
         this.assertPermissions('MOVE_MEMBERS', Modules.DiscordPermissions.MOVE_MEMBERS);
-        Modules.GuildActions.setChannel(this.guild_id, this.user_id, channel.id);
+        Modules.GuildActions.setChannel(this.guildId, this.userId, channel.id);
     }
 
     /**
@@ -237,7 +236,7 @@ export class GuildMember {
      */
     mute(active = true) {
         this.assertPermissions('MUTE_MEMBERS', Modules.DiscordPermissions.MUTE_MEMBERS);
-        Modules.GuildActions.setServerMute(this.guild_id, this.user_id, active);
+        Modules.GuildActions.setServerMute(this.guildId, this.userId, active);
     }
 
     /**
@@ -252,7 +251,7 @@ export class GuildMember {
      */
     deafen(active = true) {
         this.assertPermissions('DEAFEN_MEMBERS', Modules.DiscordPermissions.DEAFEN_MEMBERS);
-        Modules.GuildActions.setServerDeaf(this.guild_id, this.user_id, active);
+        Modules.GuildActions.setServerDeaf(this.guildId, this.userId, active);
     }
 
     /**

@@ -50,7 +50,7 @@ export class Channel {
     static get GroupChannel() { return GroupChannel }
 
     get id() { return this.discordObject.id }
-    get application_id() { return this.discordObject.application_id }
+    get applicationId() { return this.discordObject.application_id }
     get type() { return this.discordObject.type }
     get name() { return this.discordObject.name }
 
@@ -62,9 +62,11 @@ export class Channel {
      */
     async sendMessage(content, parse = false) {
         if (this.assertPermissions) this.assertPermissions('SEND_MESSAGES', Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES);
-        let response = {};
-        if (parse) response = await Modules.MessageActions._sendMessage(this.id, Modules.MessageParser.parse(this.discordObject, content));
-        else response = await Modules.MessageActions._sendMessage(this.id, {content});
+
+        if (parse) content = Modules.MessageParser.parse(this.discordObject, content);
+        else content = {content};
+
+        const response = await Modules.MessageActions._sendMessage(this.id, content);
         return Message.from(Modules.MessageStore.getMessage(this.id, response.body.id));
     }
 
@@ -116,13 +118,13 @@ export class Channel {
      */
     select() {
         if (this.assertPermissions) this.assertPermissions('VIEW_CHANNEL', Modules.DiscordPermissions.VIEW_CHANNEL);
-        Modules.NavigationUtils.transitionToGuild(this.guild_id ? this.guild_id : Modules.DiscordConstants.ME, this.id);
+        Modules.NavigationUtils.transitionToGuild(this.guildId ? this.guildId : Modules.DiscordConstants.ME, this.id);
     }
 
     /**
      * Whether this channel is currently selected.
      */
-    get selected() {
+    get isSelected() {
         return DiscordApi.currentChannel === this;
     }
 
@@ -140,7 +142,7 @@ export class Channel {
 export class PermissionOverwrite {
     constructor(data, channel_id) {
         this.discordObject = data;
-        this.channel_id = channel_id;
+        this.channelId = channel_id;
     }
 
     static from(data, channel_id) {
@@ -159,7 +161,7 @@ export class PermissionOverwrite {
     get deny() { return this.discordObject.deny }
 
     get channel() {
-        return Channel.fromId(this.channel_id);
+        return Channel.fromId(this.channelId);
     }
 
     get guild() {
@@ -168,26 +170,26 @@ export class PermissionOverwrite {
 }
 
 export class RolePermissionOverwrite extends PermissionOverwrite {
-    get role_id() { return this.discordObject.id }
+    get roleId() { return this.discordObject.id }
 
     get role() {
-        if (this.guild) return this.guild.roles.find(r => r.id === this.role_id);
+        if (this.guild) return this.guild.roles.find(r => r.id === this.roleId);
     }
 }
 
 export class MemberPermissionOverwrite extends PermissionOverwrite {
-    get member_id() { return this.discordObject.id }
+    get memberId() { return this.discordObject.id }
 
     get member() {
-        return GuildMember.fromId(this.member_id);
+        return GuildMember.fromId(this.memberId);
     }
 }
 
 export class GuildChannel extends Channel {
     static get PermissionOverwrite() { return PermissionOverwrite }
 
-    get guild_id() { return this.discordObject.guild_id }
-    get parent_id() { return this.discordObject.parent_id } // Channel category
+    get guildId() { return this.discordObject.guild_id }
+    get parentId() { return this.discordObject.parent_id } // Channel category
     get position() { return this.discordObject.position }
     get nicks() { return this.discordObject.nicks }
 
@@ -196,12 +198,11 @@ export class GuildChannel extends Channel {
     }
 
     assertPermissions(name, perms) {
-        if (!this.checkPermissions(perms))
-            throw new InsufficientPermissions(name);
+        if (!this.checkPermissions(perms)) throw new InsufficientPermissions(name);
     }
 
     get category() {
-        return Channel.fromId(this.parent_id);
+        return Channel.fromId(this.parentId);
     }
 
     /**
@@ -211,20 +212,19 @@ export class GuildChannel extends Channel {
         return Modules.GuildPermissions.getChannelPermissions(this.id);
     }
 
-    get permission_overwrites() {
+    get permissionOverwrites() {
         return List.from(Object.entries(this.discordObject.permissionOverwrites), ([i, p]) => PermissionOverwrite.from(p, this.id));
     }
 
     get guild() {
-        const guild = Modules.GuildStore.getGuild(this.guild_id);
-        if (guild) return Guild.from(guild);
+        return Guild.fromId(this.guildId);
     }
 
     /**
      * Whether this channel is the guild's default channel.
      */
-    get default_channel() {
-        return Modules.GuildChannelsStore.getDefaultChannel(this.guild_id).id === this.id;
+    get defaultChannel() {
+        return Modules.GuildChannelsStore.getDefaultChannel(this.guildId).id === this.id;
     }
 }
 
@@ -238,7 +238,7 @@ export class GuildTextChannel extends GuildChannel {
 // Type 2 - GUILD_VOICE
 export class GuildVoiceChannel extends GuildChannel {
     get type() { return 'GUILD_VOICE' }
-    get user_limit() { return this.discordObject.userLimit }
+    get userLimit() { return this.discordObject.userLimit }
     get bitrate() { return this.discordObject.bitrate }
 
     sendMessage() { throw new Error('Cannot send messages in a voice channel.'); }
@@ -252,7 +252,7 @@ export class GuildVoiceChannel extends GuildChannel {
 // Type 4 - GUILD_CATEGORY
 export class ChannelCategory extends GuildChannel {
     get type() { return 'GUILD_CATEGORY' }
-    get parent_id() { return undefined }
+    get parentId() { return undefined }
     get category() { return undefined }
 
     sendMessage() { throw new Error('Cannot send messages in a channel category.'); }
@@ -266,31 +266,31 @@ export class ChannelCategory extends GuildChannel {
      * A list of channels in this category.
      */
     get channels() {
-        return List.from(this.guild.channels, c => c.parent_id === this.id);
+        return List.from(this.guild.channels, c => c.parentId === this.id);
     }
 }
 
 export class PrivateChannel extends Channel {
-    get user_limit() { return this.discordObject.userLimit }
+    get userLimit() { return this.discordObject.userLimit }
     get bitrate() { return this.discordObject.bitrate }
 }
 
 // Type 1 - DM
 export class DirectMessageChannel extends PrivateChannel {
     get type() { return 'DM' }
-    get recipient_id() { return this.discordObject.recipients[0] }
+    get recipientId() { return this.discordObject.recipients[0] }
 
     /**
      * The other user of this direct message channel.
      */
     get recipient() {
-        return User.fromId(this.recipient_id);
+        return User.fromId(this.recipientId);
     }
 }
 
 // Type 3 - GROUP_DM
 export class GroupChannel extends PrivateChannel {
-    get owner_id() { return this.discordObject.ownerId }
+    get ownerId() { return this.discordObject.ownerId }
     get type() { return 'GROUP_DM' }
     get icon() { return this.discordObject.icon }
 
@@ -305,6 +305,6 @@ export class GroupChannel extends PrivateChannel {
      * The owner of this group direct message channel. This is usually the person who created it.
      */
     get owner() {
-        return User.fromId(this.owner_id);
+        return User.fromId(this.ownerId);
     }
 }

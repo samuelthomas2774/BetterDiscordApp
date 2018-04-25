@@ -21,8 +21,8 @@ export class Reaction {
         reactions.set(data, this);
 
         this.discordObject = data;
-        this.message_id = message_id;
-        this.channel_id = channel_id;
+        this.messageId = message_id;
+        this.channelId = channel_id;
     }
 
     get emoji() {
@@ -39,7 +39,7 @@ export class Reaction {
     }
 
     get message() {
-        if (this.channel) return this.channel.messages.find(m => m.id === this.message_id);
+        if (this.channel) return this.channel.messages.find(m => m.id === this.messageId);
     }
 
     get guild() {
@@ -55,8 +55,8 @@ export class Embed {
         embeds.set(data, this);
 
         this.discordObject = data;
-        this.message_id = message_id;
-        this.channel_id = channel_id;
+        this.messageId = message_id;
+        this.channelId = channel_id;
     }
 
     get title() { return this.discordObject.title }
@@ -74,11 +74,11 @@ export class Embed {
     get fields() { return this.discordObject.fields }
 
     get channel() {
-        return Channel.fromId(this.channel_id);
+        return Channel.fromId(this.channelId);
     }
 
     get message() {
-        if (this.channel) return this.channel.messages.find(m => m.id === this.message_id);
+        if (this.channel) return this.channel.messages.find(m => m.id === this.messageId);
     }
 
     get guild() {
@@ -123,21 +123,20 @@ export class Message {
     static get Embed() { return Embed }
 
     get id() { return this.discordObject.id }
-    get channel_id() { return this.discordObject.channel_id }
+    get channelId() { return this.discordObject.channel_id }
     get nonce() { return this.discordObject.nonce }
     get type() { return this.discordObject.type }
     get timestamp() { return this.discordObject.timestamp }
     get state() { return this.discordObject.state }
     get nick() { return this.discordObject.nick }
-    get colour_string() { return this.discordObject.colorString }
+    get colourString() { return this.discordObject.colorString }
 
     get author() {
-        if (this.webhook_id) return this.discordObject.author;
-        if (this.discordObject.author) return User.from(this.discordObject.author);
+        if (this.discordObject.author && !this.webhookId) return User.from(this.discordObject.author);
     }
 
     get channel() {
-        return Channel.fromId(this.channel_id);
+        return Channel.fromId(this.channelId);
     }
 
     get guild() {
@@ -149,30 +148,29 @@ export class Message {
      * TODO: how do we know if the message was deleted successfully?
      */
     delete() {
-        Modules.MessageActions.deleteMessage(this.channel_id, this.id);
+        Modules.MessageActions.deleteMessage(this.channelId, this.id);
     }
 
     /**
      * Jumps to the message.
      */
     jumpTo(flash = true) {
-        Modules.MessageActions.jumpToMessage(this.channel_id, this.id, flash);
+        Modules.MessageActions.jumpToMessage(this.channelId, this.id, flash);
     }
 
 }
 
 export class DefaultMessage extends Message {
-    get webhook_id() { return this.discordObject.webhookId }
+    get webhookId() { return this.discordObject.webhookId }
     get type() { return 'DEFAULT' }
     get content() { return this.discordObject.content }
-    get content_parsed() { return this.discordObject.contentParsed }
-    get invite_codes() { return this.discordObject.invites }
-    // get embeds() { return this.discordObject.embeds }
+    get contentParsed() { return this.discordObject.contentParsed }
+    get inviteCodes() { return this.discordObject.invites }
     get attachments() { return this.discordObject.attachments }
-    get mention_ids() { return this.discordObject.mentions }
-    get mention_role_ids() { return this.discordObject.mentionRoles }
-    get mention_everyone() { return this.discordObject.mentionEveryone }
-    get edited_timestamp() { return this.discordObject.editedTimestamp }
+    get mentionIds() { return this.discordObject.mentions }
+    get mentionRoleIds() { return this.discordObject.mentionRoles }
+    get mentionEveryone() { return this.discordObject.mentionEveryone }
+    get editedTimestamp() { return this.discordObject.editedTimestamp }
     get tts() { return this.discordObject.tts }
     get mentioned() { return this.discordObject.mentioned }
     get bot() { return this.discordObject.bot }
@@ -181,24 +179,28 @@ export class DefaultMessage extends Message {
     get activity() { return this.discordObject.activity }
     get application() { return this.discordObject.application }
 
+    get webhook() {
+        if (this.webhookId) return this.discordObject.author;
+    }
+
     get mentions() {
-        return List.from(this.mention_ids, id => User.fromId(id));
+        return List.from(this.mentionIds, id => User.fromId(id));
     }
 
     get mention_roles() {
-        return List.from(this.mention_role_ids, id => this.guild.roles.find(r => r.id === id));
+        return List.from(this.mentionRoleIds, id => this.guild.roles.find(r => r.id === id));
     }
 
     get embeds() {
-        return List.from(this.discordObject.embeds, r => new Embed(r, this.id, this.channel_id));
+        return List.from(this.discordObject.embeds, r => new Embed(r, this.id, this.channelId));
     }
 
     get reactions() {
-        return List.from(this.discordObject.reactions, r => new Reaction(r, this.id, this.channel_id));
+        return List.from(this.discordObject.reactions, r => new Reaction(r, this.id, this.channelId));
     }
 
     get edited() {
-        return !!this.edited_timestamp;
+        return !!this.editedTimestamp;
     }
 
     /**
@@ -208,19 +210,19 @@ export class DefaultMessage extends Message {
      * @param {Boolean} parse Whether to parse the message or update it as it is
      */
     edit(content, parse = false) {
-        if (this.author !== DiscordApi.currentUser)
-            throw new Error('Cannot edit messages sent by other users.');
-        if (parse) Modules.MessageActions.editMessage(this.channel_id, this.id, Modules.MessageParser.parse(this.discordObject, content));
-        else Modules.MessageActions.editMessage(this.channel_id, this.id, {content});
+        if (this.author !== DiscordApi.currentUser) throw new Error('Cannot edit messages sent by other users.');
+        if (parse) content = Modules.MessageParser.parse(this.discordObject, content);
+        else content = {content};
+        Modules.MessageActions.editMessage(this.channelId, this.id, content);
     }
 
     /**
      * Start the edit mode of the UI.
+     * @param {String} content A string to show in the message text area - if empty the message's current content will be used
      */
     startEdit(content) {
-        if (this.author !== DiscordApi.currentUser)
-            throw new Error('Cannot edit messages sent by other users.');
-        Modules.MessageActions.startEditMessage(this.channel_id, this.id, content || this.content);
+        if (this.author !== DiscordApi.currentUser) throw new Error('Cannot edit messages sent by other users.');
+        Modules.MessageActions.startEditMessage(this.channelId, this.id, content || this.content);
     }
 
     /**
@@ -233,35 +235,35 @@ export class DefaultMessage extends Message {
 
 export class RecipientAddMessage extends Message {
     get type() { return 'RECIPIENT_ADD' }
-    get added_user_id() { return this.discordObject.mentions[0] }
+    get addedUserId() { return this.discordObject.mentions[0] }
 
-    get added_user() {
-        return User.fromId(this.added_user_id);
+    get addedUser() {
+        return User.fromId(this.addedUserId);
     }
 }
 
 export class RecipientRemoveMessage extends Message {
     get type() { return 'RECIPIENT_REMOVE' }
-    get removed_user_id() { return this.discordObject.mentions[0] }
+    get removedUserId() { return this.discordObject.mentions[0] }
 
-    get removed_user() {
-        return User.fromId(this.removed_user_id);
+    get removedUser() {
+        return User.fromId(this.removedUserId);
     }
 
-    get user_left() {
-        return this.author === this.removed_user;
+    get userLeft() {
+        return this.author === this.removedUser;
     }
 }
 
 export class CallMessage extends Message {
     get type() { return 'CALL' }
-    get mention_ids() { return this.discordObject.mentions }
+    get mentionIds() { return this.discordObject.mentions }
     get call() { return this.discordObject.call }
 
-    get ended_timestamp() { return this.call.endedTimestamp }
+    get endedTimestamp() { return this.call.endedTimestamp }
 
     get mentions() {
-        return List.from(this.mention_ids, id => User.fromId(id));
+        return List.from(this.mentionIds, id => User.fromId(id));
     }
 
     get participants() {
@@ -271,7 +273,7 @@ export class CallMessage extends Message {
 
 export class GroupChannelNameChangeMessage extends Message {
     get type() { return 'CHANNEL_NAME_CHANGE' }
-    get new_name() { return this.discordObject.content }
+    get newName() { return this.discordObject.content }
 }
 
 export class GroupChannelIconChangeMessage extends Message {

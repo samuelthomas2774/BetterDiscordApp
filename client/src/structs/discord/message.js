@@ -9,7 +9,7 @@
 */
 
 import { DiscordApi, DiscordApiModules as Modules } from 'modules';
-import { List } from 'structs';
+import { List, InsufficientPermissions } from 'structs';
 import { Channel } from './channel';
 import { User } from './user';
 
@@ -148,7 +148,16 @@ export class Message {
      * TODO: how do we know if the message was deleted successfully?
      */
     delete() {
+        if (!this.isDeletable) throw new Error(`Message type ${this.type} is not deletable.`);
+        if (this.author === DiscordApi.currentUser) {}
+        else if (this.channel.assertPermissions) this.channel.assertPermissions('MANAGE_MESSAGES', Modules.DiscordPermissions.MANAGE_MESSAGES);
+        else if (!this.channel.owner === DiscordApi.currentUser) throw new InsufficientPermissions('MANAGE_MESSAGES');
+
         Modules.MessageActions.deleteMessage(this.channelId, this.id);
+    }
+
+    isDeletable() {
+        return this.type === 'DEFAULT' || this.type === 'CHANNEL_PINNED_MESSAGE' || this.type === 'GUILD_MEMBER_JOIN';
     }
 
     /**

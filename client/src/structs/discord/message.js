@@ -215,15 +215,21 @@ export class DefaultMessage extends Message {
 
     /**
      * Programmatically update the message's content.
-     * TODO: how do we know if the message was updated successfully?
      * @param {String} content The message's new content
      * @param {Boolean} parse Whether to parse the message or update it as it is
+     * @return {Promise}
      */
-    edit(content, parse = false) {
+    async edit(content, parse = false) {
         if (this.author !== DiscordApi.currentUser) throw new Error('Cannot edit messages sent by other users.');
         if (parse) content = Modules.MessageParser.parse(this.discordObject, content);
         else content = {content};
-        Modules.MessageActions.editMessage(this.channelId, this.id, content);
+
+        const response = await Modules.APIModule.patch({
+            url: `${Modules.DiscordConstants.Endpoints.MESSAGES(this.channelId)}/${this.id}`,
+            body: content
+        });
+
+        this.discordObject = Modules.MessageStore.getMessage(this.id, response.body.id);
     }
 
     /**

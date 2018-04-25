@@ -58,7 +58,7 @@ export class Channel {
      * Send a message in this channel.
      * @param {String} content The new message's content
      * @param {Boolean} parse Whether to parse the message or send it as it is
-     * @return {Promise}
+     * @return {Promise => Message}
      */
     async sendMessage(content, parse = false) {
         if (this.assertPermissions) this.assertPermissions('SEND_MESSAGES', Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES);
@@ -105,7 +105,7 @@ export class Channel {
     /**
      * Sends an invite in this channel.
      * @param {String} code The invite code
-     * @return {Promise}
+     * @return {Promise => Messaage}
      */
     async sendInvite(code) {
         if (this.assertPermissions) this.assertPermissions('SEND_MESSAGES', Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES);

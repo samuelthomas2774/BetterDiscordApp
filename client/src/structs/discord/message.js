@@ -119,6 +119,7 @@ export class Message {
     static get GroupChannelIconChangeMessage() { return GroupChannelIconChangeMessage }
     static get MessagePinnedMessage() { return MessagePinnedMessage }
     static get GuildMemberJoinMessage() { return GuildMemberJoinMessage }
+
     static get Reaction() { return Reaction }
     static get Embed() { return Embed }
 

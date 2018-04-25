@@ -226,7 +226,7 @@ export class Guild {
     }
 
     /**
-     * Whether this channel is currently selected.
+     * Whether this guild is currently selected.
      */
     get isSelected() {
         return DiscordApi.currentGuild === this;

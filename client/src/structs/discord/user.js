@@ -170,8 +170,27 @@ export class GuildMember {
      * Opens the modal to change this user's nickname.
      */
     openChangeNicknameModal() {
-        if (DiscordApi.currentUser !== this) this.assertPermissions('MANAGE_NICKNAMES', Modules.DiscordPermissions.MANAGE_NICKNAMES);
+        if (DiscordApi.currentUser === this.user)
+            this.assertPermissions('CHANGE_NICKNAME', Modules.DiscordPermissions.CHANGE_NICKNAME);
+        else this.assertPermissions('MANAGE_NICKNAMES', Modules.DiscordPermissions.MANAGE_NICKNAMES);
+
         Modules.ChangeNicknameModal.open(this.guild_id, this.user_id);
+    }
+
+    /**
+     * Changes the user's nickname on this guild.
+     * @param {String} nickname The user's new nickname
+     * @return {Promise}
+     */
+    changeNickname(nick) {
+        if (DiscordApi.currentUser === this.user)
+            this.assertPermissions('CHANGE_NICKNAME', Modules.DiscordPermissions.CHANGE_NICKNAME);
+        else this.assertPermissions('MANAGE_NICKNAMES', Modules.DiscordPermissions.MANAGE_NICKNAMES);
+
+        return Modules.APIModule.patch({
+            url: `${Modules.DiscordConstants.Endpoints.GUILD_MEMBERS(this.guild_id)}/${DiscordApi.currentUser === this.user ? '@me/nick' : this.user_id}`,
+            body: { nick }
+        });
     }
 
     /**

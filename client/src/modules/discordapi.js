@@ -53,6 +53,7 @@ export const Modules = {
     get NotificationSettingsModal() { return this._getModule('NotificationSettingsModal'); },
     get PrivacySettingsModal() { return this._getModule('PrivacySettingsModal'); },
     get UserProfileModal() { return this._getModule('UserProfileModal'); },
+    get APIModule() { return this._getModule('APIModule'); },
 
     get DiscordPermissions() { return this.DiscordConstants.Permissions; }
 };

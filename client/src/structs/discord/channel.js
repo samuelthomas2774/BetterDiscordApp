@@ -56,7 +56,7 @@ export class Channel {
 
     /**
      * Send a message in this channel.
-     * @param {String} content The message's new content
+     * @param {String} content The new message's content
      * @param {Boolean} parse Whether to parse the message or send it as it is
      * @return {Promise}
      */
@@ -66,6 +66,17 @@ export class Channel {
         if (parse) response = await Modules.MessageActions._sendMessage(this.id, Modules.MessageParser.parse(this.discordObject, content));
         else response = await Modules.MessageActions._sendMessage(this.id, {content});
         return Message.from(Modules.MessageStore.getMessage(this.id, response.body.id));
+    }
+
+    /**
+     * Send a bot message in this channel that only the current user can see.
+     * @param {String} content The new message's content
+     * @return {Message}
+     */
+    sendBotMessage(content) {
+        const message = Modules.MessageParser.createBotMessage(this.id, content);
+        Modules.MessageActions.receiveMessage(this.id, message);
+        return Message.from(Modules.MessageStore.getMessage(this.id, message.id));
     }
 
     /**

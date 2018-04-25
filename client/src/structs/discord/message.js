@@ -146,7 +146,7 @@ export class Message {
 
     /**
      * Deletes the message.
-     * TODO: how do we know if the message was deleted successfully?
+     * @return {Promise}
      */
     delete() {
         if (!this.isDeletable) throw new Error(`Message type ${this.type} is not deletable.`);
@@ -154,10 +154,10 @@ export class Message {
         else if (this.channel.assertPermissions) this.channel.assertPermissions('MANAGE_MESSAGES', Modules.DiscordPermissions.MANAGE_MESSAGES);
         else if (!this.channel.owner === DiscordApi.currentUser) throw new InsufficientPermissions('MANAGE_MESSAGES');
 
-        Modules.MessageActions.deleteMessage(this.channelId, this.id);
+        return Modules.APIModule.delete(`${Modules.DiscordConstants.Endpoints.MESSAGES(this.channelId)}/${this.id}`);
     }
 
-    isDeletable() {
+    get isDeletable() {
         return this.type === 'DEFAULT' || this.type === 'CHANNEL_PINNED_MESSAGE' || this.type === 'GUILD_MEMBER_JOIN';
     }
 

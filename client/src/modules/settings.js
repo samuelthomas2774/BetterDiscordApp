@@ -61,7 +61,7 @@ export default new class Settings {
 
             CssEditor.setState(scss, css, css_editor_files, scss_error);
             CssEditor.editor_bounds = css_editor_bounds || {};
-            EmoteModule.favourite_emotes = favourite_emotes;
+            EmoteModule.favourite_emotes = favourite_emotes || [];
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet

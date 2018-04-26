@@ -63,6 +63,8 @@ export class Channel {
     async sendMessage(content, parse = false) {
         if (this.assertPermissions) this.assertPermissions('SEND_MESSAGES', Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES);
 
+        this.select();
+
         if (parse) content = Modules.MessageParser.parse(this.discordObject, content);
         else content = {content};
 
@@ -76,6 +78,7 @@ export class Channel {
      * @return {Message}
      */
     sendBotMessage(content) {
+        this.select();
         const message = Modules.MessageParser.createBotMessage(this.id, content);
         Modules.MessageActions.receiveMessage(this.id, message);
         return Message.from(Modules.MessageStore.getMessage(this.id, message.id));

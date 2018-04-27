@@ -210,7 +210,7 @@ export class ReactComponents {
         return c;
     }
 
-    static async getComponent(name, important) {
+    static async getComponent(name, important, filter) {
         const have = this.components.find(c => c.id === name);
         if (have) return have;
         if (important) {
@@ -223,24 +223,25 @@ export class ReactComponents {
                 const select = document.querySelector(important.selector);
                 if (!select) return;
                 const reflect = Reflection(select);
-                if (!reflect.component) {
+                const component = filter ? reflect.components.find(filter) || reflect.component : reflect.component;
+                if (!component) {
                     clearInterval(importantInterval);
                     Logger.error('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select]);
                     return;
                 }
-                if (!reflect.component.displayName) reflect.component.displayName = name;
+                if (!component.displayName) component.displayName = name;
                 Logger.info('ReactComponents', [`Found important component ${name} with reflection`, reflect]);
-                this.push(reflect.component);
+                this.push(component);
                 clearInterval(importantInterval);
             }, 50);
         }
-        const listener = this.listeners.find(l => l.id === name);
-        if (!listener) this.listeners.push({
+        let listener = this.listeners.find(l => l.id === name);
+        if (!listener) this.listeners.push(listener = {
             id: name,
             listeners: []
         });
         return new Promise(resolve => {
-            this.listeners.find(l => l.id === name).listeners.push(resolve);
+            listener.listeners.push(resolve);
         });
     }
 

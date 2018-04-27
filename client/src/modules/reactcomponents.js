@@ -299,6 +299,7 @@ export class ReactAutoPatcher {
         await this.patchChannel();
         await this.patchChannelList();
         await this.patchUserProfileModal();
+        await this.patchUserPopout();
         this.forceUpdate();
     }
 
@@ -376,6 +377,21 @@ export class ReactAutoPatcher {
             retVal.props['data-user-id'] = user.id;
             if (user.bot) retVal.props.className += ' bd-isBot';
             if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+        });
+    }
+
+    static async patchUserPopout() {
+        this.UserProfileModal = await ReactComponents.getComponent('UserPopout', { selector: '.userPopout-11hFKo' });
+        this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
+            const { user, guild, guildMember } = component.props;
+            if (!user) return;
+            retVal.props['data-user-id'] = user.id;
+            if (user.bot) retVal.props.className += ' bd-isBot';
+            if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+            if (guild) retVal.props['data-guild-id'] = guild.id;
+            if (guild && user.id === guild.ownerId) retVal.props.className += ' bd-isGuildOwner';
+            if (guild && guildMember) retVal.props.className += ' bd-isGuildMember';
+            if (guildMember && guildMember.roles.length) retVal.props.className += ' bd-hasRoles';
         });
     }
 

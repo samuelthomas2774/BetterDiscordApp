@@ -187,8 +187,8 @@ export default class extends Module {
             const c = contributors.find(c => c.id === user.id);
             if (!c) return;
 
-            const element = ReactHelpers.React.createElement('span', {
-                className: 'bd-profile-badges',
+            const element = ReactHelpers.React.createElement('div', {
+                className: 'bd-profile-badges-outer',
                 'data-userid': user.id
             });
 
@@ -216,7 +216,7 @@ export default class extends Module {
     }
 
     injectProfileBadges(element) {
-        for (const beo of element.getElementsByClassName('bd-profile-badges'))
+        for (const beo of element.getElementsByClassName('bd-profile-badges-outer'))
             this.injectProfileBadge(beo);
     }
 
@@ -224,8 +224,6 @@ export default class extends Module {
         while (root.firstChild) {
             root.removeChild(root.firstChild);
         }
-
-        if (root.classList.contains('bd-has-badge')) return;
 
         const { userid } = root.dataset;
         if (!userid) return;
@@ -236,8 +234,8 @@ export default class extends Module {
         VueInjector.inject(root, {
             components: { BdBadge },
             data: { c },
-            template: '<BdBadge class="bd-has-badge" :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />',
-        });
+            template: '<BdBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />',
+        }, DOM.createElement('span'));
     }
 
 }

@@ -225,6 +225,8 @@ export default class extends Module {
             root.removeChild(root.firstChild);
         }
 
+        if (root.classList.contains('bd-has-badge')) return;
+
         const { userid } = root.dataset;
         if (!userid) return;
 
@@ -234,7 +236,7 @@ export default class extends Module {
         VueInjector.inject(root, {
             components: { BdBadge },
             data: { c },
-            template: '<BdBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />',
+            template: '<BdBadge class="bd-has-badge" :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />',
         });
     }
 

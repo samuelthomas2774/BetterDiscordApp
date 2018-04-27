@@ -159,8 +159,8 @@ export default function (node) {
         getComponentByPrototypes(props, selector) {
             return Reflection.findComponent(this.node, Filters.byPrototypeFields(props, selector));
         }
-        getComponentByRegex(filter) {
-            return Reflection.findComponent(this.node, Filters.byCode(displayName));
+        getComponentByRegex(regex, selector) {
+            return Reflection.findComponent(this.node, Filters.byCode(regex, selector));
         }
         getComponentByDisplayName(name) {
             return Reflection.findComponent(this.node, Filters.byDisplayName(name));

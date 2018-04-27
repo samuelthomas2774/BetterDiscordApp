@@ -18,7 +18,7 @@ import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
 import EventsWrapper from './eventswrapper';
-import { WebpackModules } from './webpackmodules';
+import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
 import { ReactComponents } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
@@ -438,20 +438,29 @@ export default class PluginApi {
     }
 
     /**
+     * Filters
+     */
+
+    get Filters() { return Filters }
+
+    /**
      * DiscordApi
      */
 
-    get Discord() {
-        return DiscordApi;
-    }
+    get Discord() { return DiscordApi }
+    get DiscordApi() { return DiscordApi }
 
-    get ReactComponents() {
-        return ReactComponents;
-    }
+    /**
+     * ReactComponents
+     */
 
-    get Reflection() {
-        return Reflection;
-    }
+    get ReactComponents() { return ReactComponents }
+
+    /**
+     * Reflection
+     */
+
+    get Reflection() { return Reflection }
 
     /**
      * Patcher

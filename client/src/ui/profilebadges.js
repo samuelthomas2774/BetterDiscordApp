@@ -176,26 +176,59 @@ export default class extends Module {
     }
 
     /**
-     * Patches UserProfileModal to inject profile badges into the modal once opened.
-     * TODO: just patch the modal component
+     * Patches UserProfileModal to render profile badges.
      */
     async patchUserProfileModal() {
-        const UserProfileModal = WebpackModules.getModuleByName('UserProfileModal');
+        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal');
+        this.unpatchUserProfileModal = MonkeyPatch('ProfileBadges', this.UserProfileModal.component.prototype).after('renderBadges', (component, args, retVal, setRetVal) => {
 
-        MonkeyPatch('BdUI', UserProfileModal).after('open', async (context, [userid]) => {
-            const c = contributors.find(c => c.id === userid);
+            const user = ReactHelpers.findProp(component, 'user');
+            if (!user) return;
+            const c = contributors.find(c => c.id === user.id);
             if (!c) return;
 
-            const root = await Utils.until(() => document.querySelector('[class*="headerInfo"]'));
-            const el = DOM.createElement('div', null, 'bdprofilebadges');
-            root.insertBefore(el.element, root.firstChild.nextSibling);
+            const element = ReactHelpers.React.createElement('span', {
+                className: 'bd-profile-badges',
+                'data-userid': user.id
+            });
 
-            this.injectProfileBadge(userid, el.element);
+            if (!retVal) {
+                setRetVal(ReactHelpers.React.createElement('div', {
+                    className: 'bd-profile-badges-wrap',
+                    children: element
+                }));
+            } else retVal.props.children.splice(0, 0, element);
+        });
+
+        this.UserProfileModal.component.prototype.componentDidMount = this.UserProfileModal.component.prototype.componentDidMount || (() => {});
+        this.unpatchUserProfileModalMount = MonkeyPatch('ProfileBadges', this.UserProfileModal.component.prototype).after('componentDidMount', component => {
+            const element = ReactHelpers.ReactDOM.findDOMNode(component);
+            if (!element) return;
+            this.injectProfileBadges(element);
+        });
+
+        this.UserProfileModal.component.prototype.componentDidUpdate = this.UserProfileModal.component.prototype.componentDidUpdate || (() => {});
+        this.unpatchUserProfileModalUpdate = MonkeyPatch('ProfileBadges', this.UserProfileModal.component.prototype).after('componentDidUpdate', component => {
+            const element = ReactHelpers.ReactDOM.findDOMNode(component);
+            if (!element) return;
+            this.injectProfileBadges(element);
         });
     }
 
-    injectProfileBadge(userid, root) {
-        const c = contributors.find(c => c.id === userid);
+    injectProfileBadges(element) {
+        for (const beo of element.getElementsByClassName('bd-profile-badges'))
+            this.injectProfileBadge(beo);
+    }
+
+    injectProfileBadge(root) {
+        while (root.firstChild) {
+            root.removeChild(root.firstChild);
+        }
+
+        const { userid } = root.dataset;
+        if (!userid) return;
+
+        const c = contributors.find(c => c.id == userid);
         if (!c) return;
 
         VueInjector.inject(root, {

@@ -21,7 +21,7 @@
     import { shell } from 'electron';
 
     export default {
-        props: ['webdev', 'developer', 'contributor', 'hasBadges'],
+        props: ['webdev', 'developer', 'contributor'],
         methods: {
             click() {
                 if (this.developer) return shell.openExternal('https://github.com/JsSucks/BetterDiscordApp');

@@ -8,8 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Filters } from 'modules';
-import { ClientLogger as Logger } from 'common';
+import { Filters, ClientLogger as Logger } from 'common';
 
 class Reflection {
     static reactInternalInstance(node) {

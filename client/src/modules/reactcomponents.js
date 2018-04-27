@@ -11,9 +11,9 @@
 
 import { EmoteModule } from 'builtin';
 import { Reflection } from 'ui';
-import { ClientLogger as Logger } from 'common';
+import { Filters, ClientLogger as Logger } from 'common';
 import { MonkeyPatch, Patcher } from './patcher';
-import { WebpackModules, Filters } from './webpackmodules';
+import { WebpackModules } from './webpackmodules';
 import DiscordApi from './discordapi';
 
 class Helpers {

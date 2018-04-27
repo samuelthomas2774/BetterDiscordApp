@@ -8,44 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-export class Filters {
-    static byProperties(props, selector = m => m) {
-        return module => {
-            const component = selector(module);
-            if (!component) return false;
-            return props.every(property => component[property] !== undefined);
-        };
-    }
-
-    static byPrototypeFields(fields, selector = m => m) {
-        return module => {
-            const component = selector(module);
-            if (!component) return false;
-            if (!component.prototype) return false;
-            return fields.every(field => component.prototype[field] !== undefined);
-        };
-    }
-
-    static byCode(search, selector = m => m) {
-        return module => {
-            const method = selector(module);
-            if (!method) return false;
-            return method.toString().search(search) !== -1;
-        };
-    }
-
-    static byDisplayName(name) {
-        return module => {
-            return module && module.displayName === name;
-        };
-    }
-
-    static combine(...filters) {
-        return module => {
-            return filters.every(filter => filter(module));
-        };
-    }
-}
+import { Filters } from 'common';
 
 const KnownModules = {
     React: Filters.byProperties(['createElement', 'cloneElement']),
@@ -321,7 +284,6 @@ export class WebpackModules {
         return Object.keys(KnownModules);
     }
 
-    static get Filters() { return Filters }
     static get KnownModules() { return KnownModules }
 
 }

@@ -298,6 +298,7 @@ export class ReactAutoPatcher {
         await this.patchGuild();
         await this.patchChannel();
         await this.patchChannelList();
+        await this.patchUserProfileModal();
         this.forceUpdate();
     }
 
@@ -364,6 +365,17 @@ export class ReactAutoPatcher {
             if (!channel) return;
             retVal.props['data-channel-id'] = channel.id;
             retVal.props['data-channel-name'] = channel.name;
+        });
+    }
+
+    static async patchUserProfileModal() {
+        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', { selector: '.root-2sNHUF' }, Filters.byPrototypeFields(['renderHeader', 'renderBadges']));
+        this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
+            const { user } = component.props;
+            if (!user) return;
+            retVal.props['data-user-id'] = user.id;
+            if (user.bot) retVal.props.className += ' bd-isBot';
+            if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
         });
     }
 

@@ -283,24 +283,23 @@ export class ReactAutoPatcher {
             ReactComponents.push(args[0]);
         });
         this.patchComponents();
-        return 1;
     }
 
     static async ensureReact() {
         while (!window.webpackJsonp || !WebpackModules.getModuleByName('React')) await new Promise(resolve => setTimeout(resolve, 10));
-        return 1;
     }
 
-    static async patchComponents() {
-        await this.patchMessage();
-        await this.patchMessageGroup();
-        await this.patchChannelMember();
-        await this.patchGuild();
-        await this.patchChannel();
-        await this.patchChannelList();
-        await this.patchUserProfileModal();
-        await this.patchUserPopout();
-        this.forceUpdate();
+    static patchComponents() {
+        return Promise.all([
+            this.patchMessage(),
+            this.patchMessageGroup(),
+            this.patchChannelMember(),
+            this.patchGuild(),
+            this.patchChannel(),
+            this.patchChannelList(),
+            this.patchUserProfileModal(),
+            this.patchUserPopout()
+        ]);
     }
 
     static async patchMessage() {
@@ -316,6 +315,10 @@ export class ReactAutoPatcher {
             if (embeds && embeds.length) retVal.props.className += ' bd-hasEmbeds';
             if (author && author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
         });
+
+        for (const e of document.querySelectorAll('.message')) {
+            Reflection(e).forceUpdate();
+        }
     }
 
     static async patchMessageGroup() {
@@ -326,17 +329,24 @@ export class ReactAutoPatcher {
             if (author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
             if (type !== 0) retVal.props.className += ' bd-isSystemMessage';
         });
+
+        for (const e of document.querySelectorAll('.message-group')) {
+            Reflection(e).forceUpdate();
+        }
     }
 
     static async patchChannelMember() {
         this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member-2FrNV0' });
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
-            // Logger.log('ReactComponents', ['Rendering ChannelMember', component, args, retVal]);
             if (!retVal.props || !retVal.props.children) return;
             const user = Helpers.findProp(component, 'user');
             if (!user) return;
             retVal.props['data-user-id'] = user.id;
         });
+
+        for (const e of document.querySelectorAll('.member-sFrNV0')) {
+            Reflection(e).forceUpdate();
+        }
     }
 
     static async patchGuild() {
@@ -347,6 +357,10 @@ export class ReactAutoPatcher {
             retVal.props['data-guild-id'] = guild.id;
             retVal.props['data-guild-name'] = guild.name;
         });
+
+        for (const e of document.querySelectorAll('.guild')) {
+            Reflection(e).forceUpdate();
+        }
     }
 
     static async patchChannel() {
@@ -357,6 +371,10 @@ export class ReactAutoPatcher {
             retVal.props['data-channel-id'] = channel.id;
             retVal.props['data-channel-name'] = channel.name;
         });
+
+        for (const e of document.querySelectorAll('.chat')) {
+            Reflection(e).forceUpdate();
+        }
     }
 
     static async patchChannelList() {
@@ -367,6 +385,10 @@ export class ReactAutoPatcher {
             retVal.props['data-channel-id'] = channel.id;
             retVal.props['data-channel-name'] = channel.name;
         });
+
+        for (const e of document.querySelectorAll('.containerDefault-7RImuF')) {
+            Reflection(e).forceUpdate();
+        }
     }
 
     static async patchUserProfileModal() {
@@ -378,6 +400,10 @@ export class ReactAutoPatcher {
             if (user.bot) retVal.props.className += ' bd-isBot';
             if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
         });
+
+        for (const e of document.querySelectorAll('.root-2sNHUF')) {
+            Reflection(e).forceUpdate();
+        }
     }
 
     static async patchUserPopout() {
@@ -393,10 +419,8 @@ export class ReactAutoPatcher {
             if (guild && guildMember) retVal.props.className += ' bd-isGuildMember';
             if (guildMember && guildMember.roles.length) retVal.props.className += ' bd-hasRoles';
         });
-    }
 
-    static forceUpdate() {
-        for (const e of document.querySelectorAll('.message, .message-group, .guild, .containerDefault-7RImuF, .channel-members .member-2FrNV0')) {
+        for (const e of document.querySelectorAll('.userPopout-11hFKo')) {
             Reflection(e).forceUpdate();
         }
     }

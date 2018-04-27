@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Filters } from 'modules';
 import { ClientLogger as Logger } from 'common';
 
 class Reflection {
@@ -99,34 +100,43 @@ class Reflection {
         }
     }
 
-    static getComponent(node, first = true) {
-        // IMPORTANT TODO Currently only checks the first found component. For example channel-member will not return the correct component
-        try {
-            return this.reactInternalInstance(node).return.type;
-        } catch (err) {
-            return null;
-        }
-        /*
-        if (!node) return null;
-        if (first) node = this.reactInternalInstance(node);
-        if (node.hasOwnProperty('return')) {
-            if (node.return.hasOwnProperty('return') && !node.return.type) return node.type;
-            return this.getComponent(node.return, false);
-        }
-        if (node.hasOwnProperty('type')) return node.type;
-        return null;
-        */
+    static getComponent(node) {
+        return this.getComponents(node)[0];
+    }
+
+    static getComponents(node) {
+        const instance = this.reactInternalInstance(node);
+        const components = [];
+        let lastInstance = instance;
+
+        do {
+            if (lastInstance.return.type) components.push(lastInstance.return.type);
+            lastInstance = lastInstance.return;
+            if (typeof lastInstance.return.type === 'string') return components;
+        } while (lastInstance.return);
+
+        return components;
+    }
+
+    static findComponent(node, filter, first = true) {
+        return this.getComponents(node)[first ? 'find' : 'filter'](filter);
     }
 }
+
+const propsProxyHandler = {
+    get(node, prop) {
+        return Reflection.findProp(node, prop);
+    }
+};
 
 export default function (node) {
     return new class {
         constructor(node) {
-            if ('string' === typeof node) node = document.querySelector(node);
+            if (typeof node === 'string') node = document.querySelector(node);
             this.node = this.el = this.element = node;
         }
         get props() {
-            return 'not yet implemented';
+            return new Proxy(this.node, propsProxyHandler);
         }
         get state() {
             return Reflection.getState(this.node);
@@ -139,6 +149,21 @@ export default function (node) {
         }
         get component() {
             return Reflection.getComponent(this.node);
+        }
+        get components() {
+            return Reflection.getComponents(this.node);
+        }
+        getComponentByProps(props, selector) {
+            return Reflection.findComponent(this.node, Filters.byProperties(props, selector));
+        }
+        getComponentByPrototypes(props, selector) {
+            return Reflection.findComponent(this.node, Filters.byPrototypeFields(props, selector));
+        }
+        getComponentByRegex(filter) {
+            return Reflection.findComponent(this.node, Filters.byCode(displayName));
+        }
+        getComponentByDisplayName(name) {
+            return Reflection.findComponent(this.node, Filters.byDisplayName(name));
         }
         forceUpdate() {
             try {

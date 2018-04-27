@@ -69,6 +69,23 @@ export class User {
         return Modules.UserStatusStore.getActivity(this.id);
     }
 
+    get note() {
+        const note = Modules.UserNoteStore.getNote(this.id);
+        if (note) return note;
+    }
+
+    /**
+     * Updates the note for this user.
+     * @param {String} note The new note
+     * @return {Promise}
+     */
+    updateNote(note) {
+        return Modules.APIModule.put({
+            url: `${Modules.DiscordConstants.Endpoints.NOTES}/${this.id}`,
+            body: { note }
+        });
+    }
+
     get privateChannel() {
         return DiscordApi.channels.find(c => c.type === 'DM' && c.recipientId === this.id);
     }

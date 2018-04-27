@@ -53,6 +53,8 @@ const KnownModules = {
     UserTypingStore: Filters.byProperties(['isTyping']),
     UserActivityStore: Filters.byProperties(['getActivity']),
     UserNameResolver: Filters.byProperties(['getName']),
+    UserNoteStore: Filters.byProperties(['getNote']),
+    UserNoteActions: Filters.byProperties(['updateNote']),
 
     /* Emoji Store and Utils */
     EmojiInfo: Filters.byProperties(['isEmojiDisabled']),

@@ -10,6 +10,7 @@
 
 import { DiscordApi, DiscordApiModules as Modules } from 'modules';
 import { List, InsufficientPermissions } from 'structs';
+import { Utils } from 'common';
 import { Guild } from './guild';
 import { Channel } from './channel';
 
@@ -276,5 +277,52 @@ export class GuildMember {
      */
     undeafen() {
         this.deafen(false);
+    }
+
+    /**
+     * Gives this user a role.
+     * @param {Role} role The role to add
+     * @return {Promise}
+     */
+    addRole(...roles) {
+        const newRoles = this.roleIds.concat([]);
+        let changed = false;
+        for (let role of roles) {
+            if (newRoles.includes(role.id || role)) continue;
+            newRoles.push(role.id || role);
+            changed = true;
+        }
+        if (!changed) return;
+        return this.updateRoles(newRoles);
+    }
+
+    /**
+     * Removes a role from this user.
+     * @param {Role} role The role to remove
+     * @return {Promise}
+     */
+    removeRole(...roles) {
+        const newRoles = this.roleIds.concat([]);
+        let changed = false;
+        for (let role of roles) {
+            if (!newRoles.includes(role.id || role)) continue;
+            Utils.removeFromArray(newRoles, role.id || role);
+            changed = true;
+        }
+        if (!changed) return;
+        return this.updateRoles(newRoles);
+    }
+
+    /**
+     * Updates this user's roles.
+     * @param {Array} roles An array of Role objects or role IDs
+     * @return {Promise}
+     */
+    updateRoles(roles) {
+        roles = roles.map(r => r.id || r);
+        return Modules.APIModule.patch({
+            url: `${Modules.DiscordConstants.Endpoints.GUILD_MEMBERS(this.guildId)}/${this.userId}`,
+            body: { roles }
+        });
     }
 }

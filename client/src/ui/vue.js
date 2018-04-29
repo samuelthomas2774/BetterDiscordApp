@@ -26,7 +26,21 @@ Vue.use(VTooltip, {
         defaultWrapperClass: 'bd-popover-wrapper',
         defaultInnerClass: 'bd-popover-inner',
         defaultArrowClass: 'bd-popover-arrow',
-        defaultBoundariesElement: DOM.getElement('#app-mount')
+        defaultBoundariesElement: DOM.getElement('#app-mount'),
+        defaultPopperOptions: {
+            modifiers: {
+                computeStyle: {
+                    gpuAcceleration: false
+                }
+            }
+        }
+    },
+    defaultPopperOptions: {
+        modifiers: {
+            computeStyle: {
+                gpuAcceleration: false
+            }
+        }
     }
 });
 

@@ -19,6 +19,6 @@
 }
 
 // Any layers need to be above the main layer (where the BD button is placed)
-.layer-kosS71 + .layer-kosS71 {
+[class*="layers-"] > * + * {
     z-index: 900;
 }

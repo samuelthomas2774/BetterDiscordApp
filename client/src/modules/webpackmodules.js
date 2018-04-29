@@ -101,7 +101,7 @@ const KnownModules = {
     DNDSources: Filters.byProperties(["addTarget"]),
     DNDObjects: Filters.byProperties(["DragSource"]),
 
-    /* Electron & Other Internals with Utils*/
+    /* Electron & Other Internals with Utils */
     ElectronModule: Filters.byProperties(["_getMainWindow"]),
     Dispatcher: Filters.byProperties(['dirtyDispatch']),
     PathUtils: Filters.byProperties(["hasBasename"]),
@@ -127,7 +127,6 @@ const KnownModules = {
     WindowInfo: Filters.byProperties(['isFocused', 'windowSize']),
     TagInfo: Filters.byProperties(['VALID_TAG_NAMES']),
     DOMInfo: Filters.byProperties(['canUseDOM']),
-    HTMLUtils: Filters.byProperties(['htmlFor', 'sanitizeUrl']),
 
     /* Locale/Location and Time */
     LocaleManager: Filters.byProperties(['setLocale']),
@@ -139,11 +138,14 @@ const KnownModules = {
     Strings: Filters.byProperties(["TEXT", "TEXTAREA_PLACEHOLDER"]),
     StringFormats: Filters.byProperties(['a', 'z']),
     StringUtils: Filters.byProperties(["toASCII"]),
-    hljs: Filters.byProperties(['highlight', 'highlightBlock']),
 
     /* URLs and Utils */
     URLParser: Filters.byProperties(['Url', 'parse']),
     ExtraURLs: Filters.byProperties(['getArticleURL']),
+
+    /* Text Processing */
+    hljs: Filters.byProperties(['highlight', 'highlightBlock']),
+    SimpleMarkdown: Filters.byProperties(['parseBlock', 'parseInline', 'defaultOutput']),
 
     /* DOM/React Components */
     /* ==================== */

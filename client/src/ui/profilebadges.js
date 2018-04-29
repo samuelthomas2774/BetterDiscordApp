@@ -105,7 +105,8 @@ export default class extends Module {
         if (this.PatchedNameTag) return this.PatchedNameTag;
 
         const ProfileBadges = this;
-        const NameTag = await ReactComponents.getComponent('NameTag', {selector: '.nameTag-m8r81H'});
+        const selector = '.' + WebpackModules.getModuleByProps(['nameTag', 'username', 'discriminator', 'ownerIcon']).nameTag;
+        const NameTag = await ReactComponents.getComponent('NameTag', { selector });
 
         this.PatchedNameTag = class extends NameTag.component {
             render() {
@@ -143,7 +144,9 @@ export default class extends Module {
 
         // Rerender all channel members
         if (this.unpatchChannelMemberRender) {
-            for (const channelMember of document.querySelectorAll('.member-3W1lQa')) {
+            const selector = '.' + WebpackModules.getModuleByProps(['member', 'memberInner', 'activity']).member;
+
+            for (const channelMember of document.querySelectorAll(selector)) {
                 Reflection(channelMember).forceUpdate();
             }
         }

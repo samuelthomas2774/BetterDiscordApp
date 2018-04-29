@@ -336,7 +336,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannelMember() {
-        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member-2FrNV0' });
+        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member-3W1lQa' });
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
             if (!retVal.props || !retVal.props.children) return;
             const user = Helpers.findProp(component, 'user');
@@ -392,7 +392,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchUserProfileModal() {
-        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', { selector: '.root-2sNHUF' }, Filters.byPrototypeFields(['renderHeader', 'renderBadges']));
+        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', { selector: '.root-SR8cQa' }, Filters.byPrototypeFields(['renderHeader', 'renderBadges']));
         this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
             const { user } = component.props;
             if (!user) return;
@@ -401,13 +401,13 @@ export class ReactAutoPatcher {
             if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
         });
 
-        for (const e of document.querySelectorAll('.root-2sNHUF')) {
+        for (const e of document.querySelectorAll('.root-SR8cQa')) {
             Reflection(e).forceUpdate();
         }
     }
 
     static async patchUserPopout() {
-        this.UserProfileModal = await ReactComponents.getComponent('UserPopout', { selector: '.userPopout-11hFKo' });
+        this.UserProfileModal = await ReactComponents.getComponent('UserPopout', { selector: '.userPopout-3XzG_A' });
         this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
             const { user, guild, guildMember } = component.props;
             if (!user) return;
@@ -420,7 +420,7 @@ export class ReactAutoPatcher {
             if (guildMember && guildMember.roles.length) retVal.props.className += ' bd-hasRoles';
         });
 
-        for (const e of document.querySelectorAll('.userPopout-11hFKo')) {
+        for (const e of document.querySelectorAll('.userPopout-3XzG_A')) {
             Reflection(e).forceUpdate();
         }
     }

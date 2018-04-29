@@ -109,9 +109,9 @@ class Reflection {
         let lastInstance = instance;
 
         do {
+            if (typeof lastInstance.return.type === 'string') break;
             if (lastInstance.return.type) components.push(lastInstance.return.type);
             lastInstance = lastInstance.return;
-            if (typeof lastInstance.return.type === 'string') return components;
         } while (lastInstance.return);
 
         return components;

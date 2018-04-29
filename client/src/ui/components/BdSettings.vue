@@ -101,7 +101,8 @@
         methods: {
             itemOnClick(id) {
                 if (this.animating || id === this.activeIndex) return;
-                if (this.activeIndex >= 0) this.sidebarItems.find(item => item.id === this.activeIndex).active = false;
+                const activeItem = this.sidebarItems.find(item => item.id === this.activeIndex);
+                if (activeItem) activeItem.active = false;
                 this.sidebarItems.find(item => item.id === id).active = true;
                 this.animating = true;
                 this.lastActiveIndex = this.activeIndex;

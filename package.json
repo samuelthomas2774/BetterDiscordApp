@@ -16,8 +16,8 @@
   },
   "private": false,
   "dependencies": {
-    "node-sass": "^4.7.2",
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "node-sass": "^4.7.2"
   },
   "devDependencies": {
     "archiver": "^2.1.1",

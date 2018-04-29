@@ -34,28 +34,13 @@ export default class {
             remote.BrowserWindow.getFocusedWindow().webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
                 const { currentGuild, currentChannel } = DiscordApi;
 
-                if (!this.pathCache.server) {
+                if (!this.pathCache.server)
                     Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
-                    this.pathCache.server = currentGuild;
-                    this.pathCache.channel = currentChannel;
-                    return;
-                }
-
-                if (!this.pathCache.channel) {
+                else if (!this.pathCache.channel)
                     Events.emit('channel-switch', currentChannel);
-                    this.pathCache.server = currentGuild;
-                    this.pathCache.channel = currentChannel;
-                    return;
-                }
-
-                if (currentGuild && currentGuild.id && this.pathCache.server && this.pathCache.server.id !== currentGuild.id) {
+                else if (currentGuild && currentGuild.id && this.pathCache.server && this.pathCache.server.id !== currentGuild.id)
                     Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
-                    this.pathCache.server = currentGuild;
-                    this.pathCache.channel = currentChannel;
-                    return;
-                }
-
-                if (currentChannel && currentChannel.id && this.pathCache.channel && this.pathCache.channel.id !== currentChannel.id)
+                else if (currentChannel && currentChannel.id && this.pathCache.channel && this.pathCache.channel.id !== currentChannel.id)
                     Events.emit('channel-switch', currentChannel);
 
                 this.pathCache.server = currentGuild;

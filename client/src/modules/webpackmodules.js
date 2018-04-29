@@ -139,6 +139,7 @@ const KnownModules = {
     Strings: Filters.byProperties(["TEXT", "TEXTAREA_PLACEHOLDER"]),
     StringFormats: Filters.byProperties(['a', 'z']),
     StringUtils: Filters.byProperties(["toASCII"]),
+    hljs: Filters.byProperties(['highlight', 'highlightBlock']),
 
     /* URLs and Utils */
     URLParser: Filters.byProperties(['Url', 'parse']),

@@ -11,6 +11,7 @@
 import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { BdMenu, Modals, DOM, Reflection } from 'ui';
+import * as CommonComponents from 'commoncomponents';
 import { Utils, Filters, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
@@ -57,6 +58,13 @@ export default class PluginApi {
 
     get AsyncEventEmitter() { return AsyncEventEmitter }
     get EventsWrapper() { return EventsWrapper }
+
+    get CommonComponents() { return CommonComponents }
+    get Filters() { return Filters }
+    get Discord() { return DiscordApi }
+    get DiscordApi() { return DiscordApi }
+    get ReactComponents() { return ReactComponents }
+    get Reflection() { return Reflection }
 
     /**
      * Logger
@@ -431,36 +439,12 @@ export default class PluginApi {
             getModuleByProperties: this.getWebpackModuleByProperties.bind(this),
             getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this),
             getModulesByProperties: this.getWebpackModulesByProperties.bind(this),
-            getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this)
+            getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this),
+            KnownModules: WebpackModules.KnownModules
         }, 'require', {
             get: () => this.webpackRequire
         });
     }
-
-    /**
-     * Filters
-     */
-
-    get Filters() { return Filters }
-
-    /**
-     * DiscordApi
-     */
-
-    get Discord() { return DiscordApi }
-    get DiscordApi() { return DiscordApi }
-
-    /**
-     * ReactComponents
-     */
-
-    get ReactComponents() { return ReactComponents }
-
-    /**
-     * Reflection
-     */
-
-    get Reflection() { return Reflection }
 
     /**
      * Patcher

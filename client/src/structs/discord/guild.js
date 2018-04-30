@@ -261,10 +261,12 @@ export class Guild {
      * @param {Number} days
      */
     pruneMembers(days) {
+        this.assertPermissions('KICK_MEMBERS', Modules.DiscordPermissions.KICK_MEMBERS);
         Modules.PruneMembersModal.prune(this.id, days);
     }
 
     openPruneMumbersModal() {
+        this.assertPermissions('KICK_MEMBERS', Modules.DiscordPermissions.KICK_MEMBERS);
         Modules.PruneMembersModal.open(this.id);
     }
 
@@ -272,7 +274,7 @@ export class Guild {
      * Opens the create channel modal for this guild.
      * @param {Number} type The type of channel to create - either 0 (text), 2 (voice) or 4 (category)
      * @param {ChannelCategory} category The category to create the channel in
-     * @param {GuildChannel} clone A channel to clone permissions of
+     * @param {GuildChannel} clone A channel to clone permissions, topic, bitrate and user limit of
      */
     openCreateChannelModal(type, category, clone) {
         this.assertPermissions('MANAGE_CHANNELS', Modules.DiscordPermissions.MANAGE_CHANNELS);
@@ -296,7 +298,7 @@ export class Guild {
                 parent_id: category ? category.id : undefined,
                 permission_overwrites: permission_overwrites ? permission_overwrites.map(p => ({
                     type: p.type,
-                    id: p.type === 'user' ? p.userId : p.roleId,
+                    id: (p.type === 'user' ? p.userId : p.roleId) || p.id,
                     allow: p.allow,
                     deny: p.deny
                 })) : undefined

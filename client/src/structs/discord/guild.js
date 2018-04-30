@@ -9,7 +9,7 @@
 */
 
 import { DiscordApi, DiscordApiModules as Modules } from 'modules';
-import { List } from 'structs';
+import { List, InsufficientPermissions } from 'structs';
 import { Channel } from './channel';
 import { GuildMember } from './user';
 
@@ -195,6 +195,14 @@ export class Guild {
         return List.from(Modules.EmojiUtils.getGuildEmoji(this.id), e => new Emoji(e, this.id));
     }
 
+    checkPermissions(perms) {
+        return Modules.PermissionUtils.can(perms, DiscordApi.currentUser, this.discordObject);
+    }
+
+    assertPermissions(name, perms) {
+        if (!this.checkPermissions(perms)) throw new InsufficientPermissions(name);
+    }
+
     /**
      * The current user's permissions on this guild.
      */
@@ -320,6 +328,137 @@ export class Guild {
      */
     changeSortLocation(index) {
         Modules.GuildActions.move(DiscordApi.guildPositions.indexOf(this.id), index);
+    }
+
+    /**
+     * Updates this guild.
+     * @return {Promise}
+     */
+    async updateGuild(body) {
+        this.assertPermissions('MANAGE_GUILD', Modules.DiscordPermissions.MANAGE_GUILD);
+        const response = await Modules.APIModule.patch({
+            url: Modules.DiscordConstants.Endpoints.GUILD(this.id),
+            body
+        });
+
+        this.discordObject = Modules.GuildStore.getGuild(this.id);
+        guilds.set(this.discordObject, this);
+    }
+
+    /**
+     * Updates this guild's name.
+     * @param {String} name The new name
+     * @return {Promise}
+     */
+    updateName(name) {
+        return this.updateGuild({ name });
+    }
+
+    /**
+     * Updates this guild's voice region.
+     * @param {String} region The ID of the new voice region (obtainable via the API - see https://discordapp.com/developers/docs/resources/voice#list-voice-regions)
+     * @return {Promise}
+     */
+    updateVoiceRegion(region) {
+        return this.updateGuild({ region });
+    }
+
+    /**
+     * Updates this guild's verification level.
+     * @param {Number} verificationLevel The new verification level (see https://discordapp.com/developers/docs/resources/guild#guild-object-verification-level)
+     * @return {Promise}
+     */
+    updateVerificationLevel(verification_level) {
+        return this.updateGuild({ verification_level });
+    }
+
+    /**
+     * Updates this guild's default message notification level.
+     * @param {Number} defaultMessageNotifications The new default notification level (0: all messages, 1: only mentions)
+     * @return {Promise}
+     */
+    updateDefaultMessageNotifications(default_message_notifications) {
+        return this.updateGuild({ default_message_notifications });
+    }
+
+    /**
+     * Updates this guild's explicit content filter level.
+     * @param {Number} explicitContentFilter The new explicit content filter level (0: disabled, 1: members without roles, 2: everyone)
+     * @return {Promise}
+     */
+    updateExplicitContentFilter(explicit_content_filter) {
+        return this.updateGuild({ explicit_content_filter });
+    }
+
+    /**
+     * Updates this guild's AFK channel.
+     * @param {GuildVoiceChannel} afkChannel The new AFK channel
+     * @return {Promise}
+     */
+    updateAfkChannel(afk_channel) {
+        return this.updateGuild({ afk_channel_id: afk_channel.id || afk_channel });
+    }
+
+    /**
+     * Updates this guild's AFK timeout.
+     * @param {Number} afkTimeout The new AFK timeout
+     * @return {Promise}
+     */
+    updateAfkTimeout(afk_timeout) {
+        return this.updateGuild({ afk_timeout });
+    }
+
+    /**
+     * Updates this guild's icon.
+     * @param {Number} icon A base 64 encoded 128x128 JPEG image
+     * @return {Promise}
+     */
+    updateIcon(icon) {
+        return this.updateGuild({ icon });
+    }
+
+    /**
+     * Updates this guild's icon using a local file.
+     * TODO
+     * @param {String} icon_path The path to the new icon
+     * @return {Promise}
+     */
+    updateIconFromFile(icon_path) {}
+
+    /**
+     * Updates this guild's owner. (Should plugins really ever need to do this?)
+     * @param {User|GuildMember} owner The user/guild member to transfer ownership to
+     * @return {Promise}
+     */
+    updateOwner(owner) {
+        return this.updateGuild({ owner_id: owner.user ? owner.user.id : owner.id || owner });
+    }
+
+    /**
+     * Updates this guild's splash image.
+     * (I don't know what this is actually used for. The API documentation says it's VIP-only.)
+     * @param {Number} icon A base 64 encoded 128x128 JPEG image
+     * @return {Promise}
+     */
+    updateSplash(icon) {
+        return this.updateGuild({ icon });
+    }
+
+    /**
+     * Updates this guild's splash image using a local file.
+     * TODO
+     * @param {String} splash_path The path to the new splash
+     * @return {Promise}
+     */
+    updateSplashFromFile(splash_path) {}
+
+    /**
+     * Updates this guild's system channel.
+     * @param {GuildTextChannel} systemChannel The new system channel
+     * @return {Promise}
+     */
+    updateAfkChannel(system_channel) {
+        return this.updateGuild({ system_channel_id: system_channel.id || system_channel });
     }
 
 }

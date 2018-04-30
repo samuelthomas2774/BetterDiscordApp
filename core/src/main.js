@@ -142,7 +142,7 @@ class Comms {
         return sass.types.Null.NULL;
     }
 
-    toSassList(value, commaSeparator, convertJsValues = true) {
+    toSassList(value, commaSeparator = true, convertJsValues = true) {
         const list = new sass.types.List(value.length, !!commaSeparator);
         for (let index of value.keys()) {
             list.setValue(index, convertJsValues ? this.toSassValue(value[index]) : value[index]);

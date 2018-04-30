@@ -10,6 +10,7 @@
 
 import { DiscordApi, DiscordApiModules as Modules } from 'modules';
 import { List, InsufficientPermissions } from 'structs';
+import { FileUtils } from 'common';
 import { Channel } from './channel';
 import { GuildMember } from './user';
 
@@ -412,11 +413,11 @@ export class Guild {
 
     /**
      * Updates this guild's icon.
-     * @param {Number} icon A base 64 encoded 128x128 JPEG image
+     * @param {Buffer|String} icon A buffer/base 64 encoded 128x128 JPEG image
      * @return {Promise}
      */
     updateIcon(icon) {
-        return this.updateGuild({ icon });
+        return this.updateGuild({ icon: typeof icon === 'string' ? icon : icon.toString('base64') });
     }
 
     /**
@@ -425,7 +426,10 @@ export class Guild {
      * @param {String} icon_path The path to the new icon
      * @return {Promise}
      */
-    updateIconFromFile(icon_path) {}
+    async updateIconFromFile(icon_path) {
+        const buffer = await FileUtils.readFileBuffer(icon_path);
+        return this.updateIcon(buffer);
+    }
 
     /**
      * Updates this guild's owner. (Should plugins really ever need to do this?)
@@ -439,11 +443,11 @@ export class Guild {
     /**
      * Updates this guild's splash image.
      * (I don't know what this is actually used for. The API documentation says it's VIP-only.)
-     * @param {Number} icon A base 64 encoded 128x128 JPEG image
+     * @param {Buffer|String} icon A buffer/base 64 encoded 128x128 JPEG image
      * @return {Promise}
      */
-    updateSplash(icon) {
-        return this.updateGuild({ icon });
+    updateSplash(splash) {
+        return this.updateGuild({ splash: typeof splash === 'string' ? splash : splash.toString('base64') });
     }
 
     /**
@@ -452,7 +456,10 @@ export class Guild {
      * @param {String} splash_path The path to the new splash
      * @return {Promise}
      */
-    updateSplashFromFile(splash_path) {}
+    async updateSplashFromFile(splash_path) {
+        const buffer = await FileUtils.readFileBuffer(splash_path);
+        return this.updateSplash(buffer);
+    }
 
     /**
      * Updates this guild's system channel.

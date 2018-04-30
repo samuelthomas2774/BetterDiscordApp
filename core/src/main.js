@@ -92,6 +92,19 @@ class Comms {
                 options.path = undefined;
             }
 
+            const functions = {};
+            const comms = this;
+            if (options.functions) for (let [signature, id] of Object.entries(options.functions)) {
+                functions[signature] = this.toSassFunction(async (...sassArgs) => {
+                    const args = sassArgs.map(a => comms.toJsValue(a));
+                    const result = await BDIpc.send(event.ipcEvent.sender, `bd-sass-function-${id}`, {
+                        signature, args
+                    });
+                    return result;
+                });
+            }
+            options.functions = functions;
+
             sass.render(options, (err, result) => {
                 if (err) event.reject(err);
                 else event.reply(result);
@@ -99,6 +112,77 @@ class Comms {
         });
 
         BDIpc.on('bd-dba', (event, options) => this.bd.dbInstance.exec(options), true);
+    }
+
+    toSassFunction(f, convertJsValues = true) {
+        const comms = this;
+        return function (...args) {
+            const done = args.pop();
+            const result = f.apply(this, args);
+            if (!(result instanceof Promise)) return convertJsValues ? comms.toSassValue(result) : result;
+            result.then(v => done(convertJsValues ? comms.toSassValue(v) : v)).catch(err => {
+                console.error('Error in Sass function:', err);
+                done(convertJsValues ? comms.toSassValue(err) : err);
+            });
+        };
+    }
+
+    toSassValue(value) {
+        if (value === undefined || value === null) return sass.types.Null.NULL;
+        if (value === true) return sass.types.Boolean.TRUE;
+        if (value === false) return sass.types.Boolean.FALSE;
+        if (typeof value === 'string') return new sass.types.String(value);
+        if (typeof value === 'number') return new sass.types.Number(value);
+        if (value instanceof Array) return this.toSassList(value);
+        if (value instanceof Error) return new sass.types.Error(value.toString());
+        if (value.__sass_type === 'color') return value.argb ? new sass.types.Color(value.argb) : new sass.types.Color(value.r, value.g, value.b, value.a);
+        if (value.__sass_type === 'number') return new sass.types.Number(value.number, value.unit);
+        if (value.__sass_type === 'list') return this.toSassList(value.array, value.commaSeparator);
+        if (typeof value === 'object') return this.toSassMap(value);
+        return sass.types.Null.NULL;
+    }
+
+    toSassList(value, commaSeparator, convertJsValues = true) {
+        const list = new sass.types.List(value.length, !!commaSeparator);
+        for (let index of value.keys()) {
+            list.setValue(index, convertJsValues ? this.toSassValue(value[index]) : value[index]);
+        }
+        return list;
+    }
+
+    toSassMap(value, convertJsValues = true) {
+        const keys = Object.keys(value);
+        const map = new sass.types.Map(keys.length);
+        for (let [index, key] of keys.entries()) {
+            map.setKey(index, new sass.types.String(key));
+            map.setValue(index, convertJsValues ? this.toSassValue(value[key]) : value[key]);
+        }
+        return map;
+    }
+
+    toJsValue(value) {
+        if (value instanceof sass.types.Boolean) return value.getValue();
+        if (value instanceof sass.types.String) return value.getValue();
+        if (value instanceof sass.types.Number) return {__sass_type: 'number', number: value.getValue(), unit: value.getUnit()};
+        if (value instanceof sass.types.List) return this.toJsArray(value);
+        if (value instanceof sass.types.Map) return this.toJsObject(value);
+        return null;
+    }
+
+    toJsArray(value, convertSassValues = true) {
+        const array = [];
+        for (let index = 0; index < value.getLength(); index++) {
+            array.push(convertSassValues ? this.toJsValue(value.getValue(index)) : value.getValue(index));
+        }
+        return {__sass_type: 'list', array, commaSeparator: value.getSeparator()};
+    }
+
+    toJsObject(value, convertSassValues = true) {
+        const object = {};
+        for (let index = 0; index < value.getLength(); index++) {
+            object[value.getKey(index)] = convertSassValues ? this.toJsValue(value.getValue(index)) : value.getValue(index);
+        }
+        return object;
     }
 
     async send(channel, message) {

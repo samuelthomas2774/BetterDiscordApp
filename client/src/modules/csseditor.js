@@ -9,11 +9,13 @@
 */
 
 import { FileUtils, ClientLogger as Logger, ClientIPC } from 'common';
-import Settings from './settings';
 import { DOM } from 'ui';
 import filewatcher from 'filewatcher';
 import path from 'path';
 import electron from 'electron';
+import Settings from './settings';
+import PluginManager from './pluginmanager';
+import ThemeManager from './thememanager';
 
 /**
  * Custom css editor communications
@@ -44,6 +46,21 @@ export default new class {
             await this.save();
         }, true);
 
+        ClientIPC.on('bd-sass-function-eval', (event, {signature, args: [js, args]}) => {
+            args = args.array;
+            Logger.log(`CssEditor`, ['Sass function eval called', js]);
+            return eval(js);
+        }, true);
+
+        ClientIPC.on('bd-sass-function-get-content-config', async (event, {signature, args: [id]}) => {
+            const contentType = signature === 'get-plugin-config($id)' ? 'plugin' : 'theme';
+            const content = (contentType === 'plugin' ? PluginManager : ThemeManager).getContentById(id);
+            const sv = await this.setToSassValue(content.settings);
+
+            Logger.log(`CssEditor`, ['Sass function get-content-config called', {signature, args: [id], id, content, sv}]);
+            return sv;
+        }, true);
+
         this.liveupdate = Settings.getSetting('css', 'default', 'live-update');
         this.liveupdate.on('setting-updated', event => {
             this.sendToEditor('set-liveupdate', event.value);
@@ -57,6 +74,31 @@ export default new class {
             if (event.value) this.watchfiles = this.files;
             else this.watchfiles = [];
         });
+    }
+
+    async setToSassValue(set) {
+        const config = {};
+
+        for (let setting of set.findSettings(() => true)) {
+            config[setting.id] = await this.settingToSassValue(setting);
+        }
+
+        return config;
+    }
+
+    async settingToSassValue(setting) {
+        if (setting.type === 'array') return await Promise.all(setting.items.map(set => this.setToSassValue(set)));
+        if (setting.type === 'file') return setting.value && setting.value.length ? await Promise.all(setting.value.map(async filepath => {
+            const buffer = await FileUtils.readFileBuffer(path.resolve(this.path, filepath));
+            const type = await FileUtils.getFileType(buffer);
+            return {
+                data: ThemeManager.toSCSSString(buffer.toString('base64')),
+                type: ThemeManager.toSCSSString(type.mime),
+                url: ThemeManager.toSCSSString(await FileUtils.toDataURI(buffer, type.mime))
+            };
+        })) : [];
+        if (setting.type === 'colour') return {__sass_type: 'color', r: 0, g: 0, b: 0, a: 0};
+        return setting.value;
     }
 
     /**
@@ -121,7 +163,12 @@ export default new class {
     async compile(scss) {
         return await ClientIPC.send('bd-compileSass', {
             data: scss,
-            path: await this.fileExists() ? this.filePath : undefined
+            path: await this.fileExists() ? this.filePath : undefined,
+            functions: {
+                'get-plugin-config($id)': 'get-content-config',
+                'get-theme-config($id)': 'get-content-config',
+                'eval($js, $args...)': 'eval'
+            }
         });
     }
 

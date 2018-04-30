@@ -230,6 +230,7 @@ export class DefaultMessage extends Message {
         });
 
         this.discordObject = Modules.MessageStore.getMessage(this.id, response.body.id);
+        messages.set(this.discordObject, this);
     }
 
     /**

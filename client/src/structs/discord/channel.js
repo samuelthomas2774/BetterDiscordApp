@@ -131,6 +131,21 @@ export class Channel {
         return DiscordApi.currentChannel === this;
     }
 
+    /**
+     * Updates this channel.
+     * @return {Promise}
+     */
+    async updateChannel(body) {
+        if (this.assertPermissions) this.assertPermissions('MANAGE_CHANNELS', Modules.DiscordPermissions.MANAGE_CHANNELS);
+        const response = await Modules.APIModule.patch({
+            url: `${Modules.DiscordConstants.Endpoints.CHANNELS}/${this.id}`,
+            body
+        });
+
+        this.discordObject = Modules.ChannelStore.getChannel(this.id);
+        channels.set(this.discordObject, this);
+    }
+
 }
 
 export class PermissionOverwrite {
@@ -229,6 +244,23 @@ export class GuildChannel extends Channel {
         Modules.ChannelSettingsWindow.setSection(section);
         Modules.ChannelSettingsWindow.open(this.id);
     }
+
+    updateName(name) {
+        return this.updateChannel({ name });
+    }
+
+    changeSortLocation(position = 0) {
+        if (position instanceof GuildChannel) position = position.position;
+        return this.updateChannel({ position });
+    }
+
+    updatePermissionOverwrites(permission_overwrites) {
+        return this.updateChannel({ permission_overwrites });
+    }
+
+    updateCategory(category) {
+        return this.updateChannel({ parent_id: category.id || category });
+    }
 }
 
 // Type 0 - GUILD_TEXT
@@ -236,6 +268,18 @@ export class GuildTextChannel extends GuildChannel {
     get type() { return 'GUILD_TEXT' }
     get topic() { return this.discordObject.topic }
     get nsfw() { return this.discordObject.nsfw }
+
+    updateTopic(topic) {
+        return this.updateChannel({ topic });
+    }
+
+    setNswf(nsfw = true) {
+        return this.updateChannel({ nsfw });
+    }
+
+    setNotNsfw() {
+        return this.setNswf(false);
+    }
 }
 
 // Type 2 - GUILD_VOICE
@@ -250,6 +294,14 @@ export class GuildVoiceChannel extends GuildChannel {
     get hasMoreAfter() { return false; }
     sendInvite() { throw new Error('Cannot invite someone to a voice channel.'); }
     select() { throw new Error('Cannot select a voice channel.'); }
+
+    updateBitrate(bitrate) {
+        return this.updateChannel({ bitrate });
+    }
+
+    updateUserLimit(user_limit) {
+        return this.updateChannel({ user_limit });
+    }
 }
 
 // Type 4 - GUILD_CATEGORY
@@ -330,5 +382,9 @@ export class GroupChannel extends PrivateChannel {
      */
     get owner() {
         return User.fromId(this.ownerId);
+    }
+
+    updateName(name) {
+        return this.updateChannel({ name });
     }
 }

@@ -160,6 +160,13 @@ export class Guild {
     }
 
     /**
+     * The channel system messages are sent to.
+     */
+    get systemChannel() {
+        if (this.systemChannelId) return Channel.fromId(this.systemChannelId);
+    }
+
+    /**
      * A list of GuildMember objects.
      */
     get members() {
@@ -259,8 +266,36 @@ export class Guild {
      * @param {ChannelCategory} category The category to create the channel in
      * @param {GuildChannel} clone A channel to clone permissions of
      */
-    openCreateChannelModal(type = 0, category, clone) {
+    openCreateChannelModal(type, category, clone) {
+        this.assertPermissions('MANAGE_CHANNELS', Modules.DiscordPermissions.MANAGE_CHANNELS);
         Modules.CreateChannelModal.open(type, this.id, category ? category.id : undefined, clone ? clone.id : undefined);
+    }
+
+    /**
+     * Creates a channel in this guild.
+     * @param {Number} type The type of channel to create - either 0 (text), 2 (voice) or 4 (category)
+     * @param {String} name A name for the new channel
+     * @param {ChannelCategory} category The category to create the channel in
+     * @param {Array} permission_overwrites An array of PermissionOverwrite-like objects - leave to use the permissions of the category
+     * @return {Promise => GuildChannel}
+     */
+    async createChannel(type, name, category, permission_overwrites) {
+        this.assertPermissions('MANAGE_CHANNELS', Modules.DiscordPermissions.MANAGE_CHANNELS);
+        const response = await Modules.APIModule.post({
+            url: Modules.DiscordConstants.Endpoints.GUILD_CHANNELS(this.id),
+            body: {
+                type, name,
+                parent_id: category ? category.id : undefined,
+                permission_overwrites: permission_overwrites ? permission_overwrites.map(p => ({
+                    type: p.type,
+                    id: p.type === 'user' ? p.userId : p.roleId,
+                    allow: p.allow,
+                    deny: p.deny
+                })) : undefined
+            }
+        });
+
+        return Channel.fromId(response.body.id);
     }
 
     openNotificationSettingsModal() {

@@ -271,6 +271,26 @@ export class ChannelCategory extends GuildChannel {
     get channels() {
         return List.from(this.guild.channels, c => c.parentId === this.id);
     }
+
+    /**
+     * Opens the create channel modal for this guild.
+     * @param {Number} type The type of channel to create - either 0 (text), 2 (voice) or 4 (category)
+     * @param {GuildChannel} clone A channel to clone permissions of
+     */
+    openCreateChannelModal(type, category, clone) {
+        this.guild.openCreateChannelModal(type, this.id, this, clone);
+    }
+
+    /**
+     * Creates a channel in this category.
+     * @param {Number} type The type of channel to create - either 0 (text) or 2 (voice)
+     * @param {String} name A name for the new channel
+     * @param {Array} permission_overwrites An array of PermissionOverwrite-like objects - leave to use the permissions of the category
+     * @return {Promise => GuildChannel}
+     */
+    createChannel(type, name, permission_overwrites) {
+        return this.guild.createChannel(type, name, this, permission_overwrites);
+    }
 }
 
 export class PrivateChannel extends Channel {

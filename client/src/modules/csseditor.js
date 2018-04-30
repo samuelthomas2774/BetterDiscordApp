@@ -16,6 +16,7 @@ import electron from 'electron';
 import Settings from './settings';
 import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
+import { WebpackModules } from './webpackmodules';
 
 /**
  * Custom css editor communications
@@ -50,6 +51,21 @@ export default new class {
             args = args.array;
             Logger.log(`CssEditor`, ['Sass function eval called', js]);
             return eval(js);
+        }, true);
+
+        ClientIPC.on('bd-sass-function-class', (event, {signature, args: [component, c, first]}) => {
+            const getClass = (className, ...props) => {
+                const classes = WebpackModules.getModuleByProps(props)[className || props[0]];
+                if (classes) return first ? classes.split(' ')[0] : classes.split(' ');
+            };
+
+            switch (component) {
+                case 'user-popout': return getClass(c, 'userPopout', 'headerNormal');
+                case 'user-profile-modal': return getClass(c, 'root', 'topSectionNormal');
+                case 'channel-list': return getClass(c, 'containerDefault', 'actionIcon');
+                case 'channel-member': return getClass(c, 'member', 'memberInner', 'activity');
+                case 'name-tag': return getClass(c, 'nameTag', 'username', 'discriminator', 'ownerIcon');
+            }
         }, true);
 
         ClientIPC.on('bd-sass-function-get-content-config', async (event, {signature, args: [id]}) => {
@@ -167,6 +183,7 @@ export default new class {
             functions: {
                 'get-plugin-config($id)': 'get-content-config',
                 'get-theme-config($id)': 'get-content-config',
+                'class($component, $name: null, $first: true)': 'class',
                 'eval($js, $args...)': 'eval'
             }
         });

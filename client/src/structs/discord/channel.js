@@ -245,19 +245,39 @@ export class GuildChannel extends Channel {
         Modules.ChannelSettingsWindow.open(this.id);
     }
 
+    /**
+     * Updates this channel's name.
+     * @param {String} name The channel's new name
+     * @return {Promise}
+     */
     updateName(name) {
         return this.updateChannel({ name });
     }
 
+    /**
+     * Changes the channel's position.
+     * @param {Number} position The channel's new position
+     * @return {Promise}
+     */
     changeSortLocation(position = 0) {
         if (position instanceof GuildChannel) position = position.position;
         return this.updateChannel({ position });
     }
 
+    /**
+     * Updates this channel's permission overwrites.
+     * @param {Array} permissionOverwrites An array of permission overwrites
+     * @return {Promise}
+     */
     updatePermissionOverwrites(permission_overwrites) {
         return this.updateChannel({ permission_overwrites });
     }
 
+    /**
+     * Updates this channel's category.
+     * @param {ChannelCategory} category The new channel category
+     * @return {Promise}
+     */
     updateCategory(category) {
         return this.updateChannel({ parent_id: category.id || category });
     }
@@ -269,10 +289,20 @@ export class GuildTextChannel extends GuildChannel {
     get topic() { return this.discordObject.topic }
     get nsfw() { return this.discordObject.nsfw }
 
+    /**
+     * Updates this channel's topic.
+     * @param {String} topc The new channel topic
+     * @return {Promise}
+     */
     updateTopic(topic) {
         return this.updateChannel({ topic });
     }
 
+    /**
+     * Updates this channel's NSFW flag.
+     * @param {Boolean} nsfw Whether the channel should be marked as NSFW
+     * @return {Promise}
+     */
     setNswf(nsfw = true) {
         return this.updateChannel({ nsfw });
     }
@@ -289,16 +319,26 @@ export class GuildVoiceChannel extends GuildChannel {
     get bitrate() { return this.discordObject.bitrate }
 
     sendMessage() { throw new Error('Cannot send messages in a voice channel.'); }
-    get messages() { return []; }
+    get messages() { return new List(); }
     jumpToPresent() { throw new Error('Cannot select a voice channel.'); }
     get hasMoreAfter() { return false; }
     sendInvite() { throw new Error('Cannot invite someone to a voice channel.'); }
     select() { throw new Error('Cannot select a voice channel.'); }
 
+    /**
+     * Updates this channel's bitrate.
+     * @param {Number} bitrate The new bitrate
+     * @return {Promise}
+     */
     updateBitrate(bitrate) {
         return this.updateChannel({ bitrate });
     }
 
+    /**
+     * Updates this channel's user limit.
+     * @param {Number} userLimit The new user limit
+     * @return {Promise}
+     */
     updateUserLimit(user_limit) {
         return this.updateChannel({ user_limit });
     }
@@ -311,11 +351,12 @@ export class ChannelCategory extends GuildChannel {
     get category() { return undefined }
 
     sendMessage() { throw new Error('Cannot send messages in a channel category.'); }
-    get messages() { return []; }
+    get messages() { return new List(); }
     jumpToPresent() { throw new Error('Cannot select a channel category.'); }
     get hasMoreAfter() { return false; }
     sendInvite() { throw new Error('Cannot invite someone to a channel category.'); }
     select() { throw new Error('Cannot select a channel category.'); }
+    updateCategory() { throw new Error('Cannot set a channel category on another channel category.'); }
 
     /**
      * A list of channels in this category.
@@ -384,6 +425,11 @@ export class GroupChannel extends PrivateChannel {
         return User.fromId(this.ownerId);
     }
 
+    /**
+     * Updates this channel's name.
+     * @param {String} name The channel's new name
+     * @return {Promise}
+     */
     updateName(name) {
         return this.updateChannel({ name });
     }

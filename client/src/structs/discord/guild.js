@@ -466,7 +466,7 @@ export class Guild {
      * @param {GuildTextChannel} systemChannel The new system channel
      * @return {Promise}
      */
-    updateAfkChannel(system_channel) {
+    updateSystemChannel(system_channel) {
         return this.updateGuild({ system_channel_id: system_channel.id || system_channel });
     }
 

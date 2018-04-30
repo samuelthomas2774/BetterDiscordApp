@@ -338,7 +338,7 @@ export class ReactAutoPatcher {
     static async patchChannelMember() {
         const selector = '.' + WebpackModules.getModuleByProps(['member', 'memberInner', 'activity']).member;
 
-        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector });
+        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector }, m => m.prototype.renderActivity);
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
             if (!retVal.props || !retVal.props.children) return;
             const user = Helpers.findProp(component, 'user');

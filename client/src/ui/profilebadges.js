@@ -92,7 +92,9 @@ export default class extends Module {
 
         // Rerender all channel members
         if (this.PatchedNameTag) {
-            for (const channelMember of document.querySelectorAll('.member-2FrNV0')) {
+            const selector = '.' + WebpackModules.getModuleByProps(['member', 'memberInner', 'activity']).member;
+
+            for (const channelMember of document.querySelectorAll(selector)) {
                 Reflection(channelMember).forceUpdate();
             }
         }

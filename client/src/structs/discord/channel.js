@@ -131,15 +131,6 @@ export class Channel {
         return DiscordApi.currentChannel === this;
     }
 
-    /**
-     * Opens this channel's settings window.
-     * @param {String} section The section to open (see DiscordConstants.ChannelSettingsSections)
-     */
-    openSettings(section = 'OVERVIEW') {
-        Modules.ChannelSettingsWindow.setSection(section);
-        Modules.ChannelSettingsWindow.open(this.id);
-    }
-
 }
 
 export class PermissionOverwrite {
@@ -226,8 +217,17 @@ export class GuildChannel extends Channel {
     /**
      * Whether this channel is the guild's default channel.
      */
-    get defaultChannel() {
+    get isDefaultChannel() {
         return Modules.GuildChannelsStore.getDefaultChannel(this.guildId).id === this.id;
+    }
+
+    /**
+     * Opens this channel's settings window.
+     * @param {String} section The section to open (see DiscordConstants.ChannelSettingsSections)
+     */
+    openSettings(section = 'OVERVIEW') {
+        Modules.ChannelSettingsWindow.setSection(section);
+        Modules.ChannelSettingsWindow.open(this.id);
     }
 }
 
@@ -295,6 +295,7 @@ export class DirectMessageChannel extends PrivateChannel {
 export class GroupChannel extends PrivateChannel {
     get ownerId() { return this.discordObject.ownerId }
     get type() { return 'GROUP_DM' }
+    get name() { return this.discordObject.name }
     get icon() { return this.discordObject.icon }
 
     /**

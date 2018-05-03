@@ -21,7 +21,7 @@ import Events from './events';
 import EventsWrapper from './eventswrapper';
 import { WebpackModules } from './webpackmodules';
 import DiscordApi from './discordapi';
-import { ReactComponents } from './reactcomponents';
+import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
 
 export default class PluginApi {
@@ -64,6 +64,7 @@ export default class PluginApi {
     get Discord() { return DiscordApi }
     get DiscordApi() { return DiscordApi }
     get ReactComponents() { return ReactComponents }
+    get ReactHelpers() { return ReactHelpers }
     get Reflection() { return Reflection }
 
     /**

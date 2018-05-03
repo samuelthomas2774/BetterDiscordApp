@@ -366,7 +366,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannel() {
-        this.Channel = await ReactComponents.getComponent('Channel');
+        this.Channel = await ReactComponents.getComponent('Channel', {selector: '.chat'});
         this.unpatchChannel = MonkeyPatch('BD:ReactComponents', this.Channel.component.prototype).after('render', (component, args, retVal) => {
             const channel = component.props.channel || component.state.channel;
             if (!channel) return;

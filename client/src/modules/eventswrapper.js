@@ -14,6 +14,7 @@ export default class EventsWrapper {
 
     constructor(eventemitter, bind) {
         eventemitters.set(this, eventemitter);
+        this.bind = bind || this;
     }
 
     get eventSubs() {
@@ -37,16 +38,16 @@ export default class EventsWrapper {
 
     get off() { return this.unsubscribe }
     unsubscribe(event, callback) {
-        for (let index of this.eventSubs) {
+        for (let index in this.eventSubs) {
             if (this.eventSubs[index].event !== event || (callback && this.eventSubs[index].callback === callback)) continue;
-            eventemitters.get(this).off(event, this.eventSubs[index].boundCallback);
+            eventemitters.get(this).removeListener(event, this.eventSubs[index].boundCallback);
             this.eventSubs.splice(index, 1);
         }
     }
 
     unsubscribeAll() {
         for (let event of this.eventSubs) {
-            eventemitters.get(this).off(event.event, event.boundCallback);
+            eventemitters.get(this).removeListener(event.event, event.boundCallback);
         }
         this.eventSubs.splice(0, this.eventSubs.length);
     }

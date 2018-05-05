@@ -38,7 +38,7 @@ export default class extends Module {
 
         this.unpatchMessageRender = MonkeyPatch('ProfileBadges', Message.component.prototype).after('render', (component, args, retVal) => {
             if (!retVal.props || !retVal.props.children) return;
-            if (ReactHelpers.findProp(component, 'jumpSequenceId')) retVal = retVal.props.children;
+            if (ReactHelpers.findProp(component, 'jumpSequenceId') && ReactHelpers.findProp(component, 'canFlash')) retVal = retVal.props.children;
 
             const message = ReactHelpers.findProp(component, 'message');
             if (!message || !message.author) return;

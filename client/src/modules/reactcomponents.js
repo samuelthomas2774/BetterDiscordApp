@@ -305,9 +305,9 @@ export class ReactAutoPatcher {
     static async patchMessage() {
         this.Message = await ReactComponents.getComponent('Message', { selector: '.message' });
         this.unpatchMessageRender = MonkeyPatch('BD:ReactComponents', this.Message.component.prototype).after('render', (component, args, retVal) => {
-            const { message, jumpSequenceId } = component.props;
+            const { message, jumpSequenceId, canFlash } = component.props;
             const { id, colorString, bot, author, attachments, embeds } = message;
-            if (jumpSequenceId) retVal = retVal.props.children;
+            if (jumpSequenceId && canFlash) retVal = retVal.props.children;
             retVal.props['data-message-id'] = id;
             retVal.props['data-colourstring'] = colorString;
             if (author && author.id) retVal.props['data-user-id'] = author.id;

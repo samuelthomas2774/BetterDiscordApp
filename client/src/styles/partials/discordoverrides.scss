@@ -22,3 +22,7 @@
 [class*="layers-"] > * + * {
     z-index: 900;
 }
+
+.bd-settings-wrapper.platform-linux {
+    transform: none;
+}

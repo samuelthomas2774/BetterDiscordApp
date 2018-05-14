@@ -10,7 +10,7 @@
 
 import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenu, Modals, DOM, Reflection } from 'ui';
+import { BdMenu, Modals, DOM, DOMObserver, Reflection, VueInjector } from 'ui';
 import * as CommonComponents from 'commoncomponents';
 import { Utils, Filters, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
@@ -66,6 +66,12 @@ export default class PluginApi {
     get ReactComponents() { return ReactComponents }
     get ReactHelpers() { return ReactHelpers }
     get Reflection() { return Reflection }
+    get DOM() { return DOM }
+    get VueInjector() { return VueInjector }
+
+    get observer() {
+        return this._observer || (this._observer = new DOMObserver());
+    }
 
     /**
      * Logger

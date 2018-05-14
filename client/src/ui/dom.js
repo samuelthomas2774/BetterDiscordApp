@@ -30,12 +30,15 @@ class BdNode {
     }
 }
 
-class DOMObserver {
-
-    constructor() {
+export class DOMObserver {
+    constructor(root, options) {
         this.observe = this.observe.bind(this);
         this.subscribe = this.subscribe.bind(this);
         this.observerCallback = this.observerCallback.bind(this);
+
+        this.root = root || document.getElementById('app-mount');
+        this.options = options || { attributes: true, childList: true, subtree: true };
+
         this.observer = new MutationObserver(this.observerCallback);
         this.observe();
     }
@@ -47,20 +50,14 @@ class DOMObserver {
                 if (!f) continue;
                 if (sub.type && sub.type === 'filter' && !f.length) continue;
                 sub.callback(f);
-            } catch(err) {}
+            } catch (err) {
+                Logger.warn('DOMObserver', [`Error in observer callback ${sub.id}`, err]);
+            }
         }
     }
 
     observe() {
         this.observer.observe(this.root, this.options);
-    }
-
-    get root() {
-        return document.getElementById('app-mount');
-    }
-
-    get options() {
-        return { attributes: true, childList: true, subtree: true };
     }
 
     get subscriptions() {
@@ -78,11 +75,14 @@ class DOMObserver {
     }
 
     unsubscribe(id) {
-        const index = this.subscriptions.find(sub => sub.id === id);
+        const index = this.subscriptions.findIndex(sub => sub.id === id);
         if (index < 0) return;
         this.subscriptions.splice(index, 1);
     }
 
+    unsubscribeAll() {
+        this.subscriptions.splice(index, this.subscriptions.length);
+    }
 }
 
 class Manip {
@@ -95,6 +95,7 @@ class Manip {
         document.execCommand('insertText', false, text);
         if (activeElement && refocus) activeElement.focus();
     }
+
     static getText() {
         const txt = document.querySelector('.chat form textarea');
         if (!txt) return '';
@@ -112,24 +113,12 @@ export default class DOM {
         return this._observer || (this._observer = new DOMObserver());
     }
 
-    static get bdHead() {
-        return this.getElement('bd-head') || this.createElement('bd-head').appendTo('head');
-    }
-    static get bdBody() {
-        return this.getElement('bd-body') || this.createElement('bd-body').appendTo('body');
-    }
-    static get bdStyles() {
-        return this.getElement('bd-styles') || this.createElement('bd-styles').appendTo(this.bdHead);
-    }
-    static get bdThemes() {
-        return this.getElement('bd-themes') || this.createElement('bd-themes').appendTo(this.bdHead);
-    }
-    static get bdTooltips() {
-        return this.getElement('bd-tooltips') || this.createElement('bd-tooltips').appendTo(this.bdBody);
-    }
-    static get bdModals() {
-        return this.getElement('bd-modals') || this.createElement('bd-modals').appendTo(this.bdBody);
-    }
+    static get bdHead() { return this.getElement('bd-head') || this.createElement('bd-head').appendTo('head') }
+    static get bdBody() { return this.getElement('bd-body') || this.createElement('bd-body').appendTo('body') }
+    static get bdStyles() { return this.getElement('bd-styles') || this.createElement('bd-styles').appendTo(this.bdHead) }
+    static get bdThemes() { return this.getElement('bd-themes') || this.createElement('bd-themes').appendTo(this.bdHead) }
+    static get bdTooltips() { return this.getElement('bd-tooltips') || this.createElement('bd-tooltips').appendTo(this.bdBody) }
+    static get bdModals() { return this.getElement('bd-modals') || this.createElement('bd-modals').appendTo(this.bdBody) }
 
     static getElement(e) {
         if (e instanceof BdNode) return e.element;

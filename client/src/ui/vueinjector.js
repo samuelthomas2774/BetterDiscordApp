@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { WebpackModules } from 'modules';
 import Vue from './vue';
 
 export default class {
@@ -26,6 +27,45 @@ export default class {
 
         vue.$mount(bdnode ? bdnode.element : root);
         return vue;
+    }
+
+    /**
+     * Returns a React element that will render a Vue component.
+     * @param {Object} options Options to pass to Vue
+     * @return {React.Element}
+     */
+    static createReactElement(options) {
+        const React = WebpackModules.getModuleByName('React');
+        return React.createElement(this.ReactCompatibility, {options});
+    }
+
+    static get ReactCompatibility() {
+        if (this._ReactCompatibility) return this._ReactCompatibility;
+
+        const React = WebpackModules.getModuleByName('React');
+        const ReactDOM = WebpackModules.getModuleByName('ReactDOM');
+
+        return this._ReactCompatibility = class VueComponent extends React.Component {
+            render() {
+                return React.createElement('span');
+            }
+
+            componentDidMount() {
+                const element = ReactDOM.findDOMNode(this);
+                if (!element) return;
+                this.vueInstance.$mount(element);
+            }
+
+            componentDidUpdate() {
+                const element = ReactDOM.findDOMNode(this);
+                if (!element) return;
+                this.vueInstance.$mount(element);
+            }
+
+            get vueInstance() {
+                return this._vueInstance || (this._vueInstance = new Vue(this.props.options));
+            }
+        }
     }
 
 }

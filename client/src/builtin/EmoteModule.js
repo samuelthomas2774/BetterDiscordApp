@@ -92,17 +92,7 @@ export default new class EmoteModule {
         return this._searchCache || (this._searchCache = {});
     }
 
-    get React() {
-        return WebpackModules.getModuleByName('React');
-    }
-
-    get ReactDOM() {
-        return WebpackModules.getModuleByName('ReactDOM');
-    }
-
     processMarkup(markup, timestamp) {
-        if (!this.enabledSetting.value) return markup;
-
         timestamp = timestamp.valueOf();
         const allowNoWrapper = timestamp < enforceWrapperFrom;
 
@@ -126,12 +116,13 @@ export default new class EmoteModule {
                         newMarkup.push(text);
                         text = null;
                     }
-                    newMarkup.push(this.React.createElement('span', {
-                        className: 'bd-emote-outer',
-                        'data-bdemote-name': emote.name,
-                        'data-bdemote-src': emote.src,
-                        'data-has-wrapper': /;[\w]+;/gmi.test(word)
+
+                    newMarkup.push(VueInjector.createReactElement({
+                        components: { EmoteComponent },
+                        data: { emote, hasWrapper: /;[\w]+;/gmi.test(word) },
+                        template: '<EmoteComponent :src="emote.src" :name="emote.name" :hasWrapper="hasWrapper" />'
                     }));
+
                     continue;
                 }
                 if (text === null) {
@@ -149,16 +140,6 @@ export default new class EmoteModule {
 
     testWord(word) {
         return !/;[\w]+;/gmi.test(word);
-    }
-
-    injectAll() {
-        if (!this.enabledSetting.value) return;
-
-        const all = document.getElementsByClassName('bd-emote-outer');
-        for (const ec of all) {
-            if (ec.children.length) continue;
-            this.injectEmote(ec);
-        }
     }
 
     findByProp(obj, what, value) {
@@ -179,7 +160,7 @@ export default new class EmoteModule {
             try {
                 // First child has all the actual text content, second is the edited timestamp
                 const markup = this.findByProp(retVal, 'className', 'markup');
-                if (!markup) return;
+                if (!markup || !this.enabledSetting.value) return;
                 markup.children[0] = this.processMarkup(markup.children[0], component.props.message.editedTimestamp || component.props.message.timestamp);
             } catch (err) {
                 Logger.err('EmoteModule', err);
@@ -188,39 +169,6 @@ export default new class EmoteModule {
         for (const message of document.querySelectorAll('.message')) {
             Reflection(message).forceUpdate();
         }
-        this.injectAll();
-        this.unpatchMount = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidMount', component => {
-            const element = this.ReactDOM.findDOMNode(component);
-            if (!element) return;
-            this.injectEmotes(element);
-        });
-        this.unpatchUpdate = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidUpdate', component => {
-            const element = this.ReactDOM.findDOMNode(component);
-            if (!element) return;
-            this.injectEmotes(element);
-        });
-    }
-
-    injectEmote(root) {
-        if (!this.enabledSetting.value) return;
-
-        while (root.firstChild) {
-            root.removeChild(root.firstChild);
-        }
-        const { bdemoteName, bdemoteSrc, hasWrapper } = root.dataset;
-        if (!bdemoteName || !bdemoteSrc) return;
-        VueInjector.inject(root, {
-            components: { EmoteComponent },
-            data: { src: bdemoteSrc, name: bdemoteName, hasWrapper },
-            template: '<EmoteComponent :src="src" :name="name" :hasWrapper="hasWrapper" />'
-        }, DOM.createElement('span'));
-        root.classList.add('bd-is-emote');
-    }
-
-    injectEmotes(element) {
-        if (!this.enabledSetting.value || !element) return;
-
-        for (const beo of element.getElementsByClassName('bd-emote-outer')) this.injectEmote(beo);
     }
 
     getEmote(word) {

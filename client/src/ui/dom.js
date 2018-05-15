@@ -8,6 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { ClientLogger as Logger } from 'common';
+
 class BdNode {
     constructor(tag, className, id) {
         this.element = document.createElement(tag);
@@ -81,7 +83,7 @@ export class DOMObserver {
     }
 
     unsubscribeAll() {
-        this.subscriptions.splice(index, this.subscriptions.length);
+        this.subscriptions.splice(0, this.subscriptions.length);
     }
 }
 

@@ -51,15 +51,20 @@ export default class {
             }
 
             componentDidMount() {
-                const element = ReactDOM.findDOMNode(this);
-                if (!element) return;
-                this.vueInstance.$mount(element);
+                this.vueInstance.$mount(this.vueMount);
             }
 
             componentDidUpdate() {
+                this.vueInstance.$mount(this.vueMount);
+            }
+
+            get vueMount() {
                 const element = ReactDOM.findDOMNode(this);
                 if (!element) return;
-                this.vueInstance.$mount(element);
+                if (element.firstChild) return element.firstChild;
+                const newElement = document.createElement('span');
+                element.appendChild(newElement);
+                return newElement;
             }
 
             get vueInstance() {

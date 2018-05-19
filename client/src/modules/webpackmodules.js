@@ -203,7 +203,7 @@ export class WebpackModules {
             if (first) return foundModule;
             rm.push(foundModule);
         }
-        return first || rm.length == 0 ? undefined : rm;
+        return first ? undefined : rm;
     }
 
     /**
@@ -265,12 +265,23 @@ export class WebpackModules {
     static get require() {
         if (this._require) return this._require;
         const id = 'bd-webpackmodules';
-        const __webpack_require__ = window['webpackJsonp']([], {
-            [id]: (module, exports, __webpack_require__) => exports.default = __webpack_require__
-        }, [id]).default;
-        delete __webpack_require__.m[id];
-        delete __webpack_require__.c[id];
-        return this._require = __webpack_require__;
+
+        if (typeof window.webpackJsonp === 'function') {
+            const __webpack_require__ = window['webpackJsonp']([], {
+                [id]: (module, exports, __webpack_require__) => exports.default = __webpack_require__
+            }, [id]).default;
+            delete __webpack_require__.m[id];
+            delete __webpack_require__.c[id];
+            return this._require = __webpack_require__;
+        } else if (window.webpackJsonp && window.webpackJsonp.push) {
+            const __webpack_require__ = window['webpackJsonp'].push([[], {
+                [id]: (module, exports, req) => exports.default = req
+            }, [[id]]]).default;
+            window['webpackJsonp'].pop();
+            delete __webpack_require__.m[id];
+            delete __webpack_require__.c[id];
+            return this._require = __webpack_require__;
+        }
     }
 
     /**

@@ -27,7 +27,7 @@ export default new class EmoteModule {
         this.enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
         this.enabledSetting.on('setting-updated', event => {
             // Rerender all messages (or if we're disabling emotes, those that have emotes)
-            for (const message of document.querySelectorAll(event.value ? '.message' : '.bd-emote-outer')) {
+            for (const message of document.querySelectorAll(event.value ? '.message' : '.bd-emotewrapper')) {
                 Reflection(event.value ? message : message.closest('.message')).forceUpdate();
             }
         });

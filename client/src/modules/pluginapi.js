@@ -437,7 +437,7 @@ export default class PluginApi {
         return WebpackModules.getModuleByPrototypes(props, false);
     }
     get WebpackModules() {
-        return Object.defineProperty({
+        return new Proxy({
             getModule: this.getWebpackModule.bind(this),
             getModuleByName: this.getWebpackModuleByName.bind(this),
             getModuleByDisplayName: this.getWebpackModuleByName.bind(this),
@@ -447,9 +447,12 @@ export default class PluginApi {
             getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this),
             getModulesByProperties: this.getWebpackModulesByProperties.bind(this),
             getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this),
-            KnownModules: WebpackModules.KnownModules
-        }, 'require', {
-            get: () => this.webpackRequire
+            get KnownModules() { return WebpackModules.KnownModules },
+            get require() { return WebpackModules.require }
+        }, {
+            get(WebpackModules, property) {
+                return WebpackModules[property] || WebpackModules.getModuleByName(property);
+            }
         });
     }
 

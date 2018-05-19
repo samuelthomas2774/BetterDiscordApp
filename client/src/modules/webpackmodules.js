@@ -179,7 +179,7 @@ const KnownModules = {
     ExternalLink: Filters.byCode(/\.trusted\b/)
 };
 
-export class WebpackModules {
+class WebpackModules {
 
     /**
      * Finds a module using a filter function.
@@ -303,3 +303,11 @@ export class WebpackModules {
     static get KnownModules() { return KnownModules }
 
 }
+
+const WebpackModulesProxy = new Proxy(WebpackModules, {
+    get(WebpackModules, property) {
+        return WebpackModules[property] || WebpackModules.getModuleByName(property);
+    }
+});
+
+export { WebpackModulesProxy as WebpackModules };

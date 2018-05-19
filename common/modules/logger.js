@@ -8,8 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Vendor } from 'modules';
 import { FileUtils } from './utils';
+import moment from 'moment';
 import node_utils from 'node_utils';
 
 export const logLevels = {
@@ -60,7 +60,7 @@ export default class Logger {
     }
 
     static get timestamp() {
-        return Vendor.moment().format('DD/MM/YY hh:mm:ss');
+        return moment().format('DD/MM/YY hh:mm:ss');
     }
 
 }

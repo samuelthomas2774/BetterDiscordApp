@@ -1,6 +1,6 @@
-module.exports = (Plugin, Api, Vendor) => 
+module.exports = (Plugin, Api, Vendor) =>
 
-    const { $, moment } = Vendor;
+    const { $ } = Vendor;
     const { Events } = Api;
 
     const test = 'Testing';

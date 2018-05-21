@@ -35,7 +35,7 @@ module.exports = {
         electron: 'window.require("electron")',
         fs: 'window.require("fs")',
         path: 'window.require("path")',
-        node_utils: 'window.require("util")',
+        util: 'window.require("util")',
         sparkplug: 'require("./sparkplug")'
     },
     resolve: {

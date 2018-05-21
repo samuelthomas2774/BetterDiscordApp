@@ -33,7 +33,7 @@
 </template>
 
 <script>
-    import ClientIPC from 'bdipc';
+    import { ClientIPC } from 'common';
 
     import { remote } from 'electron';
 

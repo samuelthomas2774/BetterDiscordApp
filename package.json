@@ -16,7 +16,6 @@
   },
   "private": false,
   "dependencies": {
-    "moment": "^2.22.1",
     "nedb": "^1.8.0",
     "node-sass": "^4.7.2"
   },

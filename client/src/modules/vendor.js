@@ -11,7 +11,6 @@
 import jQuery from 'jquery';
 import lodash from 'lodash';
 import Vue from 'vue';
-import moment from 'moment';
 
 export { jQuery as $ };
 
@@ -28,11 +27,6 @@ export default class {
      */
     static get lodash() { return lodash }
     static get _() { return this.lodash }
-
-    /**
-     * Moment
-     */
-    static get moment() { return moment }
 
     /**
      * Vue

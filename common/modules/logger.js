@@ -9,8 +9,7 @@
 */
 
 import { FileUtils } from './utils';
-import moment from 'moment';
-import node_utils from 'node_utils';
+import node_utils from 'util';
 
 export const logLevels = {
     'log': 'log',
@@ -60,7 +59,7 @@ export default class Logger {
     }
 
     static get timestamp() {
-        return moment().format('DD/MM/YY hh:mm:ss');
+        return (new Date()).toLocaleString('en-GB');
     }
 
 }

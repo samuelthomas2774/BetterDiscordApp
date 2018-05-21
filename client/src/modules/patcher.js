@@ -37,9 +37,8 @@ export class Patcher {
     }
 
     static resolveModule(module) {
-        if (module instanceof Function || (module instanceof Object && !(module instanceof Array))) return module;
+        if (module instanceof Function || (module instanceof Object)) return module;
         if (typeof module === 'string') return WebpackModules.getModuleByName(module);
-        if (module instanceof Array) return WebpackModules.getModuleByProps(module);
         return null;
     }
 
@@ -80,7 +79,9 @@ export class Patcher {
     }
 
     static rePatch(patch) {
-        patch.proxyFunction = patch.module[patch.functionName] = this.overrideFn(patch);
+        if (patch.module instanceof Array && typeof patch.functionName === 'number')
+            patch.module.splice(patch.functionName, 1, patch.proxyFunction = this.overrideFn(patch));
+        else patch.proxyFunction = patch.module[patch.functionName] = this.overrideFn(patch);
     }
 
     static pushPatch(caller, id, module, functionName) {

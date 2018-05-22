@@ -7,8 +7,8 @@ const unzipStream = require('unzip-stream');
 const GitHub = require('github-api');
 const github = new GitHub();
 
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
+const readFile = (...args) => new Promise((resolve, reject) => fs.readFile(...args, (err, data) => err ? reject(err) : resolve(data)));
+const writeFile = (...args) => new Promise((resolve, reject) => fs.writeFile(...args, (err, data) => err ? reject(err) : resolve(data)));
 
 github.getLatestRelease = async function (user, repo) {
     try {

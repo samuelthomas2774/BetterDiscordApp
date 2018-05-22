@@ -31,6 +31,7 @@
     "css-loader": "^0.28.9",
     "del": "^3.0.0",
     "electron": "^1.6.15",
+    "electron-packager": "^12.1.0",
     "electron-rebuild": "^1.7.3",
     "eslint": "^4.16.0",
     "eslint-plugin-vue": "^4.3.0",
@@ -48,9 +49,7 @@
     "html-webpack-plugin": "^3.0.6",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
-    "nedb": "^1.8.0",
     "node-gyp": "^3.6.2",
-    "node-sass": "^4.7.2",
     "pump": "^2.0.0",
     "sass-loader": "^6.0.6",
     "unzip-stream": "^0.3.0",
@@ -71,12 +70,13 @@
     "watch_core": "npm run watch --prefix core",
     "build_csseditor": "npm run build --prefix csseditor",
     "watch_csseditor": "npm run watch --prefix csseditor",
-    "installer": "electron installer/test/index.js",
+    "installer": "electron installer/app/index.js",
     "build_installer": "npm run build --prefix installer",
     "watch_installer": "npm run watch --prefix installer",
+    "release_installer": "npm run release --prefix installer",
     "lint": "eslint -f unix client/src core/src csseditor/src installer/src",
     "test": "npm run build && npm run lint",
     "build_node-sass": "node scripts/build-node-sass.js",
-    "release": "npm run lint && npm run build && gulp release"
+    "release": "npm run lint && npm run build && gulp release && npm run release_installer"
   }
 }

@@ -45,7 +45,18 @@
         margin-top: 0;
     }
 
-    > .bd-drawer {
+    > .bd-form-customsetting-value {
         margin-bottom: 0;
+
+        .bd-form-textarea-details {
+            margin-top: 15px;
+        }
+
+        .bd-button {
+            margin-top: 10px;
+            padding: 5px 8px;
+            border-radius: 2px;
+            font-size: 14px;
+        }
     }
 }

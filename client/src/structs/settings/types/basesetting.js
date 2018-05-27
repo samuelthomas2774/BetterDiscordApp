@@ -12,10 +12,18 @@ import { ThemeManager } from 'modules';
 import { Utils, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 
-export default class Setting {
+export default class Setting extends AsyncEventEmitter {
 
     constructor(args, ...merge) {
+        super();
         this.args = args.args || args;
+
+        this.args.id = this.args.id || 'default';
+        this.args.text = this.args.text || undefined;
+        this.args.hint = this.args.hint || undefined;
+        this.args.path = this.args.path || undefined;
+        this.args.disabled = !!this.args.disabled;
+        this.args.fullwidth = !!this.args.fullwidth;
 
         if (!this.args.hasOwnProperty('value'))
             this.args.value = this.defaultValue;
@@ -26,7 +34,6 @@ export default class Setting {
             this._merge(newSetting);
         }
 
-        this.emitter = new AsyncEventEmitter();
         this.changed = !Utils.compare(this.args.value, this.args.saved_value);
     }
 
@@ -70,6 +77,10 @@ export default class Setting {
         return this.args.text;
     }
 
+    set text(value) {
+        this.args.text = value;
+    }
+
     /**
      * Text to be displayed with the setting.
      */
@@ -77,9 +88,14 @@ export default class Setting {
         return this.args.hint;
     }
 
+    set hint(value) {
+        this.args.hint = value;
+    }
+
     /**
      * The path of the plugin/theme this setting is part of.
      * Used by settings of type "array", "custom" and "file".
+     * Use set/category/setting.setContentPath to change.
      */
     get path() {
         return this.args.path;
@@ -93,12 +109,20 @@ export default class Setting {
         return this.args.disabled || false;
     }
 
+    set disabled(value) {
+        this.args.disabled = !!value;
+    }
+
     /**
      * Whether the setting should take the full width of the settings panel.
      * This is only customisable in some setting types.
      */
     get fullwidth() {
         return this.args.fullwidth || false;
+    }
+
+    set fullwidth(value) {
+        this.args.fullwidth = !!value;
     }
 
     /**
@@ -233,9 +257,5 @@ export default class Setting {
             return ThemeManager.toSCSSString(this.value);
         }
     }
-
-    on(...args) { return this.emitter.on(...args); }
-    off(...args) { return this.emitter.removeListener(...args); }
-    emit(...args) { return this.emitter.emit(...args); }
 
 }

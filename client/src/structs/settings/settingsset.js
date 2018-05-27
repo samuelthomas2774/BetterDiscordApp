@@ -14,11 +14,18 @@ import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { Modals } from 'ui';
 
-export default class SettingsSet {
+export default class SettingsSet extends AsyncEventEmitter {
 
     constructor(args, ...merge) {
-        this.emitter = new AsyncEventEmitter();
-        this.args = args.args || args;
+        super();
+
+        if (typeof args === 'string')
+            args = {id: args};
+        this.args = args.args || args || {};
+
+        this.args.id = this.args.id || undefined;
+        this.args.text = this.args.text || undefined;
+        this.args.headertext = this.args.headertext || undefined;
 
         this.args.categories = this.categories.map(category => new SettingsCategory(category));
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
@@ -54,6 +61,10 @@ export default class SettingsSet {
         return this.args.text;
     }
 
+    set text(value) {
+        this.args.text = value;
+    }
+
     /**
      * Text to be displayed with the set.
      */
@@ -63,14 +74,6 @@ export default class SettingsSet {
 
     set headertext(headertext) {
         this.args.headertext = headertext;
-    }
-
-    /**
-     * Whether this set should be displayed.
-     * Currently only used in the settings menu.
-     */
-    get hidden() {
-        return this.args.hidden || false;
     }
 
     /**
@@ -409,7 +412,8 @@ export default class SettingsSet {
 
         if (emit_multi)
             await this.emit('settings-updated', new SettingsUpdatedEvent({
-                updatedSettings
+                updatedSettings,
+                data: typeof emit_multi !== 'boolean' ? emit_multi : undefined
             }));
 
         return updatedSettings;
@@ -446,12 +450,8 @@ export default class SettingsSet {
             text: this.text,
             headertext: this.headertext,
             settings: this.categories.map(category => category.clone()),
-            schemes: this.schemes.map(scheme => scheme.clone())
+            schemes: this.schemes
         }, ...merge);
     }
-
-    on(...args) { return this.emitter.on(...args); }
-    off(...args) { return this.emitter.removeListener(...args); }
-    emit(...args) { return this.emitter.emit(...args); }
 
 }

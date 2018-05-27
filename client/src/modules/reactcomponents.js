@@ -6,19 +6,21 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
+import { EmoteModule } from 'builtin';
+import { Reflection } from 'ui';
+import { ClientLogger as Logger } from 'common';
 import { MonkeyPatch, Patcher } from './patcher';
 import { WebpackModules, Filters } from './webpackmodules';
 import DiscordApi from './discordapi';
-import { EmoteModule } from 'builtin';
-import { Reflection } from 'ui';
 
 class Helpers {
     static get plannedActions() {
         return this._plannedActions || (this._plannedActions = new Map());
     }
+
     static recursiveArray(parent, key, count = 1) {
         let index = 0;
         function* innerCall(parent, key) {
@@ -34,13 +36,15 @@ class Helpers {
 
         return innerCall(parent, key);
     }
+
     static recursiveArrayCount(parent, key) {
         let count = 0;
         // eslint-disable-next-line no-empty-pattern
-        for (let { } of this.recursiveArray(parent, key))
+        for (let {} of this.recursiveArray(parent, key))
             ++count;
         return this.recursiveArray(parent, key, count);
     }
+
     static get recursiveChildren() {
         return function* (parent, key, index = 0, count = 1) {
             const item = parent[key];
@@ -52,12 +56,14 @@ class Helpers {
             }
         }
     }
+
     static returnFirst(iterator, process) {
         for (let child of iterator) {
             const retVal = process(child);
             if (retVal !== undefined) return retVal;
         }
     }
+
     static getFirstChild(rootParent, rootKey, selector) {
         const getDirectChild = (item, selector) => {
             if (item && item.props && item.props.children) {
@@ -116,11 +122,13 @@ class Helpers {
         };
         return this.returnFirst(this.recursiveChildren(rootParent, rootKey), checkFilter.bind(null, selector)) || {};
     }
+
     static parseSelector(selector) {
         if (selector.startsWith('.')) return { className: selector.substr(1) }
         if (selector.startsWith('#')) return { id: selector.substr(1) }
         return {}
     }
+
     static findByProp(obj, what, value) {
         if (obj.hasOwnProperty(what) && obj[what] === value) return obj;
         if (obj.props && !obj.children) return this.findByProp(obj.props, what, value);
@@ -132,6 +140,7 @@ class Helpers {
         }
         return null;
     }
+
     static findProp(obj, what) {
         if (obj.hasOwnProperty(what)) return obj[what];
         if (obj.props && !obj.children) return this.findProp(obj.props, what);
@@ -144,10 +153,17 @@ class Helpers {
         }
         return null;
     }
+
+    static get React() {
+        return WebpackModules.getModuleByName('React');
+    }
+
     static get ReactDOM() {
         return WebpackModules.getModuleByName('ReactDOM');
     }
 }
+
+export { Helpers as ReactHelpers };
 
 class ReactComponent {
     constructor(id, component, retVal) {
@@ -155,12 +171,15 @@ class ReactComponent {
         this._component = component;
         this._retVal = retVal;
     }
+
     get id() {
         return this._id;
     }
+
     get component() {
         return this._component;
     }
+
     get retVal() {
         return this._retVal;
     }
@@ -197,7 +216,7 @@ export class ReactComponents {
         if (important) {
             const importantInterval = setInterval(() => {
                 if (this.components.find(c => c.id === name)) {
-                    console.info(`Important component ${name} already found`);
+                    Logger.info('ReactComponents', `Important component ${name} already found`);
                     clearInterval(importantInterval);
                     return;
                 }
@@ -206,11 +225,11 @@ export class ReactComponents {
                 const reflect = Reflection(select);
                 if (!reflect.component) {
                     clearInterval(importantInterval);
-                    console.error(`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select);
+                    Logger.error('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select]);
                     return;
                 }
                 if (!reflect.component.displayName) reflect.component.displayName = name;
-                console.info(`Found important component ${name} with reflection.`);
+                Logger.info('ReactComponents', [`Found important component ${name} with reflection`, reflect]);
                 this.push(reflect.component);
                 clearInterval(importantInterval);
             }, 50);
@@ -221,7 +240,7 @@ export class ReactComponents {
             listeners: []
         });
         return new Promise(resolve => {
-            this.listeners.find(l => l.id === name).listeners.push(c => resolve(c));
+            this.listeners.find(l => l.id === name).listeners.push(resolve);
         });
     }
 
@@ -307,9 +326,10 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannelMember() {
-        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member.member-status' });
+        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member-2FrNV0' });
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
-            if (!retVal.props || !retVal.props.children || !retVal.props.children.length) return;
+            // Logger.log('ReactComponents', ['Rendering ChannelMember', component, args, retVal]);
+            if (!retVal.props || !retVal.props.children) return;
             const user = Helpers.findProp(component, 'user');
             if (!user) return;
             retVal.props['data-user-id'] = user.id;
@@ -347,7 +367,7 @@ export class ReactAutoPatcher {
     }
 
     static forceUpdate() {
-        for (const e of document.querySelectorAll('.message,.message-group,.guild,.containerDefault-7RImuF,.channel-members .member')) {
+        for (const e of document.querySelectorAll('.message, .message-group, .guild, .containerDefault-7RImuF, .channel-members .member-2FrNV0')) {
             Reflection(e).forceUpdate();
         }
     }

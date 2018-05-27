@@ -8,30 +8,39 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-/*Module Manager initializes all modules when everything is ready*/
-
+import { ClientLogger as Logger } from 'common';
 import { Events, SocketProxy, EventHook, CssEditor } from 'modules';
 import { ProfileBadges } from 'ui';
 import Updater from './updater';
 
+/**
+ * Module Manager initializes all modules when everything is ready
+ */
 export default class {
 
+    /**
+     * An array of modules.
+     */
     static get modules() {
         return this._modules ? this._modules : (this._modules = [
             new ProfileBadges(),
             new SocketProxy(),
             new EventHook(),
             CssEditor,
-            new Updater()
+            Updater
         ]);
     }
 
+    /**
+     * Initializes all modules.
+     * @return {Promise}
+     */
     static async initModules() {
         for (let module of this.modules) {
             try {
                 if (module.init && module.init instanceof Function) module.init();
             } catch (err) {
-                console.log(`Failed to initialize module: ${err}`);
+                Logger.err('Module Manager', ['Failed to initialize module:', err]);
             }
         }
         return true;

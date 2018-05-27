@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Plugin Api
+ * BetterDiscord Plugin API
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -8,7 +8,10 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, ClientLogger as Logger, ClientIPC } from 'common';
+import { EmoteModule } from 'builtin';
+import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
+import { BdMenu, Modals, DOM, Reflection } from 'ui';
+import { Utils, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
@@ -16,35 +19,26 @@ import ThemeManager from './thememanager';
 import Events from './events';
 import EventsWrapper from './eventswrapper';
 import { WebpackModules } from './webpackmodules';
-import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenuItems, Modals, DOM, Reflection } from 'ui';
 import DiscordApi from './discordapi';
 import { ReactComponents } from './reactcomponents';
-import { MonkeyPatch } from './patcher';
+import { Patcher, MonkeyPatch } from './patcher';
 
 export default class PluginApi {
 
-    constructor(pluginInfo) {
+    constructor(pluginInfo, pluginPath) {
         this.pluginInfo = pluginInfo;
+        this.pluginPath = pluginPath;
+
         this.Events = new EventsWrapper(Events);
+        Utils.defineSoftGetter(this.Events, 'bind', () => this.plugin);
+
         this._menuItems = undefined;
         this._injectedStyles = undefined;
         this._modalStack = undefined;
     }
-    get Discord() {
-        return DiscordApi;
-    }
-    get ReactComponents() {
-        return ReactComponents;
-    }
-    get Reflection() {
-        return Reflection;
-    }
-    get MonkeyPatch() {
-        return module => MonkeyPatch(this.pluginInfo.id, module);
-    }
+
     get plugin() {
-        return PluginManager.getPluginById(this.pluginInfo.id || this.pluginInfo.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-'));
+        return PluginManager.getPluginByPath(this.pluginPath);
     }
 
     async bridge(plugin_id) {
@@ -61,22 +55,22 @@ export default class PluginApi {
 
     get Api() { return this }
 
+    get AsyncEventEmitter() { return AsyncEventEmitter }
+    get EventsWrapper() { return EventsWrapper }
+
     /**
      * Logger
      */
 
-    loggerLog(...message) { Logger.log(this.pluginInfo.name, message) }
-    loggerErr(...message) { Logger.err(this.pluginInfo.name, message) }
-    loggerWarn(...message) { Logger.warn(this.pluginInfo.name, message) }
-    loggerInfo(...message) { Logger.info(this.pluginInfo.name, message) }
-    loggerDbg(...message) { Logger.dbg(this.pluginInfo.name, message) }
     get Logger() {
         return {
-            log: this.loggerLog.bind(this),
-            err: this.loggerErr.bind(this),
-            warn: this.loggerWarn.bind(this),
-            info: this.loggerInfo.bind(this),
-            dbg: this.loggerDbg.bind(this)
+            log: (...message) => Logger.log(this.plugin.name, message),
+            error: (...message) => Logger.err(this.plugin.name, message),
+            err: (...message) => Logger.err(this.plugin.name, message),
+            warn: (...message) => Logger.warn(this.plugin.name, message),
+            info: (...message) => Logger.info(this.plugin.name, message),
+            debug: (...message) => Logger.dbg(this.plugin.name, message),
+            dbg: (...message) => Logger.dbg(this.plugin.name, message)
         };
     }
 
@@ -86,15 +80,16 @@ export default class PluginApi {
 
     get Utils() {
         return {
-            overload: () => Utils.overload.apply(Utils, arguments),
-            monkeyPatch: () => Utils.monkeyPatch.apply(Utils, arguments),
-            monkeyPatchOnce: () => Utils.monkeyPatchOnce.apply(Utils, arguments),
-            compatibleMonkeyPatch: () => Utils.monkeyPatchOnce.apply(Utils, arguments),
-            tryParseJson: () => Utils.tryParseJson.apply(Utils, arguments),
-            toCamelCase: () => Utils.toCamelCase.apply(Utils, arguments),
-            compare: () => Utils.compare.apply(Utils, arguments),
-            deepclone: () => Utils.deepclone.apply(Utils, arguments),
-            deepfreeze: () => Utils.deepfreeze.apply(Utils, arguments)
+            overload: (...args) => Utils.overload.apply(Utils, args),
+            tryParseJson: (...args) => Utils.tryParseJson.apply(Utils, args),
+            toCamelCase: (...args) => Utils.toCamelCase.apply(Utils, args),
+            compare: (...args) => Utils.compare.apply(Utils, args),
+            deepclone: (...args) => Utils.deepclone.apply(Utils, args),
+            deepfreeze: (...args) => Utils.deepfreeze.apply(Utils, args),
+            removeFromArray: (...args) => Utils.removeFromArray.apply(Utils, args),
+            defineSoftGetter: (...args) => Utils.defineSoftGetter.apply(Utils, args),
+            wait: (...args) => Utils.wait.apply(Utils, args),
+            until: (...args) => Utils.until.apply(Utils, args)
         };
     }
 
@@ -142,6 +137,9 @@ export default class PluginApi {
 
     get BdMenu() {
         return {
+            open: BdMenu.open.bind(BdMenu),
+            close: BdMenu.close.bind(BdMenu),
+            items: this.BdMenuItems,
             BdMenuItems: this.BdMenuItems
         };
     }
@@ -154,23 +152,23 @@ export default class PluginApi {
         return this._menuItems || (this._menuItems = []);
     }
     addMenuItem(item) {
-        return BdMenuItems.add(item);
+        return BdMenu.items.add(item);
     }
     addMenuSettingsSet(category, set, text) {
-        const item = BdMenuItems.addSettingsSet(category, set, text);
+        const item = BdMenu.items.addSettingsSet(category, set, text);
         return this.menuItems.push(item);
     }
     addMenuVueComponent(category, text, component) {
-        const item = BdMenuItems.addVueComponent(category, text, component);
+        const item = BdMenu.items.addVueComponent(category, text, component);
         return this.menuItems.push(item);
     }
     removeMenuItem(item) {
-        BdMenuItems.remove(item);
+        BdMenu.items.remove(item);
         Utils.removeFromArray(this.menuItems, item);
     }
     removeAllMenuItems() {
         for (let item of this.menuItems)
-            BdMenuItems.remove(item);
+            BdMenu.items.remove(item);
     }
     get BdMenuItems() {
         return Object.defineProperty({
@@ -293,6 +291,52 @@ export default class PluginApi {
     }
 
     /**
+     * Emotes
+     */
+
+    get emotes() {
+        return EmoteModule.emotes;
+    }
+    get favourite_emotes() {
+        return EmoteModule.favourite_emotes;
+    }
+    setFavouriteEmote(emote, favourite) {
+        return EmoteModule.setFavourite(emote, favourite);
+    }
+    addFavouriteEmote(emote) {
+        return EmoteModule.addFavourite(emote);
+    }
+    removeFavouriteEmote(emote) {
+        return EmoteModule.addFavourite(emote);
+    }
+    isFavouriteEmote(emote) {
+        return EmoteModule.isFavourite(emote);
+    }
+    getEmote(emote) {
+        return EmoteModule.getEmote(emote);
+    }
+    filterEmotes(regex, limit, start = 0) {
+        return EmoteModule.filterEmotes(regex, limit, start);
+    }
+    get Emotes() {
+        return Object.defineProperties({
+            setFavourite: this.setFavouriteEmote.bind(this),
+            addFavourite: this.addFavouriteEmote.bind(this),
+            removeFavourite: this.removeFavouriteEmote.bind(this),
+            isFavourite: this.isFavouriteEmote.bind(this),
+            getEmote: this.getEmote.bind(this),
+            filter: this.filterEmotes.bind(this)
+        }, {
+            emotes: {
+                get: () => this.emotes
+            },
+            favourite_emotes: {
+                get: () => this.favourite_emotes
+            }
+        });
+    }
+
+    /**
      * Plugins
      */
 
@@ -359,14 +403,23 @@ export default class PluginApi {
     getWebpackModuleByName(name, fallback) {
         return WebpackModules.getModuleByName(name, fallback);
     }
-    getWebpackModuleByRegex(regex, first = true) {
-        return WebpackModules.getModuleByRegex(regex, first);
+    getWebpackModuleByRegex(regex) {
+        return WebpackModules.getModuleByRegex(regex, true);
     }
-    getWebpackModuleByProperties(props, first = true) {
-        return WebpackModules.getModuleByProps(props, first);
+    getWebpackModulesByRegex(regex) {
+        return WebpackModules.getModuleByRegex(regex, false);
     }
-    getWebpackModuleByPrototypeFields(props, first = true) {
-        return WebpackModules.getModuleByPrototypes(props, first);
+    getWebpackModuleByProperties(...props) {
+        return WebpackModules.getModuleByProps(props, true);
+    }
+    getWebpackModuleByPrototypeFields(...props) {
+        return WebpackModules.getModuleByPrototypes(props, true);
+    }
+    getWebpackModulesByProperties(...props) {
+        return WebpackModules.getModuleByProps(props, false);
+    }
+    getWebpackModulesByPrototypeFields(...props) {
+        return WebpackModules.getModuleByPrototypes(props, false);
     }
     get WebpackModules() {
         return Object.defineProperty({
@@ -374,11 +427,62 @@ export default class PluginApi {
             getModuleByName: this.getWebpackModuleByName.bind(this),
             getModuleByDisplayName: this.getWebpackModuleByName.bind(this),
             getModuleByRegex: this.getWebpackModuleByRegex.bind(this),
+            getModulesByRegex: this.getWebpackModulesByRegex.bind(this),
             getModuleByProperties: this.getWebpackModuleByProperties.bind(this),
-            getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this)
+            getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this),
+            getModulesByProperties: this.getWebpackModulesByProperties.bind(this),
+            getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this)
         }, 'require', {
             get: () => this.webpackRequire
         });
+    }
+
+    /**
+     * DiscordApi
+     */
+
+    get Discord() {
+        return DiscordApi;
+    }
+
+    get ReactComponents() {
+        return ReactComponents;
+    }
+
+    get Reflection() {
+        return Reflection;
+    }
+
+    /**
+     * Patcher
+     */
+
+    get patches() {
+        return Patcher.getPatchesByCaller(this.plugin.id);
+    }
+    patchBefore(...args) { return this.pushChildPatch(...args, 'before') }
+    patchAfter(...args) { return this.pushChildPatch(...args, 'after') }
+    patchInstead(...args) { return this.pushChildPatch(...args, 'instead') }
+    pushChildPatch(...args) {
+        return Patcher.pushChildPatch(this.plugin.id, ...args);
+    }
+    unpatchAll(patches) {
+        return Patcher.unpatchAll(patches || this.plugin.id);
+    }
+    get Patcher() {
+        return Object.defineProperty({
+            before: this.patchBefore.bind(this),
+            after: this.patchAfter.bind(this),
+            instead: this.patchInstead.bind(this),
+            pushChildPatch: this.pushChildPatch.bind(this),
+            unpatchAll: this.unpatchAll.bind(this),
+            monkeyPatch: this.monkeyPatch.bind(this)
+        }, 'patches', {
+            get: () => this.patches
+        });
+    }
+    get monkeyPatch() {
+        return m => MonkeyPatch(this.plugin.id, m);
     }
 
 }

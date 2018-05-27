@@ -10,7 +10,7 @@
 
 const Datastore = require('nedb');
 
-class Database  {
+class Database {
 
     constructor(dbPath) {
         this.exec = this.exec.bind(this);

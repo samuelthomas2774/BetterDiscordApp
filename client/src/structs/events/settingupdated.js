@@ -12,38 +12,65 @@ import Event from './event';
 
 export default class SettingUpdatedEvent extends Event {
 
+    /**
+     * The set containing the setting that was updated.
+     */
     get set() {
         return this.args.set;
     }
 
+    /**
+     * The ID of the set containing the setting that was updated.
+     */
     get set_id() {
-        return this.args.set.id;
+        return this.set.id;
     }
 
+    /**
+     * The category containing the setting that was updated.
+     */
     get category() {
         return this.args.category;
     }
 
+    /**
+     * The ID of the category containing the setting that was updated.
+     */
     get category_id() {
-        return this.args.category.id;
+        return this.category.id;
     }
 
+    /**
+     * The setting that was updated.
+     */
     get setting() {
         return this.args.setting;
     }
 
+    /**
+     * The ID of the setting that was updated.
+     */
     get setting_id() {
-        return this.args.setting.id;
+        return this.setting.id;
     }
 
+    /**
+     * The setting's new value.
+     */
     get value() {
         return this.args.value;
     }
 
+    /**
+     * The setting's old value.
+     */
     get old_value() {
         return this.args.old_value;
     }
 
+    /**
+     * The type of event.
+     */
     get __eventType() {
         return 'setting-updated';
     }

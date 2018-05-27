@@ -5,14 +5,16 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 import { WebpackModules } from './webpackmodules';
 import { ClientLogger as Logger, Utils } from 'common';
 
 export class Patcher {
+
     static get patches() { return this._patches || (this._patches = {}) }
+
     static getPatchesByCaller(id) {
         const patches = [];
         for (const patch in this.patches) {
@@ -22,23 +24,28 @@ export class Patcher {
         }
         return patches;
     }
+
     static unpatchAll(patches) {
+        if (typeof patches === 'string')
+            patches = this.getPatchesByCaller(patches);
+
         for (const patch of patches) {
             for (const child of patch.children) {
                 child.unpatch();
             }
         }
     }
+
     static resolveModule(module) {
         if (module instanceof Function || (module instanceof Object && !(module instanceof Array))) return module;
-        if ('string' === typeof module) return WebpackModules.getModuleByName(module);
+        if (typeof module === 'string') return WebpackModules.getModuleByName(module);
         if (module instanceof Array) return WebpackModules.getModuleByProps(module);
         return null;
     }
 
     static overrideFn(patch) {
         return function () {
-            let retVal = null;
+            let retVal = undefined;
             if (!patch.children) return patch.originalFunction.apply(this, arguments);
             for (const superPatch of patch.children.filter(c => c.type === 'before')) {
                 try {
@@ -99,10 +106,12 @@ export class Patcher {
     static before() { return this.pushChildPatch(...arguments, 'before') }
     static after() { return this.pushChildPatch(...arguments, 'after') }
     static instead() { return this.pushChildPatch(...arguments, 'instead') }
+
     static pushChildPatch(caller, unresolvedModule, functionName, callback, displayName, type = 'after') {
         const module = this.resolveModule(unresolvedModule);
         if (!module || !module[functionName] || !(module[functionName] instanceof Function)) return null;
-        displayName = 'string' === typeof unresolvedModule ? unresolvedModule : displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
+        displayName = typeof unresolvedModule === 'string' ? unresolvedModule :
+            displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
         const patchId = `${displayName}:${functionName}:${caller}`;
 
         const patch = this.patches[patchId] || this.pushPatch(caller, patchId, module, functionName);

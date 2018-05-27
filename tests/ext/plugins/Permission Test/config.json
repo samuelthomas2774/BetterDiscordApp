@@ -2,15 +2,20 @@
     "info": {
         "id": "permission-test",
         "name": "Permission Test",
-        "authors": [ "Jiiks" ],
+        "authors": [
+            {
+                "name": "Jiiks",
+                "discord_id": "81388395867156480",
+                "github_username": "Jiiks",
+                "twitter_username": "Jiiksi"
+            }
+        ],
         "version": 1.0,
         "description": "Permission Test Description"
     },
     "main": "index.js",
-    "type": "plugin",
     "permissions": [
         "READ_MESSAGES",
         "SEND_MESSAGES"
-    ],
-    "defaultConfig": []
+    ]
 }

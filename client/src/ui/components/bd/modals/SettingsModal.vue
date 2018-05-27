@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-settings-modal" :class="{'bd-edited': changed}">
-        <Modal :headerText="modal.headertext" :close="modal.close" :class="{'bd-modal-out': modal.closing}">
+        <Modal :class="{'bd-modal-out': modal.closing}" :headerText="modal.headertext" @close="modal.close">
             <SettingsPanel :settings="settings" :schemes="modal.schemes" slot="body" class="bd-settings-modal-body" />
             <div slot="footer" class="bd-footer-alert" :class="{'bd-active': changed || saving, 'bd-warn': warnclose}" :style="{pointerEvents: changed ? 'all' : 'none'}">
                 <div class="bd-footer-alert-text">Unsaved changes</div>
@@ -23,9 +23,9 @@
         </Modal>
     </div>
 </template>
+
 <script>
     // Imports
-    import Vue from 'vue';
     import { Modal } from '../../common';
     import SettingsPanel from '../SettingsPanel.vue';
     import { Utils, ClientLogger as Logger } from 'common';
@@ -54,10 +54,9 @@
                 if (this.saving) return;
                 this.saving = true;
                 try {
-                    if (this.modal.saveSettings) await this.modal.saveSettings(this.settings);
-                    else await this.modal.settings.merge(this.settings);
+                    await this.modal.saveSettings ? this.modal.saveSettings(this.settings) : this.modal.settings.merge(this.settings);
                 } catch (err) {
-                    // TODO Display error that settings failed to save
+                    // TODO: display error that settings failed to save
                     Logger.err('SettingsModal', ['Failed to save settings:', err]);
                 }
                 this.saving = false;
@@ -71,13 +70,13 @@
             }
         },
         created() {
-            this.modal.beforeClose = force => {
+            this.modal.on('close', force => {
                 if (this.changed && !force) {
                     this.warnclose = true;
                     setTimeout(() => this.warnclose = false, 400);
                     throw {message: 'Settings have been changed'};
                 }
-            };
+            });
 
             this.modal.settings.on('settings-updated', this.cloneSettings);
             this.cloneSettings();

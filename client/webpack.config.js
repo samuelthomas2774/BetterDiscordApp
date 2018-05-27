@@ -1,6 +1,5 @@
-const
-    path = require('path'),
-    webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 
 const jsLoader = {
     test: /\.(js|jsx)$/,
@@ -9,18 +8,18 @@ const jsLoader = {
     query: {
         presets: ['react']
     }
-}
+};
 
 const vueLoader = {
     test: /\.(vue)$/,
     loader: 'vue-loader'
-}
+};
 
 const scssLoader = {
     test: /\.scss$/,
     exclude: /node_modules/,
     loader: ['css-loader', 'sass-loader']
-}
+};
 
 module.exports = {
     entry: './src/index.js',
@@ -32,9 +31,11 @@ module.exports = {
         loaders: [jsLoader, vueLoader, scssLoader]
     },
     externals: {
-        'electron': 'window.require("electron")',
-        'fs': 'window.require("fs")',
-        'path': 'window.require("path")'
+        electron: 'window.require("electron")',
+        fs: 'window.require("fs")',
+        path: 'window.require("path")',
+        node_utils: 'window.require("util")',
+        sparkplug: 'require("../../core/dist/sparkplug")'
     },
     resolve: {
         alias: {
@@ -49,15 +50,10 @@ module.exports = {
             path.resolve('src', 'structs'),
             path.resolve('src', 'builtin')
         ]
+    },
+    node: {
+        process: false,
+        __filename: false,
+        __dirname: false
     }
-   /* resolve: {
-        alias: {
-            'momentjs': 'vendor/moment.min.js'
-        },
-        modules: [
-            path.resolve('./node_modules'),
-            path.resolve(__dirname, '..'),
-            path.resolve(__dirname, '..', 'node_modules')
-        ]
-    }*/
 };

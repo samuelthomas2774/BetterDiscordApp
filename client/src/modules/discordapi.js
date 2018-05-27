@@ -402,7 +402,7 @@ export default class DiscordApi {
 
     static get currentChannel() {
         const channel = Modules.ChannelStore.getChannel(Modules.SelectedChannelStore.getChannelId());
-        return channel.isPrivate ? new PrivateChannel(channel) : new GuildChannel(channel);
+        if (channel) return channel.isPrivate() ? new PrivateChannel(channel) : new GuildChannel(channel);
     }
 
     static get currentUser() {
@@ -415,5 +415,5 @@ export default class DiscordApi {
         for (const id of friends) returnUsers.push(User.fromId(id));
         return returnUsers;
     }
-    
+
 }

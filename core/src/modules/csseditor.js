@@ -13,6 +13,7 @@ const { BrowserWindow } = require('electron');
 
 const { Module } = require('./modulebase');
 const { WindowUtils } = require('./utils');
+const { BDIpc } = require('./bdipc');
 
 class CSSEditor extends Module {
 
@@ -22,57 +23,64 @@ class CSSEditor extends Module {
         this.bd = bd;
     }
 
-    openEditor(o) {
-        if (this.editor) {
-            if (this.editor.isFocused()) return;
+    /**
+     * Opens an editor.
+     * @return {Promise}
+     */
+    openEditor(options) {
+        return new Promise((resolve, reject) => {
+            if (this.editor) {
+                if (this.editor.isFocused()) return;
 
-            this.editor.focus();
-            this.editor.flashFrame(true);
-            o.reply(true);
-            return;
-        }
-
-        const options = this.options;
-        for (let option in o.args) {
-            if (o.args.hasOwnProperty(option)) {
-                options[option] = o.args[option];
+                this.editor.focus();
+                this.editor.flashFrame(true);
+                return resolve(true);
             }
-        }
 
-        this.editor = new BrowserWindow(options);
-        this.editor.loadURL('about:blank');
-        this.editor.setSheetOffset(33);
-        this.editorUtils = new WindowUtils({ window: this.editor });
+            options = Object.assign({}, this.options, options);
 
-        this.editor.on('close', () => {
-            this.bd.windowUtils.send('bd-save-csseditor-bounds', this.editor.getBounds());
-            this.editor = null;
-        });
+            this.editor = new BrowserWindow(options);
+            this.editor.loadURL('about:blank');
+            this.editor.setSheetOffset(33);
+            this.editorUtils = new WindowUtils({ window: this.editor });
 
-        this.editor.once('ready-to-show', () => {
-            this.editor.show();
-        });
+            this.editor.on('close', () => {
+                this.bd.windowUtils.send('bd-save-csseditor-bounds', this.editor.getBounds());
+                this.editor = null;
+            });
 
-        this.editor.webContents.on('did-finish-load', () => {
-            this.editorUtils.injectScript(path.join(this.editorPath, 'csseditor.js'));
-            o.reply(true);
-        });
+            this.editor.once('ready-to-show', () => {
+                this.editor.show();
+            });
+
+            this.editor.webContents.on('did-finish-load', () => {
+                this.editorUtils.injectScript(path.join(this.editorPath, 'csseditor.js'));
+                resolve(true);
+            });
+        })
     }
 
-    setSCSS(scss) {
-        this.send('set-scss', scss);
-    }
-
+    /**
+     * Sends data to the editor.
+     * @param {String} channel
+     * @param {Any} data
+     */
     send(channel, data) {
-        if (!this.editor) return;
-        this.editor.webContents.send(channel, data);
+        if (!this.editor) throw {message: 'The CSS editor is not open.'};
+        return BDIpc.send(this.editor, channel, data);
     }
 
+    /**
+     * Sets the CSS editor's always on top flag.
+     */
     set alwaysOnTop(state) {
         if (!this.editor) return;
         this.editor.setAlwaysOnTop(state);
     }
 
+    /**
+     * Default options to pass to BrowserWindow.
+     */
     get options() {
         return {
             width: 800,
@@ -81,7 +89,7 @@ class CSSEditor extends Module {
             frame: false
         };
     }
-    
+
 }
 
 module.exports = { CSSEditor };

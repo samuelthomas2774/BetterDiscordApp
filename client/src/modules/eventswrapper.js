@@ -11,7 +11,8 @@
 const eventemitters = new WeakMap();
 
 export default class EventsWrapper {
-    constructor(eventemitter) {
+
+    constructor(eventemitter, bind) {
         eventemitters.set(this, eventemitter);
     }
 
@@ -19,27 +20,35 @@ export default class EventsWrapper {
         return this._eventSubs || (this._eventSubs = []);
     }
 
+    get on() { return this.subscribe }
     subscribe(event, callback) {
         if (this.eventSubs.find(e => e.event === event && e.callback === callback)) return;
-        this.eventSubs.push({
-            event,
-            callback
-        });
-        eventemitters.get(this).on(event, callback);
+        const boundCallback = (...args) => callback.apply(this.bind, args);
+        this.eventSubs.push({ event, callback, boundCallback });
+        eventemitters.get(this).on(event, boundCallback);
     }
 
+    once(event, callback) {
+        if (this.eventSubs.find(e => e.event === event && e.callback === callback)) return;
+        const boundCallback = (...args) => this.off(event, callback) && callback.apply(this.bind, args);
+        this.eventSubs.push({ event, callback, boundCallback });
+        eventemitters.get(this).on(event, boundCallback);
+    }
+
+    get off() { return this.unsubscribe }
     unsubscribe(event, callback) {
         for (let index of this.eventSubs) {
-            if (this.eventSubs[index].event !== event || (callback && this.eventSubs[index].callback === callback)) return;
-            eventemitters.get(this).off(event, this.eventSubs[index].callback);
+            if (this.eventSubs[index].event !== event || (callback && this.eventSubs[index].callback === callback)) continue;
+            eventemitters.get(this).off(event, this.eventSubs[index].boundCallback);
             this.eventSubs.splice(index, 1);
         }
     }
 
     unsubscribeAll() {
         for (let event of this.eventSubs) {
-            eventemitters.get(this).off(event.event, event.callback);
+            eventemitters.get(this).off(event.event, event.boundCallback);
         }
         this.eventSubs.splice(0, this.eventSubs.length);
     }
+
 }

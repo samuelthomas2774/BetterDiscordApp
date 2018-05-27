@@ -7,35 +7,112 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
 */
-import { FileUtils, ClientLogger as Logger } from 'common';
-import { Events, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
-import { DOM, VueInjector, Reflection } from 'ui';
-import EmoteComponent from './EmoteComponent.vue';
-let emotes = null;
-const emotesEnabled = true;
 
-export default class {
-    static get searchCache() {
+import { Events, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
+import { DOM, VueInjector, Reflection } from 'ui';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
+import path from 'path';
+import EmoteComponent from './EmoteComponent.vue';
+
+const enforceWrapperFrom = (new Date('2018-05-01')).valueOf();
+
+export default new class EmoteModule {
+
+    constructor() {
+        this.emotes = new Map();
+        this.favourite_emotes = [];
+    }
+
+    async init() {
+        this.enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
+        this.enabledSetting.on('setting-updated', event => {
+            // Rerender all messages (or if we're disabling emotes, those that have emotes)
+            for (const message of document.querySelectorAll(event.value ? '.message' : '.bd-emote-outer')) {
+                Reflection(event.value ? message : message.closest('.message')).forceUpdate();
+            }
+        });
+
+        const dataPath = Globals.getPath('data');
+        try {
+            await this.load(path.join(dataPath, 'emotes.json'));
+        } catch (err) {
+            Logger.err('EmoteModule', [`Failed to load emote data. Make sure you've downloaded the emote data and placed it in ${dataPath}:`, err]);
+            return;
+        }
+
+        try {
+            await this.observe();
+        } catch (err) {
+            Logger.err('EmoteModule', ['Error patching Message', err]);
+        }
+    }
+
+    async load(dataPath) {
+        const emotes = await FileUtils.readJsonFromFile(dataPath);
+        for (let [index, emote] of emotes.entries()) {
+            // Pause every 10000 emotes so the window doesn't freeze
+            if ((index % 10000) === 0)
+                await Utils.wait();
+
+            const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
+            emote.name = emote.id;
+            emote.src = uri.replace(':id', emote.value.id || emote.value);
+            this.emotes.set(emote.id, emote);
+        }
+    }
+
+    /**
+     * Sets an emote as favourite.
+     * @param {String} emote The name of the emote
+     * @param {Boolean} favourite The new favourite state
+     * @param {Boolean} save Whether to save settings
+     * @return {Promise}
+     */
+    setFavourite(emote, favourite, save = true) {
+        emote = emote.id || emote;
+        if (favourite && !this.favourite_emotes.includes(emote)) this.favourite_emotes.push(emote);
+        if (!favourite) Utils.removeFromArray(this.favourite_emotes, emote);
+        if (save) return Settings.saveSettings();
+    }
+
+    addFavourite(emote, save = true) {
+        return this.setFavourite(emote, true, save);
+    }
+
+    removeFavourite(emote, save = true) {
+        return this.setFavourite(emote, false, save);
+    }
+
+    isFavourite(emote) {
+        emote = emote.id || emote;
+        return this.favourite_emotes.includes(emote);
+    }
+
+    get searchCache() {
         return this._searchCache || (this._searchCache = {});
     }
-    static get emoteDb() {
-        return emotes;
-    }
-    static get React() {
+
+    get React() {
         return WebpackModules.getModuleByName('React');
     }
-    static get ReactDOM() {
+
+    get ReactDOM() {
         return WebpackModules.getModuleByName('ReactDOM');
     }
-    static processMarkup(markup) {
-        if (!emotesEnabled) return markup; // TODO Get it from setttings
+
+    processMarkup(markup, timestamp) {
+        if (!this.enabledSetting.value) return markup;
+
+        timestamp = timestamp.valueOf();
+        const allowNoWrapper = timestamp < enforceWrapperFrom;
+
         const newMarkup = [];
         for (const child of markup) {
-            if ('string' !== typeof child) {
+            if (typeof child !== 'string') {
                 newMarkup.push(child);
                 continue;
             }
-            if (!this.testWord(child)) {
+            if (!this.testWord(child) && !allowNoWrapper) {
                 newMarkup.push(child);
                 continue;
             }
@@ -43,13 +120,18 @@ export default class {
             if (!words) continue;
             let text = null;
             for (const [wordIndex, word] of words.entries()) {
-                const isEmote = this.isEmote(word);
-                if (isEmote) {
+                const emote = this.getEmote(word);
+                if (emote) {
                     if (text !== null) {
                         newMarkup.push(text);
                         text = null;
                     }
-                    newMarkup.push(this.React.createElement('span', { className: 'bd-emote-outer', 'data-bdemote-name': isEmote.name, 'data-bdemote-src': isEmote.src }));
+                    newMarkup.push(this.React.createElement('span', {
+                        className: 'bd-emote-outer',
+                        'data-bdemote-name': emote.name,
+                        'data-bdemote-src': emote.src,
+                        'data-has-wrapper': /;[\w]+;/gmi.test(word)
+                    }));
                     continue;
                 }
                 if (text === null) {
@@ -65,13 +147,13 @@ export default class {
         return newMarkup;
     }
 
-    static testWord(word) {
-        if (!/;[\w]+;/gmi.test(word)) return false;
-        return true;
+    testWord(word) {
+        return !/;[\w]+;/gmi.test(word);
     }
 
-    static injectAll() {
-        if (!emotesEnabled) return;
+    injectAll() {
+        if (!this.enabledSetting.value) return;
+
         const all = document.getElementsByClassName('bd-emote-outer');
         for (const ec of all) {
             if (ec.children.length) continue;
@@ -79,7 +161,7 @@ export default class {
         }
     }
 
-    static findByProp(obj, what, value) {
+    findByProp(obj, what, value) {
         if (obj.hasOwnProperty(what) && obj[what] === value) return obj;
         if (obj.props && !obj.children) return this.findByProp(obj.props, what, value);
         if (!obj.children || !obj.children.length) return null;
@@ -91,92 +173,81 @@ export default class {
         return null;
     }
 
-    static async observe() {
-        const dataPath = Globals.getObject('paths').find(path => path.id === 'data').path;
-        try {
-            emotes = await FileUtils.readJsonFromFile(dataPath + '/emotes.json');
-            const Message = await ReactComponents.getComponent('Message');
-            this.unpatchRender = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('render', (component, args, retVal) => {
-                try {
-                    const markup = this.findByProp(retVal, 'className', 'markup'); // First child has all the actual text content, second is the edited timestamp
-                    if (!markup) return;
-                    markup.children[0] = this.processMarkup(markup.children[0]);
-                } catch (err) {
-                    Logger.err('EmoteModule', err);
-                }
-            });
-            for (const message of document.querySelectorAll('.message')) {
-                Reflection(message).forceUpdate();
+    async observe() {
+        const Message = await ReactComponents.getComponent('Message');
+        this.unpatchRender = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('render', (component, args, retVal) => {
+            try {
+                // First child has all the actual text content, second is the edited timestamp
+                const markup = this.findByProp(retVal, 'className', 'markup');
+                if (!markup) return;
+                markup.children[0] = this.processMarkup(markup.children[0], component.props.message.editedTimestamp || component.props.message.timestamp);
+            } catch (err) {
+                Logger.err('EmoteModule', err);
             }
-            this.injectAll();
-            this.unpatchMount = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidMount', component => {
-                const element = this.ReactDOM.findDOMNode(component);
-                if (!element) return;
-                this.injectEmotes(element);
-            });
-            this.unpatchUpdate = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidUpdate', component => {
-                const element = this.ReactDOM.findDOMNode(component);
-                if (!element) return;
-                this.injectEmotes(element);
-            });
-        } catch (err) {
-            Logger.err('EmoteModule', err);
+        });
+        for (const message of document.querySelectorAll('.message')) {
+            Reflection(message).forceUpdate();
         }
+        this.injectAll();
+        this.unpatchMount = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidMount', component => {
+            const element = this.ReactDOM.findDOMNode(component);
+            if (!element) return;
+            this.injectEmotes(element);
+        });
+        this.unpatchUpdate = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidUpdate', component => {
+            const element = this.ReactDOM.findDOMNode(component);
+            if (!element) return;
+            this.injectEmotes(element);
+        });
     }
 
-    static injectEmote(root) {
-        if (!emotesEnabled) return;
+    injectEmote(root) {
+        if (!this.enabledSetting.value) return;
+
         while (root.firstChild) {
             root.removeChild(root.firstChild);
         }
-        const { bdemoteName, bdemoteSrc } = root.dataset;
+        const { bdemoteName, bdemoteSrc, hasWrapper } = root.dataset;
         if (!bdemoteName || !bdemoteSrc) return;
-        VueInjector.inject(
-            root,
-            DOM.createElement('span'),
-            { EmoteComponent },
-            `<EmoteComponent src="${bdemoteSrc}" name="${bdemoteName}"/>`
-        );
+        VueInjector.inject(root, {
+            components: { EmoteComponent },
+            data: { src: bdemoteSrc, name: bdemoteName, hasWrapper },
+            template: '<EmoteComponent :src="src" :name="name" :hasWrapper="hasWrapper" />'
+        }, DOM.createElement('span'));
         root.classList.add('bd-is-emote');
     }
 
-    static injectEmotes(element) {
-        if (!emotesEnabled || !element) return;
+    injectEmotes(element) {
+        if (!this.enabledSetting.value || !element) return;
+
         for (const beo of element.getElementsByClassName('bd-emote-outer')) this.injectEmote(beo);
     }
 
-    static isEmote(word) {
-        if (!emotes) return null;
+    getEmote(word) {
         const name = word.replace(/;/g, '');
-        const emote = emotes.find(emote => emote.id === name);
-        if (!emote) return null;
-        let { id, value } = emote;
-        if (value.id) value = value.id;
-        const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
-        return { name, src: uri.replace(':id', value) };
+        return this.emotes.get(name);
     }
 
-    static filterTest() {
-        const re = new RegExp('Kappa', 'i');
-        const filtered = emotes.filter(emote => re.test(emote.id));
-        return filtered.slice(0, 10);
-    }
-
-    static filter(regex, limit, start = 0) {
+    filter(regex, limit, start = 0) {
         const key = `${regex}:${limit}:${start}`;
         if (this.searchCache.hasOwnProperty(key)) return this.searchCache[key];
         let index = 0;
         let startIndex = 0;
-        return this.searchCache[key] = emotes.filter(emote => {
-            if (index >= limit) return false;
+
+        const matching = this.searchCache[key] = [];
+        for (let emote of this.emotes.values()) {
+            if (index >= limit) break;
             if (regex.test(emote.id)) {
                 if (startIndex < start) {
                     startIndex++;
-                    return false;
+                    continue;
                 }
                 index++;
-                return true;
+                matching.push(emote);
             }
-        });
+        }
+
+        return matching;
     }
+
 }

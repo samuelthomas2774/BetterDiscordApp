@@ -43,7 +43,7 @@
     import SettingsPanel from '../SettingsPanel.vue';
 
     export default {
-        props: ['setting', 'change'],
+        props: ['setting'],
         components: {
             MiSettings, MiOpenInNew, MiMinus
         },

@@ -31,10 +31,6 @@ export default class Theme extends Content {
     get type() { return 'theme' }
     get css() { return this.data.css }
 
-    // Don't use - these will eventually be removed!
-    get themePath() { return this.contentPath }
-    get themeConfig() { return this.config }
-
     /**
      * Called when settings are updated.
      * This can be overridden by other content types.
@@ -63,7 +59,7 @@ export default class Theme extends Content {
      * @return {Promise}
      */
     async compile() {
-        console.log('Compiling CSS');
+        Logger.log(this.name, 'Compiling CSS');
 
         if (this.info.type === 'sass') {
             const config = await ThemeManager.getConfigAsSCSS(this.settings);
@@ -76,7 +72,7 @@ export default class Theme extends Content {
             Logger.log(this.name, ['Finished compiling theme', new class Info {
                 get SCSS_variables() { console.log(config); }
                 get Compiled_SCSS() { console.log(result.css.toString()); }
-				get Result() { console.log(result); }
+                get Result() { console.log(result); }
             }]);
 
             return {
@@ -121,6 +117,7 @@ export default class Theme extends Content {
      */
     set files(files) {
         this.data.files = files;
+
         if (Settings.get('css', 'default', 'watch-files'))
             this.watchfiles = files;
     }
@@ -151,6 +148,8 @@ export default class Theme extends Content {
      * @param {Array} files Files to watch
      */
     set watchfiles(files) {
+        if (!files) files = [];
+
         for (let file of files) {
             if (!this.watchfiles.includes(file)) {
                 this.filewatcher.add(file);

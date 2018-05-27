@@ -186,4 +186,5 @@ export default class DOM {
             node.setAttribute(attribute.name, attribute.value);
         }
     }
+
 }

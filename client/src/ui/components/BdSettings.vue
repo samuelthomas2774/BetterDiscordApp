@@ -9,16 +9,16 @@
 */
 
 <template>
-    <div class="bd-settings" :class="{active: active, 'bd-settings-out': activeIndex === -1 && lastActiveIndex >= 0}" @keyup="close">
+    <div class="bd-settings" :class="{active: active, 'bd-settings-out': activeIndex === -1 && lastActiveIndex >= 0}" @keyup="$emit('close')">
         <SidebarView :contentVisible="this.activeIndex >= 0 || this.lastActiveIndex >= 0" :animating="this.animating" :class="{'bd-stop': !first}">
             <Sidebar slot="sidebar">
-                <div class="bd-settings-x" @click="close">
+                <div class="bd-settings-x" @click="$emit('close')">
                     <MiClose size="17"/>
                     <span class="bd-x-text">ESC</span>
                 </div>
                 <template v-for="(category, text) in sidebar">
                     <SidebarItem :item="{text, type: 'header'}" />
-                    <SidebarItem v-for="item in category" :item="item" :key="item.id" :onClick="itemOnClick" />
+                    <SidebarItem v-for="item in category" :item="item" :key="item.id" @click="itemOnClick(item.id)" />
                 </template>
             </Sidebar>
             <div slot="sidebarfooter" class="bd-info">
@@ -49,18 +49,20 @@
                     <CssEditorView v-if="item.contentid === 'css'" />
                     <PluginsView v-if="item.contentid === 'plugins'" />
                     <ThemesView v-if="item.contentid === 'themes'" />
+                    <UpdaterView v-if="item.contentid === 'updater'" />
                 </div>
             </ContentColumn>
         </SidebarView>
     </div>
 </template>
+
 <script>
     // Imports
-    import { shell } from 'electron';
-    import { Settings } from 'modules';
+    import { Events, Settings } from 'modules';
     import { BdMenuItems } from 'ui';
+    import { shell } from 'electron';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView } from './bd';
+    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView } from './bd';
     import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
 
     export default {
@@ -74,12 +76,12 @@
                 Settings,
                 timeout: null,
                 SettingsWrapper
-            }
+            };
         },
-        props: ['active', 'close'],
+        props: ['active'],
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView,
+            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView,
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         computed: {
@@ -131,7 +133,7 @@
                 this.timeout = setTimeout(() => {
                     this.animating = false;
                     this.lastActiveIndex = -1;
-					this.timeout = null;
+                    this.timeout = null;
                 }, 400);
             },
             openGithub() {
@@ -149,6 +151,9 @@
                 if (active) return;
                 this.closeContent();
             }
+        },
+        created() {
+            Events.on('bd-open-menu', item => item && this.itemOnClick(this.sidebarItems.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
         }
     }
 </script>

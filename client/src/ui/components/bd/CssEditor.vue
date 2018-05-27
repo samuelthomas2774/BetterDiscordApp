@@ -11,15 +11,15 @@
 <template>
     <SettingsWrapper headertext="CSS Editor">
         <div class="bd-css-editor">
-            <div v-if="CssEditor.error" class="bd-form-item">
+            <div v-if="error" class="bd-form-item">
                 <h5 style="margin-bottom: 10px;">Compiler error</h5>
-                <div class="bd-err bd-pre-wrap"><div class="bd-pre">{{ CssEditor.error.formatted }}</div></div>
+                <div class="bd-err bd-pre-wrap"><div class="bd-pre">{{ error.formatted }}</div></div>
                 <div class="bd-form-divider"></div>
             </div>
 
             <div class="bd-form-item">
                 <h5>Custom Editor</h5>
-                <FormButton v-if="internalEditorIsInstalled" :onClick="openInternalEditor">Open</FormButton>
+                <FormButton v-if="internalEditorIsInstalled" @click="openInternalEditor">Open</FormButton>
                 <template v-else>
                     <div class="bd-form-warning">
                         <div class="bd-text">Custom Editor is not installed!</div>
@@ -32,7 +32,7 @@
 
             <div class="bd-form-item">
                 <h5>System Editor</h5>
-                <FormButton :onClick="openSystemEditor">Open</FormButton>
+                <FormButton @click="openSystemEditor">Open</FormButton>
                 <p class="bd-hint">This will open {{ systemEditorPath }} in your system's default editor.</p>
             </div>
             <div class="bd-form-divider"></div>
@@ -42,10 +42,7 @@
             </div>
             <SettingsPanel :settings="settingsset" />
 
-            <!-- <Setting :setting="liveUpdateSetting" />
-            <Setting :setting="watchFilesSetting" /> -->
-
-            <FormButton :onClick="recompile" :loading="compiling">Recompile</FormButton>
+            <FormButton @click="recompile" :loading="compiling">Recompile</FormButton>
         </div>
     </SettingsWrapper>
 </template>

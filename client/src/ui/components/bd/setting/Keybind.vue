@@ -24,15 +24,16 @@
 </template>
 
 <script>
+    import { KeybindSetting } from 'structs';
+    import { ClientIPC, ClientLogger as Logger } from 'common';
     import { shell } from 'electron';
-    import { ClientIPC } from 'common';
+    import process from 'process';
     import Combokeys from 'combokeys';
     import CombokeysRecord from 'combokeys/plugins/record';
 
     const combokeys = new Combokeys(document);
     CombokeysRecord(combokeys);
 
-    const process = window.require('process');
     const modifierKey = process.platform === 'darwin' ? 'meta' : 'ctrl';
 
     export default {
@@ -49,6 +50,7 @@
         },
         watch: {
             active(active) {
+                KeybindSetting.paused = active;
                 if (active) combokeys.record(this.recorded);
             }
         },
@@ -65,7 +67,7 @@
                 this.active = false;
                 this.recordingValue = undefined;
                 this.setting.value = sequence.join(' ');
-                console.log('keypress', sequence);
+                Logger.log('Keybind', ['Recorded sequence', sequence]);
             },
             getDisplayString(value) {
                 if (!value) return;

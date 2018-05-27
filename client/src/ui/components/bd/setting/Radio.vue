@@ -16,14 +16,15 @@
             </div>
             <div class="bd-hint">{{setting.hint}}</div>
         </div>
-        <RadioGroup :options="setting.options" :selected="setting.value" :disabled="setting.disabled" :change="change" />
+        <RadioGroup :options="setting.options" v-model="setting.value" :disabled="setting.disabled" />
     </div>
 </template>
+
 <script>
     import RadioGroup from '../../common/RadioGroup.vue';
 
     export default {
-        props: ['setting', 'change'],
+        props: ['setting'],
         components: {
             RadioGroup
         }

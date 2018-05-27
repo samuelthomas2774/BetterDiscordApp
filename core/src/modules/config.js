@@ -5,7 +5,7 @@
  * https://github.com/JsSucks - https://betterdiscord.net
  *
  * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree. 
+ * LICENSE file in the root directory of this source tree.
 */
 
 const { Module } = require('./modulebase');
@@ -20,10 +20,15 @@ class Config extends Module {
         return this.args.paths;
     }
 
+    getPath(id, full) {
+        const path = this.paths.find(path => path.id === id);
+        return full ? path : path.path;
+    }
+
     get config() {
         return {
-            'version': this.version,
-            'paths': this.paths
+            version: this.version,
+            paths: this.paths
         };
     }
 

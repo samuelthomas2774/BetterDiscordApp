@@ -5,7 +5,7 @@
         "headertext": "Core Settings",
         "settings": [
             {
-                "category": "default",
+                "id": "default",
                 "settings": [
                     {
                         "id": "test-setting",
@@ -40,8 +40,8 @@
                 ]
             },
             {
-                "category": "advanced",
-                "category_name": "Advanced",
+                "id": "advanced",
+                "name": "Advanced",
                 "type": "drawer",
                 "settings": [
                     {
@@ -50,6 +50,12 @@
                         "text": "Developer mode",
                         "hint": "Adds some of BetterDiscord's internal modules to `global._bd`.",
                         "value": false
+                    },
+                    {
+                        "id": "debugger-keybind",
+                        "type": "keybind",
+                        "text": "Debugger keybind",
+                        "hint": "When this keybind is activated the developer tools will be opened and Discord will be paused."
                     },
                     {
                         "id": "ignore-content-manager-errors",
@@ -68,7 +74,7 @@
         "headertext": "UI Settings",
         "settings": [
             {
-                "category": "default",
+                "id": "default",
                 "settings": [
                     {
                         "id": "hide-button",
@@ -86,15 +92,26 @@
         "id": "emotes",
         "text": "Emotes",
         "headertext": "Emote Settings",
-        "settings": []
+        "settings": [
+            {
+                "id": "default",
+                "settings": [
+                    {
+                        "id": "enable",
+                        "type": "bool",
+                        "text": "Enable emotes",
+                        "value": true
+                    }
+                ]
+            }
+        ]
     },
     {
         "id": "css",
         "text": "CSS Editor",
-        "hidden": true,
         "settings": [
             {
-                "category": "default",
+                "id": "default",
                 "settings": [
                     {
                         "id": "live-update",
@@ -118,8 +135,6 @@
         "id": "security",
         "text": "Security",
         "headertext": "Security Settings",
-        "settings": [
-
-        ]
+        "settings": []
     }
 ]

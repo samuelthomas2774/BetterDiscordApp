@@ -1,0 +1,68 @@
+.bd-emote-outer {
+    display: inline-block;
+    height: 32px;
+    user-select: none;
+
+    .bd-is-emote {
+        font-size: 0;
+    }
+}
+
+.bd-emotewrapper {
+    display: flex;
+    max-height: 32px;
+
+    img {
+        height: 32px;
+        margin: 0 .05em 0 .1em !important;
+        min-height: 22px;
+        min-width: 22px;
+        object-fit: contain;
+        vertical-align: -.4em;
+        max-height: 32px;
+    }
+}
+
+.bd-emotewrapper,
+.bd-autocomplete-selector {
+    .bd-emote-favourite-button {
+        display: none;
+        width: 16px;
+        height: 16px;
+        margin-left: -17px;
+        margin-right: 1px;
+        cursor: pointer;
+        opacity: .7;
+        transition: opacity .1s ease;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        svg {
+            fill: $coldimwhite;
+            transition: fill .1s ease;
+        }
+
+        &.bd-active svg {
+            fill: #fff;
+        }
+    }
+
+    &.bd-selected .bd-emote-favourite-button,
+    &:hover .bd-emote-favourite-button {
+        display: block;
+    }
+}
+
+.bd-autocomplete-selector {
+    .bd-emote-favourite-button {
+        margin-left: 8px;
+        margin-right: 0;
+        opacity: .5;
+
+        &.bd-active {
+            display: block;
+        }
+    }
+}

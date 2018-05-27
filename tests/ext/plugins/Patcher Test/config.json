@@ -2,11 +2,16 @@
     "info": {
         "id": "patcher-test",
         "name": "Patcher Test",
-        "authors": [ "Jiiks" ],
+        "authors": [
+            {
+                "name": "Jiiks",
+                "discord_id": "81388395867156480",
+                "github_username": "Jiiks",
+                "twitter_username": "Jiiksi"
+            }
+        ],
         "version": 1.0,
         "description": "Patcher Test Description"
     },
-    "main": "index.js",
-    "type": "plugin",
-    "defaultConfig": []
+    "main": "index.js"
 }

@@ -31,6 +31,7 @@ const darwin_x64 = new Promise((resolve, reject) => {
 const linux_x64 = new Promise((resolve, reject) => {
     const archive = archiver('zip');
     archive.file(readme_path, {name: 'README.md'});
+    archive.file(path.resolve(__dirname, '..', 'installer', 'linux-start.desktop'), {name: 'Install BetterDiscord.desktop', mode: 0755});
     archive.file(license_path, {name: 'license.txt'});
     archive.file(`${installer_path}-linux-x64/LICENSE`, {name: 'electron-license.txt'});
     archive.file(`${installer_path}-linux-x64/LICENSES.chromium.html`, {name: 'chromium-license.html'});
@@ -48,6 +49,7 @@ const linux_x64 = new Promise((resolve, reject) => {
 const win32_ia32 = new Promise((resolve, reject) => {
     const archive = archiver('zip');
     archive.file(readme_path, {name: 'README.md'});
+    archive.file(path.resolve(__dirname, '..', 'installer', 'windows-start.bat'), {name: 'Install BetterDiscord.bat'});
     archive.file(license_path, {name: 'license.txt'});
     archive.file(`${installer_path}-win32-ia32/LICENSE`, {name: 'electron-license.txt'});
     archive.file(`${installer_path}-win32-ia32/LICENSES.chromium.html`, {name: 'chromium-license.html'});

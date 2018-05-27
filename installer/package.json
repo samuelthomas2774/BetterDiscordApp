@@ -23,6 +23,6 @@
     "package-darwin": "electron-packager ./app \"BetterDiscord Installer\" --electron-version 1.6.15 --extra-resource dist --platform darwin --arch x64",
     "package-linux": "electron-packager ./app \"BetterDiscord Installer\" --electron-version 1.6.15 --extra-resource dist --platform linux --arch x64",
     "package-win32": "electron-packager ./app \"BetterDiscord Installer\" --electron-version 1.6.15 --extra-resource dist --platform win32 --arch ia32",
-    "release": "npm run build && npm run install-dependencies && npm run package"
+    "release": "npm run build && npm run install-dependencies && npm run package && node ../scripts/package-installer.js"
   }
 }

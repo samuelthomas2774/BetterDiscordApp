@@ -8,11 +8,11 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const path = require('path');
-const sass = require('node-sass');
-const { BrowserWindow, dialog } = require('electron');
+import path from 'path';
+import sass from 'node-sass';
+import { BrowserWindow, dialog } from 'electron';
 
-const { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
+import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } from './modules';
 
 const tests = typeof PRODUCTION === 'undefined';
 
@@ -117,7 +117,7 @@ class Comms {
     }
 }
 
-class BetterDiscord {
+export class BetterDiscord {
 
     constructor(args) {
         if (BetterDiscord.loaded) {
@@ -225,7 +225,3 @@ class BetterDiscord {
 }
 
 BetterDiscord.patchBrowserWindow();
-
-module.exports = {
-    BetterDiscord
-};

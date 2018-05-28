@@ -10,13 +10,13 @@
 
 // TODO Use common
 
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 
-const { Module } = require('./modulebase');
-const { BDIpc } = require('./bdipc');
+import Module from './modulebase';
+import BDIpc from './bdipc';
 
-class Utils {
+export class Utils {
     static async tryParseJson(jsonString) {
         try {
             return JSON.parse(jsonString);
@@ -29,7 +29,7 @@ class Utils {
     }
 }
 
-class FileUtils {
+export class FileUtils {
     static async fileExists(path) {
         return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
@@ -158,7 +158,7 @@ class FileUtils {
     }
 }
 
-class WindowUtils extends Module {
+export class WindowUtils extends Module {
     bindings() {
         this.openDevTools = this.openDevTools.bind(this);
         this.executeJavascript = this.executeJavascript.bind(this);
@@ -209,9 +209,3 @@ class WindowUtils extends Module {
         return BDIpc.send(this.window, channel, message);
     }
 }
-
-module.exports = {
-    Utils,
-    FileUtils,
-    WindowUtils
-};

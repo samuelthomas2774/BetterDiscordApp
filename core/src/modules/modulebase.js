@@ -11,7 +11,7 @@
 /**
  * Base Module that every non-static module should extend.
  */
-class Module {
+export default class Module {
 
     constructor(args) {
         this.__ = {
@@ -31,5 +31,3 @@ class Module {
     get state() { return this.__.state; }
 
 }
-
-module.exports = { Module };

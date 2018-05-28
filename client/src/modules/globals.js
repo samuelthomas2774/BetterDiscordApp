@@ -18,6 +18,7 @@ export default new class extends Module {
     constructor(args) {
         super(args);
 
+        // eslint-disable-next-line no-undef
         this.require = __non_webpack_require__;
     }
 

@@ -44,7 +44,7 @@ class BetterDiscord {
             __filename, __dirname,
             module: Globals.require.cache[__filename],
             require: Globals.require,
-            webpack_require: __webpack_require__,
+            webpack_require: __webpack_require__, // eslint-disable-line no-undef
             get discord_require() { return WebpackModules.require }
         };
 

@@ -10,10 +10,30 @@
  * This file is evaluated in the renderer process!
  */
 
+import electron, { ipcRenderer } from 'electron';
+
 (() => {
     if (module.exports.bd) return;
 
     console.log('[BetterDiscord|Sparkplug]');
+
+    const currentWindow = electron.remote.getCurrentWindow();
+
+    if (currentWindow.__bd_preload) {
+        for (let preloadScript of currentWindow.__bd_preload) {
+            try {
+                require(preloadScript);
+            } catch (err) {
+                console.error('[BetterDiscord|Sparkplug] Error thrown in preload script', preloadScript, err);
+            }
+        }
+    }
+
+    ipcRenderer.on('--bd-inject-script', (event, {script, variable}) => {
+        console.log('[BetterDiscord|Sparkplug] Injecting script', script, variable);
+        if (variable) window[variable] = require(script);
+        else require(script);
+    });
 
     const ls = window.localStorage;
     if (!ls) console.warn('[BetterDiscord|Sparkplug] Failed to hook localStorage :(');

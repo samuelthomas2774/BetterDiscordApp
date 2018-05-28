@@ -185,13 +185,17 @@ class WindowUtils extends Module {
         return WindowUtils.injectScript(this.window, fpath, variable);
     }
 
-    static injectScript(window, fpath, variable) {
+    static async injectScript(window, fpath, variable) {
         window = window.webContents || window;
         if (!window) return;
         // console.log(`Injecting: ${fpath} to`, window);
 
         const escaped_path = fpath.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
         const escaped_variable = variable ? variable.replace(/\\/g, '\\\\').replace(/"/g, '\\"') : null;
+
+        const nodeIntegration = await window.executeJavaScript(`typeof require !== 'undefined'`);
+
+        if (!nodeIntegration) return window.send('--bd-inject-script', {script: fpath, variable});
 
         if (variable) return window.executeJavaScript(`window["${escaped_variable}"] = require("${escaped_path}");`);
         else return window.executeJavaScript(`require("${escaped_path}");`);

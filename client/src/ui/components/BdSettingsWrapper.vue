@@ -23,6 +23,7 @@
     // Imports
     import { Events, Settings } from 'modules';
     import { Modals } from 'ui';
+    import process from 'process';
     import BdSettings from './BdSettings.vue';
 
     export default {
@@ -33,7 +34,7 @@
                 active: false,
                 animating: false,
                 timeout: null,
-                platform: global.process.platform
+                platform: process.platform
             };
         },
         components: {

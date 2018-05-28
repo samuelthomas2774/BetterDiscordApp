@@ -28,10 +28,9 @@
 
 <script>
     // Imports
+    import process from 'process';
     import { Modal } from '../../common';
     import { MiError } from '../../common/MaterialIcon';
-
-    const process = window.require('process');
 
     export default {
         props: ['modal'],

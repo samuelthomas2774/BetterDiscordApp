@@ -12,6 +12,7 @@ import { Events, Permissions } from 'modules';
 import { Modals } from 'ui';
 import { ErrorEvent } from 'structs';
 import { ClientLogger as Logger } from 'common';
+import Globals from './globals';
 import ContentManager from './contentmanager';
 import ExtModuleManager from './extmodulemanager';
 import Plugin from './plugin';
@@ -96,7 +97,7 @@ export default class extends ContentManager {
             }
         }
 
-        const plugin = window.require(paths.mainPath)(Plugin, new PluginApi(info, paths.contentPath), Vendor, deps);
+        const plugin = Globals.require(paths.mainPath)(Plugin, new PluginApi(info, paths.contentPath), Vendor, deps);
         if (!(plugin.prototype instanceof Plugin))
             throw {message: `Plugin ${info.name} did not return a class that extends Plugin.`};
 

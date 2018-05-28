@@ -58,9 +58,12 @@ class PatchedBrowserWindow extends BrowserWindow {
         options.webPreferences = Object.assign({}, options.webPreferences);
 
         // Make sure Node integration is enabled
-        options.webPreferences.nodeIntegration = true;
+        const originalPreloadScript = options.webPreferences.preload;
+        options.webPreferences.preload = sparkplug;
 
-        return new BrowserWindow(options);
+        super(options);
+
+        this.__bd_preload = [originalPreloadScript];
     }
 }
 
@@ -147,7 +150,6 @@ class BetterDiscord {
 
         this.csseditor = new CSSEditor(this, this.config.getPath('csseditor'));
 
-        this.windowUtils.on('did-get-response-details', () => this.ignite());
         this.windowUtils.on('did-finish-load', () => this.injectScripts(true));
 
         this.windowUtils.on('did-navigate-in-page', (event, url, isMainFrame) => {
@@ -164,10 +166,6 @@ class BetterDiscord {
         return new Promise(resolve => {
             const defer = setInterval(() => {
                 const windows = BrowserWindow.getAllWindows();
-
-                for (let window of windows) {
-                    if (window) BetterDiscord.ignite(window);
-                }
 
                 if (windows.length === 1 && windows[0].webContents.getURL().includes('discordapp.com')) {
                     resolve(windows[0]);

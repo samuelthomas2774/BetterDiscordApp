@@ -8,10 +8,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { Globals } from 'modules';
+import path from 'path';
 import Setting from './basesetting';
 import SettingsCategory from '../settingscategory';
 import SettingsScheme from '../settingsscheme';
-import path from 'path';
 
 export default class CustomSetting extends Setting {
 
@@ -68,7 +69,7 @@ export default class CustomSetting extends Setting {
      * @param {String} classExport The name of a property of the file's exports that will be used (optional)
      */
     setClass(class_file, class_export) {
-        const component = window.require(path.join(this.path, class_file));
+        const component = Globals.require(path.join(this.path, class_file));
         const setting_class = class_export ? component[class_export](CustomSetting) : component.default ? component.default(CustomSetting) : component(CustomSetting);
 
         if (!(setting_class.prototype instanceof CustomSetting))

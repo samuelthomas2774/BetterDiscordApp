@@ -27,7 +27,7 @@
 </template>
 
 <script>
-    import { PluginManager } from 'modules';
+    import { Globals, PluginManager } from 'modules';
     import SettingsPanel from '../SettingsPanel.vue';
     import Drawer from '../../common/Drawer.vue';
     import Button from '../../common/Button.vue';
@@ -42,7 +42,7 @@
         computed: {
             component() {
                 if (typeof this.setting.file === 'string') {
-                    const component = window.require(path.join(this.setting.path, this.setting.file));
+                    const component = Globals.require(path.join(this.setting.path, this.setting.file));
                     return this.setting.component ? component[this.setting.component] : component.default ? component.default : component;
                 }
 

@@ -39,7 +39,13 @@ class BetterDiscord {
 
             plugins: PluginManager.localContent,
             themes: ThemeManager.localContent,
-            extmodules: ExtModuleManager.localContent
+            extmodules: ExtModuleManager.localContent,
+
+            __filename, __dirname,
+            module: Globals.require.cache[__filename],
+            require: Globals.require,
+            webpack_require: __webpack_require__,
+            get discord_require() { return WebpackModules.require }
         };
 
         const developermode = Settings.getSetting('core', 'advanced', 'developer-mode');

@@ -269,7 +269,7 @@ export default class {
 
             const index = this.getContentIndex(content);
 
-            delete window.require.cache[window.require.resolve(content.paths.mainPath)];
+            delete Globals.require.cache[Globals.require.resolve(content.paths.mainPath)];
 
             if (reload) {
                 const newcontent = await this.preloadContent(content.dirName, true, index);

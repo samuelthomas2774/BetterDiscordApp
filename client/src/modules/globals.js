@@ -17,6 +17,8 @@ export default new class extends Module {
 
     constructor(args) {
         super(args);
+
+        this.require = __non_webpack_require__;
     }
 
     initg() {

@@ -12,6 +12,11 @@ import jQuery from 'jquery';
 import lodash from 'lodash';
 import Vue from 'vue';
 
+import Combokeys from 'combokeys';
+import filetype from 'file-type';
+import filewatcher from 'filewatcher';
+import VTooltip from 'v-tooltip';
+
 export { jQuery as $ };
 
 export default class {
@@ -32,5 +37,10 @@ export default class {
      * Vue
      */
     static get Vue() { return Vue }
+
+    static get Combokeys() { return Combokeys }
+    static get filetype() { return filetype }
+    static get filewatcher() { return filewatcher }
+    static get VTooltip() { return VTooltip }
 
 }

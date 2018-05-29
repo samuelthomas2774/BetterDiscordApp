@@ -416,8 +416,8 @@ export class ReactAutoPatcher {
     static async patchUserPopout() {
         const selector = '.' + WebpackModules.getModuleByProps(['userPopout', 'headerNormal']).userPopout;
 
-        this.UserProfileModal = await ReactComponents.getComponent('UserPopout', { selector });
-        this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
+        this.UserPopout = await ReactComponents.getComponent('UserPopout', { selector });
+        this.unpatchUserPopout = MonkeyPatch('BD:ReactComponents', this.UserPopout.component.prototype).after('render', (component, args, retVal) => {
             const { user, guild, guildMember } = component.props;
             if (!user) return;
             retVal.props['data-user-id'] = user.id;

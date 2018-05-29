@@ -56,11 +56,6 @@
                 sterm: ''
             };
         },
-        props: ['initial'],
-        beforeMount() {
-            // this.emotes = EmoteModule.filter(new RegExp(this.initial, 'i'), 10);
-            // this.open = this.emotes.length;
-        },
         created() {
             const enabled = Settings.getSetting('emotes', 'default', 'enable');
             enabled.on('setting-updated', event => {

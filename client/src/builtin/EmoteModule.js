@@ -13,6 +13,7 @@ import { DOM, VueInjector, Reflection } from 'ui';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import EmoteComponent from './EmoteComponent.vue';
+import Autocomplete from '../ui/components/common/Autocomplete.vue';
 
 const enforceWrapperFrom = (new Date('2018-05-01')).valueOf();
 
@@ -41,9 +42,12 @@ export default new class EmoteModule {
         }
 
         try {
-            await this.observe();
+            await Promise.all([
+                this.patchMessage(),
+                this.patchChannelTextArea()
+            ]);
         } catch (err) {
-            Logger.err('EmoteModule', ['Error patching Message', err]);
+            Logger.err('EmoteModule', ['Error patching Message / ChannelTextArea', err]);
         }
     }
 
@@ -154,23 +158,6 @@ export default new class EmoteModule {
         return null;
     }
 
-    async observe() {
-        const Message = await ReactComponents.getComponent('Message');
-        this.unpatchRender = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('render', (component, args, retVal) => {
-            try {
-                // First child has all the actual text content, second is the edited timestamp
-                const markup = this.findByProp(retVal, 'className', 'markup');
-                if (!markup || !this.enabledSetting.value) return;
-                markup.children[0] = this.processMarkup(markup.children[0], component.props.message.editedTimestamp || component.props.message.timestamp);
-            } catch (err) {
-                Logger.err('EmoteModule', err);
-            }
-        });
-        for (const message of document.querySelectorAll('.message')) {
-            Reflection(message).forceUpdate();
-        }
-    }
-
     getEmote(word) {
         const name = word.replace(/;/g, '');
         return this.emotes.get(name);
@@ -196,6 +183,43 @@ export default new class EmoteModule {
         }
 
         return matching;
+    }
+
+    async patchMessage() {
+        const Message = await ReactComponents.getComponent('Message');
+
+        this.unpatchRender = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('render', (component, args, retVal) => {
+            try {
+                // First child has all the actual text content, second is the edited timestamp
+                const markup = this.findByProp(retVal, 'className', 'markup');
+                if (!markup || !this.enabledSetting.value) return;
+                markup.children[0] = this.processMarkup(markup.children[0], component.props.message.editedTimestamp || component.props.message.timestamp);
+            } catch (err) {
+                Logger.err('EmoteModule', err);
+            }
+        });
+
+        for (const message of document.querySelectorAll('.message')) {
+            Reflection(message).forceUpdate();
+        }
+    }
+
+    async patchChannelTextArea() {
+        const selector = '.' + WebpackModules.getModuleByProps(['channelTextArea', 'emojiButton']).channelTextArea;
+
+        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', {selector});
+        this.unpatchChannelTextArea = MonkeyPatch('BD:ReactComponents', ChannelTextArea.component.prototype).after('render', (component, args, retVal) => {
+            if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
+
+            retVal.props.children.splice(0, 0, VueInjector.createReactElement({
+                components: { Autocomplete },
+                template: '<Autocomplete />'
+            }));
+        });
+
+        for (const e of document.querySelectorAll(selector)) {
+            Reflection(e).forceUpdate();
+        }
     }
 
 }

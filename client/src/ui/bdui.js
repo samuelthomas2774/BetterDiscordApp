@@ -13,7 +13,6 @@ import { Utils } from 'common';
 import { remote } from 'electron';
 import DOM from './dom';
 import Vue from './vue';
-import AutoManip from './automanip';
 import { BdSettingsWrapper, BdModals } from './components';
 
 export default class {
@@ -24,9 +23,6 @@ export default class {
             server: DiscordApi.currentGuild,
             channel: DiscordApi.currentChannel
         };
-
-        window.addEventListener('keyup', e => Events.emit('gkh:keyup', e));
-        this.autoManip = new AutoManip();
 
         const ehookInterval = setInterval(() => {
             if (!remote.BrowserWindow.getFocusedWindow()) return;

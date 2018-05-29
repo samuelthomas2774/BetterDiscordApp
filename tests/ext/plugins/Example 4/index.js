@@ -1,13 +1,13 @@
 module.exports = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Api }) => class extends Plugin {
-	async onstart() {
+    async onstart() {
         this.keybindEvent = this.keybindEvent.bind(this);
 
-		// Some array event examples
-		const arraySetting = this.settings.getSetting('default', 'array-1');
-		Logger.log('Array setting', arraySetting);
-		arraySetting.on('item-added', event => Logger.log('Item', event.item, 'was added to the array setting'));
-		arraySetting.on('item-updated', event => Logger.log('Item', event.item, 'of the array setting was updated', event));
-		arraySetting.on('item-removed', event => Logger.log('Item', event.item, 'removed from the array setting'));
+        // Some array event examples
+        const arraySetting = this.settings.getSetting('default', 'array-1');
+        Logger.log('Array setting', arraySetting);
+        arraySetting.on('item-added', event => Logger.log('Item', event.item, 'was added to the array setting'));
+        arraySetting.on('item-updated', event => Logger.log('Item', event.item, 'of the array setting was updated', event));
+        arraySetting.on('item-removed', event => Logger.log('Item', event.item, 'removed from the array setting'));
 
         // Keybind setting examples
         const keybindSetting = this.settings.getSetting('default', 'keybind-1');
@@ -62,14 +62,14 @@ module.exports = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, A
                 Api, plugin: Api.plugin
             }; }
         });
-	}
+    }
 
-	onstop() {
+    onstop() {
         const keybindSetting = this.settings.getSetting('default', 'keybind-1');
         keybindSetting.off('keybind-activated', this.keybindEvent);
 
         BdMenuItems.removeAll();
-	}
+    }
 
     keybindEvent(event) {
         Logger.log('Keybind pressed', event);

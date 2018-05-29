@@ -129,8 +129,8 @@
                     this.reset();
                     return;
                 }
-                this.title = this.sterm;
-                this.emotes = EmoteModule.filter(new RegExp(this.sterm.substr(1), ''), 10);
+                this.title = this.sterm.substr(1);
+                this.emotes = EmoteModule.filter(new RegExp(this.sterm.substr(1), 'i'), 10);
                 this.open = this.emotes.length;
             },
             traverse(e) {

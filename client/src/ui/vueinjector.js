@@ -59,6 +59,11 @@ export default class {
                 this.vueInstance.$mount(this.vueMount);
             }
 
+            componentWillUnmount() {
+                this.vueInstance.$destroy();
+                delete this._vueInstance;
+            }
+
             get vueMount() {
                 const element = ReactDOM.findDOMNode(this);
                 if (!element) return;

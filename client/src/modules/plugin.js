@@ -18,12 +18,12 @@ export default class Plugin extends Content {
     get start() { return this.enable }
     get stop() { return this.disable }
 
-    reload() {
-        return PluginManager.reloadPlugin(this);
+    reload(force) {
+        return PluginManager.reloadPlugin(this, force);
     }
 
-    unload() {
-        return PluginManager.unloadPlugin(this);
+    unload(force) {
+        return PluginManager.unloadPlugin(this, force);
     }
 
 }

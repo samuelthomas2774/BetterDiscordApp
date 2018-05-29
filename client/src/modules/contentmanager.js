@@ -256,16 +256,22 @@ export default class {
     /**
      * Unload content.
      * @param {Content|String} content Content to unload
+     * @param {Boolean} force If true the content will be unloaded even if an exception is thrown when disabling/unloading
      * @param {Boolean} reload Whether to reload the content after
      * @return {Content}
      */
-    static async unloadContent(content, reload) {
+    static async unloadContent(content, force, reload) {
         content = this.findContent(content);
         if (!content) throw {message: `Could not find a ${this.contentType} from ${content}.`};
 
         try {
-            await content.disable(false);
-            await content.emit('unload', reload);
+            const disablePromise = content.disable(false);
+            const unloadPromise = content.emit('unload', reload);
+
+            if (!force) {
+                await disablePromise;
+                await unloadPromise;
+            }
 
             const index = this.getContentIndex(content);
 
@@ -288,10 +294,11 @@ export default class {
     /**
      * Reload content.
      * @param {Content|String} content Content to reload
+     * @param {Boolean} force If true the content will be unloaded even if an exception is thrown when disabling/unloading
      * @return {Content}
      */
-    static reloadContent(content) {
-        return this.unloadContent(content, true);
+    static reloadContent(content, force) {
+        return this.unloadContent(content, force, true);
     }
 
     /**

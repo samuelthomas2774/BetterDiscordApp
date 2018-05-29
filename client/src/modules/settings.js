@@ -94,7 +94,7 @@ export default new class Settings {
             }
         } catch (err) {
             // There was an error saving settings
-            Logger.err('Settings', err);
+            Logger.err('Settings', ['Failed to save internal settings', err]);
             throw err;
         }
     }

@@ -214,7 +214,7 @@ export default new class EmoteModule {
             retVal.props.children.splice(0, 0, VueInjector.createReactElement({
                 components: { Autocomplete },
                 template: '<Autocomplete />'
-            }));
+            }, true));
         });
 
         for (const e of document.querySelectorAll(selector)) {

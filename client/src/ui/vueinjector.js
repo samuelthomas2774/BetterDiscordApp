@@ -32,11 +32,12 @@ export default class {
     /**
      * Returns a React element that will render a Vue component.
      * @param {Object} options Options to pass to Vue
+     * @param {Boolean} mountAtTop Whether to mount the Vue component at the top of the React component instead of mounting it in a container
      * @return {React.Element}
      */
-    static createReactElement(options) {
+    static createReactElement(options, mountAtTop) {
         const React = WebpackModules.getModuleByName('React');
-        return React.createElement(this.ReactCompatibility, {options});
+        return React.createElement(this.ReactCompatibility, {options, mountAtTop});
     }
 
     static get ReactCompatibility() {
@@ -61,6 +62,7 @@ export default class {
             get vueMount() {
                 const element = ReactDOM.findDOMNode(this);
                 if (!element) return;
+                if (this.props.mountAtTop) return element;
                 if (element.firstChild) return element.firstChild;
                 const newElement = document.createElement('span');
                 element.appendChild(newElement);

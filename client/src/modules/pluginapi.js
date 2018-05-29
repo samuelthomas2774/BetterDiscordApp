@@ -418,6 +418,9 @@ export default class PluginApi {
     getWebpackModuleByName(name, fallback) {
         return WebpackModules.getModuleByName(name, fallback);
     }
+    getWebpackModuleByDisplayName(name, fallback) {
+        return WebpackModules.getModuleByDisplayName(name, fallback);
+    }
     getWebpackModuleByRegex(regex) {
         return WebpackModules.getModuleByRegex(regex, true);
     }
@@ -440,7 +443,7 @@ export default class PluginApi {
         return new Proxy({
             getModule: this.getWebpackModule.bind(this),
             getModuleByName: this.getWebpackModuleByName.bind(this),
-            getModuleByDisplayName: this.getWebpackModuleByName.bind(this),
+            getModuleByDisplayName: this.getWebpackModuleByDisplayName.bind(this),
             getModuleByRegex: this.getWebpackModuleByRegex.bind(this),
             getModulesByRegex: this.getWebpackModulesByRegex.bind(this),
             getModuleByProperties: this.getWebpackModuleByProperties.bind(this),

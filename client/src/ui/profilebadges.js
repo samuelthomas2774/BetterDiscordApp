@@ -48,11 +48,7 @@ export default class extends Module {
             const username = ReactHelpers.findByProp(retVal, 'type', 'h2');
             if (!username) return;
 
-            username.props.children.splice(1, 0, VueInjector.createReactElement({
-                components: { BdMessageBadge },
-                data: { c },
-                template: '<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />'
-            }));
+            username.props.children.splice(1, 0, VueInjector.createReactElement(BdMessageBadge, c));
         });
 
         // Rerender all messages
@@ -111,11 +107,7 @@ export default class extends Module {
                     const c = contributors.find(c => c.id === user.id);
                     if (!c) return;
 
-                    retVal.props.children.splice(1, 0, VueInjector.createReactElement({
-                        components: { BdMessageBadge },
-                        data: { c },
-                        template: '<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />'
-                    }));
+                    retVal.props.children.splice(1, 0, VueInjector.createReactElement(BdMessageBadge, c));
                 } catch (err) {
                     Logger.err('ProfileBadges', ['Error thrown while rendering a NameTag', err]);
                 }
@@ -147,11 +139,7 @@ export default class extends Module {
             const c = contributors.find(c => c.id === user.id);
             if (!c) return;
 
-            const element = VueInjector.createReactElement({
-                components: { BdBadge },
-                data: { c },
-                template: '<BdBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />',
-            });
+            const element = VueInjector.createReactElement(BdBadge, c);
 
             if (!retVal) {
                 setRetVal(ReactHelpers.React.createElement('div', {

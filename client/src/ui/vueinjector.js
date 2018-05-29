@@ -31,13 +31,14 @@ export default class {
 
     /**
      * Returns a React element that will render a Vue component.
-     * @param {Object} options Options to pass to Vue
+     * @param {Object} component A Vue component to render
+     * @param {Object} props Props to pass to the Vue component
      * @param {Boolean} mountAtTop Whether to mount the Vue component at the top of the React component instead of mounting it in a container
      * @return {React.Element}
      */
-    static createReactElement(options, mountAtTop) {
+    static createReactElement(component, props, mountAtTop) {
         const React = WebpackModules.getModuleByName('React');
-        return React.createElement(this.ReactCompatibility, {options, mountAtTop});
+        return React.createElement(this.ReactCompatibility, {component, mountAtTop, props});
     }
 
     static get ReactCompatibility() {
@@ -55,7 +56,12 @@ export default class {
                 this.vueInstance.$mount(this.vueMount);
             }
 
-            componentDidUpdate() {
+            componentDidUpdate(oldProps) {
+                if (oldProps.options && !this.props.options || !oldProps.options && this.props.options) {
+                    this.vueInstance.$destroy();
+                    delete this._vueInstance;
+                }
+
                 this.vueInstance.$mount(this.vueMount);
             }
 
@@ -75,7 +81,14 @@ export default class {
             }
 
             get vueInstance() {
-                return this._vueInstance || (this._vueInstance = new Vue(this.props.options));
+                return this._vueInstance || (this._vueInstance = new Vue(this.props.options || {
+                    data: this.props,
+                    render(createElement) {
+                        return createElement(this.component, {
+                            props: this.props
+                        });
+                    }
+                }));
             }
         }
     }

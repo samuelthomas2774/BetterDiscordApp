@@ -121,10 +121,10 @@ export default new class EmoteModule {
                         text = null;
                     }
 
-                    newMarkup.push(VueInjector.createReactElement({
-                        components: { EmoteComponent },
-                        data: { emote, hasWrapper: /;[\w]+;/gmi.test(word) },
-                        template: '<EmoteComponent :src="emote.src" :name="emote.name" :hasWrapper="hasWrapper" />'
+                    newMarkup.push(VueInjector.createReactElement(EmoteComponent, {
+                        src: emote.src,
+                        name: emote.name,
+                        hasWrapper: /;[\w]+;/gmi.test(word)
                     }));
 
                     continue;
@@ -211,10 +211,7 @@ export default new class EmoteModule {
         this.unpatchChannelTextArea = MonkeyPatch('BD:ReactComponents', ChannelTextArea.component.prototype).after('render', (component, args, retVal) => {
             if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
 
-            retVal.props.children.splice(0, 0, VueInjector.createReactElement({
-                components: { Autocomplete },
-                template: '<Autocomplete />'
-            }, true));
+            retVal.props.children.splice(0, 0, VueInjector.createReactElement(Autocomplete, {}, true));
         });
 
         for (const e of document.querySelectorAll(selector)) {

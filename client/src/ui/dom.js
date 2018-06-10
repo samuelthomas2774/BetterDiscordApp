@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { ClientLogger as Logger } from 'common';
+import { Utils, ClientLogger as Logger } from 'common';
 
 class BdNode {
     constructor(tag, className, id) {

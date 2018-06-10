@@ -105,6 +105,8 @@ class Manip {
     }
 }
 
+export { Manip as DOMManip };
+
 export default class DOM {
 
     static get manip() {

@@ -37,7 +37,7 @@
 <script>
     import { EmoteModule } from 'builtin';
     import { Events, Settings } from 'modules';
-    import { DOM } from 'ui';
+    import { DOMManip as Manip } from 'ui';
     import { MiStar } from './MaterialIcon';
 
     export default {
@@ -162,7 +162,7 @@
                 let substr = value.substr(0, selectionEnd);
                 substr = substr.replace(new RegExp(this.sterm + '$'), en);
 
-                DOM.manip.setText(substr + value.substr(selectionEnd, value.length), false);
+                Manip.setText(substr + value.substr(selectionEnd, value.length), false);
                 ta.selectionEnd = ta.selectionStart = selectionEnd + en.length - this.sterm.length;
                 this.reset();
             }

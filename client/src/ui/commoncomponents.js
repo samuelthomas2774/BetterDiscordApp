@@ -7,4 +7,3 @@ export { default as Setting } from './components/bd/setting/Setting.vue';
 export { default as Card } from './components/bd/Card.vue';
 export { default as ContentAuthor } from './components/bd/ContentAuthor.vue';
 export { default as BdBadge } from './components/bd/BdBadge.vue';
-export { default as BdMessageBadge } from './components/bd/BdMessageBadge.vue';

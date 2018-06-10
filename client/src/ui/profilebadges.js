@@ -12,7 +12,7 @@ import { Module, ReactComponents, ReactHelpers, MonkeyPatch, WebpackModules } fr
 import { Reflection } from 'ui';
 import { Utils, ClientLogger as Logger } from 'common';
 import DOM from './dom';
-import { BdBadge, BdMessageBadge } from './components/bd';
+import { BdBadge } from './components/bd';
 import VueInjector from './vueinjector';
 import contributors from '../data/contributors';
 
@@ -42,13 +42,16 @@ export default class extends Module {
             const message = ReactHelpers.findProp(component, 'message');
             if (!message || !message.author) return;
             const user = message.author;
-            const c = contributors.find(c => c.id === user.id);
-            if (!c) return;
+            const contributor = contributors.find(c => c.id === user.id);
+            if (!contributor) return;
 
             const username = ReactHelpers.findByProp(retVal, 'type', 'h2');
             if (!username) return;
 
-            username.props.children.splice(1, 0, VueInjector.createReactElement(BdMessageBadge, c));
+            username.props.children.splice(1, 0, VueInjector.createReactElement(BdBadge, {
+                contributor,
+                type: 'nametag'
+            }));
         });
 
         // Rerender all messages
@@ -104,10 +107,13 @@ export default class extends Module {
 
                     const user = ReactHelpers.findProp(this, 'user');
                     if (!user) return;
-                    const c = contributors.find(c => c.id === user.id);
-                    if (!c) return;
+                    const contributor = contributors.find(c => c.id === user.id);
+                    if (!contributor) return;
 
-                    retVal.props.children.splice(1, 0, VueInjector.createReactElement(BdMessageBadge, c));
+                    retVal.props.children.splice(1, 0, VueInjector.createReactElement(BdBadge, {
+                        contributor,
+                        type: 'nametag'
+                    }));
                 } catch (err) {
                     Logger.err('ProfileBadges', ['Error thrown while rendering a NameTag', err]);
                 }
@@ -136,10 +142,13 @@ export default class extends Module {
         this.unpatchUserProfileModal = MonkeyPatch('ProfileBadges', this.UserProfileModal.component.prototype).after('renderBadges', (component, args, retVal, setRetVal) => {
             const user = ReactHelpers.findProp(component, 'user');
             if (!user) return;
-            const c = contributors.find(c => c.id === user.id);
-            if (!c) return;
+            const contributor = contributors.find(c => c.id === user.id);
+            if (!contributor) return;
 
-            const element = VueInjector.createReactElement(BdBadge, c);
+            const element = VueInjector.createReactElement(BdBadge, {
+                contributor,
+                type: 'profile-modal'
+            });
 
             if (!retVal) {
                 setRetVal(ReactHelpers.React.createElement('div', {

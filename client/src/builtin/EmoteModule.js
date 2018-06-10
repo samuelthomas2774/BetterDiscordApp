@@ -58,8 +58,12 @@ export default new class EmoteModule {
             if ((index % 10000) === 0)
                 await Utils.wait();
 
-            const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
-            emote.name = emote.id;
+            const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x'
+                : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1'
+                    : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
+
+            // emote.id is the emote's name
+            // emote.src is the emote's URL
             emote.src = uri.replace(':id', emote.value.id || emote.value);
             this.emotes.set(emote.id, emote);
         }
@@ -123,7 +127,7 @@ export default new class EmoteModule {
 
                     newMarkup.push(VueInjector.createReactElement(EmoteComponent, {
                         src: emote.src,
-                        name: emote.name,
+                        name: emote.id,
                         hasWrapper: /;[\w]+;/gmi.test(word)
                     }));
 

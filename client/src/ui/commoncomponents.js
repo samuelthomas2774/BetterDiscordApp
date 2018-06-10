@@ -1,3 +1,5 @@
+export { ReactComponent } from './vue';
+
 export * from './components/common';
 
 export { default as SettingsPanel } from './components/bd/SettingsPanel.vue';

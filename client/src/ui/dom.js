@@ -38,6 +38,7 @@ export class DOMObserver {
         this.subscribe = this.subscribe.bind(this);
         this.observerCallback = this.observerCallback.bind(this);
 
+        this.active = false;
         this.root = root || document.getElementById('app-mount');
         this.options = options || { attributes: true, childList: true, subtree: true };
 
@@ -48,42 +49,102 @@ export class DOMObserver {
     observerCallback(mutations) {
         for (let sub of this.subscriptions) {
             try {
-                const f = sub.type && sub.type === 'filter' ? mutations.filter(sub.filter) : mutations.find(sub.filter);
-                if (!f) continue;
-                if (sub.type && sub.type === 'filter' && !f.length) continue;
-                sub.callback(f);
+                const filteredMutations = sub.filter ? mutations.filter(sub.filter) : mutations;
+
+                if (sub.group) {
+                    if (!filteredMutations.length) continue;
+                    sub.callback.call(sub.bind || sub, filteredMutations);
+                } else {
+                    for (let mutation of filteredMutations) sub.callback.call(sub.bind || sub, mutation);
+                }
             } catch (err) {
-                Logger.warn('DOMObserver', [`Error in observer callback ${sub.id}`, err]);
+                Logger.warn('DOMObserver', [`Error in observer callback`, err]);
             }
         }
     }
 
+    /**
+     * Starts observing the element. This will be called when attaching a callback.
+     * You don't need to call this manually.
+     */
     observe() {
+        if (this.active) return;
         this.observer.observe(this.root, this.options);
+        this.active = true;
     }
+
+    /**
+     * Disconnects this observer. This stops callbacks being called, but does not unbind them.
+     * You probably want to use observer.unsubscribeAll instead.
+     */
+    disconnect() {
+        if (!this.active) return;
+        this.observer.disconnect();
+        this.active = false;
+    }
+
+    reconnect() {
+        if (this.active) {
+            this.disconnect();
+            this.observe();
+        }
+    }
+
+    get root() { return this._root }
+    set root(root) { this._root = root; this.reconnect(); }
+
+    get options() { return this._options }
+    set options(options) { this._options = options; this.reconnect(); }
 
     get subscriptions() {
         return this._subscriptions || (this._subscriptions = []);
     }
 
-    subscribe(id, filter, callback, type) {
-        if (this.subscriptions.find(sub => sub.id === id)) return;
-        this.subscriptions.push({
-            id,
-            filter,
-            callback,
-            type
-        });
+    /**
+     * Subscribes to mutations.
+     * @param {Function} callback A function to call when on a mutation
+     * @param {Function} filter A function to call to filter mutations
+     * @param {Any} bind Something to bind the callback to
+     * @param {Boolean} group Whether to call the callback with an array of mutations instead of a single mutation
+     * @return {Object}
+     */
+    subscribe(callback, filter, bind, group) {
+        const subscription = { callback, filter, bind, group };
+        this.subscriptions.push(subscription);
+        this.observe();
+        return subscription;
     }
 
-    unsubscribe(id) {
-        const index = this.subscriptions.findIndex(sub => sub.id === id);
-        if (index < 0) return;
-        this.subscriptions.splice(index, 1);
+    /**
+     * Removes a subscription and disconnect if there are none left.
+     * @param {Object} subscription A subscription object returned by observer.subscribe
+     */
+    unsubscribe(subscription) {
+        if (!this.subscriptions.includes(subscription))
+            subscription = this.subscriptions.find(s => s.callback === subscription);
+        Utils.removeFromArray(this.subscriptions, subscription);
+        if (!this.subscriptions.length) this.disconnect();
     }
 
     unsubscribeAll() {
         this.subscriptions.splice(0, this.subscriptions.length);
+        this.disconnect();
+    }
+
+    /**
+     * Subscribes to mutations that affect an element matching a selector.
+     * @param {Function} callback A function to call when on a mutation
+     * @param {Function} filter A function to call to filter mutations
+     * @param {Any} bind Something to bind the callback to
+     * @param {Boolean} group Whether to call the callback with an array of mutations instead of a single mutation
+     * @return {Object}
+     */
+    subscribeToQuerySelector(callback, selector, bind, group) {
+        return this.subscribe(callback, mutation => {
+            return mutation.target.matches(selector) // If the target matches the selector
+                || Array.from(mutation.addedNodes).concat(Array.from(mutation.removedNodes)) // Or if either an added or removed node
+                    .find(n => n instanceof Element && (n.matches(selector) || n.querySelector(selector))); // match or contain an element matching the selector
+        }, bind, group);
     }
 }
 

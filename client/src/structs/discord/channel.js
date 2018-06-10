@@ -299,16 +299,16 @@ export class GuildTextChannel extends GuildChannel {
     }
 
     /**
-     * Updates this channel's NSFW flag.
+     * Updates this channel's not-safe-for-work flag.
      * @param {Boolean} nsfw Whether the channel should be marked as NSFW
      * @return {Promise}
      */
-    setNswf(nsfw = true) {
+    setNsfw(nsfw = true) {
         return this.updateChannel({ nsfw });
     }
 
     setNotNsfw() {
-        return this.setNswf(false);
+        return this.setNsfw(false);
     }
 }
 

@@ -10,8 +10,7 @@
 
 import { DOM, BdUI, BdMenu, Modals, Reflection } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
-import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
+import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi } from 'modules';
 import { EmoteModule } from 'builtin';
 import electron from 'electron';
 import path from 'path';
@@ -32,7 +31,7 @@ class BetterDiscord {
             ModuleManager, PluginManager, ThemeManager, ExtModuleManager,
             Vendor,
 
-            WebpackModules, Patcher, MonkeyPatch, ReactComponents, DiscordApi,
+            WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi,
             EmoteModule,
 
             Logger, ClientIPC, Utils,

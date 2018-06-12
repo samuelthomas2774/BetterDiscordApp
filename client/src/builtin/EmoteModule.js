@@ -25,17 +25,22 @@ export default new class EmoteModule {
     }
 
     async init() {
+        const dataPath = Globals.getPath('data');
+
         this.enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
-        this.enabledSetting.on('setting-updated', event => {
+        this.enabledSetting.on('setting-updated', async event => {
+            // Load emotes if we haven't already
+            if (event.value && !this.emotes.size) await this.load(path.join(dataPath, 'emotes.json'));
+
             // Rerender all messages (or if we're disabling emotes, those that have emotes)
             for (const message of document.querySelectorAll(event.value ? '.message' : '.bd-emotewrapper')) {
                 Reflection(event.value ? message : message.closest('.message')).forceUpdate();
             }
         });
 
-        const dataPath = Globals.getPath('data');
         try {
-            await this.load(path.join(dataPath, 'emotes.json'));
+            if (this.enabledSetting.value) await this.load(path.join(dataPath, 'emotes.json'));
+            else Logger.info('EmoteModule', ['Not loading emotes as they\'re disabled.']);
         } catch (err) {
             Logger.err('EmoteModule', [`Failed to load emote data. Make sure you've downloaded the emote data and placed it in ${dataPath}:`, err]);
             return;

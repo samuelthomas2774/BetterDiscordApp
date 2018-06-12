@@ -10,7 +10,7 @@
 
 import { ClientLogger as Logger } from 'common';
 import { Events, SocketProxy, EventHook, CssEditor } from 'modules';
-import { ProfileBadges } from 'ui';
+import { ProfileBadges, ClassNormaliser } from 'ui';
 import Updater from './updater';
 
 /**
@@ -24,6 +24,7 @@ export default class {
     static get modules() {
         return this._modules ? this._modules : (this._modules = [
             new ProfileBadges(),
+            new ClassNormaliser(),
             new SocketProxy(),
             new EventHook(),
             CssEditor,

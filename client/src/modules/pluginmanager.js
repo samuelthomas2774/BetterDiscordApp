@@ -74,7 +74,7 @@ export default class extends ContentManager {
     static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
-    static async loadPlugin(paths, configs, info, main, dependencies, permissions) {
+    static async loadPlugin(paths, configs, info, main, dependencies, permissions, mainExport) {
         if (permissions && permissions.length > 0) {
             for (let perm of permissions) {
                 Logger.log(this.moduleName, `Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
@@ -97,8 +97,15 @@ export default class extends ContentManager {
             }
         }
 
-        const plugin = Globals.require(paths.mainPath)(Plugin, new PluginApi(info, paths.contentPath), Vendor, deps);
-        if (!(plugin.prototype instanceof Plugin))
+        const pluginExports = Globals.require(paths.mainPath);
+
+        const pluginFunction = mainExport ? pluginExports[mainExport]
+            : pluginExports.__esModule ? pluginExports.default : pluginExports;
+        if (typeof pluginFunction !== 'function')
+            throw {message: `Plugin ${info.name} did not export a function.`};
+
+        const plugin = pluginFunction.call(pluginExports, Plugin, new PluginApi(info, paths.contentPath), Vendor, deps);
+        if (!plugin || !(plugin.prototype instanceof Plugin))
             throw {message: `Plugin ${info.name} did not return a class that extends Plugin.`};
 
         const instance = new plugin({

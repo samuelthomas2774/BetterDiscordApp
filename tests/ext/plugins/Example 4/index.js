@@ -1,4 +1,4 @@
-module.exports = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Api }) => class extends Plugin {
+exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Api }) => class extends Plugin {
     async onstart() {
         this.keybindEvent = this.keybindEvent.bind(this);
 

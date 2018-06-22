@@ -29,7 +29,7 @@
 
 <script>
     import { shell } from 'electron';
-    import { ClientIPC } from 'common';
+    import { Utils, ClientIPC } from 'common';
     import { MiOpenInNew, MiMinus } from '../../common';
     import path from 'path';
 
@@ -51,7 +51,7 @@
             },
             removeItem(file_path) {
                 if (this.setting.disabled) return;
-                this.setting = this.setting.value.filter(f => f !== file_path);
+                Utils.removeFromArray(this.setting.value, file_path);
             }
         }
     }

@@ -342,18 +342,10 @@ export default class {
     /**
      * Wait for content to load
      * @param {String} content_id
-     * @return {Promise}
+     * @return {Promise => Content}
      */
     static waitForContent(content_id) {
-        return new Promise((resolve, reject) => {
-            const check = () => {
-                const content = this.getContentById(content_id);
-                if (content) return resolve(content);
-
-                setTimeout(check, 100);
-            };
-            check();
-        });
+        return Utils.until(() => this.getContentById(content_id), 100);
     }
 
 }

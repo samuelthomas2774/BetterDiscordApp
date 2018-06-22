@@ -1,4 +1,4 @@
-exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Api }) => class extends Plugin {
+exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, CommonComponents, Api }) => class extends Plugin {
     async onstart() {
         this.keybindEvent = this.keybindEvent.bind(this);
 
@@ -54,10 +54,12 @@ exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Api
         this.menuItem = BdMenuItems.addSettingsSet('Plugins', set, 'Plugin 4');
 
         this.menuItem2 = BdMenuItems.addVueComponent('Plugins', 'Also Plugin 4', {
-            template: `<component :is="SettingsWrapper" :headertext="plugin.name + ' custom menu panel'">
+            template: `<settings-wrapper :headertext="plugin.name + ' custom menu panel'">
                 <p style="margin-top: 0; color: #f6f6f7;">Test</p>
-            </component>`,
-            props: ['SettingsWrapper'],
+            </settings-wrapper>`,
+            components: {
+                SettingsWrapper: CommonComponents.SettingsWrapper
+            },
             data() { return {
                 Api, plugin: Api.plugin
             }; }

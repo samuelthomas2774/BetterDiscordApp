@@ -2,6 +2,7 @@ export { ReactComponent } from './vue';
 
 export * from './components/common';
 
+export { default as SettingsWrapper } from './components/bd/SettingsWrapper.vue';
 export { default as SettingsPanel } from './components/bd/SettingsPanel.vue';
 export { default as Setting } from './components/bd/setting/Setting.vue';
 export { default as Card } from './components/bd/Card.vue';

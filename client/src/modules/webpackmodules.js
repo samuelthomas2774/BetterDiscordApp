@@ -9,6 +9,7 @@
 */
 
 import { Filters } from 'common';
+import Events from './events';
 
 const KnownModules = {
     React: Filters.byProperties(['createElement', 'cloneElement']),
@@ -264,6 +265,15 @@ class WebpackModules {
      */
     static get require() {
         if (this._require) return this._require;
+
+        const __webpack_require__ = this.getWebpackRequire();
+        if (!__webpack_require__) return;
+
+        this.hookWebpackRequireCache(__webpack_require__);
+        return this._require = __webpack_require__;
+    }
+
+    static getWebpackRequire() {
         const id = 'bd-webpackmodules';
 
         if (typeof window.webpackJsonp === 'function') {
@@ -272,7 +282,7 @@ class WebpackModules {
             }, [id]).default;
             delete __webpack_require__.m[id];
             delete __webpack_require__.c[id];
-            return this._require = __webpack_require__;
+            return __webpack_require__;
         } else if (window.webpackJsonp && window.webpackJsonp.push) {
             const __webpack_require__ = window['webpackJsonp'].push([[], {
                 [id]: (module, exports, req) => exports.default = req
@@ -280,8 +290,45 @@ class WebpackModules {
             window['webpackJsonp'].pop();
             delete __webpack_require__.m[id];
             delete __webpack_require__.c[id];
-            return this._require = __webpack_require__;
+            return __webpack_require__;
         }
+    }
+
+    static hookWebpackRequireCache(__webpack_require__) {
+        __webpack_require__.c = new Proxy(__webpack_require__.c, {
+            set(module_cache, module_id, module) {
+                // Add it to our emitter cache and emit a module-loading event
+                this.moduleLoading(module_id, module);
+                Events.emit('module-loading', module);
+
+                // Add the module to the cache as normal
+                module_cache[module_id] = module;
+            }
+        });
+    }
+
+    static moduleLoading(module_id, module) {
+        if (this.require.c[module_id]) return;
+
+        if (!this.moduleLoadedEventTimeout) {
+            this.moduleLoadedEventTimeout = setTimeout(() => {
+                this.moduleLoadedEventTimeout = undefined;
+
+                // Emit a module-loaded event for every module
+                for (let module of this.modulesLoadingCache) {
+                    Events.emit('module-loaded', module);
+                }
+
+                // Emit a modules-loaded event
+                Events.emit('modules-loaded', this.modulesLoadingCache);
+
+                this.modulesLoadedCache = [];
+            }, 0);
+        }
+
+        // Add this to our own cache
+        if (!this.modulesLoadingCache) this.modulesLoadingCache = [];
+        this.modulesLoadingCache.push(module);
     }
 
     /**

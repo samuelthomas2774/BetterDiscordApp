@@ -186,10 +186,11 @@ class WebpackModules {
      * Finds a module using a filter function.
      * @param {Function} filter A function to use to filter modules
      * @param {Boolean} first Whether to return only the first matching module
+     * @param {Array} modules An array of modules to search in
      * @return {Any}
      */
-    static getModule(filter, first = true) {
-        const modules = this.getAllModules();
+    static getModule(filter, first = true, _modules) {
+        const modules = _modules || this.getAllModules();
         const rm = [];
         for (let index in modules) {
             if (!modules.hasOwnProperty(index)) continue;
@@ -329,6 +330,58 @@ class WebpackModules {
         // Add this to our own cache
         if (!this.modulesLoadingCache) this.modulesLoadingCache = [];
         this.modulesLoadingCache.push(module);
+    }
+
+    static waitForWebpackRequire() {
+        return Utils.until(() => this.require, 10);
+    }
+
+    /**
+     * Waits for a module to load.
+     * This only returns a single module, as it can't guarentee there are no more modules that could
+     * match the filter, which is pretty much what that would be asking for.
+     * @param {Function} filter The name of a known module or a filter function
+     * @return {Any}
+     */
+    static async waitForModule(filter) {
+        const module = this.getModule(filter);
+        if (module) return module;
+
+        while (this.require.m.length > this.require.c.length) {
+            const additionalModules = await Events.once('modules-loaded');
+
+            const module = this.getModule(filter, true, additionalModules);
+            if (module) return module;
+        }
+
+        throw new Error('All modules have now been loaded. None match the passed filter.');
+    }
+
+    /**
+     * Finds a module by it's name.
+     * @param {String} name The name of the module
+     * @param {Function} fallback A function to use to filter modules if not finding a known module
+     * @return {Any}
+     */
+    static async waitForModuleByName(name, fallback) {
+        if (Cache.hasOwnProperty(name)) return Cache[name];
+        if (KnownModules.hasOwnProperty(name)) fallback = KnownModules[name];
+        if (!fallback) return undefined;
+        const module = await this.waitForModule(fallback, true);
+        return module ? Cache[name] = module : undefined;
+    }
+
+    static waitForModuleByDisplayName(props) {
+        return this.waitForModule(Filters.byDisplayName(props));
+    }
+    static waitForModuleByRegex(props) {
+        return this.waitForModule(Filters.byCode(props));
+    }
+    static waitForModuleByProps(props) {
+        return this.waitForModule(Filters.byProperties(props));
+    }
+    static waitForModuleByPrototypes(props) {
+        return this.waitForModule(Filters.byPrototypeFields(props));
     }
 
     /**

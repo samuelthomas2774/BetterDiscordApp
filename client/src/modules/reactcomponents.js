@@ -273,19 +273,21 @@ export class ReactComponents {
 }
 
 export class ReactAutoPatcher {
+    /**
+     * Wait for React to be loaded and patch it's createElement to store all unknown components.
+     * Also patches of some known components.
+     */
     static async autoPatch() {
-        await this.ensureReact();
-        this.React = {};
-        this.React.unpatchCreateElement = MonkeyPatch('BD:ReactComponents:createElement', 'React').before('createElement', (component, args) => {
-            ReactComponents.push(args[0]);
-        });
+        const React = await WebpackModules.waitForModuleByName('React');
+
+        this.unpatchCreateElement = MonkeyPatch('BD:ReactComponents:createElement', React).before('createElement', (component, args) => ReactComponents.push(args[0]));
+
         this.patchComponents();
     }
 
-    static async ensureReact() {
-        while (!window.webpackJsonp || !WebpackModules.getModuleByName('React')) await new Promise(resolve => setTimeout(resolve, 10));
-    }
-
+    /**
+     * Patches a few known components.
+     */
     static patchComponents() {
         return Promise.all([
             this.patchMessage(),

@@ -211,13 +211,23 @@ export class Guild {
         return Modules.GuildPermissions.getGuildPermissions(this.id);
     }
 
-    getMember(id) {
-        const member = Modules.GuildMemberStore.getMember(this.id, id);
+    /**
+     * Returns the GuildMember object for a user.
+     * @param {User|GuildMember|Number} user A User or GuildMember object or a user ID
+     * @return {GuildMember}
+     */
+    getMember(user) {
+        const member = Modules.GuildMemberStore.getMember(this.id, user.userId || user.id || user);
         if (member) return new GuildMember(member, this.id);
     }
 
-    isMember(id) {
-        return Modules.GuildMemberStore.isMember(this.id, id);
+    /**
+     * Checks if a user is a member of this guild.
+     * @param {User|GuildMember|Number} user A User or GuildMember object or a user ID
+     * @return {Boolean}
+     */
+    isMember(user) {
+        return Modules.GuildMemberStore.isMember(this.id, user.userId || user.id || user);
     }
 
     /**

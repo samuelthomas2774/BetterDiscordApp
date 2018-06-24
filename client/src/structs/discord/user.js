@@ -34,6 +34,8 @@ export class User {
         if (user) return User.from(user);
     }
 
+    static get GuildMember() { return GuildMember }
+
     get id() { return this.discordObject.id }
     get username() { return this.discordObject.username }
     get usernameLowerCase() { return this.discordObject.usernameLowerCase }

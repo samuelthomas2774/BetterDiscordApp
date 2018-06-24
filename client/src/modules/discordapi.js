@@ -194,10 +194,10 @@ export class UserSettings {
      * Configurable in the privacy and safety panel.
      */
     static get friendSourceFlags() { return Object.keys(Modules.UserSettingsStore.friendSourceFlags) }
-    static get friendSourceEveryone() { return this.friend_source_flags.include('all') }
-    static get friendSourceMutual_friends() { return this.friend_source_flags.include('all') || this.friend_source_flags.include('mutual_friends') }
-    static get friendSourceMutual_guilds() { return this.friend_source_flags.include('all') || this.friend_source_flags.include('mutual_guilds') }
-    static get friendSourceAnyone() { return this.friend_source_flags.length > 0 }
+    static get friendSourceEveryone() { return this.friendSourceFlags.include('all') }
+    static get friendSourceMutual_friends() { return this.friendSourceFlags.include('all') || this.friendSourceFlags.include('mutual_friends') }
+    static get friendSourceMutual_guilds() { return this.friendSourceFlags.include('all') || this.friendSourceFlags.include('mutual_guilds') }
+    static get friendSourceAnyone() { return this.friendSourceFlags.length > 0 }
 
     /**
      * Whether to automatically add accounts from other platforms running on the user's computer.

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Filters } from 'common';
+import { Utils, Filters } from 'common';
 import Events from './events';
 
 const KnownModules = {

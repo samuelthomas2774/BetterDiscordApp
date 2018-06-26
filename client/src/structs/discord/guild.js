@@ -114,7 +114,7 @@ export class Guild {
     get features() { return this.discordObject.features }
 
     get owner() {
-        return this.members.find(m => m.userId === this.ownerId);
+        return this.getMember(this.ownerId);
     }
 
     get roles() {

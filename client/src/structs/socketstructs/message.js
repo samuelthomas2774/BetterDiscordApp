@@ -8,17 +8,18 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import DiscordEvent from './discordevent';
+import { DiscordApi } from 'modules';
 import { Reflection } from 'ui';
+import DiscordEvent from './discordevent';
 
-export class MESSAGE_CREATE extends DiscordEvent {
-    get author() { return this.args.author }
+export class MessageEvent extends DiscordEvent {
+    get id() { return this.args.id }
+    get authorId() { return this.args.author }
     get channelId() { return this.args.channelId }
     get content() { return this.args.content }
     get attachments() { return this.args.attachments }
     get editedTimestamp() { return this.args.editedTimestamp }
     get embeds() { return this.args.embeds }
-    get id() { return this.args.id }
     get mentionEveryone() { return this.args.mentionEveryone }
     get mentionRoles() { return this.args.mentionRoles }
     get mentions() { return this.args.mentions }
@@ -27,6 +28,19 @@ export class MESSAGE_CREATE extends DiscordEvent {
     get timestamp() { return this.args.timestamp }
     get tts() { return this.args.tts }
     get type() { return this.args.type }
+
+    get channel() {
+        return DiscordApi.Channel.fromId(this.channelId);
+    }
+
+    get message() {
+        return this.channel.messages.find(m => m.id === this.id);
+    }
+
+    get author() {
+        return DiscordApi.User.fromId(this.authorId);
+    }
+
     get element() {
         const find = document.querySelector(`[message-id="${this.id}"]`);
         if (find) return find;
@@ -36,11 +50,21 @@ export class MESSAGE_CREATE extends DiscordEvent {
         return null;
     }
 }
-export class MESSAGE_UPDATE extends MESSAGE_CREATE { }
+
+export class MESSAGE_CREATE extends MessageEvent {}
+export class MESSAGE_UPDATE extends MessageEvent {}
 
 export class MESSAGE_DELETE extends DiscordEvent {
     get channelId() { return this.args.channelId }
     get messageId() { return this.args.messageId }
+
+    get channel() {
+        return DiscordApi.Channel.fromId(this.channelId);
+    }
+
+    get message() {
+        return this.channel.messages.find(m => m.id === this.messageId);
+    }
 }
 
 // TODO
@@ -49,12 +73,34 @@ export class MESSAGE_DELETE_BULK extends DiscordEvent {}
 export class MESSAGE_ACK extends DiscordEvent {
     get channelId() { return this.args.channelId }
     get messageId() { return this.args.messageId }
+
+    get channel() {
+        return DiscordApi.Channel.fromId(this.channelId);
+    }
+
+    get message() {
+        return this.channel.messages.find(m => m.id === this.messageId);
+    }
 }
 
-export class MESSAGE_REACTION_ADD extends DiscordEvent {
+export class MessageReactionEvent extends DiscordEvent {
     get channelId() { return this.args.channelId }
     get messageId() { return this.args.messageId }
     get userId() { return this.args.userId }
     get emoji() { return this.args.emoji }
+
+    get channel() {
+        return DiscordApi.Channel.fromId(this.channelId);
+    }
+
+    get message() {
+        return this.channel.messages.find(m => m.id === this.messageId);
+    }
+
+    get user() {
+        return DiscordApi.User.fromId(this.userId);
+    }
 }
-export class MESSAGE_REACTION_REMOVE extends MESSAGE_REACTION_ADD { }
+
+export class MESSAGE_REACTION_ADD extends MessageReactionEvent {}
+export class MESSAGE_REACTION_REMOVE extends MessageReactionEvent {}

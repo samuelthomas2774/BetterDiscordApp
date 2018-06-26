@@ -8,11 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils } from 'common';
-
 export default class DiscordEvent {
     constructor(args) {
-        this.args = Utils.toCamelCase(args);
+        this.args = args;
         Object.freeze(this.args);
     }
 }

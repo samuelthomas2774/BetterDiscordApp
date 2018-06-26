@@ -62,6 +62,24 @@ export default class Logger {
         return (new Date()).toLocaleString('en-GB');
     }
 
+    trimLogFile() {
+        if (!this.file) throw new Error('This logger does not have a file.');
+        return Logger.trimLogFile(this.file);
+    }
+
+    static async trimLogFile(file) {
+        const stat = await FileUtils.stat(file);
+        if (stat.size < 20 * 1024 * 1024) return; // 20 MB
+
+        const logs = await FileUtils.readFile(file);
+
+        // Trim to about 1 MB
+        const trimFrom = logs.substr(0 - 1024 * 1024).lastIndexOf('\nLOG : [');
+        if (trimFrom < 0) return;
+
+        await FileUtils.writeFile(file, logs.substr(trimFrom));
+    }
+
 }
 
 export const ClientLogger = new Logger();

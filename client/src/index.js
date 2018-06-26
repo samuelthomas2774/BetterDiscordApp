@@ -23,6 +23,7 @@ class BetterDiscord {
 
     constructor() {
         Logger.file = tests ? path.resolve(__dirname, '..', '..', 'tests', 'log.txt') : path.join(__dirname, 'log.txt');
+        Logger.trimLogFile();
         Logger.log('main', 'BetterDiscord starting');
 
         this._bd = {

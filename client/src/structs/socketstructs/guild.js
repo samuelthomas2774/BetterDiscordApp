@@ -9,6 +9,7 @@
 */
 
 import { DiscordApi } from 'modules';
+import { List } from 'structs';
 import DiscordEvent from './discordevent';
 
 export class GUILD_CREATE extends DiscordEvent {

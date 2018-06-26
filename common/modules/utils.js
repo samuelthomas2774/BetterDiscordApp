@@ -208,9 +208,9 @@ export class FileUtils {
      * @return {Promise}
      */
     static async fileExists(path) {
-        const stat = await this.stat(path);
+        const stats = await this.stat(path);
 
-        if (!stat.isFile()) throw {
+        if (!stats.isFile()) throw {
             message: `Not a file: ${path}`,
             stats
         };
@@ -222,9 +222,9 @@ export class FileUtils {
      * @return {Promise}
      */
     static async directoryExists(path) {
-        const stat = await this.stat(path);
+        const stats = await this.stat(path);
 
-        if (!stat.isDirectory()) throw {
+        if (!stats.isDirectory()) throw {
             message: `Not a directory: ${path}`,
             stats
         };

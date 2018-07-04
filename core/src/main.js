@@ -11,6 +11,7 @@
 import path from 'path';
 import sass from 'node-sass';
 import { BrowserWindow, dialog } from 'electron';
+import deepmerge from 'deepmerge';
 
 import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } from './modules';
 
@@ -54,16 +55,32 @@ const globals = {
 
 class PatchedBrowserWindow extends BrowserWindow {
     constructor(originalOptions) {
-        const options = Object.assign({}, originalOptions);
+        const userOptions = PatchedBrowserWindow.userWindowPreferences;
+
+        const options = deepmerge(originalOptions, userOptions);
         options.webPreferences = Object.assign({}, options.webPreferences);
 
         // Make sure Node integration is enabled
-        const originalPreloadScript = options.webPreferences.preload;
         options.webPreferences.preload = sparkplug;
 
         super(options);
 
-        this.__bd_preload = [originalPreloadScript];
+        this.__bd_preload = [originalOptions.webPreferences.preload];
+
+        if (userOptions.webPreferences && userOptions.webPreferences.preload) {
+            this.__bd_preload.push(path.resolve(_dataPath, userOptions.webPreferences.preload));
+        }
+    }
+
+    static get userWindowPreferences() {
+        try {
+            const userWindowPreferences = require(path.join(_dataPath, 'window'));
+            if (typeof userWindowPreferences === 'object') return userWindowPreferences;
+        } catch (err) {
+            console.log('[BetterDiscord] Error getting window preferences:', err);
+        }
+
+        return {};
     }
 }
 

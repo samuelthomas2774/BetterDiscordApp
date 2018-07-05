@@ -8,11 +8,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import SettingsCategory from './settingscategory';
-import SettingsScheme from './settingsscheme';
-import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { Modals } from 'ui';
+import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
+import SettingsCategory from './settingscategory';
+import SettingsScheme from './settingsscheme';
+import SettingsProxy from './settingsproxy';
 
 export default class SettingsSet extends AsyncEventEmitter {
 
@@ -243,6 +244,14 @@ export default class SettingsSet extends AsyncEventEmitter {
             scheme, scheme_id: scheme.id,
             from_index: index
         });
+    }
+
+    /**
+     * Returns a proxy which can be used to access the set's categories like a normal object.
+     * @return {SettingsSetProxy}
+     */
+    get proxy() {
+        return this._proxy || (this._proxy = SettingsProxy.createProxy(this));
     }
 
     /**

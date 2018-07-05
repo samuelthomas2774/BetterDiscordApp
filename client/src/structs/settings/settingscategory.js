@@ -8,10 +8,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
+import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import Setting from './setting';
 import BaseSetting from './types/basesetting';
-import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
-import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
+import SettingsProxy from './settingsproxy';
 
 export default class SettingsCategory extends AsyncEventEmitter {
 
@@ -171,6 +172,14 @@ export default class SettingsCategory extends AsyncEventEmitter {
 
         await setting.emit('removed-from', event);
         await this.emit('removed-category', event);
+    }
+
+    /**
+     * Returns a proxy which can be used to access the category's values like a normal object.
+     * @return {SettingsCategoryProxy}
+     */
+    get proxy() {
+        return this._proxy || (this._proxy = SettingsProxy.createProxy(this));
     }
 
     /**

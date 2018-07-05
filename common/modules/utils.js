@@ -345,10 +345,11 @@ export class FileUtils {
      * Writes to a file as JSON.
      * @param {String} path The file's path
      * @param {Any} data The file's new contents
+     * @param {Boolean} pretty Whether to pretty print the JSON object
      * @return {Promise}
      */
-    static async writeJsonToFile(path, json) {
-        return this.writeFile(path, JSON.stringify(json));
+    static async writeJsonToFile(path, json, pretty) {
+        return this.writeFile(path, JSON.stringify(json, null, pretty ? 4 : 0) + '\n');
     }
 
     /**

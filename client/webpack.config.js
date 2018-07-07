@@ -58,5 +58,9 @@ module.exports = {
         process: false,
         __filename: false,
         __dirname: false
-    }
+    },
+    plugins: [
+        new webpack.NamedModulesPlugin(),
+        new webpack.EvalSourceMapDevToolPlugin()
+    ]
 };

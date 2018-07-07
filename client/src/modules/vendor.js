@@ -22,7 +22,7 @@ import filetype from 'file-type';
 import filewatcher from 'filewatcher';
 import VTooltip from 'v-tooltip';
 
-export { jQuery as $ };
+export { jQuery as $, axios };
 
 export default class {
 

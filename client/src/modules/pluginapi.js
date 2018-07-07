@@ -457,6 +457,12 @@ export default class PluginApi {
     waitForWebpackModuleByPrototypeFields(...props) {
         return WebpackModules.waitForModuleByPrototypes(props);
     }
+    getWebpackClassName(...classes) {
+        return WebpackModules.getClassName(...classes);
+    }
+    waitForWebpackClassName(...classes) {
+        return WebpackModules.waitForClassName(...classes);
+    }
     get WebpackModules() {
         return new Proxy({
             getModule: this.getWebpackModule.bind(this),
@@ -475,6 +481,8 @@ export default class PluginApi {
             waitForModulesByRegex: this.waitForWebpackModulesByRegex.bind(this),
             waitForModuleByProperties: this.waitForWebpackModuleByProperties.bind(this),
             waitForModuleByPrototypeFields: this.waitForWebpackModuleByPrototypeFields.bind(this),
+            getClassName: this.getWebpackClassName.bind(this),
+            waitForClassName: this.waitForWebpackClassName.bind(this),
             get KnownModules() { return WebpackModules.KnownModules },
             get require() { return WebpackModules.require }
         }, {

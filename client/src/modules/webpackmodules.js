@@ -385,6 +385,21 @@ class WebpackModules {
     }
 
     /**
+     * Searches for a class module and returns a class from it.
+     * @param {String} base The first part of the class to find
+     * @param {String} ...additional_classes Additional classes to look for to filter duplicate class modules
+     * @return {String}
+     */
+    static getClassName(base, ...additional_classes) {
+        const class_module = this.getModuleByProps([base, ...additional_classes]);
+        if (class_module && class_module[base]) return class_module[base].split(' ')[0];
+    }
+    static async waitForClassName(base, ...additional_classes) {
+        const class_module = await this.waitForModuleByProps([base, ...additional_classes]);
+        if (class_module && class_module[base]) return class_module[base].split(' ')[0];
+    }
+
+    /**
      * Returns all loaded modules.
      * @return {Array}
      */

@@ -214,9 +214,9 @@ export default new class EmoteModule {
     }
 
     async patchChannelTextArea() {
-        const selector = '.' + WebpackModules.getModuleByProps(['channelTextArea', 'emojiButton']).channelTextArea;
-
+        const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
         const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', {selector});
+
         this.unpatchChannelTextArea = MonkeyPatch('BD:ReactComponents', ChannelTextArea.component.prototype).after('render', (component, args, retVal) => {
             if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
 

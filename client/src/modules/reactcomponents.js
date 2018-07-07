@@ -342,7 +342,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannelMember() {
-        const selector = '.' + WebpackModules.getModuleByProps(['member', 'memberInner', 'activity']).member;
+        const selector = '.' + WebpackModules.getClassName('member', 'memberInner', 'activity');
         this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector }, m => m.prototype.renderActivity);
 
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
@@ -393,8 +393,8 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannelList() {
-        const selector = '.' + WebpackModules.getModuleByProps(['containerDefault', 'actionIcon']).containerDefault;
-        this.GuildChannel = await ReactComponents.getComponent('GuildChannel', { selector: '.containerDefault-1ZnADq' });
+        const selector = '.' + WebpackModules.getClassName('containerDefault', 'actionIcon');
+        this.GuildChannel = await ReactComponents.getComponent('GuildChannel', { selector });
 
         this.unpatchGuildChannel = MonkeyPatch('BD:ReactComponents', this.GuildChannel.component.prototype).after('render', (component, args, retVal) => {
             const { channel } = component.props;
@@ -412,7 +412,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchUserProfileModal() {
-        const selector = '.' + WebpackModules.getModuleByProps(['root', 'topSectionNormal']).root;
+        const selector = '.' + WebpackModules.getClassName('root', 'topSectionNormal');
         this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', { selector }, Filters.byPrototypeFields(['renderHeader', 'renderBadges']));
 
         this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
@@ -429,7 +429,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchUserPopout() {
-        const selector = '.' + WebpackModules.getModuleByProps(['userPopout', 'headerNormal']).userPopout;
+        const selector = '.' + WebpackModules.getClassName('userPopout', 'headerNormal');
         this.UserPopout = await ReactComponents.getComponent('UserPopout', { selector });
 
         this.unpatchUserPopout = MonkeyPatch('BD:ReactComponents', this.UserPopout.component.prototype).after('render', (component, args, retVal) => {

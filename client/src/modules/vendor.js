@@ -12,17 +12,14 @@ import jQuery from 'jquery';
 import lodash from 'lodash';
 import Vue from 'vue';
 
-import axios from 'axios';
-import axiosHttpAdapter from 'axios/lib/adapters/http';
-
-axios.defaults.adapter = axiosHttpAdapter;
+import request from 'request-promise-native';
 
 import Combokeys from 'combokeys';
 import filetype from 'file-type';
 import filewatcher from 'filewatcher';
 import VTooltip from 'v-tooltip';
 
-export { jQuery as $, axios };
+export { jQuery as $, request };
 
 export default class {
 
@@ -43,7 +40,7 @@ export default class {
      */
     static get Vue() { return Vue }
 
-    static get axios() { return axios }
+    static get request() { return request }
 
     static get Combokeys() { return Combokeys }
     static get filetype() { return filetype }

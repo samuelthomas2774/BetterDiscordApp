@@ -10,8 +10,8 @@
 
 import Events from './events';
 import Globals from './globals';
-import { axios } from 'vendor';
 import { ClientLogger as Logger } from 'common';
+import request from 'request-promise-native';
 
 export default new class {
 
@@ -63,11 +63,11 @@ export default new class {
         Logger.info('Updater', 'Checking for updates');
 
         try {
-            const response = await axios.get('https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json');
+            const response = await request('https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json');
 
-            this.latestVersion = response.data.version;
+            this.latestVersion = response.version;
             Events.emit('update-check-end');
-            Logger.info('Updater', `Latest Version: ${response.data.version} - Current Version: ${Globals.version}`);
+            Logger.info('Updater', `Latest Version: ${response.version} - Current Version: ${Globals.version}`);
 
             if (this.latestVersion !== Globals.version) {
                 this.updatesAvailable = true;

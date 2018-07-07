@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "archiver": "^2.1.1",
-    "axios": "^0.18.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.7.0",
@@ -54,6 +53,7 @@
     "mkdirp": "^0.5.1",
     "node-gyp": "^3.7.0",
     "pump": "^3.0.0",
+    "request-promise-native": "^1.0.5",
     "sass-loader": "^6.0.7",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "v-tooltip": "^2.0.0-rc.33",

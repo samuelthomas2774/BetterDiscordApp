@@ -32,6 +32,13 @@ module.exports = {
         loaders: [jsLoader, vueLoader, scssLoader]
     },
     externals: {
+        electron: 'require("electron")',
+        fs: 'require("fs")',
+        path: 'require("path")',
+        util: 'require("util")',
+        process: 'require("process")',
+        net: 'require("net")',
+        request: 'require.main.require("request")',
         sparkplug: 'require("./sparkplug")'
     },
     resolve: {
@@ -48,7 +55,6 @@ module.exports = {
             path.resolve('src', 'builtin')
         ]
     },
-    target: 'electron-renderer',
     node: {
         process: false,
         __filename: false,

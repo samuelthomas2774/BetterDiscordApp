@@ -418,8 +418,8 @@ export default class PluginApi {
     getWebpackModuleByName(name, fallback) {
         return WebpackModules.getModuleByName(name, fallback);
     }
-    getWebpackModuleByDisplayName(name, fallback) {
-        return WebpackModules.getModuleByDisplayName(name, fallback);
+    getWebpackModuleByDisplayName(name) {
+        return WebpackModules.getModuleByDisplayName(name);
     }
     getWebpackModuleByRegex(regex) {
         return WebpackModules.getModuleByRegex(regex, true);
@@ -439,6 +439,24 @@ export default class PluginApi {
     getWebpackModulesByPrototypeFields(...props) {
         return WebpackModules.getModuleByPrototypes(props, false);
     }
+    waitForWebpackModule(filter) {
+        return WebpackModules.waitForModule(filter);
+    }
+    waitForWebpackModuleByName(name, fallback) {
+        return WebpackModules.waitForModuleByName(name, fallback);
+    }
+    waitForWebpackModuleByDisplayName(name) {
+        return WebpackModules.waitForModuleByDisplayName(name);
+    }
+    waitForWebpackModuleByRegex(regex) {
+        return WebpackModules.waitForModuleByRegex(regex);
+    }
+    waitForWebpackModuleByProperties(...props) {
+        return WebpackModules.waitForModuleByProps(props);
+    }
+    waitForWebpackModuleByPrototypeFields(...props) {
+        return WebpackModules.waitForModuleByPrototypes(props);
+    }
     get WebpackModules() {
         return new Proxy({
             getModule: this.getWebpackModule.bind(this),
@@ -450,6 +468,13 @@ export default class PluginApi {
             getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this),
             getModulesByProperties: this.getWebpackModulesByProperties.bind(this),
             getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this),
+            waitForModule: this.waitForWebpackModule.bind(this),
+            waitForModuleByName: this.waitForWebpackModuleByName.bind(this),
+            waitForModuleByDisplayName: this.waitForWebpackModuleByDisplayName.bind(this),
+            waitForModuleByRegex: this.waitForWebpackModuleByRegex.bind(this),
+            waitForModulesByRegex: this.waitForWebpackModulesByRegex.bind(this),
+            waitForModuleByProperties: this.waitForWebpackModuleByProperties.bind(this),
+            waitForModuleByPrototypeFields: this.waitForWebpackModuleByPrototypeFields.bind(this),
             get KnownModules() { return WebpackModules.KnownModules },
             get require() { return WebpackModules.require }
         }, {

@@ -10,8 +10,9 @@
 
 import path from 'path';
 import sass from 'node-sass';
-import { BrowserWindow, dialog } from 'electron';
+import { BrowserWindow, dialog, session } from 'electron';
 import deepmerge from 'deepmerge';
+import ContentSecurityPolicy from 'csp-parse';
 
 import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } from './modules';
 
@@ -239,6 +240,29 @@ export class BetterDiscord {
         browser_window_module.exports = PatchedBrowserWindow;
     }
 
+    /**
+     * Attaches an event handler for HTTP requests to update the Content Security Policy.
+     */
+    static hookSessionRequest() {
+        session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+            for (let [header, values] of Object.entries(details.responseHeaders)) {
+                if (!header.match(/^Content-Security-Policy(-Report-Only)?$/i)) continue;
+
+                details.responseHeaders[header] = values.map(value => {
+                    const policy = new ContentSecurityPolicy(value);
+
+                    // Add hosts that serve emotes (https://static-cdn.jtvnw.net is already in the CSP)
+                    policy.set('img-src', `${policy.get('img-src') || policy.get('default-src')} https://cdn.betterttv.net https://cdn.frankerfacez.com`);
+
+                    return policy.toString();
+                });
+            }
+
+            callback({ responseHeaders: details.responseHeaders });
+        });
+    }
+
 }
 
 BetterDiscord.patchBrowserWindow();
+BetterDiscord.hookSessionRequest();

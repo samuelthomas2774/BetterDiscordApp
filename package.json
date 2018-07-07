@@ -5,7 +5,7 @@
   "version": "2.0.0a",
   "homepage": "https://betterdiscord.net",
   "license": "MIT",
-  "main": "./core/index.js",
+  "main": "core/dist/main.js",
   "contributors": [
     "Jiiks",
     "Pohky"
@@ -16,6 +16,7 @@
   },
   "private": false,
   "dependencies": {
+    "csp-parse": "github:macropodhq/csp-parse",
     "deepmerge": "^2.1.1",
     "nedb": "^1.8.0",
     "node-sass": "^4.9.0"

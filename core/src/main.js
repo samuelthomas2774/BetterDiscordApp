@@ -66,8 +66,11 @@ class PatchedBrowserWindow extends BrowserWindow {
 
         super(options);
 
-        this.__bd_preload = [originalOptions.webPreferences.preload];
+        this.__bd_preload = [];
 
+        if (originalOptions.webPreferences && originalOptions.webPreferences.preload) {
+            this.__bd_preload.push(originalOptions.webPreferences.preload);
+        }
         if (userOptions.webPreferences && userOptions.webPreferences.preload) {
             this.__bd_preload.push(path.resolve(_dataPath, userOptions.webPreferences.preload));
         }

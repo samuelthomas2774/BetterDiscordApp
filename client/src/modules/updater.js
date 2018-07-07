@@ -63,7 +63,10 @@ export default new class {
         Logger.info('Updater', 'Checking for updates');
 
         try {
-            const response = await request('https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json');
+            const response = await request({
+                uri: 'https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json',
+                json: true
+            });
 
             this.latestVersion = response.version;
             Events.emit('update-check-end');

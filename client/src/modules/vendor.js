@@ -12,6 +12,11 @@ import jQuery from 'jquery';
 import lodash from 'lodash';
 import Vue from 'vue';
 
+import axios from 'axios';
+import axiosHttpAdapter from 'axios/lib/adapters/http';
+
+axios.defaults.adapter = axiosHttpAdapter;
+
 import Combokeys from 'combokeys';
 import filetype from 'file-type';
 import filewatcher from 'filewatcher';
@@ -37,6 +42,8 @@ export default class {
      * Vue
      */
     static get Vue() { return Vue }
+
+    static get axios() { return axios }
 
     static get Combokeys() { return Combokeys }
     static get filetype() { return filetype }

@@ -478,7 +478,6 @@ export default class PluginApi {
             waitForModuleByName: this.waitForWebpackModuleByName.bind(this),
             waitForModuleByDisplayName: this.waitForWebpackModuleByDisplayName.bind(this),
             waitForModuleByRegex: this.waitForWebpackModuleByRegex.bind(this),
-            waitForModulesByRegex: this.waitForWebpackModulesByRegex.bind(this),
             waitForModuleByProperties: this.waitForWebpackModuleByProperties.bind(this),
             waitForModuleByPrototypeFields: this.waitForWebpackModuleByPrototypeFields.bind(this),
             getClassName: this.getWebpackClassName.bind(this),

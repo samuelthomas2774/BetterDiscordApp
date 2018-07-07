@@ -10,7 +10,7 @@
 
 import Events from './events';
 import Globals from './globals';
-import { $ } from 'vendor';
+import { axios } from 'vendor';
 import { ClientLogger as Logger } from 'common';
 
 export default new class {
@@ -57,40 +57,29 @@ export default new class {
      * Checks for updates.
      * @return {Promise}
      */
-    checkForUpdates() {
-        return new Promise((resolve, reject) => {
-            if (this.updatesAvailable) return resolve(true);
-            Events.emit('update-check-start');
-            Logger.info('Updater', 'Checking for updates');
+    async checkForUpdates() {
+        if (this.updatesAvailable) return true;
+        Events.emit('update-check-start');
+        Logger.info('Updater', 'Checking for updates');
 
-            $.ajax({
-                type: 'GET',
-                url: 'https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json',
-                cache: false,
-                success: e => {
-                    try {
-                        this.latestVersion = e.version;
-                        Events.emit('update-check-end');
-                        Logger.info('Updater', `Latest Version: ${e.version} - Current Version: ${Globals.version}`);
+        try {
+            const response = await axios.get('https://rawgit.com/JsSucks/BetterDiscordApp/master/package.json');
 
-                        if (this.latestVersion !== Globals.version) {
-                            this.updatesAvailable = true;
-                            Events.emit('updates-available');
-                            resolve(true);
-                        }
+            this.latestVersion = response.data.version;
+            Events.emit('update-check-end');
+            Logger.info('Updater', `Latest Version: ${response.data.version} - Current Version: ${Globals.version}`);
 
-                        resolve(false);
-                    } catch (err) {
-                        Events.emit('update-check-fail', err);
-                        reject(err);
-                    }
-                },
-                fail: err => {
-                    Events.emit('update-check-fail', err);
-                    reject(err);
-                }
-            });
-        });
+            if (this.latestVersion !== Globals.version) {
+                this.updatesAvailable = true;
+                Events.emit('updates-available');
+                return true;
+            }
+
+            return false;
+        } catch (err) {
+            Events.emit('update-check-fail', err);
+            throw err;
+        }
     }
 
 }

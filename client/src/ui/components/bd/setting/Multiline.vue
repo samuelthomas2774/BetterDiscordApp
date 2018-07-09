@@ -30,8 +30,12 @@
                 textarea.style.height = textarea.scrollHeight + 2 + 'px';
             }
         },
+        watch: {
+            'setting.value'() {
+                this.recalculateHeight();
+            }
+        },
         mounted() {
-            this.$watch('setting.value', this.recalculateHeight);
             this.recalculateHeight();
         }
     }

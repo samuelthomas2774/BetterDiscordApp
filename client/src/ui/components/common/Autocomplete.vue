@@ -53,20 +53,26 @@
                 selected: '',
                 open: false,
                 selectedIndex: 0,
-                sterm: ''
+                sterm: '',
+                settingUpdatedHandler: null
             };
         },
         created() {
-            const enabled = Settings.getSetting('emotes', 'default', 'enable');
-            enabled.on('setting-updated', event => {
+            const enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
+            enabledSetting.on('setting-updated', this.settingUpdatedHandler = event => {
                 if (event.value) return this.addEventListeners();
                 this.removeEventListeners();
                 this.reset();
             });
 
-            if (enabled.value) this.addEventListeners();
+            if (enabledSetting.value) this.addEventListeners();
         },
         destroyed() {
+            if (this.settingUpdatedHandler) {
+                const enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
+                enabledSetting.removeListener('setting-updated', this.settingUpdatedHandler);
+            }
+
             this.removeEventListeners();
         },
         methods: {

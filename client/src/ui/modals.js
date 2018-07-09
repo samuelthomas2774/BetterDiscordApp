@@ -149,9 +149,8 @@ export default class Modals {
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = () => resolve(true);
             modal.beforeClose = () => reject();
-            this.add(modal, ConfirmModal);
         });
-        return modal;
+        return this.add(modal, ConfirmModal);
     }
 
     /**
@@ -167,9 +166,8 @@ export default class Modals {
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = () => resolve(true);
             modal.beforeClose = () => reject();
-            this.add(modal, PermissionModal);
         });
-        return modal;
+        return this.add(modal, PermissionModal);
     }
 
     /**

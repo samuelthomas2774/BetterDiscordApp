@@ -17,7 +17,7 @@
         </div>
 
         <div v-else-if="settingsSet" class="bd-form-item">
-            <component :is="SettingsPanel" :settings="settingsSet" />
+            <SettingsPanel :settings="settingsSet" />
 
             <p class="bd-hint">You must fully restart Discord for changes here to take effect.</p>
             <FormButton @click="restart">Restart</FormButton>
@@ -47,10 +47,7 @@
             return {
                 saved: {},
                 settingsSet: null,
-                disabled: false,
-
-                // TODO: fix recursive dependency somewhere
-                SettingsPanel
+                disabled: false
             };
         },
         components: {
@@ -118,6 +115,10 @@
                 this.settingsSet.getSetting('advanced', 'webview-tag').value = this.saved.webPreferences && this.saved.webPreferences.webviewTag;
                 this.settingsSet.setSaved();
             }
+        },
+        beforeCreate() {
+            // https://vuejs.org/v2/guide/components.html#Circular-References-Between-Components
+            this.$options.components.SettingsPanel = SettingsPanel;
         },
         async created() {
             if (this.filePath !== path.join(Globals.getPath('data'), 'window.json')) {

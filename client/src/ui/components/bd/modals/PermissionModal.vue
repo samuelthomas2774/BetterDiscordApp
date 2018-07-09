@@ -37,19 +37,18 @@
     import { Permissions } from 'modules';
 
     export default {
-        data() {
-            return { permissions: [] }
-        },
         props: ['modal'],
         components: {
             Modal
         },
-        beforeMount() {
-            this.permissions = this.modal.perms.map(perm => {
-                const getPerm = Permissions.permissionText(perm);
-                getPerm.BODY = getPerm.BODY.replace(':NAME:', this.modal.name);
-                return getPerm;
-            });
+        computed: {
+            permissions() {
+                return this.modal.perms.map(perm => {
+                    const getPerm = Permissions.permissionText(perm);
+                    getPerm.BODY = getPerm.BODY.replace(':NAME:', this.modal.name);
+                    return getPerm;
+                });
+            }
         }
     }
 </script>

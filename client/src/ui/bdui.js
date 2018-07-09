@@ -24,25 +24,21 @@ export default class {
             channel: DiscordApi.currentChannel
         };
 
-        const ehookInterval = setInterval(() => {
-            if (!remote.BrowserWindow.getFocusedWindow()) return;
-            clearInterval(ehookInterval);
-            remote.BrowserWindow.getFocusedWindow().webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
-                const { currentGuild, currentChannel } = DiscordApi;
+        remote.getCurrentWindow().webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
+            const { currentGuild, currentChannel } = DiscordApi;
 
-                if (!this.pathCache.server)
-                    Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
-                else if (!this.pathCache.channel)
-                    Events.emit('channel-switch', currentChannel);
-                else if (currentGuild && currentGuild.id && this.pathCache.server && this.pathCache.server.id !== currentGuild.id)
-                    Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
-                else if (currentChannel && currentChannel.id && this.pathCache.channel && this.pathCache.channel.id !== currentChannel.id)
-                    Events.emit('channel-switch', currentChannel);
+            if (!this.pathCache.server)
+                Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
+            else if (!this.pathCache.channel)
+                Events.emit('channel-switch', currentChannel);
+            else if (currentGuild && currentGuild.id && this.pathCache.server && this.pathCache.server.id !== currentGuild.id)
+                Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
+            else if (currentChannel && currentChannel.id && this.pathCache.channel && this.pathCache.channel.id !== currentChannel.id)
+                Events.emit('channel-switch', currentChannel);
 
-                this.pathCache.server = currentGuild;
-                this.pathCache.channel = currentChannel;
-            });
-        }, 100);
+            this.pathCache.server = currentGuild;
+            this.pathCache.channel = currentChannel;
+        });
     }
 
     static injectUi() {

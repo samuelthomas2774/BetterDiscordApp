@@ -27,7 +27,8 @@
         props: ['options', 'value', 'disabled'],
         data() {
             return {
-                active: false
+                active: false,
+                clickHandler: null
             };
         },
         methods: {
@@ -41,12 +42,15 @@
             }
         },
         mounted() {
-            document.addEventListener('click', e => {
+            document.addEventListener('click', this.clickHandler = e => {
                 let options = this.$refs.options;
                 if (options && !options.contains(e.target) && options !== e.target) {
                     this.active = false;
                 }
             });
+        },
+        beforeDestroy() {
+            if (this.clickHandler) document.removeEventListener('click', this.clickHandler);
         }
     }
 </script>

@@ -75,7 +75,8 @@
                 first: true,
                 Settings,
                 timeout: null,
-                SettingsWrapper
+                SettingsWrapper,
+                openMenuHandler: null
             };
         },
         props: ['active'],
@@ -154,7 +155,10 @@
             }
         },
         created() {
-            Events.on('bd-open-menu', item => item && this.itemOnClick(this.sidebarItems.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
+            Events.on('bd-open-menu', this.openMenuHandler = item => item && this.itemOnClick(this.sidebarItems.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
+        },
+        destroyed() {
+            if (this.openMenuHandler) Events.off('bd-open-menu', this.openMenuHandler);
         }
     }
 </script>

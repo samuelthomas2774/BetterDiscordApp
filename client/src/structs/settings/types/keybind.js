@@ -10,6 +10,7 @@
 
 import Setting from './basesetting';
 import Combokeys from 'combokeys';
+import CombokeysGlobalBind from 'combokeys/plugins/global-bind';
 
 let keybindsPaused = false;
 
@@ -21,7 +22,8 @@ export default class KeybindSetting extends Setting {
         this.__keybind_activated = this.__keybind_activated.bind(this);
 
         this.combokeys = new Combokeys(document);
-        this.combokeys.bind(this.value, this.__keybind_activated);
+        CombokeysGlobalBind(this.combokeys);
+        this.combokeys.bindGlobal(this.value, this.__keybind_activated);
     }
 
     /**
@@ -33,7 +35,7 @@ export default class KeybindSetting extends Setting {
 
     setValueHook() {
         this.combokeys.reset();
-        this.combokeys.bind(this.value, this.__keybind_activated);
+        this.combokeys.bindGlobal(this.value, this.__keybind_activated);
     }
 
     __keybind_activated(event) {

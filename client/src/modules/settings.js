@@ -9,8 +9,8 @@
 */
 
 import { EmoteModule } from 'builtin';
-import { SettingsSet, SettingUpdatedEvent } from 'structs';
-import { Utils, FileUtils, ClientLogger as Logger } from 'common';
+import { SettingsSet } from 'structs';
+import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import Globals from './globals';
 import CssEditor from './csseditor';

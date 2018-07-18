@@ -8,8 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
-import { DOM, VueInjector, Reflection } from 'ui';
+import { Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
+import { VueInjector, Reflection } from 'ui';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import EmoteComponent from './EmoteComponent.vue';

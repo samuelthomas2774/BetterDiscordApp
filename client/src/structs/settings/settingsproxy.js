@@ -10,7 +10,6 @@
 
 import SettingsSet from './settingsset';
 import SettingsCategory from './settingscategory';
-import Setting from './types/basesetting';
 
 const setHandler = {
     get({ set }, category_id) {

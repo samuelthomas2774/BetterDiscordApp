@@ -12,7 +12,6 @@ import Content from './content';
 import Globals from './globals';
 import Database from './database';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { Events } from 'modules';
 import { SettingsSet, ErrorEvent } from 'structs';
 import { Modals } from 'ui';
 import path from 'path';

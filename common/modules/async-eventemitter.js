@@ -11,7 +11,7 @@
 import EventEmitter from 'events';
 
 /**
- * Extends Node.js' EventEmitter to trigger event listeners asyncronously.
+ * Extends Node.js' EventEmitter to call event listeners asyncronously.
  */
 export default class AsyncEventEmitter extends EventEmitter {
 
@@ -42,7 +42,7 @@ export default class AsyncEventEmitter extends EventEmitter {
 
     /**
      * Adds an event listener that will be removed when it is called and therefore only be called once.
-     * If a callback is not specified a promise that is resolved once the event is triggered is returned.
+     * If a callback is not specified a promise that is resolved once the event is emitted is returned.
      */
     once(event, callback) {
         if (callback) {
@@ -50,7 +50,7 @@ export default class AsyncEventEmitter extends EventEmitter {
             return EventEmitter.prototype.once.apply(this, arguments);
         }
 
-        // Otherwise return a promise that is resolved once this event is triggered
+        // Otherwise return a promise that is resolved once this event is emitted
         return new Promise((resolve, reject) => {
             EventEmitter.prototype.once.call(this, event, data => {
                 return resolve(data);

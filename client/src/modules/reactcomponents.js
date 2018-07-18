@@ -12,7 +12,7 @@
 
 import { Reflection } from 'ui';
 import { Filters, ClientLogger as Logger } from 'common';
-import { MonkeyPatch, Patcher } from './patcher';
+import { MonkeyPatch } from './patcher';
 import { WebpackModules } from './webpackmodules';
 import DiscordApi from './discordapi';
 
@@ -242,7 +242,7 @@ export class ReactComponents {
         });
     }
 
-    static setName(name, filter, callback) {
+    static setName(name, filter) {
         const have = this.components.find(c => c.id === name);
         if (have) return have;
 
@@ -260,7 +260,7 @@ export class ReactComponents {
         const have = this.unknownComponents.find(c => c.component === component);
         for (const [fi, filter] of this.nameSetters.entries()) {
             if (filter.filter.filter(component)) {
-                console.log('filter match!');
+                Logger.log('ReactComponents', 'Filter match!');
                 component.displayName = filter.name;
                 this.nameSetters.splice(fi, 1);
                 return this.push(component, retVal);

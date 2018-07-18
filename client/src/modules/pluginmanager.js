@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, Permissions } from 'modules';
+import { Permissions } from 'modules';
 import { Modals } from 'ui';
 import { ErrorEvent } from 'structs';
 import { ClientLogger as Logger } from 'common';

@@ -365,7 +365,7 @@ export default class SettingsSet extends AsyncEventEmitter {
      * Merges a set into this set without emitting events (and therefore synchronously).
      * This only exists for use by the constructor.
      */
-    _merge(newSet, emit_multi = true) {
+    _merge(newSet) {
         let updatedSettings = [];
         // const categories = newSet instanceof Array ? newSet : newSet.settings;
         const categories = newSet && newSet.args ? newSet.args.settings : newSet ? newSet.settings : newSet;

@@ -10,7 +10,6 @@
 
 // TODO Use common
 
-import path from 'path';
 import fs from 'fs';
 
 import Module from './modulebase';

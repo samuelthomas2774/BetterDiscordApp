@@ -231,7 +231,7 @@ export default class PluginApi {
         this.injectedStyles.splice(this.injectedStyles.indexOf(styleid), 1);
         DOM.deleteStyle(styleid);
     }
-    deleteAllStyles(id, css) {
+    deleteAllStyles(id) {
         for (let id of this.injectedStyles) {
             this.deleteStyle(id);
         }

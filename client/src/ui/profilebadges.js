@@ -10,8 +10,7 @@
 
 import { Module, ReactComponents, ReactHelpers, MonkeyPatch, WebpackModules } from 'modules';
 import { Reflection } from 'ui';
-import { Utils, ClientLogger as Logger } from 'common';
-import DOM from './dom';
+import { ClientLogger as Logger } from 'common';
 import { BdBadge } from './components/bd';
 import VueInjector from './vueinjector';
 import contributors from '../data/contributors';
@@ -95,7 +94,6 @@ export default class extends Module {
     async patchNameTag() {
         if (this.PatchedNameTag) return this.PatchedNameTag;
 
-        const ProfileBadges = this;
         const selector = '.' + WebpackModules.getClassName('nameTag', 'username', 'discriminator', 'ownerIcon');
         const NameTag = await ReactComponents.getComponent('NameTag', { selector });
 

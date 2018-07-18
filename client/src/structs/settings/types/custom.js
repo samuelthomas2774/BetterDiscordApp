@@ -11,8 +11,6 @@
 import { Globals } from 'modules';
 import path from 'path';
 import Setting from './basesetting';
-import SettingsCategory from '../settingscategory';
-import SettingsScheme from '../settingsscheme';
 
 export default class CustomSetting extends Setting {
 

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { List, InsufficientPermissions } from 'structs';
+import { List } from 'structs';
 import { User, Channel, Guild, Message } from 'discordstructs';
 import { WebpackModules } from './webpackmodules';
 

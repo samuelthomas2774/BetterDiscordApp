@@ -8,8 +8,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Utils } from 'common';
-
 import BoolSetting from './types/bool';
 import StringSetting from './types/text';
 import NumberSetting from './types/number';

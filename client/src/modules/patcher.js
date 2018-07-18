@@ -9,7 +9,7 @@
 */
 
 import { WebpackModules } from './webpackmodules';
-import { ClientLogger as Logger, Utils } from 'common';
+import { ClientLogger as Logger } from 'common';
 
 export class Patcher {
 

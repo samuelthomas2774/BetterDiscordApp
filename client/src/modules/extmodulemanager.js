@@ -10,8 +10,6 @@
 
 import ContentManager from './contentmanager';
 import ExtModule from './extmodule';
-import { ClientLogger as Logger } from 'common';
-import { Events } from 'modules';
 
 export default class extends ContentManager {
 

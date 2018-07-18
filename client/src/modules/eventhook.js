@@ -8,7 +8,6 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, ClientLogger as Logger } from 'common';
 import { WebpackModules } from './webpackmodules';
 import Events from './events';
 import EventListener from './eventlistener';

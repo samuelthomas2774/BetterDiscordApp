@@ -8,8 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, WebpackModules, DiscordApi, MonkeyPatch } from 'modules';
-import { Utils } from 'common';
+import { Events, DiscordApi } from 'modules';
 import { remote } from 'electron';
 import DOM from './dom';
 import Vue from './vue';

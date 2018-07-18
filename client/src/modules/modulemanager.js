@@ -9,7 +9,7 @@
 */
 
 import { ClientLogger as Logger } from 'common';
-import { Events, SocketProxy, EventHook, CssEditor } from 'modules';
+import { SocketProxy, EventHook, CssEditor } from 'modules';
 import { ProfileBadges, ClassNormaliser } from 'ui';
 import Updater from './updater';
 

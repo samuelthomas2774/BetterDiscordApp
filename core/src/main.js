@@ -183,7 +183,6 @@ export class BetterDiscord {
     }
 
     async waitForWindow() {
-        const self = this;
         return new Promise(resolve => {
             const defer = setInterval(() => {
                 const windows = BrowserWindow.getAllWindows();

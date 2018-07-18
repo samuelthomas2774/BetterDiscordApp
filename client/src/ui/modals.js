@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, FileUtils, ClientLogger as Logger, AsyncEventEmitter } from 'common';
+import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { Settings, Events, PluginManager, ThemeManager } from 'modules';
 import BaseModal from './components/common/Modal.vue';
 import BasicModal from './components/bd/modals/BasicModal.vue';

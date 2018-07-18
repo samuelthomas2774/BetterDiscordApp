@@ -8,7 +8,6 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import path from 'path';
 import fs from 'fs';
 import _ from 'lodash';
 import filetype from 'file-type';
@@ -91,11 +90,7 @@ export class Utils {
      * @return {Any} The cloned value
      */
     static deepclone(value, exclude) {
-        try {
-            if (exclude && exclude(value)) return value;
-        } catch (err) {
-            console.error(arguments, err);
-        }
+        if (exclude && exclude(value)) return value;
 
         if (typeof value === 'object') {
             if (value instanceof Array) return value.map(i => this.deepclone(i, exclude));

@@ -302,7 +302,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchMessage() {
-        this.Message = await ReactComponents.getComponent('Message', { selector: '.message' });
+        this.Message = await ReactComponents.getComponent('Message', { selector: '.message' }, m => m.prototype.renderContent);
 
         this.unpatchMessageRender = MonkeyPatch('BD:ReactComponents', this.Message.component.prototype).after('render', (component, args, retVal) => {
             const { message, jumpSequenceId, canFlash } = component.props;

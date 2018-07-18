@@ -26,6 +26,30 @@ export class IterableWeakMap extends WeakMap {
     values() {
         return IterableWeakCollections.getWeakMapEntries(this).map(e => e[1]).values();
     }
+
+    forEach(callback, thisArg) {
+        for (let [key, value] of this) {
+            callback.call(thisArg, value, key, this);
+        }
+    }
+
+    clear() {
+        for (let key of this.keys()) {
+            this.delete(key);
+        }
+    }
+
+    get size() {
+        return IterableWeakCollections.getWeakMapEntries(this).length;
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'IterableWeakMap';
+    }
+
+    static get [Symbol.species]() {
+        return IterableWeakMap;
+    }
 }
 
 export class IterableWeakSet extends WeakSet {
@@ -35,6 +59,26 @@ export class IterableWeakSet extends WeakSet {
 
     values() {
         return IterableWeakCollections.getWeakSetValues(this).values();
+    }
+
+    forEach(callback, thisArg) {
+        for (let value of this) {
+            callback.call(thisArg, value, value, this);
+        }
+    }
+
+    clear() {
+        for (let value of this) {
+            this.delete(value);
+        }
+    }
+
+    get size() {
+        return IterableWeakCollections.getWeakSetValues(this).length;
+    }
+
+    static get [Symbol.species]() {
+        return IterableWeakSet;
     }
 }
 

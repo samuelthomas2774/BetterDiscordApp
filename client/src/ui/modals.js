@@ -23,18 +23,24 @@ class Modal extends AsyncEventEmitter {
     constructor(_modal, component) {
         super();
 
-        for (let key in _modal)
-            this[key] = _modal[key];
+        Object.assign(this, _modal);
 
         const modal = this;
         this.component = this.component || {
-            template: '<custom-modal :modal="modal" />',
-            components: { 'custom-modal': component },
+            render(createElement) {
+                return createElement(component, {
+                    props: {
+                        modal,
+                        id: modal.id,
+                        closing: modal.closing
+                    }
+                });
+            },
             data() { return { modal }; },
-            mounted() {
-                modal.vueInstance = this;
-                modal.vue = this.$children[0];
-            }
+            created() { modal.vueInstance = this; },
+            mounted() { modal.vue = this.$children[0]; },
+            beforeDestroy() { modal.vue = undefined; },
+            destroyed() { modal.vueInstance = undefined; }
         };
 
         this.closing = false;
@@ -43,7 +49,6 @@ class Modal extends AsyncEventEmitter {
         this.vue = undefined;
 
         this.close = this.close.bind(this);
-        this.closed = this.once('closed');
     }
 
     /**
@@ -66,6 +71,14 @@ export default class Modals {
      */
     static add(_modal, component) {
         const modal = _modal instanceof Modal ? _modal : new Modal(_modal, component);
+
+        if (this.stack.includes(modal)) {
+            Logger.log('Modals', ['Trying to show a modal that is already in the modal stack.', modal]);
+            throw new Error('Trying to show a modal that is already in the modal stack.');
+        }
+
+        modal.closing = false;
+        modal.closed = modal.once('closed');
 
         this.stack.push(modal);
         Events.emit('bd-refresh-modals');
@@ -136,7 +149,11 @@ export default class Modals {
      * @return {Modal}
      */
     static basic(title, text) {
-        return this.add({ title, text }, BasicModal);
+        return this.add(this.createBasicModal(title, text));
+    }
+
+    static createBasicModal(title, text) {
+        return new Modal({ title, text }, BasicModal);
     }
 
     /**
@@ -147,12 +164,16 @@ export default class Modals {
      * @return {Modal}
      */
     static confirm(title, text) {
+        return this.add(this.createConfirmModal(title, text));
+    }
+
+    static createConfirmModal(title, text) {
         const modal = { title, text };
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = () => resolve(true);
             modal.beforeClose = () => reject();
         });
-        return this.add(modal, ConfirmModal);
+        return new Modal(modal, ConfirmModal);
     }
 
     /**
@@ -164,12 +185,16 @@ export default class Modals {
      * @return {Modal}
      */
     static permissions(title, name, perms) {
+        return this.add(this.createPermissionsModal(title, name, perms));
+    }
+
+    static createPermissionsModal(title, name, perms) {
         const modal = { title, name, perms };
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = () => resolve(true);
             modal.beforeClose = () => reject();
         });
-        return this.add(modal, PermissionModal);
+        return new Modal(modal, PermissionModal);
     }
 
     /**
@@ -178,7 +203,11 @@ export default class Modals {
      * @return {Modal}
      */
     static error(event) {
-        return this.add({ event }, ErrorModal);
+        return this.add(this.createErrorModal(event));
+    }
+
+    static createErrorModal(event) {
+        return new Modal({ event }, ErrorModal);
     }
 
     /**
@@ -221,7 +250,11 @@ export default class Modals {
      * @return {Modal}
      */
     static settings(settingsset, headertext, options) {
-        return this.add(Object.assign({
+        return this.add(this.createSettingsModal(settingsset, headertext, options));
+    }
+
+    static createSettingsModal(settingsset, headertext, options) {
+        return new Modal(Object.assign({
             headertext: headertext ? headertext : settingsset.headertext,
             settings: settingsset,
             schemes: settingsset.schemes

@@ -282,10 +282,10 @@ export default class PluginApi {
         return this.modalStack[this.modalStack.length - 1].close(force);
     }
     basicModal(title, text) {
-        return this.addModal(Modals.basic(title, text));
+        return this.addModal(Modals.createBasicModal(title, text));
     }
     settingsModal(settingsset, headertext, options) {
-        return this.addModal(Modals.settings(settingsset, headertext, options));
+        return this.addModal(Modals.createSettingsModal(settingsset, headertext, options));
     }
     get Modals() {
         return Object.defineProperties({

@@ -17,6 +17,8 @@ import ErrorModal from './components/bd/modals/ErrorModal.vue';
 import SettingsModal from './components/bd/modals/SettingsModal.vue';
 import PermissionModal from './components/bd/modals/PermissionModal.vue';
 
+let modals = 0;
+
 class Modal extends AsyncEventEmitter {
     constructor(_modal, component) {
         super();
@@ -36,7 +38,7 @@ class Modal extends AsyncEventEmitter {
         };
 
         this.closing = false;
-        this.id = Date.now();
+        this.id = modals++;
         this.vueInstance = undefined;
         this.vue = undefined;
 

@@ -120,7 +120,7 @@ export class IterableWeakCollections {
         return new Set(this.getWeakSetValues(ws));
     }
 
-    static _setup() {
+    static _init() {
         const v8 = process.binding('v8');
 
         // Enable natives syntax
@@ -158,4 +158,4 @@ export class IterableWeakCollections {
 
 }
 
-IterableWeakCollections._setup();
+IterableWeakCollections._init();

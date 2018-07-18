@@ -51,7 +51,7 @@ export default class KeybindSetting extends Setting {
     get addEventListener() { return this.on }
     get removeEventListener() { return this.removeListener }
 
-    static _setup() {
+    static _init() {
         document.addEventListener('keydown', this.__event_handler.bind(this, 'keydown'));
         document.addEventListener('keyup', this.__event_handler.bind(this, 'keyup'));
         document.addEventListener('keypress', this.__event_handler.bind(this, 'keypress'));
@@ -73,4 +73,4 @@ export default class KeybindSetting extends Setting {
 
 }
 
-KeybindSetting._setup();
+KeybindSetting._init();

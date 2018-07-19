@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Modals Component
+ * BetterDiscord Toasts Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -9,9 +9,9 @@
 */
 
 <template>
-    <bd-toasts>
+    <div class="bd-toasts">
         <Toast v-for="(toast, index) in toasts" :message="toast.message" :type="toast.type" :icon="toast.icon" :closing="toast.closing" :key="`${toast.id}`"></Toast>
-    </bd-toasts>
+    </div>
 </template>
 <script>
     // Imports

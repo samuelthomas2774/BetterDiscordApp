@@ -29,7 +29,7 @@ export default new class Settings {
                 Logger.log('Settings', [`${set.id}/${category.id}/${setting.id} was changed from`, old_value, 'to', value]);
                 Events.emit('setting-updated', event);
                 Events.emit(`setting-updated-${set.id}_${category.id}_${setting.id}`, event);
-				Toasts.success(`${set.id}/${category.id}/${setting.id} was changed from ${old_value} to ${value}`); // Just for debugging purposes remove in prod
+                Toasts.success(`${set.id}/${category.id}/${setting.id} was changed from ${old_value} to ${value}`); // Just for debugging purposes remove in prod
             });
 
             set.on('settings-updated', async event => {

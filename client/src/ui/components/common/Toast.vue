@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Modal Component
+ * BetterDiscord Toast Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div :class="['bd-toast', {'bd-toast-has-icon': type != 'basic' || icon}, 'bd-toast-' + type, {'bd-toast-closing': closing}]">
+    <div :class="['bd-toast', 'bd-toast-' + type, {'bd-toast-has-icon': type != 'basic' || icon, 'bd-toast-closing': closing}]">
         <div class="bd-toast-icon" v-if="type != 'basic' || icon">
             <img v-if="icon" :src="icon" width="20" height="20" />
             <MiSuccess v-else-if="type == 'success'" size="20" />
@@ -32,7 +32,7 @@
             message: String,
             icon: String,
             type: {
-                default: "basic",
+                default: 'basic',
                 validator: function (value) {
                     return ['success', 'warning', 'error', 'info', 'basic'].indexOf(value) !== -1
                 }

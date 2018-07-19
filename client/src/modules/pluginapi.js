@@ -306,7 +306,7 @@ export default class PluginApi {
     }
 
 
-	/**
+    /**
      * Toasts
      */
     showToast(message, options = {}) {
@@ -323,6 +323,15 @@ export default class PluginApi {
     }
     showWarningToast(message, options = {}) {
         return Toasts.warning(message, options);
+    }
+    get Toasts() {
+        return {
+            push: this.showToast.bind(this),
+            success: this.showSuccessToast.bind(this),
+            error: this.showErrorToast.bind(this),
+            info: this.showInfoToast.bind(this),
+            warning: this.showWarningToast.bind(this)
+        };
     }
 
 

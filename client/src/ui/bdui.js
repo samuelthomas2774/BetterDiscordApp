@@ -43,13 +43,13 @@ export default class {
     static injectUi() {
         DOM.createElement('div', null, 'bd-settings').appendTo(DOM.bdBody);
         DOM.createElement('div', null, 'bd-modals').appendTo(DOM.bdModals);
+        DOM.createElement('div', null, 'bd-toasts').appendTo(DOM.bdToasts);
         DOM.createElement('bd-tooltips').appendTo(DOM.bdBody);
-        DOM.createElement('bd-toasts').appendTo(DOM.bdBody);
 
-        const toasts = new Vue({
-            el: 'bd-toasts',
+        this.toasts = new Vue({
+            el: '#bd-toasts',
             components: { BdToasts },
-            template: '<BdToasts/>'
+            template: '<BdToasts />'
         });
 
         this.modals = new Vue({

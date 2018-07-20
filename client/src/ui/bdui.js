@@ -12,7 +12,7 @@ import { Events, DiscordApi } from 'modules';
 import { remote } from 'electron';
 import DOM from './dom';
 import Vue from './vue';
-import { BdSettingsWrapper, BdModals } from './components';
+import { BdSettingsWrapper, BdModals, BdToasts } from './components';
 
 export default class {
 
@@ -43,7 +43,14 @@ export default class {
     static injectUi() {
         DOM.createElement('div', null, 'bd-settings').appendTo(DOM.bdBody);
         DOM.createElement('div', null, 'bd-modals').appendTo(DOM.bdModals);
+        DOM.createElement('div', null, 'bd-toasts').appendTo(DOM.bdToasts);
         DOM.createElement('bd-tooltips').appendTo(DOM.bdBody);
+
+        this.toasts = new Vue({
+            el: '#bd-toasts',
+            components: { BdToasts },
+            template: '<BdToasts />'
+        });
 
         this.modals = new Vue({
             el: '#bd-modals',

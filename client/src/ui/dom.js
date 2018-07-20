@@ -184,6 +184,9 @@ export default class DOM {
     static get bdThemes() { return this.getElement('bd-themes') || this.createElement('bd-themes').appendTo(this.bdHead) }
     static get bdTooltips() { return this.getElement('bd-tooltips') || this.createElement('bd-tooltips').appendTo(this.bdBody) }
     static get bdModals() { return this.getElement('bd-modals') || this.createElement('bd-modals').appendTo(this.bdBody) }
+    static get bdToasts() {
+        return this.getElement('bd-toasts') || this.createElement('bd-toasts').appendTo(this.bdBody);
+    }
 
     static getElement(e) {
         if (e instanceof BdNode) return e.element;

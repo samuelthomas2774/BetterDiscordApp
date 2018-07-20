@@ -9,13 +9,13 @@
 */
 
 <template>
-    <div :class="['bd-toast', 'bd-toast-' + type, {'bd-toast-has-icon': type != 'basic' || icon, 'bd-toast-closing': closing}]">
-        <div class="bd-toast-icon" v-if="type != 'basic' || icon">
+    <div :class="['bd-toast', 'bd-toast-' + type, {'bd-toast-has-icon': type !== 'basic' || icon, 'bd-toast-closing': closing}]">
+        <div class="bd-toast-icon" v-if="type !== 'basic' || icon">
             <img v-if="icon" :src="icon" width="20" height="20" />
-            <MiSuccess v-else-if="type == 'success'" size="20" />
-            <MiWarning v-else-if="type == 'warning'" size="20" />
-            <MiInfo v-else-if="type == 'info'" size="20" />
-            <MiError v-else-if="type == 'error'" size="20" />
+            <MiSuccess v-else-if="type === 'success'" size="20" />
+            <MiWarning v-else-if="type === 'warning'" size="20" />
+            <MiInfo v-else-if="type === 'info'" size="20" />
+            <MiError v-else-if="type === 'error'" size="20" />
         </div>
         <div class="bd-toast-text">
             {{message}}
@@ -33,7 +33,7 @@
             icon: String,
             type: {
                 default: 'basic',
-                validator: function (value) {
+                validator(value) {
                     return ['success', 'warning', 'error', 'info', 'basic'].indexOf(value) !== -1
                 }
             },

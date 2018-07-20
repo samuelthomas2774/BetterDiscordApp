@@ -8,6 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+let toasts = 0;
+
 export default class Toasts {
 
     /**
@@ -17,12 +19,13 @@ export default class Toasts {
      * @param {Object} options Options object. Optional parameter.
      * @param {string} options.type Changes the type of the toast stylistically and semantically. Choices: "basic", "info", "success", "error", "warning". Default: "basic"
      * @param {string} options.icon URL to custom icon to show in the toast. Having this overrides the default icon for the toast type.
+     * @param {string|Object|Array} options.additionalClasses Additional classes to add to the toast element. Can be used to style it. Optional.
      * @param {number} options.timeout Adjusts the time (in ms) the toast should be shown for before disappearing automatically. Default: 3000
      * @returns {Promise} This promise resolves when the toast is removed from the DOM.
      */
     static async push(message, options = {}) {
-        const {type = 'basic', icon, timeout = 3000} = options;
-        const toast = {id: Math.random(), message, type, icon, closing: false};
+        const {type = 'basic', icon, additionalClasses, timeout = 3000} = options;
+        const toast = {id: toasts++, message, type, icon, additionalClasses, closing: false};
         this.stack.push(toast);
         await new Promise(resolve => setTimeout(resolve, timeout));
         toast.closing = true;

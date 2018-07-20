@@ -10,9 +10,10 @@
 
 <template>
     <div class="bd-toasts">
-        <Toast v-for="(toast, index) in toasts" :message="toast.message" :type="toast.type" :icon="toast.icon" :closing="toast.closing" :key="`${toast.id}`"></Toast>
+        <Toast v-for="(toast, index) in toasts" :message="toast.message" :type="toast.type" :icon="toast.icon" :class="toast.additionalClasses" :closing="toast.closing" :key="toast.id"></Toast>
     </div>
 </template>
+
 <script>
     // Imports
     import { Toasts } from 'ui';

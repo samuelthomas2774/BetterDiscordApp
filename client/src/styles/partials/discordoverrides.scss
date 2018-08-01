@@ -1,4 +1,4 @@
-.guilds-wrapper {
+[class*="guildsWrapper-"] {
     padding-top: 49px !important;
 
     .platform-osx & {
@@ -6,7 +6,7 @@
     }
 }
 
-[class*="guilds-wrapper"] + [class*="flex"] {
+[class*="guildsWrapper-"] + [class*="flex"] {
     border-radius: 0 0 0 5px;
 }
 

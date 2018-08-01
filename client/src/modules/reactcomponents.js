@@ -221,9 +221,9 @@ export class ReactComponents {
 
                 clearInterval(importantInterval);
                 const reflect = Reflection(element);
-                const component = filter ? reflect.components.find(filter) || reflect.component : reflect.component;
+                const component = filter ? reflect.components.find(filter) : reflect.component;
                 if (!component) {
-                    Logger.error('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, element]);
+                    Logger.err('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, element]);
                     return;
                 }
 
@@ -323,7 +323,8 @@ export class ReactAutoPatcher {
     }
 
     static async patchMessageGroup() {
-        this.MessageGroup = await ReactComponents.getComponent('MessageGroup', { selector: '.message-group' });
+        const selector = '.' + WebpackModules.getClassName('container', 'message', 'messageCozy');
+        this.MessageGroup = await ReactComponents.getComponent('MessageGroup', {selector});
 
         this.unpatchMessageGroupRender = MonkeyPatch('BD:ReactComponents', this.MessageGroup.component.prototype).after('render', (component, args, retVal) => {
             const { author, type } = component.props.messages[0];
@@ -336,14 +337,14 @@ export class ReactAutoPatcher {
             if (dapiMessage.guild && dapiMessage.guild.isMember(author.id)) retVal.props.className += ' bd-isGuildMember';
         });
 
-        for (const e of document.querySelectorAll('.message-group')) {
+        for (const e of document.querySelectorAll(selector)) {
             Reflection(e).forceUpdate();
         }
     }
 
     static async patchChannelMember() {
         const selector = '.' + WebpackModules.getClassName('member', 'memberInner', 'activity');
-        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector }, m => m.prototype.renderActivity);
+        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', {selector}, m => m.prototype.renderActivity);
 
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
             if (!retVal.props || !retVal.props.children) return;
@@ -375,7 +376,8 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannel() {
-        this.Channel = await ReactComponents.getComponent('Channel', {selector: '.chat'});
+        const selector = '.chat';
+        this.Channel = await ReactComponents.getComponent('Channel', {selector});
 
         this.unpatchChannel = MonkeyPatch('BD:ReactComponents', this.Channel.component.prototype).after('render', (component, args, retVal) => {
             const channel = component.props.channel || component.state.channel;
@@ -387,14 +389,14 @@ export class ReactAutoPatcher {
             if (channel.type === 3) retVal.props.className += ' bd-isGroupChannel';
         });
 
-        for (const e of document.querySelectorAll('.chat')) {
+        for (const e of document.querySelectorAll(selector)) {
             Reflection(e).forceUpdate();
         }
     }
 
     static async patchChannelList() {
         const selector = '.' + WebpackModules.getClassName('containerDefault', 'actionIcon');
-        this.GuildChannel = await ReactComponents.getComponent('GuildChannel', { selector });
+        this.GuildChannel = await ReactComponents.getComponent('GuildChannel', {selector});
 
         this.unpatchGuildChannel = MonkeyPatch('BD:ReactComponents', this.GuildChannel.component.prototype).after('render', (component, args, retVal) => {
             const { channel } = component.props;
@@ -413,7 +415,7 @@ export class ReactAutoPatcher {
 
     static async patchUserProfileModal() {
         const selector = '.' + WebpackModules.getClassName('root', 'topSectionNormal');
-        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', { selector }, Filters.byPrototypeFields(['renderHeader', 'renderBadges']));
+        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', {selector}, Filters.byPrototypeFields(['renderHeader', 'renderBadges']));
 
         this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
             const { user } = component.props;
@@ -430,7 +432,7 @@ export class ReactAutoPatcher {
 
     static async patchUserPopout() {
         const selector = '.' + WebpackModules.getClassName('userPopout', 'headerNormal');
-        this.UserPopout = await ReactComponents.getComponent('UserPopout', { selector });
+        this.UserPopout = await ReactComponents.getComponent('UserPopout', {selector});
 
         this.unpatchUserPopout = MonkeyPatch('BD:ReactComponents', this.UserPopout.component.prototype).after('render', (component, args, retVal) => {
             const { user, guild, guildMember } = component.props;

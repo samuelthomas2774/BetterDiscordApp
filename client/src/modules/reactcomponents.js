@@ -384,7 +384,8 @@ export class ReactAutoPatcher {
     }
 
     static async patchGuild() {
-        this.Guild = await ReactComponents.getComponent('Guild');
+        const selector = `div.${WebpackModules.getClassName('guild', 'guildsWrapper')}:not(:first-child)`;
+        this.Guild = await ReactComponents.getComponent('Guild', {selector}, m => m.prototype.renderBadge);
 
         this.unpatchGuild = MonkeyPatch('BD:ReactComponents', this.Guild.component.prototype).after('render', (component, args, retVal) => {
             const { guild } = component.props;
@@ -393,9 +394,7 @@ export class ReactAutoPatcher {
             retVal.props['data-guild-name'] = guild.name;
         });
 
-        for (const e of document.querySelectorAll('.guild')) {
-            Reflection(e).forceUpdate();
-        }
+        this.Guild.forceUpdateAll();
     }
 
     static async patchChannel() {

@@ -166,10 +166,18 @@ class Helpers {
 export { Helpers as ReactHelpers };
 
 class ReactComponent {
-    constructor(id, component, retVal) {
+    constructor(id, component, retVal, important) {
         this.id = id;
         this.component = component;
         this.retVal = retVal;
+        this.important = important;
+    }
+
+    forceUpdateAll() {
+        if (!this.important || !this.important.selector) return;
+        for (let e of document.querySelectorAll(this.important.selector)) {
+            Reflection(e).forceUpdate(this);
+        }
     }
 }
 
@@ -181,22 +189,28 @@ export class ReactComponents {
 
     static get ReactComponent() { return ReactComponent }
 
-    static push(component, retVal) {
+    static push(component, retVal, important) {
         if (!(component instanceof Function)) return null;
         const { displayName } = component;
         if (!displayName) {
             return this.processUnknown(component, retVal);
         }
+
         const have = this.components.find(comp => comp.id === displayName);
-        if (have) return component;
-        const c = new ReactComponent(displayName, component, retVal);
-        this.components.push(c);
-        const listener = this.listeners.find(listener => listener.id === displayName);
-        if (!listener) return c;
-        for (const l of listener.listeners) {
-            l(c);
+        if (have) {
+            if (!have.important) have.important = important;
+            return component;
         }
-        this.listeners.splice(this.listeners.findIndex(listener => listener.id === displayName), 1);
+
+        const c = new ReactComponent(displayName, component, retVal, important);
+        this.components.push(c);
+
+        const listener = this.listeners.find(listener => listener.id === displayName);
+        if (listener) {
+            for (const l of listener.listeners) l(c);
+            Utils.removeFromArray(this.listeners, listener);
+        }
+
         return c;
     }
 
@@ -210,6 +224,7 @@ export class ReactComponents {
     static async getComponent(name, important, filter) {
         const have = this.components.find(c => c.id === name);
         if (have) return have;
+
         if (important) {
             const importantInterval = setInterval(() => {
                 if (this.components.find(c => c.id === name)) {
@@ -231,14 +246,17 @@ export class ReactComponents {
 
                 if (!component.displayName) component.displayName = name;
                 Logger.info('ReactComponents', [`Found important component ${name} with reflection`, reflect]);
-                this.push(component);
+                important.filter = filter;
+                this.push(component, undefined, important);
             }, 50);
         }
+
         let listener = this.listeners.find(l => l.id === name);
         if (!listener) this.listeners.push(listener = {
             id: name,
             listeners: []
         });
+
         return new Promise(resolve => {
             listener.listeners.push(resolve);
         });

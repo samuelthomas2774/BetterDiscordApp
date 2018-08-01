@@ -10,7 +10,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Reflection } from 'ui';
+import { DOM, Reflection } from 'ui';
 import { Utils, Filters, ClientLogger as Logger } from 'common';
 import { MonkeyPatch } from './patcher';
 import { WebpackModules } from './webpackmodules';
@@ -226,17 +226,17 @@ export class ReactComponents {
         if (have) return have;
 
         if (important) {
-            const importantInterval = setInterval(() => {
+            const callback = () => {
                 if (this.components.find(c => c.id === name)) {
                     Logger.info('ReactComponents', `Important component ${name} already found`);
-                    clearInterval(importantInterval);
+                    DOM.observer.unsubscribe(observerSubscription);
                     return;
                 }
 
                 const element = document.querySelector(important.selector);
                 if (!element) return;
 
-                clearInterval(importantInterval);
+                DOM.observer.unsubscribe(observerSubscription);
                 const reflect = Reflection(element);
                 const component = filter ? reflect.components.find(filter) : reflect.component;
                 if (!component) {
@@ -248,7 +248,10 @@ export class ReactComponents {
                 Logger.info('ReactComponents', [`Found important component ${name} with reflection`, reflect]);
                 important.filter = filter;
                 this.push(component, undefined, important);
-            }, 50);
+            };
+
+            const observerSubscription = DOM.observer.subscribeToQuerySelector(callback, important.selector);
+            setTimeout(callback, 0);
         }
 
         let listener = this.listeners.find(l => l.id === name);

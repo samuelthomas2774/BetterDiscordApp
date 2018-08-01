@@ -48,7 +48,7 @@ export default new class EmoteModule {
 
         try {
             await Promise.all([
-                this.patchMessage(),
+                this.patchMessageContent(),
                 this.patchChannelTextArea()
             ]);
         } catch (err) {
@@ -194,38 +194,35 @@ export default new class EmoteModule {
         return matching;
     }
 
-    async patchMessage() {
-        const Message = await ReactComponents.getComponent('Message');
+    async patchMessageContent() {
+        const selector = '.' + WebpackModules.getClassName('container', 'containerCozy', 'containerCompact', 'edited');
+        const MessageContent = await ReactComponents.getComponent('MessageContent', {selector});
 
-        this.unpatchRender = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('render', (component, args, retVal) => {
+        this.unpatchRender = MonkeyPatch('BD:EmoteModule', MessageContent.component.prototype).after('render', (component, args, retVal) => {
             try {
                 // First child has all the actual text content, second is the edited timestamp
-                const markup = this.findByProp(retVal, 'className', 'markup');
+                const markup = retVal.props.children[1].props;
                 if (!markup || !this.enabledSetting.value) return;
-                markup.children[0] = this.processMarkup(markup.children[0], component.props.message.editedTimestamp || component.props.message.timestamp);
+                markup.children[1] = this.processMarkup(markup.children[1], component.props.message.editedTimestamp || component.props.message.timestamp);
             } catch (err) {
                 Logger.err('EmoteModule', err);
             }
         });
 
-        for (const message of document.querySelectorAll('.message')) {
-            Reflection(message).forceUpdate();
-        }
+        MessageContent.forceUpdateAll();
     }
 
     async patchChannelTextArea() {
         const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
         const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', {selector});
 
-        this.unpatchChannelTextArea = MonkeyPatch('BD:ReactComponents', ChannelTextArea.component.prototype).after('render', (component, args, retVal) => {
+        this.unpatchChannelTextArea = MonkeyPatch('BD:EmoteModule', ChannelTextArea.component.prototype).after('render', (component, args, retVal) => {
             if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
 
             retVal.props.children.splice(0, 0, VueInjector.createReactElement(Autocomplete, {}, true));
         });
 
-        for (const e of document.querySelectorAll(selector)) {
-            Reflection(e).forceUpdate();
-        }
+        ChannelTextArea.forceUpdateAll();
     }
 
 }

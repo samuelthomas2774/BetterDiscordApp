@@ -11,7 +11,7 @@
 */
 
 import { Reflection } from 'ui';
-import { Filters, ClientLogger as Logger } from 'common';
+import { Utils, Filters, ClientLogger as Logger } from 'common';
 import { MonkeyPatch } from './patcher';
 import { WebpackModules } from './webpackmodules';
 import DiscordApi from './discordapi';
@@ -322,7 +322,8 @@ export class ReactAutoPatcher {
     }
 
     static async patchMessage() {
-        this.Message = await ReactComponents.getComponent('Message', { selector: '.message' }, m => m.prototype.renderContent);
+        const selector = '.' + WebpackModules.getClassName('message', 'messageCozy', 'messageCompact');
+        this.Message = await ReactComponents.getComponent('Message', {selector}, m => m.prototype && m.prototype.renderCozy);
 
         this.unpatchMessageRender = MonkeyPatch('BD:ReactComponents', this.Message.component.prototype).after('render', (component, args, retVal) => {
             const { message, jumpSequenceId, canFlash } = component.props;
@@ -335,11 +336,13 @@ export class ReactAutoPatcher {
             if (attachments && attachments.length) retVal.props.className += ' bd-hasAttachments';
             if (embeds && embeds.length) retVal.props.className += ' bd-hasEmbeds';
             if (author && author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+
+            const dapiMessage = DiscordApi.Message.from(message);
+            if (dapiMessage.guild && author.id === dapiMessage.guild.ownerId) retVal.props.className += ' bd-isGuildOwner';
+            if (dapiMessage.guild && dapiMessage.guild.isMember(author.id)) retVal.props.className += ' bd-isGuildMember';
         });
 
-        for (const e of document.querySelectorAll('.message')) {
-            Reflection(e).forceUpdate();
-        }
+        this.Message.forceUpdateAll();
     }
 
     static async patchMessageGroup() {

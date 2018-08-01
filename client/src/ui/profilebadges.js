@@ -54,9 +54,6 @@ export default class extends Module {
         });
 
         // Rerender all messages
-        for (const message of document.querySelectorAll('.message')) {
-            Reflection(message).forceUpdate();
-        }
     }
 
     /**
@@ -80,11 +77,7 @@ export default class extends Module {
 
         // Rerender all channel members
         if (this.PatchedNameTag) {
-            const selector = '.' + WebpackModules.getClassName('member', 'memberInner', 'activity');
-
-            for (const channelMember of document.querySelectorAll(selector)) {
-                Reflection(channelMember).forceUpdate();
-            }
+            ChannelMember.forceUpdateAll();
         }
     }
 
@@ -95,7 +88,7 @@ export default class extends Module {
         if (this.PatchedNameTag) return this.PatchedNameTag;
 
         const selector = '.' + WebpackModules.getClassName('nameTag', 'username', 'discriminator', 'ownerIcon');
-        const NameTag = await ReactComponents.getComponent('NameTag', { selector });
+        const NameTag = await ReactComponents.getComponent('NameTag', {selector});
 
         this.PatchedNameTag = class extends NameTag.component {
             render() {
@@ -121,11 +114,8 @@ export default class extends Module {
 
         // Rerender all channel members
         if (this.unpatchChannelMemberRender) {
-            const selector = '.' + WebpackModules.getClassName('member', 'memberInner', 'activity');
-
-            for (const channelMember of document.querySelectorAll(selector)) {
-                Reflection(channelMember).forceUpdate();
-            }
+            const ChannelMember = await ReactComponents.getComponent('ChannelMember');
+            ChannelMember.forceUpdateAll();
         }
 
         return this.PatchedNameTag;
@@ -135,9 +125,9 @@ export default class extends Module {
      * Patches UserProfileModal to render profile badges.
      */
     async patchUserProfileModal() {
-        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal');
+        const UserProfileModal = await ReactComponents.getComponent('UserProfileModal');
 
-        this.unpatchUserProfileModal = MonkeyPatch('ProfileBadges', this.UserProfileModal.component.prototype).after('renderBadges', (component, args, retVal, setRetVal) => {
+        this.unpatchUserProfileModal = MonkeyPatch('ProfileBadges', UserProfileModal.component.prototype).after('renderBadges', (component, args, retVal, setRetVal) => {
             const user = ReactHelpers.findProp(component, 'user');
             if (!user) return;
             const contributor = contributors.find(c => c.id === user.id);
@@ -155,6 +145,8 @@ export default class extends Module {
                 }));
             } else retVal.props.children.splice(0, 0, element);
         });
+
+        UserProfileModal.forceUpdateAll();
     }
 
 }

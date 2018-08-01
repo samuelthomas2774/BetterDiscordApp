@@ -8,12 +8,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { IterableWeakSet } from 'common';
 import Combokeys from 'combokeys';
 import CombokeysGlobalBind from 'combokeys/plugins/global-bind';
 import Setting from './basesetting';
 
-const instances = new IterableWeakSet();
+const instances = new Set();
 let keybindsPaused = false;
 
 export default class KeybindSetting extends Setting {
@@ -21,7 +20,17 @@ export default class KeybindSetting extends Setting {
     constructor(args, ...merge) {
         super(args, ...merge);
 
-        instances.add(this);
+        // When adding a keybind-activated listener, add the keybind setting to the set of active keybind settings
+        // This creates a reference to the keybind setting, which may cause memory leaks
+        this.on('newListener', (event, listener) => {
+            if (event === 'keybind-activated') instances.add(this);
+        });
+
+        // When there are no more keybind-activated listeners, remove the keybind setting from the set of active keybind settings
+        // Always remember to unbind keybind-activated listeners!
+        this.on('removeListener', (event, listener) => {
+            if (!this.listenerCount('keybind-activated')) instances.remove(this);
+        });
 
         this.__keybind_activated = this.__keybind_activated.bind(this);
 

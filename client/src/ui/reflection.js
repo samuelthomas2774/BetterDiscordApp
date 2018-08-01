@@ -9,6 +9,7 @@
 */
 
 import { Filters, ClientLogger as Logger } from 'common';
+import { ReactComponents } from 'modules';
 
 class Reflection {
     static reactInternalInstance(node) {
@@ -84,19 +85,38 @@ class Reflection {
     }
 
     static getState(node) {
-        try {
-            return this.reactInternalInstance(node).return.stateNode.state;
-        } catch (err) {
-            return null;
-        }
+        const stateNode = this.getStateNode(node);
+        if (stateNode) return stateNode.state;
     }
 
     static getStateNode(node) {
-        try {
-            return this.reactInternalInstance(node).return.stateNode;
-        } catch (err) {
-            return null;
+        return this.getStateNodes(node)[0];
+    }
+
+    static getStateNodes(node) {
+        const instance = this.reactInternalInstance(node);
+        const stateNodes = [];
+        let lastInstance = instance;
+
+        do {
+            if (lastInstance.return.stateNode instanceof HTMLElement) break;
+            if (lastInstance.return.stateNode) stateNodes.push(lastInstance.return.stateNode);
+            lastInstance = lastInstance.return;
+        } while (lastInstance.return);
+
+        return stateNodes;
+    }
+
+    static findComponentStateNode(node, component) {
+        if (component instanceof ReactComponents.ReactComponent) component = component.component;
+
+        for (let stateNode of this.getStateNodes(node)) {
+            if (stateNode instanceof component) return stateNode;
         }
+    }
+
+    static findStateNode(node, filter, first = true) {
+        return this.getStateNodes(node)[first ? 'find' : 'filter'](filter);
     }
 
     static getComponent(node) {
@@ -129,23 +149,41 @@ const propsProxyHandler = {
 };
 
 export default function (node) {
-    return new class {
+    return new class ReflectionInstance {
         constructor(node) {
             if (typeof node === 'string') node = document.querySelector(node);
-            this.node = this.el = this.element = node;
+            this.node = /* this.el = this.element = */ node;
         }
+
+        get el() { return this.node }
+        get element() { return this.node }
+
+        get reactInternalInstance() {
+            return Reflection.reactInternalInstance(this.node);
+        }
+
         get props() {
             return new Proxy(this.node, propsProxyHandler);
         }
         get state() {
             return Reflection.getState(this.node);
         }
+
         get stateNode() {
             return Reflection.getStateNode(this.node);
         }
-        get reactInternalInstance() {
-            return Reflection.reactInternalInstance(this.node);
+        get stateNodes() {
+            return Reflection.getStateNodes(this.node);
         }
+        getComponentStateNode(component) {
+            return Reflection.getComponentStateNode(this.node, component);
+        }
+        findStateNode(filter) {
+            if (typeof filter === 'function') return Reflection.findStateNode(this.node, filter);
+            if (filter) return Reflection.getComponentStateNode(this.node, filter);
+            return Reflection.getStateNode(this.node);
+        }
+
         get component() {
             return Reflection.getComponent(this.node);
         }
@@ -164,15 +202,17 @@ export default function (node) {
         getComponentByDisplayName(name) {
             return Reflection.findComponent(this.node, Filters.byDisplayName(name));
         }
-        forceUpdate() {
+
+        forceUpdate(filter) {
             try {
-                const stateNode = Reflection.getStateNode(this.node);
+                const stateNode = this.findStateNode(filter);
                 if (!stateNode || !stateNode.forceUpdate) return;
                 stateNode.forceUpdate();
             } catch (err) {
                 Logger.err('Reflection', err);
             }
         }
+
         prop(propName) {
             const split = propName.split('.');
             const first = Reflection.findProp(this.node, split[0]);

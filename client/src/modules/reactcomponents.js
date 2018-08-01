@@ -179,6 +179,8 @@ export class ReactComponents {
     static get listeners() { return this._listeners || (this._listeners = []) }
     static get nameSetters() { return this._nameSetters || (this._nameSetters = []) }
 
+    static get ReactComponent() { return ReactComponent }
+
     static push(component, retVal) {
         if (!(component instanceof Function)) return null;
         const { displayName } = component;

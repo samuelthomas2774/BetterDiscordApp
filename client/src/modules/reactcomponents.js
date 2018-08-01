@@ -360,9 +360,7 @@ export class ReactAutoPatcher {
             if (dapiMessage.guild && dapiMessage.guild.isMember(author.id)) retVal.props.className += ' bd-isGuildMember';
         });
 
-        for (const e of document.querySelectorAll(selector)) {
-            Reflection(e).forceUpdate();
-        }
+        this.MessageGroup.forceUpdateAll();
     }
 
     static async patchChannelMember() {
@@ -378,9 +376,7 @@ export class ReactAutoPatcher {
             if (component.props.isOwner) retVal.props.className += ' bd-isGuildOwner';
         });
 
-        for (const e of document.querySelectorAll(selector)) {
-            Reflection(e).forceUpdate();
-        }
+        this.ChannelMember.forceUpdateAll();
     }
 
     static async patchGuild() {
@@ -411,9 +407,7 @@ export class ReactAutoPatcher {
             if (channel.type === 3) retVal.props.className += ' bd-isGroupChannel';
         });
 
-        for (const e of document.querySelectorAll(selector)) {
-            Reflection(e).forceUpdate();
-        }
+        this.Channel.forceUpdateAll();
     }
 
     static async patchChannelList() {
@@ -430,9 +424,7 @@ export class ReactAutoPatcher {
             if (channel.type === 3) retVal.props.className += ' bd-isGroupChannel';
         });
 
-        for (const e of document.querySelectorAll(selector)) {
-            Reflection(e).forceUpdate();
-        }
+        this.GuildChannel.forceUpdateAll();
     }
 
     static async patchUserProfileModal() {
@@ -447,9 +439,7 @@ export class ReactAutoPatcher {
             if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
         });
 
-        for (const e of document.querySelectorAll(selector)) {
-            Reflection(e).forceUpdate();
-        }
+        this.UserProfileModal.forceUpdateAll();
     }
 
     static async patchUserPopout() {
@@ -468,8 +458,6 @@ export class ReactAutoPatcher {
             if (guildMember && guildMember.roles.length) retVal.props.className += ' bd-hasRoles';
         });
 
-        for (const e of document.querySelectorAll(selector)) {
-            Reflection(e).forceUpdate();
-        }
+        this.UserPopout.forceUpdateAll();
     }
 }

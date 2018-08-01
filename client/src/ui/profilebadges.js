@@ -54,6 +54,7 @@ export default class extends Module {
         });
 
         // Rerender all messages
+        Message.forceUpdateAll();
     }
 
     /**

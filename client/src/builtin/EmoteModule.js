@@ -202,7 +202,7 @@ export default new class EmoteModule {
             try {
                 // First child has all the actual text content, second is the edited timestamp
                 const markup = retVal.props.children[1].props;
-                if (!markup || !this.enabledSetting.value) return;
+                if (!markup || !markup.children || !this.enabledSetting.value) return;
                 markup.children[1] = this.processMarkup(markup.children[1], component.props.message.editedTimestamp || component.props.message.timestamp);
             } catch (err) {
                 Logger.err('EmoteModule', err);

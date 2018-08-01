@@ -29,7 +29,7 @@ export default class KeybindSetting extends Setting {
         // When there are no more keybind-activated listeners, remove the keybind setting from the set of active keybind settings
         // Always remember to unbind keybind-activated listeners!
         this.on('removeListener', (event, listener) => {
-            if (!this.listenerCount('keybind-activated')) instances.remove(this);
+            if (!this.listenerCount('keybind-activated')) instances.delete(this);
         });
 
         this.__keybind_activated = this.__keybind_activated.bind(this);

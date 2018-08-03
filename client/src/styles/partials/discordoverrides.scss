@@ -10,7 +10,7 @@
     border-radius: 0 0 0 5px;
 }
 
-.unread-mentions-indicator-top {
+[class*="unreadMentionsIndicatorTop-"] {
     top: 49px;
 
     .platform-osx & {

@@ -22,13 +22,13 @@ export default class KeybindSetting extends Setting {
 
         // When adding a keybind-activated listener, add the keybind setting to the set of active keybind settings
         // This creates a reference to the keybind setting, which may cause memory leaks
-        this.on('newListener', (event, listener) => {
+        this.on('newListener', ({event: [event, listener]}) => {
             if (event === 'keybind-activated') instances.add(this);
         });
 
         // When there are no more keybind-activated listeners, remove the keybind setting from the set of active keybind settings
         // Always remember to unbind keybind-activated listeners!
-        this.on('removeListener', (event, listener) => {
+        this.on('removeListener', ({event: [event, listener]}) => {
             if (!this.listenerCount('keybind-activated')) instances.delete(this);
         });
 

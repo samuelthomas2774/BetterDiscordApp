@@ -8,12 +8,18 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { WebpackModules } from './webpackmodules';
 import jQuery from 'jquery';
 import lodash from 'lodash';
 import Vue from 'vue';
 
-export { jQuery as $ };
+import request from 'request-promise-native';
+
+import Combokeys from 'combokeys';
+import filetype from 'file-type';
+import filewatcher from 'filewatcher';
+import VTooltip from 'v-tooltip';
+
+export { jQuery as $, request };
 
 export default class {
 
@@ -30,17 +36,15 @@ export default class {
     static get _() { return this.lodash }
 
     /**
-     * Moment
-     */
-    static get moment() {
-        return WebpackModules.getModuleByName('Moment');
-    }
-
-    /**
      * Vue
      */
-    static get Vue() {
-        return Vue;
-    }
+    static get Vue() { return Vue }
+
+    static get request() { return request }
+
+    static get Combokeys() { return Combokeys }
+    static get filetype() { return filetype }
+    static get filewatcher() { return filewatcher }
+    static get VTooltip() { return VTooltip }
 
 }

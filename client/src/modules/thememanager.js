@@ -10,8 +10,6 @@
 
 import ContentManager from './contentmanager';
 import Theme from './theme';
-import { FileUtils } from 'common';
-import path from 'path';
 
 export default class ThemeManager extends ContentManager {
 
@@ -116,8 +114,7 @@ export default class ThemeManager extends ContentManager {
      * @return {Promise}
      */
     static async parseSetting(setting) {
-        const { type, id, value } = setting;
-        const name = id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
+        const name = setting.id.replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
         const scss = await setting.toSCSS();
 
         if (scss) return [name, scss];

@@ -31,8 +31,6 @@ let items = 0;
 
 export const BdMenuItems = new class {
     constructor() {
-        window.bdmenu = this;
-
         this.items = [];
 
         const updater = this.add({category: 'Updates', contentid: 'updater', text: 'Updates available!', hidden: true});

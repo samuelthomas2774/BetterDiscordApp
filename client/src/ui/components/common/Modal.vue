@@ -47,18 +47,6 @@
             return {
                 scrolled: false
             };
-        },
-        beforeMount() {
-            window.addEventListener('keyup', this.keyupListener);
-        },
-        destroyed() {
-            window.removeEventListener('keyup', this.keyupListener);
-        },
-        methods: {
-            keyupListener(e) {
-                if (e.which === 27)
-                    this.$emit('close', false, e);
-            }
         }
     }
 </script>

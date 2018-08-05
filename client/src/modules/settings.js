@@ -8,9 +8,10 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Toasts } from 'ui';
 import { EmoteModule } from 'builtin';
-import { SettingsSet, SettingUpdatedEvent } from 'structs';
-import { Utils, FileUtils, ClientLogger as Logger } from 'common';
+import { SettingsSet } from 'structs';
+import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import Globals from './globals';
 import CssEditor from './csseditor';
@@ -28,6 +29,7 @@ export default new class Settings {
                 Logger.log('Settings', [`${set.id}/${category.id}/${setting.id} was changed from`, old_value, 'to', value]);
                 Events.emit('setting-updated', event);
                 Events.emit(`setting-updated-${set.id}_${category.id}_${setting.id}`, event);
+                Toasts.success(`${set.id}/${category.id}/${setting.id} was changed from ${old_value} to ${value}`); // Just for debugging purposes remove in prod
             });
 
             set.on('settings-updated', async event => {
@@ -61,7 +63,7 @@ export default new class Settings {
 
             CssEditor.setState(scss, css, css_editor_files, scss_error);
             CssEditor.editor_bounds = css_editor_bounds || {};
-            EmoteModule.favourite_emotes = favourite_emotes;
+            EmoteModule.favourite_emotes = favourite_emotes || [];
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
@@ -94,7 +96,7 @@ export default new class Settings {
             }
         } catch (err) {
             // There was an error saving settings
-            Logger.err('Settings', err);
+            Logger.err('Settings', ['Failed to save internal settings', err]);
             throw err;
         }
     }

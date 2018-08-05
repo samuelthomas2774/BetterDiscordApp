@@ -1,6 +1,7 @@
 /**
  * BetterDiscord React Component Manipulations
- * original concept and some code by samogot - https://github.com/samogot / https://github.com/samogot/betterdiscord-plugins/tree/master/v2/1Lib%20Discord%20Internals
+ * Original concept and some code by samogot - https://github.com/samogot / https://github.com/samogot/betterdiscord-plugins/tree/master/v2/1Lib%20Discord%20Internals
+ *
  * Copyright (c) 2015-present JsSucks - https://github.com/JsSucks
  * All rights reserved.
  * https://github.com/JsSucks - https://betterdiscord.net
@@ -9,11 +10,10 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { EmoteModule } from 'builtin';
-import { Reflection } from 'ui';
-import { ClientLogger as Logger } from 'common';
-import { MonkeyPatch, Patcher } from './patcher';
-import { WebpackModules, Filters } from './webpackmodules';
+import { DOM, Reflection } from 'ui';
+import { Utils, Filters, ClientLogger as Logger } from 'common';
+import { MonkeyPatch } from './patcher';
+import { WebpackModules } from './webpackmodules';
 import DiscordApi from './discordapi';
 
 class Helpers {
@@ -166,22 +166,18 @@ class Helpers {
 export { Helpers as ReactHelpers };
 
 class ReactComponent {
-    constructor(id, component, retVal) {
-        this._id = id;
-        this._component = component;
-        this._retVal = retVal;
+    constructor(id, component, retVal, important) {
+        this.id = id;
+        this.component = component;
+        this.retVal = retVal;
+        this.important = important;
     }
 
-    get id() {
-        return this._id;
-    }
-
-    get component() {
-        return this._component;
-    }
-
-    get retVal() {
-        return this._retVal;
+    forceUpdateAll() {
+        if (!this.important || !this.important.selector) return;
+        for (let e of document.querySelectorAll(this.important.selector)) {
+            Reflection(e).forceUpdate(this);
+        }
     }
 }
 
@@ -191,60 +187,85 @@ export class ReactComponents {
     static get listeners() { return this._listeners || (this._listeners = []) }
     static get nameSetters() { return this._nameSetters || (this._nameSetters = []) }
 
-    static push(component, retVal) {
+    static get ReactComponent() { return ReactComponent }
+
+    static push(component, retVal, important) {
         if (!(component instanceof Function)) return null;
         const { displayName } = component;
         if (!displayName) {
             return this.processUnknown(component, retVal);
         }
+
         const have = this.components.find(comp => comp.id === displayName);
-        if (have) return component;
-        const c = new ReactComponent(displayName, component, retVal);
-        this.components.push(c);
-        const listener = this.listeners.find(listener => listener.id === displayName);
-        if (!listener) return c;
-        for (const l of listener.listeners) {
-            l(c);
+        if (have) {
+            if (!have.important) have.important = important;
+            return component;
         }
-        this.listeners.splice(this.listeners.findIndex(listener => listener.id === displayName), 1);
+
+        const c = new ReactComponent(displayName, component, retVal, important);
+        this.components.push(c);
+
+        const listener = this.listeners.find(listener => listener.id === displayName);
+        if (listener) {
+            for (const l of listener.listeners) l(c);
+            Utils.removeFromArray(this.listeners, listener);
+        }
+
         return c;
     }
 
-    static async getComponent(name, important) {
+    /**
+     * Finds a component from the components array or by waiting for it to be mounted.
+     * @param {String} name The component's name
+     * @param {Object} important An object containing a selector to look for
+     * @param {Function} filter A function to filter components if a single element is rendered by multiple components
+     * @return {Promise => ReactComponent}
+     */
+    static async getComponent(name, important, filter) {
         const have = this.components.find(c => c.id === name);
         if (have) return have;
+
         if (important) {
-            const importantInterval = setInterval(() => {
+            const callback = () => {
                 if (this.components.find(c => c.id === name)) {
                     Logger.info('ReactComponents', `Important component ${name} already found`);
-                    clearInterval(importantInterval);
+                    DOM.observer.unsubscribe(observerSubscription);
                     return;
                 }
-                const select = document.querySelector(important.selector);
-                if (!select) return;
-                const reflect = Reflection(select);
-                if (!reflect.component) {
-                    clearInterval(importantInterval);
-                    Logger.error('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, select]);
+
+                const element = document.querySelector(important.selector);
+                if (!element) return;
+
+                DOM.observer.unsubscribe(observerSubscription);
+                const reflect = Reflection(element);
+                const component = filter ? reflect.components.find(filter) : reflect.component;
+                if (!component) {
+                    Logger.err('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, element]);
                     return;
                 }
-                if (!reflect.component.displayName) reflect.component.displayName = name;
+
+                if (!component.displayName) component.displayName = name;
                 Logger.info('ReactComponents', [`Found important component ${name} with reflection`, reflect]);
-                this.push(reflect.component);
-                clearInterval(importantInterval);
-            }, 50);
+                important.filter = filter;
+                this.push(component, undefined, important);
+            };
+
+            const observerSubscription = DOM.observer.subscribeToQuerySelector(callback, important.selector);
+            setTimeout(callback, 0);
         }
-        const listener = this.listeners.find(l => l.id === name);
-        if (!listener) this.listeners.push({
+
+        let listener = this.listeners.find(l => l.id === name);
+        if (!listener) this.listeners.push(listener = {
             id: name,
             listeners: []
         });
+
         return new Promise(resolve => {
-            this.listeners.find(l => l.id === name).listeners.push(resolve);
+            listener.listeners.push(resolve);
         });
     }
 
-    static setName(name, filter, callback) {
+    static setName(name, filter) {
         const have = this.components.find(c => c.id === name);
         if (have) return have;
 
@@ -262,7 +283,7 @@ export class ReactComponents {
         const have = this.unknownComponents.find(c => c.component === component);
         for (const [fi, filter] of this.nameSetters.entries()) {
             if (filter.filter.filter(component)) {
-                console.log('filter match!');
+                Logger.log('ReactComponents', 'Filter match!');
                 component.displayName = filter.name;
                 this.nameSetters.splice(fi, 1);
                 return this.push(component, retVal);
@@ -275,36 +296,42 @@ export class ReactComponents {
 }
 
 export class ReactAutoPatcher {
+    /**
+     * Wait for React to be loaded and patch it's createElement to store all unknown components.
+     * Also patches of some known components.
+     */
     static async autoPatch() {
-        await this.ensureReact();
-        this.React = {};
-        this.React.unpatchCreateElement = MonkeyPatch('BD:ReactComponents:createElement', 'React').before('createElement', (component, args) => {
-            ReactComponents.push(args[0]);
-        });
+        const React = await WebpackModules.waitForModuleByName('React');
+
+        this.unpatchCreateElement = MonkeyPatch('BD:ReactComponents:createElement', React).before('createElement', (component, args) => ReactComponents.push(args[0]));
+
         this.patchComponents();
-        return 1;
     }
 
-    static async ensureReact() {
-        while (!window.webpackJsonp || !WebpackModules.getModuleByName('React')) await new Promise(resolve => setTimeout(resolve, 10));
-        return 1;
-    }
-
-    static async patchComponents() {
-        await this.patchMessage();
-        await this.patchMessageGroup();
-        await this.patchChannelMember();
-        await this.patchGuild();
-        await this.patchChannel();
-        await this.patchChannelList();
-        this.forceUpdate();
+    /**
+     * Patches a few known components.
+     */
+    static patchComponents() {
+        return Promise.all([
+            this.patchMessage(),
+            this.patchMessageGroup(),
+            this.patchChannelMember(),
+            this.patchGuild(),
+            this.patchChannel(),
+            this.patchChannelList(),
+            this.patchUserProfileModal(),
+            this.patchUserPopout()
+        ]);
     }
 
     static async patchMessage() {
-        this.Message = await ReactComponents.getComponent('Message', { selector: '.message' });
+        const selector = '.' + WebpackModules.getClassName('message', 'messageCozy', 'messageCompact');
+        this.Message = await ReactComponents.getComponent('Message', {selector}, m => m.prototype && m.prototype.renderCozy);
+
         this.unpatchMessageRender = MonkeyPatch('BD:ReactComponents', this.Message.component.prototype).after('render', (component, args, retVal) => {
-            const { message } = component.props;
+            const { message, jumpSequenceId, canFlash } = component.props;
             const { id, colorString, bot, author, attachments, embeds } = message;
+            if (jumpSequenceId && canFlash) retVal = retVal.props.children;
             retVal.props['data-message-id'] = id;
             retVal.props['data-colourstring'] = colorString;
             if (author && author.id) retVal.props['data-user-id'] = author.id;
@@ -312,63 +339,128 @@ export class ReactAutoPatcher {
             if (attachments && attachments.length) retVal.props.className += ' bd-hasAttachments';
             if (embeds && embeds.length) retVal.props.className += ' bd-hasEmbeds';
             if (author && author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+
+            const dapiMessage = DiscordApi.Message.from(message);
+            if (dapiMessage.guild && author.id === dapiMessage.guild.ownerId) retVal.props.className += ' bd-isGuildOwner';
+            if (dapiMessage.guild && dapiMessage.guild.isMember(author.id)) retVal.props.className += ' bd-isGuildMember';
         });
+
+        this.Message.forceUpdateAll();
     }
 
     static async patchMessageGroup() {
-        this.MessageGroup = await ReactComponents.getComponent('MessageGroup', { selector: '.message-group' });
+        const selector = '.' + WebpackModules.getClassName('container', 'message', 'messageCozy');
+        this.MessageGroup = await ReactComponents.getComponent('MessageGroup', {selector});
+
         this.unpatchMessageGroupRender = MonkeyPatch('BD:ReactComponents', this.MessageGroup.component.prototype).after('render', (component, args, retVal) => {
             const { author, type } = component.props.messages[0];
             retVal.props['data-author-id'] = author.id;
             if (author.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
             if (type !== 0) retVal.props.className += ' bd-isSystemMessage';
+
+            const dapiMessage = DiscordApi.Message.from(component.props.messages[0]);
+            if (dapiMessage.guild && author.id === dapiMessage.guild.ownerId) retVal.props.className += ' bd-isGuildOwner';
+            if (dapiMessage.guild && dapiMessage.guild.isMember(author.id)) retVal.props.className += ' bd-isGuildMember';
         });
+
+        this.MessageGroup.forceUpdateAll();
     }
 
     static async patchChannelMember() {
-        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', { selector: '.member-2FrNV0' });
+        const selector = '.' + WebpackModules.getClassName('member', 'memberInner', 'activity');
+        this.ChannelMember = await ReactComponents.getComponent('ChannelMember', {selector}, m => m.prototype.renderActivity);
+
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
-            // Logger.log('ReactComponents', ['Rendering ChannelMember', component, args, retVal]);
             if (!retVal.props || !retVal.props.children) return;
             const user = Helpers.findProp(component, 'user');
             if (!user) return;
             retVal.props['data-user-id'] = user.id;
+            retVal.props['data-colourstring'] = component.props.colorString;
+            if (component.props.isOwner) retVal.props.className += ' bd-isGuildOwner';
         });
+
+        this.ChannelMember.forceUpdateAll();
     }
 
     static async patchGuild() {
-        this.Guild = await ReactComponents.getComponent('Guild');
+        const selector = `div.${WebpackModules.getClassName('guild', 'guildsWrapper')}:not(:first-child)`;
+        this.Guild = await ReactComponents.getComponent('Guild', {selector}, m => m.prototype.renderBadge);
+
         this.unpatchGuild = MonkeyPatch('BD:ReactComponents', this.Guild.component.prototype).after('render', (component, args, retVal) => {
             const { guild } = component.props;
             if (!guild) return;
             retVal.props['data-guild-id'] = guild.id;
             retVal.props['data-guild-name'] = guild.name;
         });
+
+        this.Guild.forceUpdateAll();
     }
 
     static async patchChannel() {
-        this.Channel = await ReactComponents.getComponent('Channel');
+        const selector = '.chat';
+        this.Channel = await ReactComponents.getComponent('Channel', {selector});
+
         this.unpatchChannel = MonkeyPatch('BD:ReactComponents', this.Channel.component.prototype).after('render', (component, args, retVal) => {
             const channel = component.props.channel || component.state.channel;
             if (!channel) return;
             retVal.props['data-channel-id'] = channel.id;
             retVal.props['data-channel-name'] = channel.name;
+            if ([0, 2, 4].includes(channel.type)) retVal.props.className += ' bd-isGuildChannel';
+            if ([1, 3].includes(channel.type)) retVal.props.className += ' bd-isPrivateChannel';
+            if (channel.type === 3) retVal.props.className += ' bd-isGroupChannel';
         });
+
+        this.Channel.forceUpdateAll();
     }
 
     static async patchChannelList() {
-        this.GuildChannel = await ReactComponents.getComponent('GuildChannel', { selector: '.containerDefault-7RImuF' });
+        const selector = '.' + WebpackModules.getClassName('containerDefault', 'actionIcon');
+        this.GuildChannel = await ReactComponents.getComponent('GuildChannel', {selector});
+
         this.unpatchGuildChannel = MonkeyPatch('BD:ReactComponents', this.GuildChannel.component.prototype).after('render', (component, args, retVal) => {
             const { channel } = component.props;
             if (!channel) return;
             retVal.props['data-channel-id'] = channel.id;
             retVal.props['data-channel-name'] = channel.name;
+            if ([0, 2, 4].includes(channel.type)) retVal.props.className += ' bd-isGuildChannel';
+            if ([1, 3].includes(channel.type)) retVal.props.className += ' bd-isPrivateChannel';
+            if (channel.type === 3) retVal.props.className += ' bd-isGroupChannel';
         });
+
+        this.GuildChannel.forceUpdateAll();
     }
 
-    static forceUpdate() {
-        for (const e of document.querySelectorAll('.message, .message-group, .guild, .containerDefault-7RImuF, .channel-members .member-2FrNV0')) {
-            Reflection(e).forceUpdate();
-        }
+    static async patchUserProfileModal() {
+        const selector = '.' + WebpackModules.getClassName('root', 'topSectionNormal');
+        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', {selector}, Filters.byPrototypeFields(['renderHeader', 'renderBadges']));
+
+        this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
+            const { user } = component.props;
+            if (!user) return;
+            retVal.props['data-user-id'] = user.id;
+            if (user.bot) retVal.props.className += ' bd-isBot';
+            if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+        });
+
+        this.UserProfileModal.forceUpdateAll();
+    }
+
+    static async patchUserPopout() {
+        const selector = '.' + WebpackModules.getClassName('userPopout', 'headerNormal');
+        this.UserPopout = await ReactComponents.getComponent('UserPopout', {selector});
+
+        this.unpatchUserPopout = MonkeyPatch('BD:ReactComponents', this.UserPopout.component.prototype).after('render', (component, args, retVal) => {
+            const { user, guild, guildMember } = component.props;
+            if (!user) return;
+            retVal.props['data-user-id'] = user.id;
+            if (user.bot) retVal.props.className += ' bd-isBot';
+            if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+            if (guild) retVal.props['data-guild-id'] = guild.id;
+            if (guild && user.id === guild.ownerId) retVal.props.className += ' bd-isGuildOwner';
+            if (guild && guildMember) retVal.props.className += ' bd-isGuildMember';
+            if (guildMember && guildMember.roles.length) retVal.props.className += ' bd-hasRoles';
+        });
+
+        this.UserPopout.forceUpdateAll();
     }
 }

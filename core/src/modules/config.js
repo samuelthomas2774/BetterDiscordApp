@@ -8,9 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const { Module } = require('./modulebase');
+import Module from './modulebase';
 
-class Config extends Module {
+export default class Config extends Module {
 
     get version() {
         return this.args.version;
@@ -33,5 +33,3 @@ class Config extends Module {
     }
 
 }
-
-module.exports = { Config };

@@ -8,7 +8,6 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import path from 'path';
 import fs from 'fs';
 import _ from 'lodash';
 import filetype from 'file-type';
@@ -87,16 +86,19 @@ export class Utils {
     /**
      * Clones an object and all it's properties.
      * @param {Any} value The value to clone
+     * @param {Function} exclude A function to filter objects that shouldn't be cloned
      * @return {Any} The cloned value
      */
-    static deepclone(value) {
+    static deepclone(value, exclude) {
+        if (exclude && exclude(value)) return value;
+
         if (typeof value === 'object') {
-            if (value instanceof Array) return value.map(i => this.deepclone(i));
+            if (value instanceof Array) return value.map(i => this.deepclone(i, exclude));
 
             const clone = Object.assign({}, value);
 
             for (let key in clone) {
-                clone[key] = this.deepclone(clone[key]);
+                clone[key] = this.deepclone(clone[key], exclude);
             }
 
             return clone;
@@ -108,7 +110,7 @@ export class Utils {
     /**
      * Freezes an object and all it's properties.
      * @param {Any} object The object to freeze
-     * @param {Function} exclude A function to filter object that shouldn't be frozen
+     * @param {Function} exclude A function to filter objects that shouldn't be frozen
      */
     static deepfreeze(object, exclude) {
         if (exclude && exclude(object)) return;
@@ -178,26 +180,35 @@ export class Utils {
 
 export class FileUtils {
     /**
-     * Checks if a file exists and is a file.
+     * Gets information about a file.
      * @param {String} path The file's path
      * @return {Promise}
      */
-    static async fileExists(path) {
+    static async stat(path) {
         return new Promise((resolve, reject) => {
-            fs.stat(path, (err, stats) => {
+            fs.stat(path, (err, stat) => {
                 if (err) return reject({
                     message: `No such file or directory: ${err.path}`,
                     err
                 });
 
-                if (!stats.isFile()) return reject({
-                    message: `Not a file: ${path}`,
-                    stats
-                });
-
-                resolve();
+                resolve(stat);
             });
         });
+    }
+
+    /**
+     * Checks if a file exists and is a file.
+     * @param {String} path The file's path
+     * @return {Promise}
+     */
+    static async fileExists(path) {
+        const stats = await this.stat(path);
+
+        if (!stats.isFile()) throw {
+            message: `Not a file: ${path}`,
+            stats
+        };
     }
 
     /**
@@ -206,21 +217,12 @@ export class FileUtils {
      * @return {Promise}
      */
     static async directoryExists(path) {
-        return new Promise((resolve, reject) => {
-            fs.stat(path, (err, stats) => {
-                if (err) return reject({
-                    message: `Directory does not exist: ${path}`,
-                    err
-                });
+        const stats = await this.stat(path);
 
-                if (!stats.isDirectory()) return reject({
-                    message: `Not a directory: ${path}`,
-                    stats
-                });
-
-                resolve();
-            });
-        });
+        if (!stats.isDirectory()) throw {
+            message: `Not a directory: ${path}`,
+            stats
+        };
     }
 
     /**
@@ -247,12 +249,8 @@ export class FileUtils {
             await this.directoryExists(path);
             return true;
         } catch (err) {
-            try {
-                await this.createDirectory(path);
-                return true;
-            } catch (err) {
-                throw err;
-            }
+            await this.createDirectory(path);
+            return true;
         }
     }
 
@@ -262,11 +260,7 @@ export class FileUtils {
      * @return {Promise}
      */
     static async readFile(path) {
-        try {
-            await this.fileExists(path);
-        } catch (err) {
-            throw err;
-        }
+        await this.fileExists(path);
 
         return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf-8', (err, data) => {
@@ -287,11 +281,7 @@ export class FileUtils {
      * @return {Promise}
      */
     static async readFileBuffer(path, options) {
-        try {
-            await this.fileExists(path);
-        } catch (err) {
-            throw err;
-        }
+        await this.fileExists(path);
 
         return new Promise((resolve, reject) => {
             fs.readFile(path, options || {}, (err, data) => {
@@ -337,12 +327,7 @@ export class FileUtils {
      * @return {Promise}
      */
     static async readJsonFromFile(path) {
-        let readFile;
-        try {
-            readFile = await this.readFile(path);
-        } catch (err) {
-            throw (err);
-        }
+        const readFile = await this.readFile(path);
 
         try {
             return await Utils.tryParseJson(readFile);
@@ -355,10 +340,11 @@ export class FileUtils {
      * Writes to a file as JSON.
      * @param {String} path The file's path
      * @param {Any} data The file's new contents
+     * @param {Boolean} pretty Whether to pretty print the JSON object
      * @return {Promise}
      */
-    static async writeJsonToFile(path, json) {
-        return this.writeFile(path, JSON.stringify(json));
+    static async writeJsonToFile(path, json, pretty) {
+        return this.writeFile(path, JSON.stringify(json, null, pretty ? 4 : 0) + '\n');
     }
 
     /**
@@ -368,6 +354,7 @@ export class FileUtils {
      */
     static async listDirectory(path) {
         await this.directoryExists(path);
+
         return new Promise((resolve, reject) => {
             fs.readdir(path, (err, files) => {
                 if (err) reject(err);

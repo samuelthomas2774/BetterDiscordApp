@@ -27,10 +27,11 @@
 </template>
 
 <script>
-    import { PluginManager } from 'modules';
+    import { Globals, PluginManager } from 'modules';
     import SettingsPanel from '../SettingsPanel.vue';
     import Drawer from '../../common/Drawer.vue';
     import Button from '../../common/Button.vue';
+    import * as InternalSettings from '../internal-settings';
     import path from 'path';
 
     export default {
@@ -41,12 +42,12 @@
         },
         computed: {
             component() {
-                if (typeof this.setting.file === 'string') {
-                    const component = window.require(path.join(this.setting.path, this.setting.file));
+                if (this.setting.path && typeof this.setting.file === 'string') {
+                    const component = Globals.require(path.join(this.setting.path, this.setting.file));
                     return this.setting.component ? component[this.setting.component] : component.default ? component.default : component;
                 }
 
-                if (typeof this.setting.function === 'string') {
+                if (this.setting.path && typeof this.setting.function === 'string') {
                     const plugin = PluginManager.getPluginByPath(this.setting.path);
                     if (!plugin) return;
                     const component = plugin[this.setting.function](this.setting, this.change);
@@ -55,15 +56,17 @@
                     return component;
                 }
 
-                if (typeof this.setting.component === 'string') {
+                if (this.setting.path && typeof this.setting.component === 'string') {
                     const plugin = PluginManager.getPluginByPath(this.setting.path);
-                    if (!plugin) return;
-                    const component = plugin[this.setting.component];
-                    return component;
+                    if (plugin && plugin[this.setting.component]) return plugin[this.setting.component];
                 }
 
                 if (typeof this.setting.component === 'object') {
                     return this.setting.component;
+                }
+
+                if (typeof this.setting.component === 'string' && InternalSettings[this.setting.component]) {
+                    return InternalSettings[this.setting.component];
                 }
             }
         },

@@ -8,11 +8,12 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
-import { DOM, VueInjector, Reflection } from 'ui';
+import { Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
+import { VueInjector, Reflection } from 'ui';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
 import EmoteComponent from './EmoteComponent.vue';
+import Autocomplete from '../ui/components/common/Autocomplete.vue';
 
 const enforceWrapperFrom = (new Date('2018-05-01')).valueOf();
 
@@ -24,26 +25,34 @@ export default new class EmoteModule {
     }
 
     async init() {
+        const dataPath = Globals.getPath('data');
+
         this.enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
-        this.enabledSetting.on('setting-updated', event => {
+        this.enabledSetting.on('setting-updated', async event => {
+            // Load emotes if we haven't already
+            if (event.value && !this.emotes.size) await this.load(path.join(dataPath, 'emotes.json'));
+
             // Rerender all messages (or if we're disabling emotes, those that have emotes)
-            for (const message of document.querySelectorAll(event.value ? '.message' : '.bd-emote-outer')) {
+            for (const message of document.querySelectorAll(event.value ? '.message' : '.bd-emotewrapper')) {
                 Reflection(event.value ? message : message.closest('.message')).forceUpdate();
             }
         });
 
-        const dataPath = Globals.getPath('data');
         try {
-            await this.load(path.join(dataPath, 'emotes.json'));
+            if (this.enabledSetting.value) await this.load(path.join(dataPath, 'emotes.json'));
+            else Logger.info('EmoteModule', ['Not loading emotes as they\'re disabled.']);
         } catch (err) {
             Logger.err('EmoteModule', [`Failed to load emote data. Make sure you've downloaded the emote data and placed it in ${dataPath}:`, err]);
             return;
         }
 
         try {
-            await this.observe();
+            await Promise.all([
+                this.patchMessageContent(),
+                this.patchChannelTextArea()
+            ]);
         } catch (err) {
-            Logger.err('EmoteModule', ['Error patching Message', err]);
+            Logger.err('EmoteModule', ['Error patching Message / ChannelTextArea', err]);
         }
     }
 
@@ -54,8 +63,12 @@ export default new class EmoteModule {
             if ((index % 10000) === 0)
                 await Utils.wait();
 
-            const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x' : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1' : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
-            emote.name = emote.id;
+            const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x'
+                : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1'
+                    : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
+
+            // emote.id is the emote's name
+            // emote.src is the emote's URL
             emote.src = uri.replace(':id', emote.value.id || emote.value);
             this.emotes.set(emote.id, emote);
         }
@@ -92,17 +105,7 @@ export default new class EmoteModule {
         return this._searchCache || (this._searchCache = {});
     }
 
-    get React() {
-        return WebpackModules.getModuleByName('React');
-    }
-
-    get ReactDOM() {
-        return WebpackModules.getModuleByName('ReactDOM');
-    }
-
     processMarkup(markup, timestamp) {
-        if (!this.enabledSetting.value) return markup;
-
         timestamp = timestamp.valueOf();
         const allowNoWrapper = timestamp < enforceWrapperFrom;
 
@@ -126,12 +129,13 @@ export default new class EmoteModule {
                         newMarkup.push(text);
                         text = null;
                     }
-                    newMarkup.push(this.React.createElement('span', {
-                        className: 'bd-emote-outer',
-                        'data-bdemote-name': emote.name,
-                        'data-bdemote-src': emote.src,
-                        'data-has-wrapper': /;[\w]+;/gmi.test(word)
+
+                    newMarkup.push(VueInjector.createReactElement(EmoteComponent, {
+                        src: emote.src,
+                        name: emote.id,
+                        hasWrapper: /;[\w]+;/gmi.test(word)
                     }));
+
                     continue;
                 }
                 if (text === null) {
@@ -151,16 +155,6 @@ export default new class EmoteModule {
         return !/;[\w]+;/gmi.test(word);
     }
 
-    injectAll() {
-        if (!this.enabledSetting.value) return;
-
-        const all = document.getElementsByClassName('bd-emote-outer');
-        for (const ec of all) {
-            if (ec.children.length) continue;
-            this.injectEmote(ec);
-        }
-    }
-
     findByProp(obj, what, value) {
         if (obj.hasOwnProperty(what) && obj[what] === value) return obj;
         if (obj.props && !obj.children) return this.findByProp(obj.props, what, value);
@@ -171,56 +165,6 @@ export default new class EmoteModule {
             if (findInChild) return findInChild;
         }
         return null;
-    }
-
-    async observe() {
-        const Message = await ReactComponents.getComponent('Message');
-        this.unpatchRender = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('render', (component, args, retVal) => {
-            try {
-                // First child has all the actual text content, second is the edited timestamp
-                const markup = this.findByProp(retVal, 'className', 'markup');
-                if (!markup) return;
-                markup.children[0] = this.processMarkup(markup.children[0], component.props.message.editedTimestamp || component.props.message.timestamp);
-            } catch (err) {
-                Logger.err('EmoteModule', err);
-            }
-        });
-        for (const message of document.querySelectorAll('.message')) {
-            Reflection(message).forceUpdate();
-        }
-        this.injectAll();
-        this.unpatchMount = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidMount', component => {
-            const element = this.ReactDOM.findDOMNode(component);
-            if (!element) return;
-            this.injectEmotes(element);
-        });
-        this.unpatchUpdate = MonkeyPatch('BD:EmoteModule', Message.component.prototype).after('componentDidUpdate', component => {
-            const element = this.ReactDOM.findDOMNode(component);
-            if (!element) return;
-            this.injectEmotes(element);
-        });
-    }
-
-    injectEmote(root) {
-        if (!this.enabledSetting.value) return;
-
-        while (root.firstChild) {
-            root.removeChild(root.firstChild);
-        }
-        const { bdemoteName, bdemoteSrc, hasWrapper } = root.dataset;
-        if (!bdemoteName || !bdemoteSrc) return;
-        VueInjector.inject(root, {
-            components: { EmoteComponent },
-            data: { src: bdemoteSrc, name: bdemoteName, hasWrapper },
-            template: '<EmoteComponent :src="src" :name="name" :hasWrapper="hasWrapper" />'
-        }, DOM.createElement('span'));
-        root.classList.add('bd-is-emote');
-    }
-
-    injectEmotes(element) {
-        if (!this.enabledSetting.value || !element) return;
-
-        for (const beo of element.getElementsByClassName('bd-emote-outer')) this.injectEmote(beo);
     }
 
     getEmote(word) {
@@ -248,6 +192,37 @@ export default new class EmoteModule {
         }
 
         return matching;
+    }
+
+    async patchMessageContent() {
+        const selector = '.' + WebpackModules.getClassName('container', 'containerCozy', 'containerCompact', 'edited');
+        const MessageContent = await ReactComponents.getComponent('MessageContent', {selector});
+
+        this.unpatchRender = MonkeyPatch('BD:EmoteModule', MessageContent.component.prototype).after('render', (component, args, retVal) => {
+            try {
+                // First child has all the actual text content, second is the edited timestamp
+                const markup = retVal.props.children[1].props;
+                if (!markup || !markup.children || !this.enabledSetting.value) return;
+                markup.children[1] = this.processMarkup(markup.children[1], component.props.message.editedTimestamp || component.props.message.timestamp);
+            } catch (err) {
+                Logger.err('EmoteModule', err);
+            }
+        });
+
+        MessageContent.forceUpdateAll();
+    }
+
+    async patchChannelTextArea() {
+        const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
+        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', {selector});
+
+        this.unpatchChannelTextArea = MonkeyPatch('BD:EmoteModule', ChannelTextArea.component.prototype).after('render', (component, args, retVal) => {
+            if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
+
+            retVal.props.children.splice(0, 0, VueInjector.createReactElement(Autocomplete, {}, true));
+        });
+
+        ChannelTextArea.forceUpdateAll();
     }
 
 }

@@ -65,6 +65,18 @@
                         "value": false
                     }
                 ]
+            },
+            {
+                "id": "window-preferences",
+                "name": "Window Preferences",
+                "type": "drawer",
+                "settings": [
+                    {
+                        "id": "window-preferences",
+                        "type": "custom",
+                        "component": "WindowPreferences"
+                    }
+                ]
             }
         ]
     },

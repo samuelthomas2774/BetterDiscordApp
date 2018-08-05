@@ -23,6 +23,7 @@
     // Imports
     import { Events, Settings } from 'modules';
     import { Modals } from 'ui';
+    import process from 'process';
     import BdSettings from './BdSettings.vue';
 
     export default {
@@ -33,7 +34,9 @@
                 active: false,
                 animating: false,
                 timeout: null,
-                platform: global.process.platform
+                platform: process.platform,
+                eventHandlers: {},
+                keybindHandler: null
             };
         },
         components: {
@@ -65,21 +68,29 @@
             }
         },
         created() {
-            Events.on('ready', e => this.loaded = true);
-            Events.on('bd-open-menu', item => this.active = true);
-            Events.on('bd-close-menu', () => this.active = false);
-            Events.on('update-check-start', e => this.updating = 0);
-            Events.on('update-check-end', e => this.updating = 1);
-            Events.on('updates-available', e => this.updating = 2);
+            Events.on('ready', this.eventHandlers.ready = e => this.loaded = true);
+            Events.on('bd-open-menu', this.eventHandlers['bd-open-menu'] = item => this.active = true);
+            Events.on('bd-close-menu', this.eventHandlers['bd-close-menu'] = () => this.active = false);
+            Events.on('update-check-start', this.eventHandlers['update-check-start'] = e => this.updating = 0);
+            Events.on('update-check-end', this.eventHandlers['update-check-end'] = e => this.updating = 1);
+            Events.on('updates-available', this.eventHandlers['updates-available'] = e => this.updating = 2);
+
             window.addEventListener('keyup', this.keyupListener);
             window.addEventListener('keydown', this.prevent, true);
 
             const menuKeybind = Settings.getSetting('core', 'default', 'menu-keybind');
-            menuKeybind.on('keybind-activated', () => this.active = !this.active);
+            menuKeybind.on('keybind-activated', this.keybindHandler = () => this.active = !this.active);
         },
         destroyed() {
+            for (let event in this.eventHandlers) Events.off(event, this.eventHandlers[event]);
+
             window.removeEventListener('keyup', this.keyupListener);
             window.removeEventListener('keydown', this.prevent);
+
+            if (this.keybindHandler) {
+                const menuKeybind = Settings.getSetting('core', 'default', 'menu-keybind');
+                menuKeybind.removeListener('keybind-activated', this.keybindHandler = () => this.active = !this.active);
+            }
         }
     }
 </script>

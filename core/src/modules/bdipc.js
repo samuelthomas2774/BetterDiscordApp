@@ -8,16 +8,15 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const { ipcMain } = require('electron');
-
-const { Module } = require('./modulebase');
+import { ipcMain } from 'electron';
+import Module from './modulebase';
 
 const callbacks = new WeakMap();
 
 /**
  * The IPC module used in the main process.
  */
-class BDIpc {
+export default class BDIpc {
 
     /**
      * Adds an IPC event listener.
@@ -76,7 +75,7 @@ class BDIpc {
 
 }
 
-class BDIpcEvent extends Module {
+export class BDIpcEvent extends Module {
 
     constructor(event, args) {
         super(args);
@@ -117,5 +116,3 @@ class BDIpcEvent extends Module {
     }
 
 }
-
-module.exports = { BDIpc };

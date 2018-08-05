@@ -8,7 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { ClientLogger as Logger } from 'common';
+import { Filters, ClientLogger as Logger } from 'common';
+import { ReactComponents } from 'modules';
 
 class Reflection {
     static reactInternalInstance(node) {
@@ -84,71 +85,134 @@ class Reflection {
     }
 
     static getState(node) {
-        try {
-            return this.reactInternalInstance(node).return.stateNode.state;
-        } catch (err) {
-            return null;
-        }
+        const stateNode = this.getStateNode(node);
+        if (stateNode) return stateNode.state;
     }
 
     static getStateNode(node) {
-        try {
-            return this.reactInternalInstance(node).return.stateNode;
-        } catch (err) {
-            return null;
+        return this.getStateNodes(node)[0];
+    }
+
+    static getStateNodes(node) {
+        const instance = this.reactInternalInstance(node);
+        const stateNodes = [];
+        let lastInstance = instance;
+
+        do {
+            if (lastInstance.return.stateNode instanceof HTMLElement) break;
+            if (lastInstance.return.stateNode) stateNodes.push(lastInstance.return.stateNode);
+            lastInstance = lastInstance.return;
+        } while (lastInstance.return);
+
+        return stateNodes;
+    }
+
+    static getComponentStateNode(node, component) {
+        if (component instanceof ReactComponents.ReactComponent) component = component.component;
+
+        for (let stateNode of this.getStateNodes(node)) {
+            if (stateNode instanceof component) return stateNode;
         }
     }
 
-    static getComponent(node, first = true) {
-        // IMPORTANT TODO Currently only checks the first found component. For example channel-member will not return the correct component
-        try {
-            return this.reactInternalInstance(node).return.type;
-        } catch (err) {
-            return null;
-        }
-        /*
-        if (!node) return null;
-        if (first) node = this.reactInternalInstance(node);
-        if (node.hasOwnProperty('return')) {
-            if (node.return.hasOwnProperty('return') && !node.return.type) return node.type;
-            return this.getComponent(node.return, false);
-        }
-        if (node.hasOwnProperty('type')) return node.type;
-        return null;
-        */
+    static findStateNode(node, filter, first = true) {
+        return this.getStateNodes(node)[first ? 'find' : 'filter'](filter);
+    }
+
+    static getComponent(node) {
+        return this.getComponents(node)[0];
+    }
+
+    static getComponents(node) {
+        const instance = this.reactInternalInstance(node);
+        const components = [];
+        let lastInstance = instance;
+
+        do {
+            if (typeof lastInstance.return.type === 'string') break;
+            if (lastInstance.return.type) components.push(lastInstance.return.type);
+            lastInstance = lastInstance.return;
+        } while (lastInstance.return);
+
+        return components;
+    }
+
+    static findComponent(node, filter, first = true) {
+        return this.getComponents(node)[first ? 'find' : 'filter'](filter);
     }
 }
 
+const propsProxyHandler = {
+    get(node, prop) {
+        return Reflection.findProp(node, prop);
+    }
+};
+
 export default function (node) {
-    return new class {
+    return new class ReflectionInstance {
         constructor(node) {
-            if ('string' === typeof node) node = document.querySelector(node);
-            this.node = this.el = this.element = node;
+            if (typeof node === 'string') node = document.querySelector(node);
+            this.node = /* this.el = this.element = */ node;
         }
+
+        get el() { return this.node }
+        get element() { return this.node }
+
+        get reactInternalInstance() {
+            return Reflection.reactInternalInstance(this.node);
+        }
+
         get props() {
-            return 'not yet implemented';
+            return new Proxy(this.node, propsProxyHandler);
         }
         get state() {
             return Reflection.getState(this.node);
         }
+
         get stateNode() {
             return Reflection.getStateNode(this.node);
         }
-        get reactInternalInstance() {
-            return Reflection.reactInternalInstance(this.node);
+        get stateNodes() {
+            return Reflection.getStateNodes(this.node);
         }
+        getComponentStateNode(component) {
+            return Reflection.getComponentStateNode(this.node, component);
+        }
+        findStateNode(filter) {
+            if (typeof filter === 'function') return Reflection.findStateNode(this.node, filter);
+            if (filter) return Reflection.getComponentStateNode(this.node, filter);
+            return Reflection.getStateNode(this.node);
+        }
+
         get component() {
             return Reflection.getComponent(this.node);
         }
-        forceUpdate() {
+        get components() {
+            return Reflection.getComponents(this.node);
+        }
+        getComponentByProps(props, selector) {
+            return Reflection.findComponent(this.node, Filters.byProperties(props, selector));
+        }
+        getComponentByPrototypes(props, selector) {
+            return Reflection.findComponent(this.node, Filters.byPrototypeFields(props, selector));
+        }
+        getComponentByRegex(regex, selector) {
+            return Reflection.findComponent(this.node, Filters.byCode(regex, selector));
+        }
+        getComponentByDisplayName(name) {
+            return Reflection.findComponent(this.node, Filters.byDisplayName(name));
+        }
+
+        forceUpdate(filter) {
             try {
-                const stateNode = Reflection.getStateNode(this.node);
+                const stateNode = this.findStateNode(filter);
                 if (!stateNode || !stateNode.forceUpdate) return;
                 stateNode.forceUpdate();
             } catch (err) {
                 Logger.err('Reflection', err);
             }
         }
+
         prop(propName) {
             const split = propName.split('.');
             const first = Reflection.findProp(this.node, split[0]);

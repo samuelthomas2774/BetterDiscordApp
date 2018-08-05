@@ -10,9 +10,8 @@
 
 import { Module, ReactComponents, ReactHelpers, MonkeyPatch, WebpackModules } from 'modules';
 import { Reflection } from 'ui';
-import { Utils, ClientLogger as Logger } from 'common';
-import DOM from './dom';
-import { BdBadge, BdMessageBadge } from './components/bd';
+import { ClientLogger as Logger } from 'common';
+import { BdBadge } from './components/bd';
 import VueInjector from './vueinjector';
 import contributors from '../data/contributors';
 
@@ -22,7 +21,7 @@ export default class extends Module {
         this.patchMessage();
         this.patchChannelMember();
         this.patchNameTag();
-        this.patchUserProfileModals();
+        this.patchUserProfileModal();
     }
 
     get contributors() {
@@ -30,45 +29,32 @@ export default class extends Module {
     }
 
     /**
-     * Patches Message to use the extended NameTag.
-     * This is because NameTag is also used in places we don't really want any badges.
+     * Patches Message to render profile badges.
      */
     async patchMessage() {
         const Message = await ReactComponents.getComponent('Message');
 
         this.unpatchMessageRender = MonkeyPatch('ProfileBadges', Message.component.prototype).after('render', (component, args, retVal) => {
             if (!retVal.props || !retVal.props.children) return;
+            if (ReactHelpers.findProp(component, 'jumpSequenceId') && ReactHelpers.findProp(component, 'canFlash')) retVal = retVal.props.children;
 
             const message = ReactHelpers.findProp(component, 'message');
             if (!message || !message.author) return;
             const user = message.author;
-            const c = contributors.find(c => c.id === user.id);
-            if (!c) return;
+            const contributor = contributors.find(c => c.id === user.id);
+            if (!contributor) return;
 
             const username = ReactHelpers.findByProp(retVal, 'type', 'h2');
             if (!username) return;
-            username.props.children.splice(1, 0, ReactHelpers.React.createElement('span', {
-                className: 'bd-badge-outer',
-                'data-userid': user.id
+
+            username.props.children.splice(1, 0, VueInjector.createReactElement(BdBadge, {
+                contributor,
+                type: 'nametag'
             }));
         });
 
-        this.unpatchMessageMount = MonkeyPatch('ProfileBadges', Message.component.prototype).after('componentDidMount', component => {
-            const element = ReactHelpers.ReactDOM.findDOMNode(component);
-            if (!element) return;
-            this.injectMessageBadges(element);
-        });
-
-        this.unpatchMessageUpdate = MonkeyPatch('ProfileBadges', Message.component.prototype).after('componentDidUpdate', component => {
-            const element = ReactHelpers.ReactDOM.findDOMNode(component);
-            if (!element) return;
-            this.injectMessageBadges(element);
-        });
-
         // Rerender all messages
-        for (const message of document.querySelectorAll('.message')) {
-            Reflection(message).forceUpdate();
-        }
+        Message.forceUpdateAll();
     }
 
     /**
@@ -92,9 +78,7 @@ export default class extends Module {
 
         // Rerender all channel members
         if (this.PatchedNameTag) {
-            for (const channelMember of document.querySelectorAll('.member-2FrNV0')) {
-                Reflection(channelMember).forceUpdate();
-            }
+            ChannelMember.forceUpdateAll();
         }
     }
 
@@ -104,8 +88,8 @@ export default class extends Module {
     async patchNameTag() {
         if (this.PatchedNameTag) return this.PatchedNameTag;
 
-        const ProfileBadges = this;
-        const NameTag = await ReactComponents.getComponent('NameTag', {selector: '.nameTag-26T3kW'});
+        const selector = '.' + WebpackModules.getClassName('nameTag', 'username', 'discriminator', 'ownerIcon');
+        const NameTag = await ReactComponents.getComponent('NameTag', {selector});
 
         this.PatchedNameTag = class extends NameTag.component {
             render() {
@@ -115,94 +99,55 @@ export default class extends Module {
 
                     const user = ReactHelpers.findProp(this, 'user');
                     if (!user) return;
-                    const c = contributors.find(c => c.id === user.id);
-                    if (!c) return;
+                    const contributor = contributors.find(c => c.id === user.id);
+                    if (!contributor) return;
 
-                    retVal.props.children.splice(1, 0, ReactHelpers.React.createElement('span', {
-                        className: 'bd-badge-outer',
-                        'data-userid': user.id
+                    retVal.props.children.splice(1, 0, VueInjector.createReactElement(BdBadge, {
+                        contributor,
+                        type: 'nametag'
                     }));
                 } catch (err) {
                     Logger.err('ProfileBadges', ['Error thrown while rendering a NameTag', err]);
                 }
                 return retVal;
             }
-
-            componentDidMount() {
-                const element = ReactHelpers.ReactDOM.findDOMNode(this);
-                if (!element) return;
-                ProfileBadges.injectMessageBadges(element);
-            }
-
-            componentDidUpdate() {
-                const element = ReactHelpers.ReactDOM.findDOMNode(this);
-                if (!element) return;
-                ProfileBadges.injectMessageBadges(element);
-            }
         };
 
         // Rerender all channel members
         if (this.unpatchChannelMemberRender) {
-            for (const channelMember of document.querySelectorAll('.member-2FrNV0')) {
-                Reflection(channelMember).forceUpdate();
-            }
+            const ChannelMember = await ReactComponents.getComponent('ChannelMember');
+            ChannelMember.forceUpdateAll();
         }
 
         return this.PatchedNameTag;
     }
 
-    injectMessageBadges(element) {
-        for (const beo of element.getElementsByClassName('bd-badge-outer'))
-            this.injectMessageBadge(beo);
-    }
-
-    injectMessageBadge(root) {
-        while (root.firstChild) {
-            root.removeChild(root.firstChild);
-        }
-
-        const { userid } = root.dataset;
-        if (!userid) return;
-
-        const c = contributors.find(c => c.id === userid);
-        if (!c) return;
-
-        VueInjector.inject(root, {
-            components: { BdMessageBadge },
-            data: { c },
-            template: '<BdMessageBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />'
-        }, DOM.createElement('span'));
-        root.classList.add('bd-has-badge');
-    }
-
     /**
-     * Patches UserProfileModals to inject profile badges into the modal once opened.
-     * TODO: just patch the modal component
+     * Patches UserProfileModal to render profile badges.
      */
-    async patchUserProfileModals() {
-        const UserProfileModals = WebpackModules.getModuleByName('UserProfileModals');
+    async patchUserProfileModal() {
+        const UserProfileModal = await ReactComponents.getComponent('UserProfileModal');
 
-        MonkeyPatch('BdUI', UserProfileModals).after('open', async (context, [userid]) => {
-            const c = contributors.find(c => c.id === userid);
-            if (!c) return;
+        this.unpatchUserProfileModal = MonkeyPatch('ProfileBadges', UserProfileModal.component.prototype).after('renderBadges', (component, args, retVal, setRetVal) => {
+            const user = ReactHelpers.findProp(component, 'user');
+            if (!user) return;
+            const contributor = contributors.find(c => c.id === user.id);
+            if (!contributor) return;
 
-            const root = await Utils.until(() => document.querySelector('[class*="headerInfo"]'));
-            const el = DOM.createElement('div', null, 'bdprofilebadges');
-            root.insertBefore(el.element, root.firstChild.nextSibling);
+            const element = VueInjector.createReactElement(BdBadge, {
+                contributor,
+                type: 'profile-modal'
+            });
 
-            this.injectProfileBadge(userid, el.element);
+            if (!retVal) {
+                setRetVal(ReactHelpers.React.createElement('div', {
+                    className: 'bd-profile-badges-wrap',
+                    children: element
+                }));
+            } else retVal.props.children.splice(0, 0, element);
         });
-    }
 
-    injectProfileBadge(userid, root) {
-        const c = contributors.find(c => c.id === userid);
-        if (!c) return;
-
-        VueInjector.inject(root, {
-            components: { BdBadge },
-            data: { c },
-            template: '<BdBadge :developer="c.developer" :webdev="c.webdev" :contributor="c.contributor" />',
-        });
+        UserProfileModal.forceUpdateAll();
     }
 
 }

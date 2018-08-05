@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { WebpackModules } from 'modules';
 import Vue from './vue';
 
 export default class {
@@ -26,6 +27,70 @@ export default class {
 
         vue.$mount(bdnode ? bdnode.element : root);
         return vue;
+    }
+
+    /**
+     * Returns a React element that will render a Vue component.
+     * @param {Object} component A Vue component to render
+     * @param {Object} props Props to pass to the Vue component
+     * @param {Boolean} mountAtTop Whether to mount the Vue component at the top of the React component instead of mounting it in a container
+     * @return {React.Element}
+     */
+    static createReactElement(component, props, mountAtTop) {
+        const React = WebpackModules.getModuleByName('React');
+        return React.createElement(this.ReactCompatibility, {component, mountAtTop, props});
+    }
+
+    static get ReactCompatibility() {
+        if (this._ReactCompatibility) return this._ReactCompatibility;
+
+        const React = WebpackModules.getModuleByName('React');
+        const ReactDOM = WebpackModules.getModuleByName('ReactDOM');
+
+        return this._ReactCompatibility = class VueComponent extends React.Component {
+            render() {
+                return React.createElement('span');
+            }
+
+            componentDidMount() {
+                this.vueInstance.$mount(this.vueMount);
+            }
+
+            componentDidUpdate(oldProps) {
+                if (oldProps.options && !this.props.options || !oldProps.options && this.props.options) {
+                    this.vueInstance.$destroy();
+                    delete this._vueInstance;
+                }
+
+                this.vueInstance.$mount(this.vueMount);
+            }
+
+            componentWillUnmount() {
+                this.vueInstance.$destroy();
+                delete this._vueInstance;
+            }
+
+            get vueMount() {
+                const element = ReactDOM.findDOMNode(this);
+                if (!element) return;
+                if (this.props.mountAtTop) return element;
+                if (element.firstChild) return element.firstChild;
+                const newElement = document.createElement('span');
+                element.appendChild(newElement);
+                return newElement;
+            }
+
+            get vueInstance() {
+                return this._vueInstance || (this._vueInstance = new Vue(this.props.options || {
+                    data: this.props,
+                    render(createElement) {
+                        return createElement(this.component, {
+                            props: this.props
+                        });
+                    }
+                }));
+            }
+        }
     }
 
 }

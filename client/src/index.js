@@ -8,9 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI, BdMenu, Modals, Reflection } from 'ui';
+import { DOM, BdUI, BdMenu, Modals, Reflection, Toasts } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactAutoPatcher, DiscordApi } from 'modules';
+import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { EmoteModule } from 'builtin';
 import electron from 'electron';
@@ -23,19 +23,30 @@ class BetterDiscord {
 
     constructor() {
         Logger.file = tests ? path.resolve(__dirname, '..', '..', 'tests', 'log.txt') : path.join(__dirname, 'log.txt');
+        Logger.trimLogFile();
         Logger.log('main', 'BetterDiscord starting');
 
         this._bd = {
-            DOM, BdUI, BdMenu, Modals, Reflection,
+            DOM, BdUI, BdMenu, Modals, Reflection, Toasts,
 
             Events, CssEditor, Globals, Settings, Database, Updater,
             ModuleManager, PluginManager, ThemeManager, ExtModuleManager,
             Vendor,
 
-            WebpackModules, Patcher, MonkeyPatch, ReactComponents, DiscordApi,
+            WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi,
             EmoteModule,
 
-            Logger, ClientIPC, Utils
+            Logger, ClientIPC, Utils,
+
+            plugins: PluginManager.localContent,
+            themes: ThemeManager.localContent,
+            extmodules: ExtModuleManager.localContent,
+
+            __filename, __dirname,
+            module: Globals.require.cache[__filename],
+            require: Globals.require,
+            webpack_require: __webpack_require__, // eslint-disable-line no-undef
+            get discord_require() { return WebpackModules.require }
         };
 
         const developermode = Settings.getSetting('core', 'advanced', 'developer-mode');

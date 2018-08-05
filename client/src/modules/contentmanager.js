@@ -12,7 +12,6 @@ import Content from './content';
 import Globals from './globals';
 import Database from './database';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { Events } from 'modules';
 import { SettingsSet, ErrorEvent } from 'structs';
 import { Modals } from 'ui';
 import path from 'path';
@@ -240,7 +239,7 @@ export default class {
                 mainPath
             };
 
-            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies, readConfig.permissions);
+            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies, readConfig.permissions, readConfig.mainExport);
             if (!content) return undefined;
             if (!reload && this.getContentById(content.id))
                 throw {message: `A ${this.contentType} with the ID ${content.id} already exists.`};
@@ -256,20 +255,26 @@ export default class {
     /**
      * Unload content.
      * @param {Content|String} content Content to unload
+     * @param {Boolean} force If true the content will be unloaded even if an exception is thrown when disabling/unloading
      * @param {Boolean} reload Whether to reload the content after
      * @return {Content}
      */
-    static async unloadContent(content, reload) {
+    static async unloadContent(content, force, reload) {
         content = this.findContent(content);
         if (!content) throw {message: `Could not find a ${this.contentType} from ${content}.`};
 
         try {
-            await content.disable(false);
-            await content.emit('unload', reload);
+            const disablePromise = content.disable(false);
+            const unloadPromise = content.emit('unload', reload);
+
+            if (!force) {
+                await disablePromise;
+                await unloadPromise;
+            }
 
             const index = this.getContentIndex(content);
 
-            delete window.require.cache[window.require.resolve(content.paths.mainPath)];
+            delete Globals.require.cache[Globals.require.resolve(content.paths.mainPath)];
 
             if (reload) {
                 const newcontent = await this.preloadContent(content.dirName, true, index);
@@ -288,10 +293,11 @@ export default class {
     /**
      * Reload content.
      * @param {Content|String} content Content to reload
+     * @param {Boolean} force If true the content will be unloaded even if an exception is thrown when disabling/unloading
      * @return {Content}
      */
-    static reloadContent(content) {
-        return this.unloadContent(content, true);
+    static reloadContent(content, force) {
+        return this.unloadContent(content, force, true);
     }
 
     /**
@@ -335,18 +341,10 @@ export default class {
     /**
      * Wait for content to load
      * @param {String} content_id
-     * @return {Promise}
+     * @return {Promise => Content}
      */
     static waitForContent(content_id) {
-        return new Promise((resolve, reject) => {
-            const check = () => {
-                const content = this.getContentById(content_id);
-                if (content) return resolve(content);
-
-                setTimeout(check, 100);
-            };
-            check();
-        });
+        return Utils.until(() => this.getContentById(content_id), 100);
     }
 
 }

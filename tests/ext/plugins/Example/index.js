@@ -1,6 +1,6 @@
 module.exports = (Plugin, Api, Vendor, Dependencies) => {
 
-    const { $, moment, _ } = Vendor;
+    const { $, _ } = Vendor;
     const { Events, Logger, InternalSettings, CssUtils } = Api;
 
     return class extends Plugin {

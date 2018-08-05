@@ -8,11 +8,13 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const path = require('path');
-const sass = require('node-sass');
-const { BrowserWindow, dialog } = require('electron');
+import path from 'path';
+import sass from 'node-sass';
+import { BrowserWindow, dialog, session } from 'electron';
+import deepmerge from 'deepmerge';
+import ContentSecurityPolicy from 'csp-parse';
 
-const { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } = require('./modules');
+import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } from './modules';
 
 const tests = typeof PRODUCTION === 'undefined';
 
@@ -54,13 +56,35 @@ const globals = {
 
 class PatchedBrowserWindow extends BrowserWindow {
     constructor(originalOptions) {
-        const options = Object.assign({}, originalOptions);
+        const userOptions = PatchedBrowserWindow.userWindowPreferences;
+
+        const options = deepmerge(originalOptions, userOptions);
         options.webPreferences = Object.assign({}, options.webPreferences);
 
         // Make sure Node integration is enabled
-        options.webPreferences.nodeIntegration = true;
+        options.webPreferences.preload = sparkplug;
 
-        return new BrowserWindow(options);
+        super(options);
+
+        this.__bd_preload = [];
+
+        if (originalOptions.webPreferences && originalOptions.webPreferences.preload) {
+            this.__bd_preload.push(originalOptions.webPreferences.preload);
+        }
+        if (userOptions.webPreferences && userOptions.webPreferences.preload) {
+            this.__bd_preload.push(path.resolve(_dataPath, userOptions.webPreferences.preload));
+        }
+    }
+
+    static get userWindowPreferences() {
+        try {
+            const userWindowPreferences = require(path.join(_dataPath, 'window'));
+            if (typeof userWindowPreferences === 'object') return userWindowPreferences;
+        } catch (err) {
+            console.log('[BetterDiscord] Error getting window preferences:', err);
+        }
+
+        return {};
     }
 }
 
@@ -114,7 +138,7 @@ class Comms {
     }
 }
 
-class BetterDiscord {
+export class BetterDiscord {
 
     constructor(args) {
         if (BetterDiscord.loaded) {
@@ -147,7 +171,6 @@ class BetterDiscord {
 
         this.csseditor = new CSSEditor(this, this.config.getPath('csseditor'));
 
-        this.windowUtils.on('did-get-response-details', () => this.ignite());
         this.windowUtils.on('did-finish-load', () => this.injectScripts(true));
 
         this.windowUtils.on('did-navigate-in-page', (event, url, isMainFrame) => {
@@ -160,14 +183,9 @@ class BetterDiscord {
     }
 
     async waitForWindow() {
-        const self = this;
         return new Promise(resolve => {
             const defer = setInterval(() => {
                 const windows = BrowserWindow.getAllWindows();
-
-                for (let window of windows) {
-                    if (window) BetterDiscord.ignite(window);
-                }
 
                 if (windows.length === 1 && windows[0].webContents.getURL().includes('discordapp.com')) {
                     resolve(windows[0]);
@@ -224,10 +242,29 @@ class BetterDiscord {
         browser_window_module.exports = PatchedBrowserWindow;
     }
 
+    /**
+     * Attaches an event handler for HTTP requests to update the Content Security Policy.
+     */
+    static hookSessionRequest() {
+        session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+            for (let [header, values] of Object.entries(details.responseHeaders)) {
+                if (!header.match(/^Content-Security-Policy(-Report-Only)?$/i)) continue;
+
+                details.responseHeaders[header] = values.map(value => {
+                    const policy = new ContentSecurityPolicy(value);
+
+                    // Add hosts that serve emotes (https://static-cdn.jtvnw.net is already in the CSP)
+                    policy.set('img-src', `${policy.get('img-src') || policy.get('default-src')} https://cdn.betterttv.net https://cdn.frankerfacez.com`);
+
+                    return policy.toString();
+                });
+            }
+
+            callback({ responseHeaders: details.responseHeaders });
+        });
+    }
+
 }
 
 BetterDiscord.patchBrowserWindow();
-
-module.exports = {
-    BetterDiscord
-};
+BetterDiscord.hookSessionRequest();

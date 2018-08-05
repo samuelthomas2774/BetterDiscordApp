@@ -37,7 +37,8 @@
                 warnclose: false,
                 settings: null,
                 closing: false,
-                saving: false
+                saving: false,
+                closeHandler: null
             }
         },
         components: {
@@ -70,7 +71,7 @@
             }
         },
         created() {
-            this.modal.on('close', force => {
+            this.modal.on('close', this.closeHandler = force => {
                 if (this.changed && !force) {
                     this.warnclose = true;
                     setTimeout(() => this.warnclose = false, 400);
@@ -82,6 +83,7 @@
             this.cloneSettings();
         },
         destroyed() {
+            if (this.closeHandler) this.modal.removeListener('close', this.closeHandler);
             this.modal.settings.off('settings-updated', this.cloneSettings);
         }
     }

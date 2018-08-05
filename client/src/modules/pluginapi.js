@@ -10,8 +10,9 @@
 
 import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenu, Modals, DOM, Reflection } from 'ui';
-import { Utils, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
+import { BdMenu, Modals, DOM, DOMObserver, Reflection, VueInjector, Toasts } from 'ui';
+import * as CommonComponents from 'commoncomponents';
+import { Utils, Filters, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
 import PluginManager from './pluginmanager';
@@ -20,7 +21,7 @@ import Events from './events';
 import EventsWrapper from './eventswrapper';
 import { WebpackModules } from './webpackmodules';
 import DiscordApi from './discordapi';
-import { ReactComponents } from './reactcomponents';
+import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
 
 export default class PluginApi {
@@ -57,6 +58,20 @@ export default class PluginApi {
 
     get AsyncEventEmitter() { return AsyncEventEmitter }
     get EventsWrapper() { return EventsWrapper }
+
+    get CommonComponents() { return CommonComponents }
+    get Filters() { return Filters }
+    get Discord() { return DiscordApi }
+    get DiscordApi() { return DiscordApi }
+    get ReactComponents() { return ReactComponents }
+    get ReactHelpers() { return ReactHelpers }
+    get Reflection() { return Reflection }
+    get DOM() { return DOM }
+    get VueInjector() { return VueInjector }
+
+    get observer() {
+        return this._observer || (this._observer = new DOMObserver());
+    }
 
     /**
      * Logger
@@ -216,7 +231,7 @@ export default class PluginApi {
         this.injectedStyles.splice(this.injectedStyles.indexOf(styleid), 1);
         DOM.deleteStyle(styleid);
     }
-    deleteAllStyles(id, css) {
+    deleteAllStyles(id) {
         for (let id of this.injectedStyles) {
             this.deleteStyle(id);
         }
@@ -267,10 +282,10 @@ export default class PluginApi {
         return this.modalStack[this.modalStack.length - 1].close(force);
     }
     basicModal(title, text) {
-        return this.addModal(Modals.basic(title, text));
+        return this.addModal(Modals.createBasicModal(title, text));
     }
     settingsModal(settingsset, headertext, options) {
-        return this.addModal(Modals.settings(settingsset, headertext, options));
+        return this.addModal(Modals.createSettingsModal(settingsset, headertext, options));
     }
     get Modals() {
         return Object.defineProperties({
@@ -289,6 +304,36 @@ export default class PluginApi {
             }
         });
     }
+
+
+    /**
+     * Toasts
+     */
+    showToast(message, options = {}) {
+        return Toasts.push(message, options);
+    }
+    showSuccessToast(message, options = {}) {
+        return Toasts.success(message, options);
+    }
+    showInfoToast(message, options = {}) {
+        return Toasts.info(message, options);
+    }
+    showErrorToast(message, options = {}) {
+        return Toasts.error(message, options);
+    }
+    showWarningToast(message, options = {}) {
+        return Toasts.warning(message, options);
+    }
+    get Toasts() {
+        return {
+            push: this.showToast.bind(this),
+            success: this.showSuccessToast.bind(this),
+            error: this.showErrorToast.bind(this),
+            info: this.showInfoToast.bind(this),
+            warning: this.showWarningToast.bind(this)
+        };
+    }
+
 
     /**
      * Emotes
@@ -403,6 +448,9 @@ export default class PluginApi {
     getWebpackModuleByName(name, fallback) {
         return WebpackModules.getModuleByName(name, fallback);
     }
+    getWebpackModuleByDisplayName(name) {
+        return WebpackModules.getModuleByDisplayName(name);
+    }
     getWebpackModuleByRegex(regex) {
         return WebpackModules.getModuleByRegex(regex, true);
     }
@@ -421,36 +469,56 @@ export default class PluginApi {
     getWebpackModulesByPrototypeFields(...props) {
         return WebpackModules.getModuleByPrototypes(props, false);
     }
+    waitForWebpackModule(filter) {
+        return WebpackModules.waitForModule(filter);
+    }
+    waitForWebpackModuleByName(name, fallback) {
+        return WebpackModules.waitForModuleByName(name, fallback);
+    }
+    waitForWebpackModuleByDisplayName(name) {
+        return WebpackModules.waitForModuleByDisplayName(name);
+    }
+    waitForWebpackModuleByRegex(regex) {
+        return WebpackModules.waitForModuleByRegex(regex);
+    }
+    waitForWebpackModuleByProperties(...props) {
+        return WebpackModules.waitForModuleByProps(props);
+    }
+    waitForWebpackModuleByPrototypeFields(...props) {
+        return WebpackModules.waitForModuleByPrototypes(props);
+    }
+    getWebpackClassName(...classes) {
+        return WebpackModules.getClassName(...classes);
+    }
+    waitForWebpackClassName(...classes) {
+        return WebpackModules.waitForClassName(...classes);
+    }
     get WebpackModules() {
-        return Object.defineProperty({
+        return new Proxy({
             getModule: this.getWebpackModule.bind(this),
             getModuleByName: this.getWebpackModuleByName.bind(this),
-            getModuleByDisplayName: this.getWebpackModuleByName.bind(this),
+            getModuleByDisplayName: this.getWebpackModuleByDisplayName.bind(this),
             getModuleByRegex: this.getWebpackModuleByRegex.bind(this),
             getModulesByRegex: this.getWebpackModulesByRegex.bind(this),
             getModuleByProperties: this.getWebpackModuleByProperties.bind(this),
             getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this),
             getModulesByProperties: this.getWebpackModulesByProperties.bind(this),
-            getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this)
-        }, 'require', {
-            get: () => this.webpackRequire
+            getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this),
+            waitForModule: this.waitForWebpackModule.bind(this),
+            waitForModuleByName: this.waitForWebpackModuleByName.bind(this),
+            waitForModuleByDisplayName: this.waitForWebpackModuleByDisplayName.bind(this),
+            waitForModuleByRegex: this.waitForWebpackModuleByRegex.bind(this),
+            waitForModuleByProperties: this.waitForWebpackModuleByProperties.bind(this),
+            waitForModuleByPrototypeFields: this.waitForWebpackModuleByPrototypeFields.bind(this),
+            getClassName: this.getWebpackClassName.bind(this),
+            waitForClassName: this.waitForWebpackClassName.bind(this),
+            get KnownModules() { return WebpackModules.KnownModules },
+            get require() { return WebpackModules.require }
+        }, {
+            get(WebpackModules, property) {
+                return WebpackModules[property] || WebpackModules.getModuleByName(property);
+            }
         });
-    }
-
-    /**
-     * DiscordApi
-     */
-
-    get Discord() {
-        return DiscordApi;
-    }
-
-    get ReactComponents() {
-        return ReactComponents;
-    }
-
-    get Reflection() {
-        return Reflection;
     }
 
     /**

@@ -40,13 +40,15 @@ export default class {
         emitter.removeListener(event, callback);
     }
 
+    static get removeListener() { return this.off }
+
     /**
      * Emits an event
      * @param {String} event The event to emit
      * @param {Any} ...data Data to pass to the event listeners
      */
-    static emit(...args) {
-        emitter.emit(...args);
+    static emit(event, ...data) {
+        emitter.emit(event, ...data);
     }
 
 }

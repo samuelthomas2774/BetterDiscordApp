@@ -8,9 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const Datastore = require('nedb');
+import Datastore from 'nedb';
 
-class Database {
+export default class Database {
 
     constructor(dbPath) {
         this.exec = this.exec.bind(this);
@@ -67,5 +67,3 @@ class Database {
     }
 
 }
-
-module.exports = { Database };

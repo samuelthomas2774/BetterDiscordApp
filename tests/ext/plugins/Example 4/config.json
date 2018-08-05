@@ -15,7 +15,7 @@
         "description": "Plugin for testing array setting events as the first example plugin has a lot of stuff in it now."
     },
     "main": "index.js",
-    "type": "plugin",
+    "mainExport": "main",
     "defaultConfig": [
         {
             "category": "default",

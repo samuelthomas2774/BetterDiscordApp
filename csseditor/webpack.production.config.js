@@ -24,7 +24,9 @@ module.exports = {
     },
     externals: {
         electron: 'window.require("electron")',
-        fs: 'window.require("fs")'
+        fs: 'window.require("fs")',
+        util: 'window.require("util")',
+        process: 'require("process")'
     },
     resolve: {
         alias: {

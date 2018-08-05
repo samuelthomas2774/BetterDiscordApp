@@ -37,7 +37,7 @@
 <script>
     import { EmoteModule } from 'builtin';
     import { Events, Settings } from 'modules';
-    import { DOM } from 'ui';
+    import { DOMManip as Manip } from 'ui';
     import { MiStar } from './MaterialIcon';
 
     export default {
@@ -53,25 +53,26 @@
                 selected: '',
                 open: false,
                 selectedIndex: 0,
-                sterm: ''
+                sterm: '',
+                settingUpdatedHandler: null
             };
         },
-        props: ['initial'],
-        beforeMount() {
-            // this.emotes = EmoteModule.filter(new RegExp(this.initial, 'i'), 10);
-            // this.open = this.emotes.length;
-        },
         created() {
-            const enabled = Settings.getSetting('emotes', 'default', 'enable');
-            enabled.on('setting-updated', event => {
+            const enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
+            enabledSetting.on('setting-updated', this.settingUpdatedHandler = event => {
                 if (event.value) return this.addEventListeners();
                 this.removeEventListeners();
                 this.reset();
             });
 
-            if (enabled.value) this.addEventListeners();
+            if (enabledSetting.value) this.addEventListeners();
         },
         destroyed() {
+            if (this.settingUpdatedHandler) {
+                const enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
+                enabledSetting.removeListener('setting-updated', this.settingUpdatedHandler);
+            }
+
             this.removeEventListeners();
         },
         methods: {
@@ -134,8 +135,8 @@
                     this.reset();
                     return;
                 }
-                this.title = this.sterm;
-                this.emotes = EmoteModule.filter(new RegExp(this.sterm.substr(1), ''), 10);
+                this.title = this.sterm.substr(1);
+                this.emotes = EmoteModule.filter(new RegExp(this.sterm.substr(1), 'i'), 10);
                 this.open = this.emotes.length;
             },
             traverse(e) {
@@ -167,7 +168,7 @@
                 let substr = value.substr(0, selectionEnd);
                 substr = substr.replace(new RegExp(this.sterm + '$'), en);
 
-                DOM.manip.setText(substr + value.substr(selectionEnd, value.length), false);
+                Manip.setText(substr + value.substr(selectionEnd, value.length), false);
                 ta.selectionEnd = ta.selectionStart = selectionEnd + en.length - this.sterm.length;
                 this.reset();
             }

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, FileUtils, ClientLogger as Logger, AsyncEventEmitter } from 'common';
+import { Utils, ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { Modals } from 'ui';
 import Database from './database';
 

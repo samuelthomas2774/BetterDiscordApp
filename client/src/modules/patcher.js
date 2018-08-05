@@ -9,7 +9,7 @@
 */
 
 import { WebpackModules } from './webpackmodules';
-import { ClientLogger as Logger, Utils } from 'common';
+import { ClientLogger as Logger } from 'common';
 
 export class Patcher {
 
@@ -37,9 +37,8 @@ export class Patcher {
     }
 
     static resolveModule(module) {
-        if (module instanceof Function || (module instanceof Object && !(module instanceof Array))) return module;
+        if (module instanceof Function || (module instanceof Object)) return module;
         if (typeof module === 'string') return WebpackModules.getModuleByName(module);
-        if (module instanceof Array) return WebpackModules.getModuleByProps(module);
         return null;
     }
 
@@ -70,7 +69,7 @@ export class Patcher {
 
             for (const slavePatch of patch.children.filter(c => c.type === 'after')) {
                 try {
-                    slavePatch.callback(this, arguments, retVal);
+                    slavePatch.callback(this, arguments, retVal, r => retVal = r);
                 } catch (err) {
                     Logger.err(`Patcher:${patch.id}`, err);
                 }
@@ -80,7 +79,9 @@ export class Patcher {
     }
 
     static rePatch(patch) {
-        patch.proxyFunction = patch.module[patch.functionName] = this.overrideFn(patch);
+        if (patch.module instanceof Array && typeof patch.functionName === 'number')
+            patch.module.splice(patch.functionName, 1, patch.proxyFunction = this.overrideFn(patch));
+        else patch.proxyFunction = patch.module[patch.functionName] = this.overrideFn(patch);
     }
 
     static pushPatch(caller, id, module, functionName) {

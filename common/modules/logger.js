@@ -8,9 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Vendor } from 'modules';
 import { FileUtils } from './utils';
-import node_utils from 'node_utils';
+import node_utils from 'util';
 
 export const logLevels = {
     'log': 'log',
@@ -40,7 +39,7 @@ export default class Logger {
         message = typeof message === 'object' && message instanceof Array ? message : [message];
         console[level]('[%cBetter%cDiscord:%s]', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, ...message);
 
-        const message_string = message.map(m => typeof m === 'string' ? m : node_utils.inspect(m)).join(' ');
+        const message_string = message.map(m => typeof m === 'string' ? m : node_utils.inspect(m, {showProxy: true})).join(' ');
         this.logs.push(`${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message_string}`);
 
         if (this.file)
@@ -60,7 +59,25 @@ export default class Logger {
     }
 
     static get timestamp() {
-        return Vendor.moment().format('DD/MM/YY hh:mm:ss');
+        return (new Date()).toLocaleString('en-GB');
+    }
+
+    trimLogFile() {
+        if (!this.file) throw new Error('This logger does not have a file.');
+        return Logger.trimLogFile(this.file);
+    }
+
+    static async trimLogFile(file) {
+        const stat = await FileUtils.stat(file);
+        if (stat.size < 20 * 1024 * 1024) return; // 20 MB
+
+        const logs = await FileUtils.readFile(file);
+
+        // Trim to about 1 MB
+        const trimFrom = logs.substr(0 - 1024 * 1024).lastIndexOf('\nLOG : [');
+        if (trimFrom < 0) return;
+
+        await FileUtils.writeFile(file, logs.substr(trimFrom));
     }
 
 }

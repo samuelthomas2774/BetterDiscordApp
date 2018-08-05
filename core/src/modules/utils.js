@@ -10,13 +10,12 @@
 
 // TODO Use common
 
-const path = require('path');
-const fs = require('fs');
+import fs from 'fs';
 
-const { Module } = require('./modulebase');
-const { BDIpc } = require('./bdipc');
+import Module from './modulebase';
+import BDIpc from './bdipc';
 
-class Utils {
+export class Utils {
     static async tryParseJson(jsonString) {
         try {
             return JSON.parse(jsonString);
@@ -29,7 +28,7 @@ class Utils {
     }
 }
 
-class FileUtils {
+export class FileUtils {
     static async fileExists(path) {
         return new Promise((resolve, reject) => {
             fs.stat(path, (err, stats) => {
@@ -158,7 +157,7 @@ class FileUtils {
     }
 }
 
-class WindowUtils extends Module {
+export class WindowUtils extends Module {
     bindings() {
         this.openDevTools = this.openDevTools.bind(this);
         this.executeJavascript = this.executeJavascript.bind(this);
@@ -185,13 +184,17 @@ class WindowUtils extends Module {
         return WindowUtils.injectScript(this.window, fpath, variable);
     }
 
-    static injectScript(window, fpath, variable) {
+    static async injectScript(window, fpath, variable) {
         window = window.webContents || window;
         if (!window) return;
         // console.log(`Injecting: ${fpath} to`, window);
 
         const escaped_path = fpath.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
         const escaped_variable = variable ? variable.replace(/\\/g, '\\\\').replace(/"/g, '\\"') : null;
+
+        const nodeIntegration = await window.executeJavaScript(`typeof require !== 'undefined'`);
+
+        if (!nodeIntegration) return window.send('--bd-inject-script', {script: fpath, variable});
 
         if (variable) return window.executeJavaScript(`window["${escaped_variable}"] = require("${escaped_path}");`);
         else return window.executeJavaScript(`require("${escaped_path}");`);
@@ -205,9 +208,3 @@ class WindowUtils extends Module {
         return BDIpc.send(this.window, channel, message);
     }
 }
-
-module.exports = {
-    Utils,
-    FileUtils,
-    WindowUtils
-};

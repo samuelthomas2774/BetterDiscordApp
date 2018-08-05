@@ -16,7 +16,7 @@
             </div>
             <div class="bd-hint">{{setting.hint}}</div>
         </div>
-        <RadioGroup :options="setting.options" v-model="setting.value" :disabled="setting.disabled" />
+        <RadioGroup :options="setting.options" v-model="setting.value" :multi="setting.multi" :min="setting.min" :max="setting.max" :disabled="setting.disabled" />
     </div>
 </template>
 

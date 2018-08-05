@@ -8,11 +8,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import SettingsCategory from './settingscategory';
-import SettingsScheme from './settingsscheme';
-import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { SettingUpdatedEvent, SettingsUpdatedEvent } from 'structs';
 import { Modals } from 'ui';
+import { ClientLogger as Logger, AsyncEventEmitter } from 'common';
+import SettingsCategory from './settingscategory';
+import SettingsScheme from './settingsscheme';
+import SettingsProxy from './settingsproxy';
 
 export default class SettingsSet extends AsyncEventEmitter {
 
@@ -246,6 +247,14 @@ export default class SettingsSet extends AsyncEventEmitter {
     }
 
     /**
+     * Returns a proxy which can be used to access the set's categories like a normal object.
+     * @return {SettingsSetProxy}
+     */
+    get proxy() {
+        return this._proxy || (this._proxy = SettingsProxy.createProxy(this));
+    }
+
+    /**
      * Returns the first category where calling {function} returns true.
      * @param {Function} function A function to call to filter categories
      * @return {SettingsCategory}
@@ -356,7 +365,7 @@ export default class SettingsSet extends AsyncEventEmitter {
      * Merges a set into this set without emitting events (and therefore synchronously).
      * This only exists for use by the constructor.
      */
-    _merge(newSet, emit_multi = true) {
+    _merge(newSet) {
         let updatedSettings = [];
         // const categories = newSet instanceof Array ? newSet : newSet.settings;
         const categories = newSet && newSet.args ? newSet.args.settings : newSet ? newSet.settings : newSet;

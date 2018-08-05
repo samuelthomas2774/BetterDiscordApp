@@ -8,14 +8,14 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const path = require('path');
-const { BrowserWindow } = require('electron');
+import path from 'path';
+import { BrowserWindow } from 'electron';
 
-const { Module } = require('./modulebase');
-const { WindowUtils } = require('./utils');
-const { BDIpc } = require('./bdipc');
+import Module from './modulebase';
+import { WindowUtils } from './utils';
+import BDIpc from './bdipc';
 
-class CSSEditor extends Module {
+export default class CSSEditor extends Module {
 
     constructor(bd, path) {
         super();
@@ -91,5 +91,3 @@ class CSSEditor extends Module {
     }
 
 }
-
-module.exports = { CSSEditor };

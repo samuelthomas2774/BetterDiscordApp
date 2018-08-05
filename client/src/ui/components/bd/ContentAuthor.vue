@@ -10,12 +10,6 @@
 
 <template>
     <v-popover class="bd-content-author bd-inline" popoverClass="bd-popover bd-content-author-links" trigger="click" placement="top" :disabled="!hasLinks">
-        <!-- <template v-if="typeof author === 'string'">{{ author }}</template>
-        <a v-else-if="author.url" :href="author.url" @click="openLink">{{ author.name }}</a>
-        <a v-else-if="author.github_username" :href="'https://github.com/' + author.github_username" @click="openLink">{{ author.name }}</a>
-        <span v-else-if="author.discord_id" @click="openUserProfileModal(author.discord_id)">{{ author.name }}</span>
-        <template v-else>{{ author.name }}</template> -->
-
         <span :class="{'bd-content-author-link': hasLinks}">{{ author.name || author }}</span><span v-text="after" @click.stop></span>
 
         <template slot="popover">
@@ -50,8 +44,7 @@
                 e.preventDefault();
             },
             openUserProfileModal(discord_id) {
-                const UserProfileModal = WebpackModules.getModuleByProps(['fetchMutualFriends', 'setSection']);
-                UserProfileModal.open(discord_id);
+                WebpackModules.getModuleByName('UserProfileModal').open(discord_id);
                 BdMenu.close();
             },
             openGitHub() {

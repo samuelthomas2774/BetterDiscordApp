@@ -75,7 +75,8 @@
                 first: true,
                 Settings,
                 timeout: null,
-                SettingsWrapper
+                SettingsWrapper,
+                openMenuHandler: null
             };
         },
         props: ['active'],
@@ -101,7 +102,8 @@
         methods: {
             itemOnClick(id) {
                 if (this.animating || id === this.activeIndex) return;
-                if (this.activeIndex >= 0) this.sidebarItems.find(item => item.id === this.activeIndex).active = false;
+                const activeItem = this.sidebarItems.find(item => item.id === this.activeIndex);
+                if (activeItem) activeItem.active = false;
                 this.sidebarItems.find(item => item.id === id).active = true;
                 this.animating = true;
                 this.lastActiveIndex = this.activeIndex;
@@ -153,7 +155,10 @@
             }
         },
         created() {
-            Events.on('bd-open-menu', item => item && this.itemOnClick(this.sidebarItems.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
+            Events.on('bd-open-menu', this.openMenuHandler = item => item && this.itemOnClick(this.sidebarItems.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
+        },
+        destroyed() {
+            if (this.openMenuHandler) Events.off('bd-open-menu', this.openMenuHandler);
         }
     }
 </script>

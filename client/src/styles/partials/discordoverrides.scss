@@ -1,4 +1,4 @@
-.guilds-wrapper {
+[class*="guildsWrapper-"] {
     padding-top: 49px !important;
 
     .platform-osx & {
@@ -6,11 +6,11 @@
     }
 }
 
-[class*="guilds-wrapper"] + [class*="flex"] {
+[class*="guildsWrapper-"] + [class*="flex"] {
     border-radius: 0 0 0 5px;
 }
 
-.unread-mentions-indicator-top {
+[class*="unreadMentionsIndicatorTop-"] {
     top: 49px;
 
     .platform-osx & {
@@ -19,6 +19,10 @@
 }
 
 // Any layers need to be above the main layer (where the BD button is placed)
-.layer-kosS71 + .layer-kosS71 {
+[class*="layers-"] > * + * {
     z-index: 900;
+}
+
+.bd-settings-wrapper.platform-linux {
+    transform: none;
 }

@@ -1,13 +1,13 @@
-module.exports = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Api }) => class extends Plugin {
-	async onstart() {
+exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, CommonComponents, Api }) => class extends Plugin {
+    async onstart() {
         this.keybindEvent = this.keybindEvent.bind(this);
 
-		// Some array event examples
-		const arraySetting = this.settings.getSetting('default', 'array-1');
-		Logger.log('Array setting', arraySetting);
-		arraySetting.on('item-added', event => Logger.log('Item', event.item, 'was added to the array setting'));
-		arraySetting.on('item-updated', event => Logger.log('Item', event.item, 'of the array setting was updated', event));
-		arraySetting.on('item-removed', event => Logger.log('Item', event.item, 'removed from the array setting'));
+        // Some array event examples
+        const arraySetting = this.settings.getSetting('default', 'array-1');
+        Logger.log('Array setting', arraySetting);
+        arraySetting.on('item-added', event => Logger.log('Item', event.item, 'was added to the array setting'));
+        arraySetting.on('item-updated', event => Logger.log('Item', event.item, 'of the array setting was updated', event));
+        arraySetting.on('item-removed', event => Logger.log('Item', event.item, 'removed from the array setting'));
 
         // Keybind setting examples
         const keybindSetting = this.settings.getSetting('default', 'keybind-1');
@@ -54,22 +54,24 @@ module.exports = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, A
         this.menuItem = BdMenuItems.addSettingsSet('Plugins', set, 'Plugin 4');
 
         this.menuItem2 = BdMenuItems.addVueComponent('Plugins', 'Also Plugin 4', {
-            template: `<component :is="SettingsWrapper" :headertext="plugin.name + ' custom menu panel'">
+            template: `<settings-wrapper :headertext="plugin.name + ' custom menu panel'">
                 <p style="margin-top: 0; color: #f6f6f7;">Test</p>
-            </component>`,
-            props: ['SettingsWrapper'],
+            </settings-wrapper>`,
+            components: {
+                SettingsWrapper: CommonComponents.SettingsWrapper
+            },
             data() { return {
                 Api, plugin: Api.plugin
             }; }
         });
-	}
+    }
 
-	onstop() {
+    onstop() {
         const keybindSetting = this.settings.getSetting('default', 'keybind-1');
         keybindSetting.off('keybind-activated', this.keybindEvent);
 
         BdMenuItems.removeAll();
-	}
+    }
 
     keybindEvent(event) {
         Logger.log('Keybind pressed', event);

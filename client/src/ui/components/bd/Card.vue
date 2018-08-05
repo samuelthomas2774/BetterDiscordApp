@@ -11,7 +11,7 @@
 <template>
     <div class="bd-card">
         <div class="bd-card-header">
-            <div class="bd-card-icon" :style="{backgroundImage: item.icon ? `url(${item.icon})` : null}">
+            <div class="bd-card-icon" :style="{backgroundImage: iconURL}">
                 <MiExtension v-if="!item.icon" :size="30" />
             </div>
             <span>{{item.name}}</span>
@@ -37,14 +37,41 @@
 
 <script>
     // Imports
+    import { FileUtils, ClientLogger as Logger } from 'common';
+    import path from 'path';
     import { MiExtension } from '../common';
     import ContentAuthor from './ContentAuthor.vue';
 
     export default {
         props: ['item'],
+        data() {
+            return {
+                iconURL: undefined
+            };
+        },
         components: {
             ContentAuthor,
             MiExtension
+        },
+        methods: {
+            async getIconURL() {
+                if (!this.item.icon) return;
+
+                try {
+                    if (this.item.icon.substr(0, 5) === 'data:') {
+                        return `url(${this.item.icon})`;
+                    }
+
+                    const iconPath = path.join(this.item.contentPath, this.item.icon);
+                    const iconURL = await FileUtils.toDataURI(iconPath, this.item.info.icon_type);
+                    return `url(${iconURL})`;
+                } catch (err) {
+                    Logger.err('ContentCard', ['Invalid icon URL', this.item]);
+                }
+            }
+        },
+        async created() {
+            this.iconURL = await this.getIconURL();
         }
     }
 </script>

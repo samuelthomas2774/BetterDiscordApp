@@ -8,7 +8,6 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils, ClientLogger as Logger } from 'common';
 import { WebpackModules } from './webpackmodules';
 import Events from './events';
 import EventListener from './eventlistener';
@@ -22,7 +21,6 @@ import * as SocketStructs from '../structs/socketstructs';
 export default class extends EventListener {
 
     init() {
-        Logger.log('EventHook', SocketStructs);
         this.hook();
     }
 
@@ -38,16 +36,14 @@ export default class extends EventListener {
 
     hook() {
         const self = this;
-        const orig = this.eventsModule.prototype.emit;
-        this.eventsModule.prototype.emit = function (...args) {
+        const Events = WebpackModules.getModuleByName('Events');
+
+        const orig = Events.prototype.emit;
+        Events.prototype.emit = function (...args) {
             orig.call(this, ...args);
             self.wsc = this;
             self.emit(...args);
         };
-    }
-
-    get eventsModule() {
-        return WebpackModules.getModuleByName('Events');
     }
 
     /**
@@ -68,22 +64,29 @@ export default class extends EventListener {
      * @param {any} event Event
      * @param {any} data Event data
      */
-    dispatch(e, d) {
-        Events.emit('raw-event', { type: e, data: d });
-        if (e === this.actions.READY || e === this.actions.RESUMED) {
-            Events.emit(e, d);
+    dispatch(type, data) {
+        Events.emit('raw-event', { type, data });
+
+        if (type === this.actions.READY || type === this.actions.RESUMED) {
+            Events.emit(type, data);
             return;
         }
-        if (!Object.keys(SocketStructs).includes(e)) return;
-        const evt = new SocketStructs[e](d);
-        Events.emit(`discord:${e}`, evt);
+
+        if (!Object.keys(SocketStructs).includes(type)) return;
+        Events.emit(`discord:${type}`, new SocketStructs[type](data));
+    }
+
+    get SocketStructs() {
+        return SocketStructs;
     }
 
     /**
      * All known socket actions
      */
     get actions() {
-        return {
+        if (this._actions) return this._actions;
+
+        return this._actions = {
             READY: 'READY', // Socket ready
             RESUMED: 'RESUMED', // Socket resumed
             TYPING_START: 'TYPING_START', // User typing start

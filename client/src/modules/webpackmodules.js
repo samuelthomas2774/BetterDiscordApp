@@ -8,44 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-export class Filters {
-    static byProperties(props, selector = m => m) {
-        return module => {
-            const component = selector(module);
-            if (!component) return false;
-            return props.every(property => component[property] !== undefined);
-        };
-    }
-
-    static byPrototypeFields(fields, selector = m => m) {
-        return module => {
-            const component = selector(module);
-            if (!component) return false;
-            if (!component.prototype) return false;
-            return fields.every(field => component.prototype[field] !== undefined);
-        };
-    }
-
-    static byCode(search, selector = m => m) {
-        return module => {
-            const method = selector(module);
-            if (!method) return false;
-            return method.toString().search(search) !== -1;
-        };
-    }
-
-    static byDisplayName(name) {
-        return module => {
-            return module && module.displayName === name;
-        };
-    }
-
-    static combine(...filters) {
-        return module => {
-            return filters.every(filter => filter(module));
-        };
-    }
-}
+import { Utils, Filters } from 'common';
+import Events from './events';
 
 const KnownModules = {
     React: Filters.byProperties(['createElement', 'cloneElement']),
@@ -90,6 +54,8 @@ const KnownModules = {
     UserTypingStore: Filters.byProperties(['isTyping']),
     UserActivityStore: Filters.byProperties(['getActivity']),
     UserNameResolver: Filters.byProperties(['getName']),
+    UserNoteStore: Filters.byProperties(['getNote']),
+    UserNoteActions: Filters.byProperties(['updateNote']),
 
     /* Emoji Store and Utils */
     EmojiInfo: Filters.byProperties(['isEmojiDisabled']),
@@ -136,7 +102,7 @@ const KnownModules = {
     DNDSources: Filters.byProperties(["addTarget"]),
     DNDObjects: Filters.byProperties(["DragSource"]),
 
-    /* Electron & Other Internals with Utils*/
+    /* Electron & Other Internals with Utils */
     ElectronModule: Filters.byProperties(["_getMainWindow"]),
     Dispatcher: Filters.byProperties(['dirtyDispatch']),
     PathUtils: Filters.byProperties(["hasBasename"]),
@@ -162,7 +128,6 @@ const KnownModules = {
     WindowInfo: Filters.byProperties(['isFocused', 'windowSize']),
     TagInfo: Filters.byProperties(['VALID_TAG_NAMES']),
     DOMInfo: Filters.byProperties(['canUseDOM']),
-    HTMLUtils: Filters.byProperties(['htmlFor', 'sanitizeUrl']),
 
     /* Locale/Location and Time */
     LocaleManager: Filters.byProperties(['setLocale']),
@@ -179,15 +144,27 @@ const KnownModules = {
     URLParser: Filters.byProperties(['Url', 'parse']),
     ExtraURLs: Filters.byProperties(['getArticleURL']),
 
+    /* Text Processing */
+    hljs: Filters.byProperties(['highlight', 'highlightBlock']),
+    SimpleMarkdown: Filters.byProperties(['parseBlock', 'parseInline', 'defaultOutput']),
+
     /* DOM/React Components */
     /* ==================== */
-    UserSettingsWindow: Filters.byProperties(['open', 'updateAccount']),
     LayerManager: Filters.byProperties(['popLayer', 'pushLayer']),
+    UserSettingsWindow: Filters.byProperties(['open', 'updateAccount']),
+    ChannelSettingsWindow: Filters.byProperties(['open', 'updateChannel']),
+    GuildSettingsWindow: Filters.byProperties(['open', 'updateGuild']),
 
     /* Modals */
     ModalStack: Filters.byProperties(['push', 'update', 'pop', 'popWithKey']),
-    UserProfileModals: Filters.byProperties(['fetchMutualFriends', 'setSection']),
     ConfirmModal: Filters.byPrototypeFields(['handleCancel', 'handleSubmit', 'handleMinorConfirm']),
+    UserProfileModal: Filters.byProperties(['fetchMutualFriends', 'setSection']),
+    ChangeNicknameModal: Filters.byProperties(['open', 'changeNickname']),
+    CreateChannelModal: Filters.byProperties(['open', 'createChannel']),
+    PruneMembersModal: Filters.byProperties(['open', 'prune']),
+    NotificationSettingsModal: Filters.byProperties(['open', 'updateNotificationSettings']),
+    PrivacySettingsModal: Filters.byCode(/PRIVACY_SETTINGS_MODAL_OPEN/, m => m.open),
+    CreateInviteModal: Filters.byProperties(['open', 'createInvite']),
 
     /* Popouts */
     PopoutStack: Filters.byProperties(['open', 'close', 'closeAll']),
@@ -203,16 +180,17 @@ const KnownModules = {
     ExternalLink: Filters.byCode(/\.trusted\b/)
 };
 
-export class WebpackModules {
+class WebpackModules {
 
     /**
      * Finds a module using a filter function.
      * @param {Function} filter A function to use to filter modules
      * @param {Boolean} first Whether to return only the first matching module
+     * @param {Array} modules An array of modules to search in
      * @return {Any}
      */
-    static getModule(filter, first = true) {
-        const modules = this.getAllModules();
+    static getModule(filter, first = true, _modules) {
+        const modules = _modules || this.getAllModules();
         const rm = [];
         for (let index in modules) {
             if (!modules.hasOwnProperty(index)) continue;
@@ -227,7 +205,7 @@ export class WebpackModules {
             if (first) return foundModule;
             rm.push(foundModule);
         }
-        return first || rm.length == 0 ? undefined : rm;
+        return first ? undefined : rm;
     }
 
     /**
@@ -288,13 +266,137 @@ export class WebpackModules {
      */
     static get require() {
         if (this._require) return this._require;
-        const id = 'bd-webpackmodules';
-        const __webpack_require__ = window['webpackJsonp']([], {
-            [id]: (module, exports, __webpack_require__) => exports.default = __webpack_require__
-        }, [id]).default;
-        delete __webpack_require__.m[id];
-        delete __webpack_require__.c[id];
+
+        const __webpack_require__ = this.getWebpackRequire();
+        if (!__webpack_require__) return;
+
+        this.hookWebpackRequireCache(__webpack_require__);
         return this._require = __webpack_require__;
+    }
+
+    static getWebpackRequire() {
+        const id = 'bd-webpackmodules';
+
+        if (typeof window.webpackJsonp === 'function') {
+            const __webpack_require__ = window['webpackJsonp']([], {
+                [id]: (module, exports, __webpack_require__) => exports.default = __webpack_require__
+            }, [id]).default;
+            delete __webpack_require__.m[id];
+            delete __webpack_require__.c[id];
+            return __webpack_require__;
+        } else if (window.webpackJsonp && window.webpackJsonp.push) {
+            const __webpack_require__ = window['webpackJsonp'].push([[], {
+                [id]: (module, exports, req) => exports.default = req
+            }, [[id]]]).default;
+            window['webpackJsonp'].pop();
+            delete __webpack_require__.m[id];
+            delete __webpack_require__.c[id];
+            return __webpack_require__;
+        }
+    }
+
+    static hookWebpackRequireCache(__webpack_require__) {
+        __webpack_require__.c = new Proxy(__webpack_require__.c, {
+            set(module_cache, module_id, module) {
+                // Add it to our emitter cache and emit a module-loading event
+                this.moduleLoading(module_id, module);
+                Events.emit('module-loading', module);
+
+                // Add the module to the cache as normal
+                module_cache[module_id] = module;
+            }
+        });
+    }
+
+    static moduleLoading(module_id, module) {
+        if (this.require.c[module_id]) return;
+
+        if (!this.moduleLoadedEventTimeout) {
+            this.moduleLoadedEventTimeout = setTimeout(() => {
+                this.moduleLoadedEventTimeout = undefined;
+
+                // Emit a module-loaded event for every module
+                for (let module of this.modulesLoadingCache) {
+                    Events.emit('module-loaded', module);
+                }
+
+                // Emit a modules-loaded event
+                Events.emit('modules-loaded', this.modulesLoadingCache);
+
+                this.modulesLoadedCache = [];
+            }, 0);
+        }
+
+        // Add this to our own cache
+        if (!this.modulesLoadingCache) this.modulesLoadingCache = [];
+        this.modulesLoadingCache.push(module);
+    }
+
+    static waitForWebpackRequire() {
+        return Utils.until(() => this.require, 10);
+    }
+
+    /**
+     * Waits for a module to load.
+     * This only returns a single module, as it can't guarentee there are no more modules that could
+     * match the filter, which is pretty much what that would be asking for.
+     * @param {Function} filter The name of a known module or a filter function
+     * @return {Any}
+     */
+    static async waitForModule(filter) {
+        const module = this.getModule(filter);
+        if (module) return module;
+
+        while (this.require.m.length > this.require.c.length) {
+            const additionalModules = await Events.once('modules-loaded');
+
+            const module = this.getModule(filter, true, additionalModules);
+            if (module) return module;
+        }
+
+        throw new Error('All modules have now been loaded. None match the passed filter.');
+    }
+
+    /**
+     * Finds a module by it's name.
+     * @param {String} name The name of the module
+     * @param {Function} fallback A function to use to filter modules if not finding a known module
+     * @return {Any}
+     */
+    static async waitForModuleByName(name, fallback) {
+        if (Cache.hasOwnProperty(name)) return Cache[name];
+        if (KnownModules.hasOwnProperty(name)) fallback = KnownModules[name];
+        if (!fallback) return undefined;
+        const module = await this.waitForModule(fallback, true);
+        return module ? Cache[name] = module : undefined;
+    }
+
+    static waitForModuleByDisplayName(props) {
+        return this.waitForModule(Filters.byDisplayName(props));
+    }
+    static waitForModuleByRegex(props) {
+        return this.waitForModule(Filters.byCode(props));
+    }
+    static waitForModuleByProps(props) {
+        return this.waitForModule(Filters.byProperties(props));
+    }
+    static waitForModuleByPrototypes(props) {
+        return this.waitForModule(Filters.byPrototypeFields(props));
+    }
+
+    /**
+     * Searches for a class module and returns a class from it.
+     * @param {String} base The first part of the class to find
+     * @param {String} ...additional_classes Additional classes to look for to filter duplicate class modules
+     * @return {String}
+     */
+    static getClassName(base, ...additional_classes) {
+        const class_module = this.getModuleByProps([base, ...additional_classes]);
+        if (class_module && class_module[base]) return class_module[base].split(' ')[0];
+    }
+    static async waitForClassName(base, ...additional_classes) {
+        const class_module = await this.waitForModuleByProps([base, ...additional_classes]);
+        if (class_module && class_module[base]) return class_module[base].split(' ')[0];
     }
 
     /**
@@ -313,4 +415,14 @@ export class WebpackModules {
         return Object.keys(KnownModules);
     }
 
+    static get KnownModules() { return KnownModules }
+
 }
+
+const WebpackModulesProxy = new Proxy(WebpackModules, {
+    get(WebpackModules, property) {
+        return WebpackModules[property] || WebpackModules.getModuleByName(property);
+    }
+});
+
+export { WebpackModulesProxy as WebpackModules };

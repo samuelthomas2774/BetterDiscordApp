@@ -8,13 +8,11 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, WebpackModules, DiscordApi, MonkeyPatch } from 'modules';
-import { Utils } from 'common';
+import { Events, DiscordApi } from 'modules';
 import { remote } from 'electron';
 import DOM from './dom';
 import Vue from './vue';
-import AutoManip from './automanip';
-import { BdSettingsWrapper, BdModals } from './components';
+import { BdSettingsWrapper, BdModals, BdToasts } from './components';
 
 export default class {
 
@@ -25,49 +23,34 @@ export default class {
             channel: DiscordApi.currentChannel
         };
 
-        window.addEventListener('keyup', e => Events.emit('gkh:keyup', e));
-        this.autoManip = new AutoManip();
+        remote.getCurrentWindow().webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
+            const { currentGuild, currentChannel } = DiscordApi;
 
-        const ehookInterval = setInterval(() => {
-            if (!remote.BrowserWindow.getFocusedWindow()) return;
-            clearInterval(ehookInterval);
-            remote.BrowserWindow.getFocusedWindow().webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
-                const { currentGuild, currentChannel } = DiscordApi;
+            if (!this.pathCache.server)
+                Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
+            else if (!this.pathCache.channel)
+                Events.emit('channel-switch', currentChannel);
+            else if (currentGuild && currentGuild.id && this.pathCache.server && this.pathCache.server.id !== currentGuild.id)
+                Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
+            else if (currentChannel && currentChannel.id && this.pathCache.channel && this.pathCache.channel.id !== currentChannel.id)
+                Events.emit('channel-switch', currentChannel);
 
-                if (!this.pathCache.server) {
-                    Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
-                    this.pathCache.server = currentGuild;
-                    this.pathCache.channel = currentChannel;
-                    return;
-                }
-
-                if (!this.pathCache.channel) {
-                    Events.emit('channel-switch', currentChannel);
-                    this.pathCache.server = currentGuild;
-                    this.pathCache.channel = currentChannel;
-                    return;
-                }
-
-                if (currentGuild && currentGuild.id && this.pathCache.server && this.pathCache.server.id !== currentGuild.id) {
-                    Events.emit('server-switch', { server: currentGuild, channel: currentChannel });
-                    this.pathCache.server = currentGuild;
-                    this.pathCache.channel = currentChannel;
-                    return;
-                }
-
-                if (currentChannel && currentChannel.id && this.pathCache.channel && this.pathCache.channel.id !== currentChannel.id)
-                    Events.emit('channel-switch', currentChannel);
-
-                this.pathCache.server = currentGuild;
-                this.pathCache.channel = currentChannel;
-            });
-        }, 100);
+            this.pathCache.server = currentGuild;
+            this.pathCache.channel = currentChannel;
+        });
     }
 
     static injectUi() {
         DOM.createElement('div', null, 'bd-settings').appendTo(DOM.bdBody);
         DOM.createElement('div', null, 'bd-modals').appendTo(DOM.bdModals);
+        DOM.createElement('div', null, 'bd-toasts').appendTo(DOM.bdToasts);
         DOM.createElement('bd-tooltips').appendTo(DOM.bdBody);
+
+        this.toasts = new Vue({
+            el: '#bd-toasts',
+            components: { BdToasts },
+            template: '<BdToasts />'
+        });
 
         this.modals = new Vue({
             el: '#bd-modals',

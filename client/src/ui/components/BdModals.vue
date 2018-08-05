@@ -47,9 +47,12 @@
             Events.on('bd-refresh-modals', this.eventListener = () => {
                 this.$forceUpdate();
             });
+
+            window.addEventListener('keyup', this.keyupListener);
         },
         destroyed() {
             if (this.eventListener) Events.off('bd-refresh-modals', this.eventListener);
+            window.removeEventListener('keyup', this.keyupListener);
         },
         methods: {
             closeModal(modal) {
@@ -57,6 +60,10 @@
             },
             downscale(index, times) {
                 return 1 - ((this.modals.stack.filter(m => !m.closing).length - index) * times);
+            },
+            keyupListener(e) {
+                if (this.modals.stack.length && e.which === 27)
+                    this.modals.closeLast(e.shiftKey);
             }
         }
     }

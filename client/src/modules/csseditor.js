@@ -8,12 +8,12 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { FileUtils, ClientLogger as Logger, ClientIPC } from 'common';
-import Settings from './settings';
 import { DOM } from 'ui';
-import filewatcher from 'filewatcher';
+import { FileUtils, ClientLogger as Logger, ClientIPC } from 'common';
 import path from 'path';
 import electron from 'electron';
+import filewatcher from 'filewatcher';
+import Settings from './settings';
 
 /**
  * Custom css editor communications

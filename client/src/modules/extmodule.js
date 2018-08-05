@@ -8,13 +8,14 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import Globals from './globals';
 import Content from './content';
 
 export default class ExtModule extends Content {
 
     constructor(internals) {
         super(internals);
-        this.__require = window.require(this.paths.mainPath);
+        this.__require = Globals.require(this.paths.mainPath);
     }
 
     get type() { return 'module' }

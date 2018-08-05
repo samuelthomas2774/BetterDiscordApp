@@ -31,10 +31,13 @@ module.exports = {
         loaders: [jsLoader, vueLoader, scssLoader]
     },
     externals: {
-        electron: 'window.require("electron")',
-        fs: 'window.require("fs")',
-        path: 'window.require("path")',
-        node_utils: 'window.require("util")',
+        electron: 'require("electron")',
+        fs: 'require("fs")',
+        path: 'require("path")',
+        util: 'require("util")',
+        process: 'require("process")',
+        net: 'require("net")',
+        request: 'require(require("path").join(require("electron").remote.app.getAppPath(), "node_modules", "request"))',
         sparkplug: 'require("../../core/dist/sparkplug")'
     },
     resolve: {
@@ -55,5 +58,9 @@ module.exports = {
         process: false,
         __filename: false,
         __dirname: false
-    }
+    },
+    plugins: [
+        new webpack.NamedModulesPlugin(),
+        new webpack.EvalSourceMapDevToolPlugin()
+    ]
 };

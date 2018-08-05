@@ -1,47 +1,25 @@
+/**
+ * BetterDiscord Discord API
+ * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
+ * All rights reserved.
+ * https://betterdiscord.net
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+*/
+
+import { List } from 'structs';
+import { User, Channel, Guild, Message } from 'discordstructs';
 import { WebpackModules } from './webpackmodules';
-import { $ } from 'vendor';
 
-class List extends Array {
-
-    constructor() {
-        super(...arguments);
-    }
-
-    get(...filters) {
-        return this.find(item => {
-            for (let filter of filters) {
-                for (let key in filter) {
-                    if (filter.hasOwnProperty(key)) {
-                        if (item[key] !== filter[key]) return false;
-                    }
-                }
-            }
-            return true;
-        });
-    }
-}
-
-class PermissionsError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'PermissionsError';
-    }
-}
-
-class InsufficientPermissions extends PermissionsError {
-    constructor(message) {
-        super(`Missing Permission — ${message}`)
-        this.name = 'InsufficientPermissions';
-    }
-}
-
-const Modules = {
+export const Modules = {
     _getModule(name) {
         const foundModule = WebpackModules.getModuleByName(name);
         if (!foundModule) return null;
         delete this[name];
         return this[name] = foundModule;
     },
+
     get ChannelSelector() { return this._getModule('ChannelSelector'); },
     get MessageActions() { return this._getModule('MessageActions'); },
     get MessageParser() { return this._getModule('MessageParser'); },
@@ -64,356 +42,258 @@ const Modules = {
     get UserStore() { return this._getModule('UserStore'); },
     get RelationshipStore() { return this._getModule('RelationshipStore'); },
     get RelationshipManager() { return this._getModule('RelationshipManager'); },
+    get ChangeNicknameModal() { return this._getModule('ChangeNicknameModal'); },
+    get UserSettingsStore() { return this._getModule('UserSettingsStore'); },
+    get UserSettingsWindow() { return this._getModule('UserSettingsWindow'); },
+    get UserStatusStore() { return this._getModule('UserStatusStore'); },
+    get ChannelSettingsWindow() { return this._getModule('ChannelSettingsWindow'); },
+    get GuildSettingsWindow() { return this._getModule('GuildSettingsWindow'); },
+    get CreateChannelModal() { return this._getModule('CreateChannelModal'); },
+    get PruneMembersModal() { return this._getModule('PruneMembersModal'); },
+    get NotificationSettingsModal() { return this._getModule('NotificationSettingsModal'); },
+    get PrivacySettingsModal() { return this._getModule('PrivacySettingsModal'); },
+    get UserProfileModal() { return this._getModule('UserProfileModal'); },
+    get APIModule() { return this._getModule('APIModule'); },
+    get UserNoteStore() { return this._getModule('UserNoteStore'); },
 
     get DiscordPermissions() { return this.DiscordConstants.Permissions; }
-
 };
-
-class User {
-    constructor(data) {
-        for (let key in data)
-            if (data.hasOwnProperty(key))
-                this[key] = data[key];
-        this.discordObject = data;
-    }
-
-    static fromId(id) {
-        return new User(Modules.UserStore.getUser(id));
-    }
-
-    async sendMessage(content, parse = true) {
-        const id = await Modules.PrivateChannelActions.ensurePrivateChannel(DiscordApi.currentUser.id, this.id);
-        const channel = new PrivateChannel(Modules.ChannelStore.getChannel(id));
-        channel.sendMessage(content, parse);
-    }
-
-    get isFriend() {
-        return Modules.RelationshipStore.isFriend(this.id);
-    }
-
-    get isBlocked() {
-        return Modules.RelationshipStore.isBlocked(this.id);
-    }
-
-    addFriend() {
-        Modules.RelationshipManager.addRelationship(this.id, {location: 'Context Menu'});
-    }
-
-    removeFriend() {
-        Modules.RelationshipManager.removeRelationship(this.id, {location: 'Context Menu'});
-    }
-
-    block() {
-        Modules.RelationshipManager.addRelationship(this.id, {location: 'Context Menu'}, Modules.DiscordConstants.RelationshipTypes.BLOCKED);
-    }
-
-    unblock() {
-        Modules.RelationshipManager.removeRelationship(this.id, {location: 'Context Menu'});
-    }
-}
-
-class Member extends User {
-    constructor(data, guild) {
-        super(data);
-        const userData = Modules.UserStore.getUser(data.userId);
-        for (let key in userData)
-            if (userData.hasOwnProperty(key))
-                this[key] = userData[key];
-        this.guild_id = guild;
-    }
-
-    checkPermissions(perms) {
-        return Modules.PermissionUtils.can(perms, DiscordApi.currentUser, Modules.GuildStore.getGuild(this.guild_id));
-    }
-
-    kick(reason = '') {
-        if (!this.checkPermissions(Modules.DiscordPermissions.KICK_MEMBERS)) throw new InsufficientPermissions('KICK_MEMBERS');
-        Modules.GuildActions.kickUser(this.guild_id, this.id, reason);
-    }
-
-    ban(daysToDelete = '1', reason = '') {
-        if (!this.checkPermissions(Modules.DiscordPermissions.BAN_MEMBERS)) throw new InsufficientPermissions('BAN_MEMBERS');
-        Modules.GuildActions.banUser(this.guild_id, this.id, daysToDelete, reason);
-    }
-
-    unban() {
-        if (!this.checkPermissions(Modules.DiscordPermissions.BAN_MEMBERS)) throw new InsufficientPermissions('BAN_MEMBERS');
-        Modules.GuildActions.unbanUser(this.guild_id, this.id);
-    }
-
-    move(channel_id) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.MOVE_MEMBERS)) throw new InsufficientPermissions('MOVE_MEMBERS');
-        Modules.GuildActions.setChannel(this.guild_id, this.id, channel_id);
-    }
-
-    mute(active = true) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.MUTE_MEMBERS)) throw new InsufficientPermissions('MUTE_MEMBERS');
-        Modules.GuildActions.setServerMute(this.guild_id, this.id, active);
-    }
-
-    unmute(active = true) {
-        this.mute(false);
-    }
-
-    deafen(active = true) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.DEAFEN_MEMBERS)) throw new InsufficientPermissions('DEAFEN_MEMBERS');
-        Modules.GuildActions.setServerDeaf(this.guild_id, this.id, active);
-    }
-
-    undeafen(active = true) {
-        this.deafen(false);
-    }
-}
-
-class Guild {
-    constructor(data) {
-        for (let key in data)
-            if (data.hasOwnProperty(key))
-                this[key] = data[key];
-        this.discordObject = data;
-    }
-
-    get channels() {
-        const channels = Modules.GuildChannelsStore.getChannels(this.id);
-        const returnChannels = new List();
-        for (const category in channels) {
-            if (channels.hasOwnProperty(category)) {
-                if (!Array.isArray(channels[category])) continue;
-                const channelList = channels[category];
-                for (const channel of channelList) {
-                    returnChannels.push(new GuildChannel(channel.channel));
-                }
-            }
-        }
-        return returnChannels;
-    }
-
-    get defaultChannel() {
-        return new GuildChannel(Modules.GuildChannelsStore.getDefaultChannel(this.id));
-    }
-
-    get members() {
-        const members = Modules.GuildMemberStore.getMembers(this.id);
-        const returnMembers = new List();
-        for (const member of members) returnMembers.push(new Member(member, this.id));
-        return returnMembers;
-    }
-
-    get memberCount() {
-        return Modules.MemberCountStore.getMemberCount(this.id);
-    }
-
-    get emojis() {
-        return Modules.EmojiUtils.getGuildEmoji(this.id);
-    }
-
-    get permissions() {
-        return Modules.GuildPermissions.getGuildPermissions(this.id);
-    }
-
-    getMember(userId) {
-        return Modules.GuildMemberStore.getMember(this.id, userId);
-    }
-
-    isMember(userId) {
-        return Modules.GuildMemberStore.isMember(this.id, userId);
-    }
-
-    markAsRead() {
-        Modules.GuildActions.markGuildAsRead(this.id);
-    }
-
-    select() {
-        Modules.GuildActions.selectGuild(this.id);
-    }
-
-    nsfwAgree() {
-        Modules.GuildActions.nsfwAgree(this.id);
-    }
-
-    nsfwDisagree() {
-        Modules.GuildActions.nsfwDisagree(this.id);
-    }
-
-    changeSortLocation(index) {
-        Modules.GuildActions.move(DiscordApi.guildPositions.indexOf(this.id), index);
-    }
-}
-
-class Channel {
-    constructor(data) {
-        for (let key in data)
-            if (data.hasOwnProperty(key))
-                this[key] = data[key];
-        this.discordObject = data;
-    }
-
-    checkPermissions(perms) {
-        return Modules.PermissionUtils.can(perms, DiscordApi.currentUser, this.discordObject) || this.isPrivate();
-    }
-
-    async sendMessage(content, parse = true) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES)) throw new InsufficientPermissions('SEND_MESSAGES');
-        let response = {};
-        if (parse) response = await Modules.MessageActions._sendMessage(this.id, Modules.MessageParser.parse(this.discordObject, content));
-        else response = await Modules.MessageActions._sendMessage(this.id, {content});
-        return new Message(Modules.MessageStore.getMessage(this.id, response.body.id));
-    }
-
-    get messages() {
-        const messages = Modules.MessageStore.getMessages(this.id).toArray();
-        for (let i in messages)
-            if (messages.hasOwnProperty(i))
-                messages[i] = new Message(messages[i]);
-        return new List(...messages);
-    }
-
-    jumpToPresent() {
-        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL)) throw new InsufficientPermissions('VIEW_CHANNEL');
-        if (this.hasMoreAfter) Modules.MessageActions.jumpToPresent(this.id, Modules.DiscordConstants.MAX_MESSAGES_PER_CHANNEL);
-        else this.messages[this.messages.length - 1].jumpTo(false);
-    }
-
-    get hasMoreAfter() {
-        return Modules.MessageStore.getMessages(this.id).hasMoreAfter;
-    }
-
-    sendInvite(inviteId) {
-        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL | Modules.DiscordPermissions.SEND_MESSAGES)) throw new InsufficientPermissions('SEND_MESSAGES');
-        Modules.MessageActions.sendInvite(this.id, inviteId);
-    }
-
-    select() {
-        if (!this.checkPermissions(Modules.DiscordPermissions.VIEW_CHANNEL)) throw new InsufficientPermissions('VIEW_CHANNEL');
-        Modules.NavigationUtils.transitionToGuild(this.guild_id ? this.guild_id : Modules.DiscordConstants.ME, this.id);
-    }
-}
-
-class GuildChannel extends Channel {
-
-    constructor(data) {
-        super(data);
-    }
-
-    get permissions() {
-        return Modules.GuildPermissions.getChannelPermissions(this.id);
-    }
-
-    get guild() {
-        return new Guild(Modules.GuildStore.getGuild(this.guild_id));
-    }
-
-    isDefaultChannel() {
-        return Modules.GuildChannelsStore.getDefaultChannel(this.guild_id).id === this.id;
-    }
-
-}
-
-class PrivateChannel extends Channel {
-    constructor(data) {
-        super(data);
-    }
-}
-
-class Message {
-    constructor(data) {
-        for (let key in data)
-            if (data.hasOwnProperty(key))
-                this[key] = data[key];
-        this.discordObject = data;
-    }
-
-    delete() {
-        Modules.MessageActions.deleteMessage(this.channel_id, this.id);
-    }
-
-    // programmatically update the content
-    edit(content, parse = false) {
-        if (this.author.id !== DiscordApi.currentUser.id) return;
-        if (parse) Modules.MessageActions.editMessage(this.channel_id, this.id, Modules.MessageParser.parse(this.discordObject, content));
-        else Modules.MessageActions.editMessage(this.channel_id, this.id, {content});
-    }
-
-    // start the editing mode of GUI
-    startEdit() {
-        if (this.author.id !== DiscordApi.currentUser.id) return;
-        Modules.MessageActions.startEditMessage(this.channel_id, this.id, this.content);
-    }
-
-    // end editing mode of GUI
-    endEdit() {
-        Modules.MessageActions.endEditMessage();
-    }
-
-    jumpTo(flash = true) {
-        Modules.MessageActions.jumpToMessage(this.channel_id, this.id, flash);
-    }
-}
 
 export default class DiscordApi {
 
-    static get channels() {
-        const channels = Modules.ChannelStore.getChannels();
-        const returnChannels = new List();
-        for (const [key, value] of Object.entries(channels)) {
-            returnChannels.push(value.isPrivate() ? new PrivateChannel(value) : new GuildChannel(value));
-        }
-        return returnChannels;
-    }
+    static get modules() { return Modules }
+    static get User() { return User }
+    static get Channel() { return Channel }
+    static get Guild() { return Guild }
+    static get Message() { return Message }
 
+    /**
+     * A list of loaded guilds.
+     */
     static get guilds() {
         const guilds = Modules.GuildStore.getGuilds();
-        const returnGuilds = new List();
-        for (const [key, value] of Object.entries(guilds)) {
-            returnGuilds.push(new Guild(value));
-        }
-        return returnGuilds;
+        return List.from(Object.entries(guilds), ([i, g]) => Guild.from(g));
     }
 
+    /**
+     * A list of loaded channels.
+     */
+    static get channels() {
+        const channels = Modules.ChannelStore.getChannels();
+        return List.from(Object.entries(channels), ([i, c]) => Channel.from(c));
+    }
+
+    /**
+     * A list of loaded users.
+     */
     static get users() {
         const users = Modules.UserStore.getUsers();
-        const returnUsers = new List();
-        for (const [key, value] of Object.entries(users)) {
-            returnUsers.push(new User(value));
-        }
-        return returnUsers;
+        return List.from(Object.entries(users), ([i, u]) => User.from(u));
     }
 
+    /**
+     * An object mapping guild IDs to their member counts.
+     */
     static get memberCounts() {
         return Modules.MemberCountStore.getMemberCounts();
     }
 
+    /**
+     * A list of guilds in the order they appear in the server list.
+     */
     static get sortedGuilds() {
         const guilds = Modules.SortedGuildStore.getSortedGuilds();
-        const returnGuilds = new List();
-        for (const guild of guilds) {
-            returnGuilds.push(new Guild(guild));
-        }
-        return returnGuilds;
+        return List.from(guilds, g => Guild.from(g));
     }
 
+    /**
+     * An array of guild IDs in the order they appear in the server list.
+     */
     static get guildPositions() {
         return Modules.SortedGuildStore.guildPositions;
     }
 
+    /**
+     * The currently selected guild.
+     */
     static get currentGuild() {
-        return new Guild(Modules.GuildStore.getGuild(Modules.SelectedGuildStore.getGuildId()));
+        const guild = Modules.GuildStore.getGuild(Modules.SelectedGuildStore.getGuildId());
+        if (guild) return Guild.from(guild);
     }
 
+    /**
+     * The currently selected channel.
+     */
     static get currentChannel() {
         const channel = Modules.ChannelStore.getChannel(Modules.SelectedChannelStore.getChannelId());
-        if (channel) return channel.isPrivate() ? new PrivateChannel(channel) : new GuildChannel(channel);
+        if (channel) return Channel.from(channel);
     }
 
+    /**
+     * The current user.
+     */
     static get currentUser() {
-        return Modules.UserStore.getCurrentUser();
+        const user = Modules.UserStore.getCurrentUser();
+        if (user) return User.from(user);
     }
 
+    /**
+     * A list of the current user's friends.
+     */
     static get friends() {
         const friends = Modules.RelationshipStore.getFriendIDs();
-        const returnUsers = new List();
-        for (const id of friends) returnUsers.push(User.fromId(id));
-        return returnUsers;
+        return List.from(friends, id => User.fromId(id));
     }
 
+    static get UserSettings() {
+        return UserSettings;
+    }
+
+}
+
+export class UserSettings {
+    /**
+     * Opens Discord's settings UI.
+     */
+    static open(section = 'ACCOUNT') {
+        Modules.UserSettingsWindow.setSection(section);
+        Modules.UserSettingsWindow.open();
+    }
+
+    /**
+     * The user's current status. Either "online", "idle", "dnd" or "invisible".
+     */
+    static get status() { return Modules.UserSettingsStore.status }
+
+    /**
+     * The user's selected explicit content filter level.
+     * 0 == off, 1 == everyone except friends, 2 == everyone
+     * Configurable in the privacy and safety panel.
+     */
+    static get explicitContentFilter() { return Modules.UserSettingsStore.explicitContentFilter }
+
+    /**
+     * Whether to disallow direct messages from server members by default.
+     */
+    static get defaultGuildsRestricted() { return Modules.UserSettingsStore.defaultGuildsRestricted }
+
+    /**
+     * An array of guilds to disallow direct messages from their members.
+     * This is bypassed if the member is has another mutual guild with this disabled, or the member is friends with the current user.
+     * Configurable in each server's privacy settings.
+     */
+    static get restrictedGuildIds() { return Modules.UserSettingsStore.restrictedGuilds }
+
+    static get restrictedGuilds() {
+        return List.from(this.restrictedGuildIds, id => Guild.fromId(id) || id);
+    }
+
+    /**
+     * An array of flags specifying who should be allowed to add the current user as a friend.
+     * If everyone is checked, this will only have one item, "all". Otherwise it has either "mutual_friends", "mutual_guilds", both or neither.
+     * Configurable in the privacy and safety panel.
+     */
+    static get friendSourceFlags() { return Object.keys(Modules.UserSettingsStore.friendSourceFlags) }
+    static get friendSourceEveryone() { return this.friendSourceFlags.include('all') }
+    static get friendSourceMutual_friends() { return this.friendSourceFlags.include('all') || this.friendSourceFlags.include('mutual_friends') }
+    static get friendSourceMutual_guilds() { return this.friendSourceFlags.include('all') || this.friendSourceFlags.include('mutual_guilds') }
+    static get friendSourceAnyone() { return this.friendSourceFlags.length > 0 }
+
+    /**
+     * Whether to automatically add accounts from other platforms running on the user's computer.
+     * Configurable in the connections panel.
+     */
+    static get detectPlatformAccounts() { return Modules.UserSettingsStore.detectPlatformAccounts }
+
+    /**
+     * The number of seconds Discord will wait for activity before sending mobile push notifications.
+     * Configurable in the notifications panel.
+     */
+    static get afkTimeout() { return Modules.UserSettingsStore.afkTimeout }
+
+    /**
+     * Whether to display the currently running game as a status message.
+     * Configurable in the games panel.
+     */
+    static get showCurrentGame() { return Modules.UserSettingsStore.showCurrentGame }
+
+    /**
+     * Whether to show images uploaded directly to Discord.
+     * Configurable in the text and images panel.
+     */
+    static get inlineAttachmentMedia() { return Modules.UserSettingsStore.inlineAttachmentMedia }
+
+    /**
+     * Whether to show images linked in Discord.
+     * Configurable in the text and images panel.
+     */
+    static get inlineEmbedMedia() { return Modules.UserSettingsStore.inlineEmbedMedia }
+
+    /**
+     * Whether to automatically play GIFs when the Discord window is active without having to hover the mouse over the image.
+     * Configurable in the text and images panel.
+     */
+    static get autoplayGifs() { return Modules.UserSettingsStore.gifAutoPlay }
+
+    /**
+     * Whether to show content from HTTP[s] links as embeds.
+     * Configurable in the text and images panel.
+     */
+    static get showEmbeds() { return Modules.UserSettingsStore.renderEmbeds }
+
+    /**
+     * Whether to show a message's reactions.
+     * Configurable in the text and images panel.
+     */
+    static get showReactions() { return Modules.UserSettingsStore.renderReactions }
+
+    /**
+     * Whether to play animated emoji.
+     * Configurable in the text and images panel.
+     */
+    static get animateEmoji() { return Modules.UserSettingsStore.animateEmoji }
+
+    /**
+     * Whether to convert ASCII emoticons to emoji.
+     * Configurable in the text and images panel.
+     */
+    static get convertEmoticons() { return Modules.UserSettingsStore.convertEmoticons }
+
+    /**
+     * Whether to allow playing text-to-speech messages.
+     * Configurable in the text and images panel.
+     */
+    static get allowTts() { return Modules.UserSettingsStore.enableTTSCommand }
+
+    /**
+     * The user's selected theme. Either "dark" or "light".
+     * Configurable in the appearance panel.
+     */
+    static get theme() { return Modules.UserSettingsStore.theme }
+
+    /**
+     * Whether the user has enabled compact mode.
+     * `true` if compact mode is enabled, `false` if cozy mode is enabled.
+     * Configurable in the appearance panel.
+     */
+    static get displayCompact() { return Modules.UserSettingsStore.messageDisplayCompact }
+
+    /**
+     * Whether the user has enabled developer mode.
+     * Currently only adds a "Copy ID" option to the context menu on users, guilds and channels.
+     * Configurable in the appearance panel.
+     */
+    static get developerMode() { return Modules.UserSettingsStore.developerMode }
+
+    /**
+     * The user's selected language code.
+     * Configurable in the language panel.
+     */
+    static get locale() { return Modules.UserSettingsStore.locale }
+
+    /**
+     * The user's timezone offset in hours.
+     * This is not configurable.
+     */
+    static get timezoneOffset() { return Modules.UserSettingsStore.timezoneOffset }
 }

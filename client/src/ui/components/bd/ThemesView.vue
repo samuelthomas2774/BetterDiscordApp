@@ -26,8 +26,8 @@
                 <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :data-theme-id="theme.id" @toggle-theme="toggleTheme(theme)" @reload-theme="reload => reloadTheme(theme, reload)" @show-settings="dont_clone => showSettings(theme, dont_clone)" @delete-theme="unload => deleteTheme(theme, unload)" />
             </div>
             <div v-if="!local" class="bd-online-ph">
-                <h3>Coming Soon</h3>
-                <a href="https://v2.betterdiscord.net/themes" target="_new">Website Browser</a>
+                <h2 v-if="loadingOnline">Loading</h2>
+                <ThemeCard v-else-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :theme="theme" :data-theme-id="theme.id" :online="true"/>
             </div>
         </div>
     </SettingsWrapper>
@@ -35,7 +35,7 @@
 
 <script>
     // Imports
-    import { ThemeManager } from 'modules';
+    import { ThemeManager, BdWebApi } from 'modules';
     import { Modals } from 'ui';
     import { ClientLogger as Logger } from 'common';
     import { MiRefresh } from '../common';
@@ -48,7 +48,9 @@
             return {
                 ThemeManager,
                 local: true,
-                localThemes: ThemeManager.localThemes
+                localThemes: ThemeManager.localThemes,
+                onlineThemes: null,
+                loadingOnline: false
             };
         },
         components: {
@@ -60,14 +62,24 @@
             showLocal() {
                 this.local = true;
             },
-            showOnline() {
+            async showOnline() {
                 this.local = false;
+                if (this.loadingOnline || this.onlineThemes) return;
+                await this.refreshOnline();
             },
             async refreshLocal() {
                 await this.ThemeManager.refreshThemes();
             },
             async refreshOnline() {
-                // TODO
+                this.loadingOnline = true;
+                try {
+                    const getThemes = await BdWebApi.themes.get();
+                    this.onlineThemes = JSON.parse(getThemes);
+                } catch (err) {
+                    Logger.err('ThemesView', err);
+                } finally {
+                    this.loadingOnline = false;
+                }
             },
             async toggleTheme(theme) {
                 // TODO: display error if theme fails to enable/disable

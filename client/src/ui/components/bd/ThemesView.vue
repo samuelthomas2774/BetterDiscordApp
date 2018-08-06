@@ -27,7 +27,7 @@
             </div>
             <div v-if="!local" class="bd-online-ph">
                 <h2 v-if="loadingOnline">Loading</h2>
-                <ThemeCard v-else-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :theme="theme" :data-theme-id="theme.id" :online="true"/>
+                <RemoteCard v-else-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme"/>
             </div>
         </div>
     </SettingsWrapper>
@@ -41,6 +41,7 @@
     import { MiRefresh } from '../common';
     import SettingsWrapper from './SettingsWrapper.vue';
     import ThemeCard from './ThemeCard.vue';
+    import RemoteCard from './RemoteCard.vue';
     import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
@@ -54,7 +55,7 @@
             };
         },
         components: {
-            SettingsWrapper, ThemeCard,
+            SettingsWrapper, ThemeCard, RemoteCard,
             MiRefresh,
             RefreshBtn
         },

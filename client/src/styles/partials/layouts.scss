@@ -2,19 +2,23 @@
     display: flex;
 }
 
-.bd-flex-row {
+.bd-flex-row,
+.bd-flexRow {
     flex-direction: row;
 }
 
-.bd-flex-col {
+.bd-flex-col,
+.bd-flexCol {
     flex-direction: column;
 }
 
-.bd-flex-grow {
+.bd-flex-grow,
+.bd-flexGrow {
     flex-grow: 1;
 }
 
-.bd-flex-spacer {
+.bd-flex-spacer,
+.bd-flexSpacer {
     flex-grow: 1;
 }
 

@@ -46,6 +46,7 @@
                         <SettingsPanel :settings="item.set" :schemes="item.set.schemes" />
                     </SettingsWrapper>
 
+                    <ConnectivityView v-if="item.contentid === 'connectivity'"/>
                     <CssEditorView v-if="item.contentid === 'css'" />
                     <PluginsView v-if="item.contentid === 'plugins'" />
                     <ThemesView v-if="item.contentid === 'themes'" />
@@ -62,7 +63,7 @@
     import { BdMenuItems } from 'ui';
     import { shell } from 'electron';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView } from './bd';
+    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView } from './bd';
     import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
 
     export default {
@@ -82,7 +83,7 @@
         props: ['active'],
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView,
+            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView,
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         computed: {

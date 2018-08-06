@@ -233,12 +233,23 @@ export class ReactComponents {
                     return;
                 }
 
-                const element = document.querySelector(important.selector);
-                if (!element) return;
+                const elements = document.querySelectorAll(important.selector);
+                if (!elements.length) return;
+
+                let component, reflect;
+                for (let element of elements) {
+                    reflect = Reflection(element);
+                    component = filter ? reflect.components.find(filter) : reflect.component;
+                    if (component) break;
+                }
+
+                if (!component && filter) {
+                    Logger.log('ReactComponents', ['Found elements matching the query selector but no components passed the filter']);
+                    return;
+                }
 
                 DOM.observer.unsubscribe(observerSubscription);
-                const reflect = Reflection(element);
-                const component = filter ? reflect.components.find(filter) : reflect.component;
+
                 if (!component) {
                     Logger.err('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, element]);
                     return;
@@ -250,7 +261,7 @@ export class ReactComponents {
                 this.push(component, undefined, important);
             };
 
-            const observerSubscription = DOM.observer.subscribeToQuerySelector(callback, important.selector);
+            const observerSubscription = DOM.observer.subscribeToQuerySelector(callback, important.selector, null, true);
             setTimeout(callback, 0);
         }
 

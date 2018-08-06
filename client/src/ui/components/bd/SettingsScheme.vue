@@ -24,7 +24,8 @@
         props: ['scheme', 'is-active'],
         data() {
             return {
-                iconURL: undefined
+                iconURL: undefined,
+                updatingIcon: false
             };
         },
         methods: {
@@ -38,10 +39,27 @@
                 } catch (err) {
                     Logger.err('SettingsScheme', ['Invalid icon URL', this.scheme, err]);
                 }
+            },
+            async refreshIcon() {
+                if (this.updatingIcon) return;
+                this.updatingIcon = true;
+                this.iconURL = this.scheme.icon_url || await this.getIconURLFromPath();
+                this.updatingIcon = false;
             }
         },
-        async created() {
-            this.iconURL = this.scheme.icon_url || await this.getIconURLFromPath();
+        watch: {
+            'scheme.path'() {
+                this.refreshIcon();
+            },
+            'scheme.icon_path'() {
+                this.refreshIcon();
+            },
+            'scheme.icon_type'() {
+                this.refreshIcon();
+            }
+        },
+        created() {
+            this.refreshIcon();
         }
     }
 </script>

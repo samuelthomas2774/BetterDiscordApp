@@ -37,6 +37,8 @@ export const BdMenuItems = new class {
         Events.on('update-check-end', () => updater.hidden = true);
         Events.on('updates-available', () => updater.hidden = false);
 
+        this.add({ category: 'Internal', contentid: 'connectivity', text: 'Connectivity' });
+
         this.addSettingsSet('Internal', 'core', 'Core');
         this.addSettingsSet('Internal', 'ui', 'UI');
         this.addSettingsSet('Internal', 'emotes', 'Emotes');

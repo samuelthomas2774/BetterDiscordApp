@@ -33,6 +33,21 @@ export default class SettingsScheme {
     }
 
     /**
+     * The path of the scheme's icon relative to the content path.
+     */
+    get icon_path() {
+        return this.args.icon_path;
+    }
+
+    /**
+     * The MIME type of the scheme's icon.
+     * This is only needed when using `icon_path` and the MIME type cannot be determined from the file contents. (Usually when using an SVG.)
+     */
+    get icon_type() {
+        return this.args.icon_type;
+    }
+
+    /**
      * The scheme's name.
      */
     get name() {
@@ -51,6 +66,14 @@ export default class SettingsScheme {
      */
     get settings() {
         return this.args.settings || [];
+    }
+
+    /**
+     * The path of the plugin/theme this scheme is part of.
+     * Use scheme.setContentPath to change.
+     */
+    get path() {
+        return this.args.path;
     }
 
     /**
@@ -87,6 +110,14 @@ export default class SettingsScheme {
      */
     applyTo(set) {
         return set.merge(this);
+    }
+
+    /**
+     * Sets the path of the plugin/theme this setting is part of.
+     * @param {String} contentPath The plugin/theme's directory path
+     */
+    setContentPath(contentPath) {
+        this.args.path = contentPath;
     }
 
 }

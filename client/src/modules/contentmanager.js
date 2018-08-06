@@ -225,6 +225,10 @@ export default class {
                 setting.setContentPath(contentPath);
             }
 
+            for (let scheme of userConfig.config.schemes) {
+                scheme.setContentPath(contentPath);
+            }
+
             Utils.deepfreeze(defaultConfig, object => object instanceof Combokeys);
 
             const configs = {

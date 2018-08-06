@@ -12,13 +12,7 @@
     <div class="bd-settings-panel">
         <div class="bd-settings-schemes" v-if="schemes && schemes.length">
             <div class="bd-settings-schemes-container">
-                <template v-for="scheme in schemes">
-                    <div class="bd-settings-scheme" :class="{'bd-active': scheme.isActive(settings)}" @click="() => scheme.applyTo(settings)">
-                        <div class="bd-settings-scheme-icon" :style="{'background-image': `url(&quot;${scheme.icon_url}&quot;)`}"></div>
-                        <div class="bd-settings-scheme-name" v-if="scheme.name">{{ scheme.name }}</div>
-                        <div class="bd-settings-scheme-hint" v-if="scheme.hint">{{ scheme.hint }}</div>
-                    </div>
-                </template>
+                <SettingsScheme v-for="scheme in schemes" :key="scheme.id" :scheme="scheme" :is-active="scheme.isActive(settings)" @apply="scheme.applyTo(settings)" />
             </div>
         </div>
 
@@ -49,12 +43,14 @@
 <script>
     // Imports
     import { Utils } from 'common';
+    import SettingsScheme from './SettingsScheme.vue';
     import Setting from './setting/Setting.vue';
     import Drawer from '../common/Drawer.vue';
 
     export default {
         props: ['settings', 'schemes'],
         components: {
+            SettingsScheme,
             Setting,
             Drawer
         }

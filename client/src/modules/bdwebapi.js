@@ -13,23 +13,54 @@ import { request } from 'vendor';
 const APIBASE = 'ifyouareinwebtestthenyouknowwhatthisshouldbe'; // Do not push
 const ENDPOINTS = {
     'themes': `${APIBASE}/themes`,
+    'theme': id => `${APIBASE}/theme/${id}`,
     'users': `${APIBASE}/users`,
+    'user': id => `${APIBASE}/user/${id}`,
     'statistics': `${APIBASE}/statistics`
 };
 
 export default class BdWebApi {
 
-    static async getThemes() {
-        const get = await request.get(ENDPOINTS.themes);
-        return JSON.parse(get);
+    static get themes() {
+        return {
+            get: this.getThemes
+        };
     }
 
-    static async getUsers() {
-        const get = await request.get(ENDPOINTS.users);
-        return get;
+    static get users() {
+        return {
+            get: this.getUsers
+        };
     }
 
-    static async patchStatistics(json) {
-        return await request({ method: 'PATCH', url: ENDPOINTS.statistics, json });
+    static get statistics() {
+        return {
+            get: this.getStatistics,
+            patch: this.patchStatistics
+        };
+    }
+
+    static getThemes(args) {
+        if (!args) return request.get(ENDPOINTS.themes);
+        const { id } = args;
+        if (id) return request.get(ENDPOINTS.theme(id));
+
+        return request.get(ENDPOINTS.themes);
+    }
+
+    static getUsers(args) {
+        if (!args) return request.get(ENDPOINTS.users);
+        const { id } = args;
+        if (id) return request.get(ENDPOINTS.user(id));
+
+        return request.get(ENDPOINTS.users);
+    }
+
+    static getStatistics() {
+        return request.get(ENDPOINTS.statistics);
+    }
+
+    static patchStatistics(json) {
+        return request({ method: 'PATCH', url: ENDPOINTS.statistics, json });
     }
 }

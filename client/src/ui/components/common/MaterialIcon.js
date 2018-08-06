@@ -17,3 +17,4 @@ export { default as MiStar } from './materialicons/Star.vue';
 export { default as MiInfo } from './materialicons/Info.vue';
 export { default as MiWarning } from './materialicons/Warning.vue';
 export { default as MiSuccess } from './materialicons/Success.vue';
+export { default as AccountCircle } from './materialicons/AccountCircle.vue';

@@ -251,7 +251,7 @@ export class ReactComponents {
                 DOM.observer.unsubscribe(observerSubscription);
 
                 if (!component) {
-                    Logger.err('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, element]);
+                    Logger.err('ReactComponents', [`FAILED TO GET IMPORTANT COMPONENT ${name} WITH REFLECTION FROM`, elements]);
                     return;
                 }
 

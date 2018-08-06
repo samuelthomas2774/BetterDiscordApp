@@ -64,8 +64,12 @@ export default class SettingsScheme {
     /**
      * An array of stripped settings categories this scheme manages.
      */
+    get categories() {
+        return this.args.categories || this.args.settings || [];
+    }
+
     get settings() {
-        return this.args.settings || [];
+        return this.categories;
     }
 
     /**
@@ -82,21 +86,21 @@ export default class SettingsScheme {
      * @return {Boolean}
      */
     isActive(set) {
-        for (let schemeCategory of this.settings) {
-            const category = set.categories.find(c => c.category === schemeCategory.category);
+        for (let schemeCategory of this.categories) {
+            const category = set.categories.find(c => c.id === (schemeCategory.id || schemeCategory.category));
             if (!category) {
-                Logger.warn('SettingsScheme', `Category ${schemeCategory.category} does not exist`);
+                Logger.warn('SettingsScheme', `Category ${schemeCategory.id || schemeCategory.category} does not exist`);
                 return false;
             }
 
             for (let schemeSetting of schemeCategory.settings) {
                 const setting = category.settings.find(s => s.id === schemeSetting.id);
                 if (!setting) {
-                    Logger.warn('SettingsScheme', `Setting ${schemeCategory.category}/${schemeSetting.id} does not exist`);
+                    Logger.warn('SettingsScheme', `Setting ${category.category}/${schemeSetting.id} does not exist`);
                     return false;
                 }
 
-                if (!Utils.compare(setting.value, schemeSetting.value)) return false;
+                if (!Utils.compare(setting.args.value, schemeSetting.value)) return false;
             }
         }
 

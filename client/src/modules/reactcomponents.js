@@ -309,7 +309,7 @@ export class ReactComponents {
 export class ReactAutoPatcher {
     /**
      * Wait for React to be loaded and patch it's createElement to store all unknown components.
-     * Also patches of some known components.
+     * Also patches some known components.
      */
     static async autoPatch() {
         const React = await WebpackModules.waitForModuleByName('React');
@@ -323,16 +323,8 @@ export class ReactAutoPatcher {
      * Patches a few known components.
      */
     static patchComponents() {
-        return Promise.all([
-            this.patchMessage(),
-            this.patchMessageGroup(),
-            this.patchChannelMember(),
-            this.patchGuild(),
-            this.patchChannel(),
-            this.patchChannelList(),
-            this.patchUserProfileModal(),
-            this.patchUserPopout()
-        ]);
+        const componentPatchFunctions = Object.getOwnPropertyNames(this).filter(p => p.startsWith('patch') && p !== 'patchComponents');
+        return Promise.all(componentPatchFunctions.map(p => this[p].call(this)));
     }
 
     static async patchMessage() {
@@ -407,6 +399,9 @@ export class ReactAutoPatcher {
         this.Guild.forceUpdateAll();
     }
 
+    /**
+     * The Channel component contains the header, message scroller, message form and member list.
+     */
     static async patchChannel() {
         const selector = '.chat';
         this.Channel = await ReactComponents.getComponent('Channel', {selector});
@@ -424,21 +419,53 @@ export class ReactAutoPatcher {
         this.Channel.forceUpdateAll();
     }
 
-    static async patchChannelList() {
+    /**
+     * The GuildTextChannel component represents a text channel in the guild channel list.
+     */
+    static async patchGuildTextChannel() {
         const selector = '.' + WebpackModules.getClassName('containerDefault', 'actionIcon');
-        this.GuildChannel = await ReactComponents.getComponent('GuildChannel', {selector});
+        this.GuildTextChannel = await ReactComponents.getComponent('GuildTextChannel', {selector}, c => c.prototype.renderMentionBadge);
 
-        this.unpatchGuildChannel = MonkeyPatch('BD:ReactComponents', this.GuildChannel.component.prototype).after('render', (component, args, retVal) => {
-            const { channel } = component.props;
-            if (!channel) return;
-            retVal.props['data-channel-id'] = channel.id;
-            retVal.props['data-channel-name'] = channel.name;
-            if ([0, 2, 4].includes(channel.type)) retVal.props.className += ' bd-isGuildChannel';
-            if ([1, 3].includes(channel.type)) retVal.props.className += ' bd-isPrivateChannel';
-            if (channel.type === 3) retVal.props.className += ' bd-isGroupChannel';
-        });
+        this.unpatchGuildTextChannel = MonkeyPatch('BD:ReactComponents', this.GuildTextChannel.component.prototype).after('render', this._afterChannelRender);
 
-        this.GuildChannel.forceUpdateAll();
+        this.GuildTextChannel.forceUpdateAll();
+    }
+
+    /**
+     * The GuildVoiceChannel component represents a voice channel in the guild channel list.
+     */
+    static async patchGuildVoiceChannel() {
+        const selector = '.' + WebpackModules.getClassName('containerDefault', 'actionIcon');
+        this.GuildVoiceChannel = await ReactComponents.getComponent('GuildVoiceChannel', {selector}, c => c.prototype.handleVoiceConnect);
+
+        this.unpatchGuildVoiceChannel = MonkeyPatch('BD:ReactComponents', this.GuildVoiceChannel.component.prototype).after('render', this._afterChannelRender);
+
+        this.GuildVoiceChannel.forceUpdateAll();
+    }
+
+    /**
+     * The DirectMessage component represents a channel in the direct messages list.
+     */
+    static async patchDirectMessage() {
+        const selector = '.channel.private';
+        this.DirectMessage = await ReactComponents.getComponent('DirectMessage', {selector}, c => c.prototype.renderAvatar);
+
+        this.unpatchDirectMessage = MonkeyPatch('BD:ReactComponents', this.DirectMessage.component.prototype).after('render', this._afterChannelRender);
+
+        this.DirectMessage.forceUpdateAll();
+    }
+
+    static _afterChannelRender(component, args, retVal) {
+        const { channel } = component.props;
+        if (!channel) return;
+
+        retVal.props['data-channel-id'] = channel.id;
+        retVal.props['data-channel-name'] = channel.name;
+        if ([0, 2, 4].includes(channel.type)) retVal.props.className += ' bd-isGuildChannel';
+        if (channel.type === 2) retVal.props.className += ' bd-isVoiceChannel';
+        // if (channel.type === 4) retVal.props.className += ' bd-isChannelCategory';
+        if ([1, 3].includes(channel.type)) retVal.props.className += ' bd-isPrivateChannel';
+        if (channel.type === 3) retVal.props.className += ' bd-isGroupChannel';
     }
 
     static async patchUserProfileModal() {

@@ -26,6 +26,9 @@
                 <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :data-theme-id="theme.id" @toggle-theme="toggleTheme(theme)" @reload-theme="reload => reloadTheme(theme, reload)" @show-settings="dont_clone => showSettings(theme, dont_clone)" @delete-theme="unload => deleteTheme(theme, unload)" />
             </div>
             <div v-if="!local" class="bd-online-ph">
+                <div class="bd-fancySearch" :class="{'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
+                    <input type="text" class="bd-textInput" @keydown.enter="searchInput" @keyup.stop/>
+                </div>
                 <h2 v-if="loadingOnline">Loading</h2>
                 <RemoteCard v-else-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme"/>
             </div>
@@ -66,7 +69,6 @@
             async showOnline() {
                 this.local = false;
                 if (this.loadingOnline || this.onlineThemes) return;
-                await this.refreshOnline();
             },
             async refreshLocal() {
                 await this.ThemeManager.refreshThemes();
@@ -136,6 +138,10 @@
                 return Modals.contentSettings(theme, null, {
                     dont_clone
                 });
+            },
+            searchInput(e) {
+                this.loadingOnline = true;
+                setTimeout(this.refreshOnline, 1000);
             }
         }
     }

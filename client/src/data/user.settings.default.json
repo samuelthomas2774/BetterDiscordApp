@@ -68,14 +68,14 @@
                         "id": "react-devtools",
                         "type": "bool",
                         "text": "React Developer Tools",
-                        "hint": "Place extension in ext/extensions",
+                        "hint": "Place extension in ext/extensions/rdt",
                         "value": false
                     },
                     {
                         "id": "vue-devtools",
                         "type": "bool",
                         "text": "Vue Developer Tools",
-                        "hint": "Place extension in ext/extensions",
+                        "hint": "Place extension in ext/extensions/vdt",
                         "value": false
                     }
                 ]

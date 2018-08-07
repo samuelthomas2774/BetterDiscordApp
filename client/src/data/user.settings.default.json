@@ -68,14 +68,14 @@
                         "id": "react-devtools",
                         "type": "bool",
                         "text": "React Developer Tools",
-                        "hint": "Enable/Disable React developer tools",
+                        "hint": "Place extension in ext/extensions",
                         "value": false
                     },
                     {
                         "id": "vue-devtools",
                         "type": "bool",
                         "text": "Vue Developer Tools",
-                        "hint": "Enable/Disable Vue developer tools",
+                        "hint": "Place extension in ext/extensions",
                         "value": false
                     }
                 ]

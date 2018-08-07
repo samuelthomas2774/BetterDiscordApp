@@ -39,13 +39,15 @@ export default new class VueDevtoolsModule extends BuiltinModule {
     devToolsOpened() {
         electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
         electron.webFrame.registerURLSchemeAsPrivileged('chrome-extension');
-        const v = electron.remote.BrowserWindow.addDevToolsExtension(path.resolve(Globals.getPath('ext'), 'extensions', 'vdt'));
-        if (v !== undefined) {
-            Toasts.success(v + ' Installed');
-            return;
-        } else {
+        try {
+            const res = electron.remote.BrowserWindow.addDevToolsExtension(path.resolve(Globals.getPath('ext'), 'extensions', 'vdt'));
+            if (res !== undefined) {
+                Toasts.success(res + ' Installed');
+                return;
+            }
+            Toasts.error('Vue.js devtools install failed');
+        } catch (err) {
             Toasts.error('Vue.js devtools install failed');
         }
-
     }
 }

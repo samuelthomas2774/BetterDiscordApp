@@ -32,9 +32,10 @@ exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Com
         const scheme = await set.addScheme({
             id: 'scheme-1',
             name: 'Test scheme',
-            icon_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Cow_female_black_white.jpg/220px-Cow_female_black_white.jpg',
+            icon_path: 'scheme-icon.jpg',
             settings: [{ category: 'default', settings: [{ id: 'test', value: 'Some\npresent\n\nmultiline\n\ntext' }] }]
         });
+        scheme.setContentPath(__dirname);
 
         set.on('settings-updated', async updatedSettings => {
             Logger.log('Updated settings', updatedSettings);

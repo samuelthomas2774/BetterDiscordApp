@@ -372,9 +372,9 @@ export default class SettingsSet extends AsyncEventEmitter {
         if (!categories) return [];
 
         for (let newCategory of categories) {
-            const category = this.find(category => category.category === newCategory.category);
+            const category = this.find(category => category.id === (newCategory.id || newCategory.category));
             if (!category) {
-                Logger.warn('SettingsCategory', `Trying to merge category ${newCategory.id}, which does not exist.`);
+                Logger.warn('SettingsSet', `Trying to merge category ${newCategory.id}, which does not exist.`);
                 continue;
             }
 
@@ -398,14 +398,14 @@ export default class SettingsSet extends AsyncEventEmitter {
      */
     async merge(newSet, emit_multi = true) {
         let updatedSettings = [];
-        // const categories = newSet instanceof Array ? newSet : newSet.settings;
-        const categories = newSet && newSet.args ? newSet.args.settings : newSet ? newSet.settings : newSet;
+        const categories = newSet && newSet.args ? newSet.args.categories || newSet.args.settings :
+            newSet ? newSet.categories || newSet.settings : newSet;
         if (!categories) return [];
 
         for (let newCategory of categories) {
-            const category = this.find(category => category.category === newCategory.category);
+            const category = this.find(category => category.id === (newCategory.id || newCategory.category));
             if (!category) {
-                Logger.warn('SettingsCategory', `Trying to merge category ${newCategory.id}, which does not exist.`);
+                Logger.warn('SettingsSet', `Trying to merge category ${newCategory.id}, which does not exist.`);
                 continue;
             }
 

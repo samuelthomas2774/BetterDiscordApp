@@ -21,7 +21,7 @@ export default class ArraySetting extends Setting {
     constructor(args, ...merge) {
         super(args, ...merge);
 
-        this.args.settings = this.settings.map(category => new SettingsCategory(category));
+        this.args.categories = this.categories.map(category => new SettingsCategory(category));
         this.args.schemes = this.schemes.map(scheme => new SettingsScheme(scheme));
         this.args.items = this.value ? this.value.map(item => this.createItem(item.args || item)) : [];
 
@@ -143,7 +143,7 @@ export default class ArraySetting extends Setting {
 
         const set = new SettingsSet({
             id: item ? item.args ? item.args.id : item.id : Math.random(),
-            settings: Utils.deepclone(this.settings),
+            categories: this.categories.map(c => c.clone()),
             schemes: this.schemes
         }, item ? item.args || item : undefined);
 

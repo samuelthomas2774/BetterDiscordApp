@@ -33,6 +33,21 @@ export default class SettingsScheme {
     }
 
     /**
+     * The path of the scheme's icon relative to the content path.
+     */
+    get icon_path() {
+        return this.args.icon_path;
+    }
+
+    /**
+     * The MIME type of the scheme's icon.
+     * This is only needed when using `icon_path` and the MIME type cannot be determined from the file contents. (Usually when using an SVG.)
+     */
+    get icon_type() {
+        return this.args.icon_type;
+    }
+
+    /**
      * The scheme's name.
      */
     get name() {
@@ -49,8 +64,20 @@ export default class SettingsScheme {
     /**
      * An array of stripped settings categories this scheme manages.
      */
+    get categories() {
+        return this.args.categories || this.args.settings || [];
+    }
+
     get settings() {
-        return this.args.settings || [];
+        return this.categories;
+    }
+
+    /**
+     * The path of the plugin/theme this scheme is part of.
+     * Use scheme.setContentPath to change.
+     */
+    get path() {
+        return this.args.path;
     }
 
     /**
@@ -59,21 +86,21 @@ export default class SettingsScheme {
      * @return {Boolean}
      */
     isActive(set) {
-        for (let schemeCategory of this.settings) {
-            const category = set.categories.find(c => c.category === schemeCategory.category);
+        for (let schemeCategory of this.categories) {
+            const category = set.categories.find(c => c.id === (schemeCategory.id || schemeCategory.category));
             if (!category) {
-                Logger.warn('SettingsScheme', `Category ${schemeCategory.category} does not exist`);
+                Logger.warn('SettingsScheme', `Category ${schemeCategory.id || schemeCategory.category} does not exist`);
                 return false;
             }
 
             for (let schemeSetting of schemeCategory.settings) {
                 const setting = category.settings.find(s => s.id === schemeSetting.id);
                 if (!setting) {
-                    Logger.warn('SettingsScheme', `Setting ${schemeCategory.category}/${schemeSetting.id} does not exist`);
+                    Logger.warn('SettingsScheme', `Setting ${category.category}/${schemeSetting.id} does not exist`);
                     return false;
                 }
 
-                if (!Utils.compare(setting.value, schemeSetting.value)) return false;
+                if (!Utils.compare(setting.args.value, schemeSetting.value)) return false;
             }
         }
 
@@ -87,6 +114,14 @@ export default class SettingsScheme {
      */
     applyTo(set) {
         return set.merge(this);
+    }
+
+    /**
+     * Sets the path of the plugin/theme this setting is part of.
+     * @param {String} contentPath The plugin/theme's directory path
+     */
+    setContentPath(contentPath) {
+        this.args.path = contentPath;
     }
 
 }

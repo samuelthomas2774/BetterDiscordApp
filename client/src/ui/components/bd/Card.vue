@@ -46,7 +46,8 @@
         props: ['item'],
         data() {
             return {
-                iconURL: undefined
+                iconURL: undefined,
+                updatingIcon: false
             };
         },
         components: {
@@ -68,10 +69,27 @@
                 } catch (err) {
                     Logger.err('ContentCard', ['Invalid icon URL', this.item]);
                 }
+            },
+            async refreshIcon() {
+                if (this.updatingIcon) return;
+                this.updatingIcon = true;
+                this.iconURL = await this.getIconURL();
+                this.updatingIcon = false;
             }
         },
-        async created() {
-            this.iconURL = await this.getIconURL();
+        watch: {
+            'item.contentPath'() {
+                this.refreshIcon();
+            },
+            'item.icon'() {
+                this.refreshIcon();
+            },
+            'item.info.icon_type'() {
+                this.refreshIcon();
+            }
+        },
+        created() {
+            this.refreshIcon();
         }
     }
 </script>

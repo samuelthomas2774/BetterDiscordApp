@@ -385,7 +385,7 @@ export class FileUtils {
      */
     static async toDataURI(buffer, type) {
         if (typeof buffer === 'string') buffer = await this.readFileBuffer(buffer);
-        if (!type) type = this.getFileType(buffer).mime;
+        if (!type) type = (await this.getFileType(buffer)).mime;
         return `data:${type};base64,${buffer.toString('base64')}`;
     }
 }

@@ -11,3 +11,4 @@ tests/data
 user.config.json
 /.vs
 /npm-debug.log
+/tests/ext/extensions

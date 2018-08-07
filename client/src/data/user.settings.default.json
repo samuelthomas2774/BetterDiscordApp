@@ -63,6 +63,20 @@
                         "text": "Ignore content manager errors",
                         "hint": "Only when starting Discord. It gets annoying when you're reloading Discord often and have plugins that are meant to fail.",
                         "value": false
+                    },
+                    {
+                        "id": "react-devtools",
+                        "type": "bool",
+                        "text": "React Developer Tools",
+                        "hint": "Place extension in ext/extensions/rdt",
+                        "value": false
+                    },
+                    {
+                        "id": "vue-devtools",
+                        "type": "bool",
+                        "text": "Vue Developer Tools",
+                        "hint": "Place extension in ext/extensions/vdt",
+                        "value": false
                     }
                 ]
             },

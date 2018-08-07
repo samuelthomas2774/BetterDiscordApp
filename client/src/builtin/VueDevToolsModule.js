@@ -33,7 +33,7 @@ export default new class VueDevtoolsModule extends BuiltinModule {
 
     disabled(e) {
         electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
-        electron.remote.BrowserWindow.getAllWindows()[0].webContents.on('devtools-opened', this.devToolsOpened);
+        electron.remote.BrowserWindow.getAllWindows()[0].webContents.removeListener('devtools-opened', this.devToolsOpened);
     }
 
     devToolsOpened() {

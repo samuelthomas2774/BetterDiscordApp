@@ -22,9 +22,19 @@ export default new class VueDevtoolsModule extends BuiltinModule {
         return ['core', 'advanced', 'vue-devtools'];
     }
 
+    get extensionName() {
+        return 'Vue.js devtools';
+    }
+
+    get extensionPath() {
+        return path.join(Globals.getPath('ext'), 'extensions', 'vdt');
+    }
+
     enabled() {
+        if (electron.remote.BrowserWindow.getDevToolsExtensions()[this.extensionName]) return;
+
         try {
-            const res = electron.remote.BrowserWindow.addDevToolsExtension(path.join(Globals.getPath('ext'), 'extensions', 'vdt'));
+            const res = electron.remote.BrowserWindow.addDevToolsExtension(this.extensionPath);
             if (res !== undefined) {
                 Toasts.success(res + ' Installed');
                 return;
@@ -36,7 +46,7 @@ export default new class VueDevtoolsModule extends BuiltinModule {
     }
 
     disabled() {
-        electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
+        electron.remote.BrowserWindow.removeDevToolsExtension(this.extensionName);
     }
 
 }

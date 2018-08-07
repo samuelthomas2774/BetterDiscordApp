@@ -22,9 +22,19 @@ export default new class ReactDevtoolsModule extends BuiltinModule {
         return ['core', 'advanced', 'react-devtools'];
     }
 
+    get extensionName() {
+        return 'React Developer Tools';
+    }
+
+    get extensionPath() {
+        return path.join(Globals.getPath('ext'), 'extensions', 'rdt');
+    }
+
     enabled() {
+        if (electron.remote.BrowserWindow.getDevToolsExtensions()[this.extensionName]) return;
+
         try {
-            const res = electron.remote.BrowserWindow.addDevToolsExtension(path.join(Globals.getPath('ext'), 'extensions', 'rdt'));
+            const res = electron.remote.BrowserWindow.addDevToolsExtension(this.extensionPath);
             if (res !== undefined) {
                 Toasts.success(res + ' Installed');
                 return;
@@ -36,7 +46,7 @@ export default new class ReactDevtoolsModule extends BuiltinModule {
     }
 
     disabled() {
-        electron.remote.BrowserWindow.removeDevToolsExtension('React Developer Tools');
+        electron.remote.BrowserWindow.removeDevToolsExtension(this.extensionName);
     }
 
 }

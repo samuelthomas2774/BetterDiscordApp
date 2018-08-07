@@ -54,6 +54,14 @@ const globals = {
     paths
 };
 
+const CSP = {
+    'img-src': ['https://cdn.betterttv.net', 'https://cdn.frankerfacez.com'],
+    'script-src': [
+        "'sha256-fSHKdpQGCHaIqWP3SpJOuUHrLp49jy4dWHzZ/RBJ/p4='", // React Devtools
+        "'sha256-VFJcfKY5B3EBkFDgQnv3CozPwBlZcxwssfLVWlPFfZU='", // Vue Devtools
+        "'sha256-VzDmLZ4PxPkOS/KY7ITzLQsSWhfCnvUrNculcj8UNgE=' 'sha256-l6K+77Z1cmldR9gIvaVWlboF/zr5MXCQHcsEHfnr5TU='"] // Vue Detector
+};
+
 class PatchedBrowserWindow extends BrowserWindow {
     constructor(originalOptions) {
         const userOptions = PatchedBrowserWindow.userWindowPreferences;
@@ -249,13 +257,11 @@ export class BetterDiscord {
         session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
             for (let [header, values] of Object.entries(details.responseHeaders)) {
                 if (!header.match(/^Content-Security-Policy(-Report-Only)?$/i)) continue;
-
                 details.responseHeaders[header] = values.map(value => {
                     const policy = new ContentSecurityPolicy(value);
-
-                    // Add hosts that serve emotes (https://static-cdn.jtvnw.net is already in the CSP)
-                    policy.set('img-src', `${policy.get('img-src') || policy.get('default-src')} https://cdn.betterttv.net https://cdn.frankerfacez.com`);
-
+                    for (const [key, value] of Object.entries(CSP)) {
+                        policy.add(key, value.join(' '));
+                    }
                     return policy.toString();
                 });
             }

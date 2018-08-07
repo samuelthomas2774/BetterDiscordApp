@@ -19,6 +19,9 @@ import electron, { ipcRenderer } from 'electron';
 
     const currentWindow = electron.remote.getCurrentWindow();
 
+    // Allows chrome extensions to load properly
+    electron.webFrame.registerURLSchemeAsPrivileged('chrome-extension');
+
     if (currentWindow.__bd_preload) {
         for (let preloadScript of currentWindow.__bd_preload) {
             try {

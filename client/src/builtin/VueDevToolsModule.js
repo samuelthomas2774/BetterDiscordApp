@@ -18,29 +18,11 @@ import { Toasts } from 'ui';
 
 export default new class VueDevtoolsModule extends BuiltinModule {
 
-    constructor() {
-        super();
-        this.devToolsOpened = this.devToolsOpened.bind(this);
-    }
-
     get settingPath() {
         return ['core', 'advanced', 'vue-devtools'];
     }
 
-    enabled(e) {
-        const window = electron.remote.getCurrentWindow();
-        window.webContents.on('devtools-opened', this.devToolsOpened);
-        if (window.isDevToolsOpened()) this.devToolsOpened();
-    }
-
-    disabled(e) {
-        electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
-        electron.remote.getCurrentWindow().webContents.removeListener('devtools-opened', this.devToolsOpened);
-    }
-
-    devToolsOpened() {
-        electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
-        electron.webFrame.registerURLSchemeAsPrivileged('chrome-extension');
+    enabled() {
         try {
             const res = electron.remote.BrowserWindow.addDevToolsExtension(path.resolve(Globals.getPath('ext'), 'extensions', 'vdt'));
             if (res !== undefined) {
@@ -51,6 +33,10 @@ export default new class VueDevtoolsModule extends BuiltinModule {
         } catch (err) {
             Toasts.error('Vue.js devtools install failed');
         }
+    }
+
+    disabled() {
+        electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
     }
 
 }

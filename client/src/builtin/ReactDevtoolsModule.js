@@ -28,12 +28,14 @@ export default new class ReactDevtoolsModule extends BuiltinModule {
     }
 
     enabled(e) {
-        electron.remote.BrowserWindow.getAllWindows()[0].webContents.on('devtools-opened', this.devToolsOpened);
+        const window = electron.remote.getCurrentWindow();
+        window.webContents.on('devtools-opened', this.devToolsOpened);
+        if (window.isDevToolsOpened()) this.devToolsOpened();
     }
 
     disabled(e) {
         electron.remote.BrowserWindow.removeDevToolsExtension('React Developer Tools');
-        electron.remote.BrowserWindow.getAllWindows()[0].webContents.removeListener('devtools-opened', this.devToolsOpened);
+        electron.remote.getCurrentWindow().webContents.removeListener('devtools-opened', this.devToolsOpened);
     }
 
     devToolsOpened() {
@@ -50,4 +52,5 @@ export default new class ReactDevtoolsModule extends BuiltinModule {
             Toasts.error('React Developer Tools install failed');
         }
     }
+
 }

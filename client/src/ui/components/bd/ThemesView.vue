@@ -26,8 +26,11 @@
                 <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :data-theme-id="theme.id" @toggle-theme="toggleTheme(theme)" @reload-theme="reload => reloadTheme(theme, reload)" @show-settings="dont_clone => showSettings(theme, dont_clone)" @delete-theme="unload => deleteTheme(theme, unload)" />
             </div>
             <div v-if="!local" class="bd-online-ph">
-                <h3>Coming Soon</h3>
-                <a href="https://v2.betterdiscord.net/themes" target="_new">Website Browser</a>
+                <div class="bd-fancySearch" :class="{'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
+                    <input type="text" class="bd-textInput" @keydown.enter="searchInput" @keyup.stop/>
+                </div>
+                <h2 v-if="loadingOnline">Loading</h2>
+                <RemoteCard v-else-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme"/>
             </div>
         </div>
     </SettingsWrapper>
@@ -35,12 +38,13 @@
 
 <script>
     // Imports
-    import { ThemeManager } from 'modules';
+    import { ThemeManager, BdWebApi } from 'modules';
     import { Modals } from 'ui';
     import { ClientLogger as Logger } from 'common';
     import { MiRefresh } from '../common';
     import SettingsWrapper from './SettingsWrapper.vue';
     import ThemeCard from './ThemeCard.vue';
+    import RemoteCard from './RemoteCard.vue';
     import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
@@ -48,11 +52,13 @@
             return {
                 ThemeManager,
                 local: true,
-                localThemes: ThemeManager.localThemes
+                localThemes: ThemeManager.localThemes,
+                onlineThemes: null,
+                loadingOnline: false
             };
         },
         components: {
-            SettingsWrapper, ThemeCard,
+            SettingsWrapper, ThemeCard, RemoteCard,
             MiRefresh,
             RefreshBtn
         },
@@ -60,14 +66,51 @@
             showLocal() {
                 this.local = true;
             },
-            showOnline() {
+            async showOnline() {
                 this.local = false;
+                if (this.loadingOnline || this.onlineThemes) return;
             },
             async refreshLocal() {
                 await this.ThemeManager.refreshThemes();
             },
             async refreshOnline() {
-                // TODO
+                this.loadingOnline = true;
+                try {
+                    // const getThemes = await BdWebApi.themes.get();
+                    // this.onlineThemes = JSON.parse(getThemes);
+                    const dummies = [];
+                    for (let i = 0; i < 10; i++) {
+                        dummies.push({
+                            id: `theme${i}`,
+                            name: `Dummy ${i}`,
+                            tags: ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'],
+                            installs: Math.floor(Math.random() * 10000),
+                            updated: '2018-07-21T14:51:32.057Z',
+                            rating: Math.floor(Math.random() * 1000),
+                            activeUsers: Math.floor(Math.random() * 1000),
+                            rated: Math.random() > .5,
+                            version: '1.0.0',
+                            repository: {
+                                name: 'ExampleRepository',
+                                baseUri: 'https://github.com/Jiiks/ExampleRepository',
+                                rawUri: 'https://github.com/Jiiks/ExampleRepository/raw/master'
+                            },
+                            files: {
+                                readme: 'Example/readme.md',
+                                previews: [{
+                                    large: 'Example/preview1-big.png',
+                                    thumb: 'Example/preview1-small.png'
+                                }]
+                            },
+                            author: 'Jiiks'
+                        });
+                    }
+                    this.onlineThemes = { docs: dummies };
+                } catch (err) {
+                    Logger.err('ThemesView', err);
+                } finally {
+                    this.loadingOnline = false;
+                }
             },
             async toggleTheme(theme) {
                 // TODO: display error if theme fails to enable/disable
@@ -95,6 +138,10 @@
                 return Modals.contentSettings(theme, null, {
                     dont_clone
                 });
+            },
+            searchInput(e) {
+                this.loadingOnline = true;
+                setTimeout(this.refreshOnline, 1000);
             }
         }
     }

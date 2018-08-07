@@ -11,20 +11,14 @@
 import BdWebApi from './bdwebapi';
 import { ClientLogger as Logger } from 'common';
 
-const APIBASE = 'ifyouareinwebtestthenyouknowwhatthisshouldbe'; // Do not push
-const ENDPOINTS = {
-    'themes': `${APIBASE}/themes`,
-    'users': `${APIBASE}/users`
-};
-
 export default class Connectivity {
 
     static start() {
         Logger.info('Connectivity', `Patching anonymous statistics`);
-        BdWebApi.patchStatistics({ themes: [], plugins: [] });
+        BdWebApi.statistics.patch({ themes: [], plugins: [] });
         setInterval(() => {
             Logger.info('Connectivity', `Patching anonymous statistics`);
-            BdWebApi.patchStatistics({ themes: [], plugins: [] });
+            BdWebApi.statistics.patch({ themes: [], plugins: [] });
         }, 15*60*1000);
     }
 

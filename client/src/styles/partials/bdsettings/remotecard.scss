@@ -1,0 +1,72 @@
+.bd-remoteCard {
+    display: flex;
+    flex-direction: column;
+    // background: rgba(0,0,0,.1);
+    margin-top: 10px;
+    padding: 10px 0;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(114, 118, 126, 0.3);
+
+    &:hover {
+        // background: rgba(0,0,0,.2);
+        transform: scale(1.005);
+        // box-shadow: 0px 0px 5px rgba(0,0,0,.5);
+    }
+
+    .bd-remoteCard-title {
+        color: #b9bbbe;
+        font-weight: 700;
+    }
+
+    .bd-remoteCard-likes {
+        color: red;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .bd-remoteCard-infoContainer {
+        margin-left: 10px;
+
+        .bd-remoteCard-infoBox {
+            color: #b3b5b8;
+            font-size: 12px;
+            font-weight: 700;
+
+            .bd-remoteCard-info {
+                display: flex;
+                font-size: 12px;
+                line-height: 16px;
+
+                .bd-material-design-icon {
+                    display: flex;
+                    fill: $colbdgreen;
+                }
+            }
+        }
+    }
+
+    .bd-remoteCard-thumb {
+        height: 100px;
+        width: 180px;
+        background: rgba(0,0,0,.1);
+        border-radius: 3px;
+    }
+
+    .bd-remoteCard-tags {
+        color: #828a97;
+        font-size: 10px;
+        line-height: 20px;
+    }
+
+    .bd-button-group {
+        align-self: flex-end;
+        justify-content: flex-end;
+        flex-grow: 1;
+        max-height: 20px;
+
+        .bd-button {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+    }
+}

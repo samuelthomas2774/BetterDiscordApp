@@ -161,6 +161,25 @@
         "id": "security",
         "text": "Security",
         "headertext": "Security Settings",
-        "settings": []
+        "settings": [
+            {
+                "id": "default",
+                "settings": [
+                    {
+                        "id": "e2ee",
+                        "type": "bool",
+                        "text": "E2EE",
+                        "hint": "End-to-end encryption",
+                        "value": false
+                    }
+                ]
+            },
+            {
+                "id": "e2eedb",
+                "name": "E2EE Database",
+                "type": "drawer",
+                "settings": []
+            }
+        ]
     }
 ]

@@ -8,22 +8,6 @@
                 "id": "default",
                 "settings": [
                     {
-                        "id": "test-setting",
-                        "type": "bool",
-                        "text": "Test Setting",
-                        "hint": "Test Setting",
-                        "value": false,
-                        "disabled": false
-                    },
-                    {
-                        "id": "test-setting2",
-                        "type": "bool",
-                        "text": "Test Setting 2",
-                        "hint": "Test Setting 2",
-                        "value": true,
-                        "disabled": false
-                    },
-                    {
                         "id": "voice-disconnect",
                         "type": "bool",
                         "text": "Voice Disconnect",

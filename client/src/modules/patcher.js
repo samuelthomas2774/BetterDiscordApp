@@ -11,28 +11,54 @@
 import { WebpackModules } from './webpackmodules';
 import { ClientLogger as Logger } from 'common';
 
+/**
+ * Function with no arguments and no return value that may be called to revert changes made by {@link Patcher}, restoring (unpatching) original method.
+ * @callback Patcher~unpatch
+ */
+
+/**
+ * A callback that modifies method logic. This callback is called on each call of the original method and is provided all data about original call. Any of the data can be modified if necessary, but do so wisely.
+ * 
+ * The third argument for the callback will be `undefined` for `before` patches. `originalFunction` for `instead` patches and `returnValue` for `after` patches.
+ * 
+ * @callback Patcher~patchCallback
+ * @param {object} thisObject - `this` in the context of the original function.
+ * @param {arguments} arguments - The original arguments of the original function.
+ * @param {(function|*)} extraValue - For `instead` patches, this is the original function from the module. For `after` patches, this is the return value of the function.
+ * @return {*} Makes sense only when using an `instead` or `after` patch. If something other than `undefined` is returned, the returned value replaces the value of `returnValue`. If used for `before` the return value is ignored.
+ */
+
 export class Patcher {
 
-    static get patches() { return this._patches || (this._patches = {}) }
+    static get patches() { return this._patches || (this._patches = []) }
 
+    /**
+     * Returns all the patches done by a specific caller
+     * @param {string} id - Name of the patch caller
+     * @method
+     */
     static getPatchesByCaller(id) {
+        if (!id) return [];
         const patches = [];
-        for (const patch in this.patches) {
-            if (this.patches.hasOwnProperty(patch)) {
-                if (this.patches[patch].caller === id) patches.push(this.patches[patch]);
-            }
+        for (const patch of this.patches) {
+            for (const childPatch of patch.children) {
+				if (childPatch.caller === id) patches.push(childPatch);
+			}
         }
         return patches;
     }
 
+    /**
+     * Unpatches all patches passed, or when a string is passed unpatches all
+     * patches done by that specific caller.
+     * @param {Array|string} patches - Either an array of patches to unpatch or a caller name
+     */
     static unpatchAll(patches) {
         if (typeof patches === 'string')
             patches = this.getPatchesByCaller(patches);
 
         for (const patch of patches) {
-            for (const child of patch.children) {
-                child.unpatch();
-            }
+            patch.unpatch();
         }
     }
 
@@ -45,7 +71,7 @@ export class Patcher {
     static overrideFn(patch) {
         return function () {
             let retVal = undefined;
-            if (!patch.children) return patch.originalFunction.apply(this, arguments);
+            if (!patch.children || !patch.children.length) return patch.originalFunction.apply(this, arguments);
             for (const superPatch of patch.children.filter(c => c.type === 'before')) {
                 try {
                     superPatch.callback(this, arguments);
@@ -60,7 +86,8 @@ export class Patcher {
             } else {
                 for (const insteadPatch of insteads) {
                     try {
-                        retVal = insteadPatch.callback(this, arguments);
+                        const tempReturn = insteadPatch.callback(this, arguments, patch.originalFunction.bind(this));
+                        if (typeof tempReturn !== 'undefined') retVal = tempReturn;
                     } catch (err) {
                         Logger.err(`Patcher:${patch.id}`, err);
                     }
@@ -69,7 +96,8 @@ export class Patcher {
 
             for (const slavePatch of patch.children.filter(c => c.type === 'after')) {
                 try {
-                    slavePatch.callback(this, arguments, retVal, r => retVal = r);
+                    const tempReturn = slavePatch.callback(this, arguments, retVal, r => retVal = r);
+                    if (typeof tempReturn !== 'undefined') retVal = tempReturn;
                 } catch (err) {
                     Logger.err(`Patcher:${patch.id}`, err);
                 }
@@ -95,19 +123,67 @@ export class Patcher {
             revert: () => { // Calling revert will destroy any patches added to the same module after this
                 patch.module[patch.functionName] = patch.originalFunction;
                 patch.proxyFunction = null;
-                patch.slaves = patch.supers = [];
+                patch.children = [];
             },
             counter: 0,
             children: []
         };
         patch.proxyFunction = module[functionName] = this.overrideFn(patch);
-        return this.patches[id] = patch;
+        return this.patches.push(patch), patch;
     }
 
-    static before() { return this.pushChildPatch(...arguments, 'before') }
-    static after() { return this.pushChildPatch(...arguments, 'after') }
-    static instead() { return this.pushChildPatch(...arguments, 'instead') }
+    /**
+     * This method patches onto another function, allowing your code to run beforehand.
+     * Using this, you are also able to modify the incoming arguments before the original method is run.
+     * 
+     * @param {string} caller - Name of the caller of the patch function. Using this you can undo all patches with the same name using {@link Patcher#unpatchAll}.
+     * @param {object} unresolvedModule - Object with the function to be patched. Can also patch an object's prototype.
+     * @param {string} functionName - Name of the method to be patched
+     * @param {Patcher~patchCallback} callback - Function to run before the original method
+     * @param {string} [displayName] You can provide meaningful name for class/object provided in `what` param for logging purposes. By default, this function will try to determine name automatically.
+     * @return {Patcher~unpatch} Function with no arguments and no return value that should be called to cancel (unpatch) this patch. You should save and run it when your plugin is stopped.
+     */
+    static before(caller, unresolvedModule, functionName, callback, displayName) { return this.pushChildPatch(caller, unresolvedModule, functionName, callback, displayName, 'before') }
 
+    /**
+     * This method patches onto another function, allowing your code to run afterwards.
+     * Using this, you are also able to modify the return value, using the return of your code instead.
+     * 
+     * @param {string} caller - Name of the caller of the patch function. Using this you can undo all patches with the same name using {@link Patcher#unpatchAll}.
+     * @param {object} unresolvedModule - Object with the function to be patched. Can also patch an object's prototype.
+     * @param {string} functionName - Name of the method to be patched
+     * @param {Patcher~patchCallback} callback - Function to run after the original method
+     * @param {string} [displayName] You can provide meaningful name for class/object provided in `what` param for logging purposes. By default, this function will try to determine name automatically.
+     * @return {Patcher~unpatch} Function with no arguments and no return value that should be called to cancel (unpatch) this patch. You should save and run it when your plugin is stopped.
+     */
+    static after(caller, unresolvedModule, functionName, callback, displayName) { return this.pushChildPatch(caller, unresolvedModule, functionName, callback, displayName, 'after') }
+
+    /**
+     * This method patches onto another function, allowing your code to run instead, preventing the running of the original code.
+     * Using this, you are also able to modify the return value, using the return of your code instead.
+     * 
+     * @param {string} caller - Name of the caller of the patch function. Using this you can undo all patches with the same name using {@link Patcher#unpatchAll}.
+     * @param {object} unresolvedModule - Object with the function to be patched. Can also patch an object's prototype.
+     * @param {string} functionName - Name of the method to be patched
+     * @param {Patcher~patchCallback} callback - Function to run instead of the original method
+     * @param {string} [displayName] You can provide meaningful name for class/object provided in `what` param for logging purposes. By default, this function will try to determine name automatically.
+     * @return {Patcher~unpatch} Function with no arguments and no return value that should be called to cancel (unpatch) this patch. You should save and run it when your plugin is stopped.
+     */
+    static instead(caller, unresolvedModule, functionName, callback, displayName) { return this.pushChildPatch(caller, unresolvedModule, functionName, callback, displayName, 'instead') }
+
+    /**
+     * This method patches onto another function, allowing your code to run before, instead or after the original function.
+     * Using this you are able to modify the incoming arguments before the original function is run as well as the return
+     * value before the original function actually returns.
+     * 
+     * @param {string} caller - Name of the caller of the patch function. Using this you can undo all patches with the same name using {@link Patcher#unpatchAll}.
+     * @param {object} unresolvedModule - Object with the function to be patched. Can also patch an object's prototype.
+     * @param {string} functionName - Name of the method to be patched
+     * @param {Patcher~patchCallback} callback - Function to run after the original method
+     * @param {string} [displayName] You can provide meaningful name for class/object provided in `what` param for logging purposes. By default, this function will try to determine name automatically.
+     * @param {string} [type=after] - Determines whether to run the function `before`, `instead`, or `after` the original.
+     * @return {Patcher~unpatch} Function with no arguments and no return value that should be called to cancel (unpatch) this patch. You should save and run it when your plugin is stopped.
+     */
     static pushChildPatch(caller, unresolvedModule, functionName, callback, displayName, type = 'after') {
         const module = this.resolveModule(unresolvedModule);
         if (!module || !module[functionName] || !(module[functionName] instanceof Function)) return null;
@@ -115,7 +191,7 @@ export class Patcher {
             displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
         const patchId = `${displayName}:${functionName}:${caller}`;
 
-        const patch = this.patches[patchId] || this.pushPatch(caller, patchId, module, functionName);
+        const patch = this.patches.find(p => p.module == module && p.functionName == functionName) || this.pushPatch(caller, patchId, module, functionName);
         if (!patch.proxyFunction) this.rePatch(patch);
         const child = {
             caller,
@@ -124,7 +200,11 @@ export class Patcher {
             callback,
             unpatch: () => {
                 patch.children.splice(patch.children.findIndex(cpatch => cpatch.id === child.id && cpatch.type === type), 1);
-                if (patch.children.length <= 0) delete this.patches[patchId];
+                if (patch.children.length <= 0) {
+					const patchNum = this.patches.findIndex(p => p.module == module && p.functionName == functionName);
+					this.patches[patchNum].revert();
+					this.patches.splice(patchNum, 1);
+				}
             }
         };
         patch.children.push(child);

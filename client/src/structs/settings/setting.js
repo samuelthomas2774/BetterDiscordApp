@@ -27,7 +27,8 @@ export default class Setting {
 
     constructor(args, ...merge) {
         args = args.args || args;
-        if (args.type instanceof Array) return new CollectionSetting(args, ...merge);
+
+        if (args.type instanceof Array) args.subtype = args.type[0], args.type = 'collection';
         if (args.type === 'color') args.type = 'colour';
 
         if (args.type === 'bool') return new BoolSetting(args, ...merge);
@@ -41,8 +42,9 @@ export default class Setting {
         else if (args.type === 'file') return new FileSetting(args, ...merge);
         else if (args.type === 'guild') return new GuildSetting(args, ...merge);
         else if (args.type === 'array') return new ArraySetting(args, ...merge);
-        else if (args.type === 'custom') return new CustomSetting(args, ...merge);
+        else if (args.type === 'collection') return new CollectionSetting(args, ...merge);
         else if (args.type === 'kvp') return new KvpSetting(args, ...merge);
+        else if (args.type === 'custom') return new CustomSetting(args, ...merge);
         else throw {message: `Setting type ${args.type} unknown`};
     }
 

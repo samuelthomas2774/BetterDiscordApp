@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Setting Bool Component
+ * BetterDiscord Collection Setting Component
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -10,33 +10,34 @@
 
 <template>
     <div class="bd-formCollection">
-        <div v-for="(s, index) in setting.items" class="bd-collectionItem">
-            <KeyValuePair v-if="setting.subtype === 'kvp'" :setting="s" :key="s.id"/>
-            <Bool v-else-if="setting.subtype === 'bool'" :setting="s" :key="s.id" />
-            <div class="bd-removeCollectionItem" @click="() => removeItem(index)"><MiMinus/></div>
+        <div v-for="s in setting.items" class="bd-collectionItem">
+            <Setting :setting="s" :key="s.id" />
+            <div class="bd-removeCollectionItem" @click="removeItem(s)"><MiMinus/></div>
         </div>
         <div class="bd-newCollectionItem" @click="addItem">+</div>
     </div>
 </template>
 
 <script>
-    import { Settings } from 'modules';
-    import { Setting } from 'structs';
-    import KeyValuePair from './KeyValuePair.vue';
-    import Bool from './Bool.vue';
-
+    import Setting from './Setting.vue';
     import { MiMinus } from '../../common';
+
     export default {
         props: ['setting'],
-        components: { KeyValuePair, Bool, MiMinus },
+        components: {
+            MiMinus
+        },
         methods: {
-            removeItem(index) {
-                this.setting.value = this.setting.items.splice(index, 1);
+            removeItem(item) {
+                this.setting.removeItem(item);
             },
             addItem() {
-                const add = new Setting({ type: this.setting.subtype });
-                this.setting.items = this.setting.value = [...this.setting.items, add];
+                this.setting.addItem();
             }
+        },
+        beforeCreate() {
+            // https://vuejs.org/v2/guide/components.html#Circular-References-Between-Components
+            this.$options.components.Setting = Setting;
         }
     }
 </script>

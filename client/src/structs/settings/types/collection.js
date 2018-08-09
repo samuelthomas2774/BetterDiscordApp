@@ -8,30 +8,42 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { Utils } from 'common';
+import ArraySetting from './array';
 import Setting from '../setting';
-import Base from './basesetting';
-import SettingsSet from '../settingsset';
-import SettingsCategory from '../settingscategory';
-import SettingsScheme from '../settingsscheme';
 
-export default class CollectionSetting extends Base {
+export default class CollectionSetting extends ArraySetting {
 
     constructor(args, ...merge) {
+        // The ArraySetting constructor will call createItem which requires this to be set
+        if (!(args.setting instanceof Setting)) args.setting = new Setting(args.setting || {type: args.subtype});
+
         super(args, ...merge);
-        this.subtype = args.type[0];
-        this.args.type = 'collection';
-        this.items = this.value.map(item => this.create(item));
     }
 
-    create(item) {
-        item.type = this.subtype;
-        return new Setting(item);
+    get setting() {
+        return this.args.setting;
     }
 
     /**
-     * The value to use when the setting doesn't have a value.
+     * Creates a new setting for this collection setting.
+     * @param {Setting} item Values to merge into the new setting (optional)
+     * @return {Setting} The new set
      */
-    get defaultValue() {
-        return [];
+    createItem(item) {
+        if (item instanceof Setting)
+            return item;
+
+        const merge = [...arguments].filter(a => a);
+        const setting = this.setting.clone(...merge);
+        setting.args.id = item ? item.args ? item.args.id : item.id : Math.random();
+
+        setting.setSaved();
+        setting.on('settings-updated', async event => {
+            await this.emit('item-updated', { item: setting, event, updatedSettings: event.updatedSettings });
+            if (event.args.updating_array !== this) await this.updateValue();
+        });
+        return setting;
     }
+
 }

@@ -10,7 +10,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, Reflection } from 'ui';
+import { DOM, Reflection, Modals } from 'ui';
 import { Utils, Filters, ClientLogger as Logger } from 'common';
 import { MonkeyPatch } from './patcher';
 import { WebpackModules } from './webpackmodules';
@@ -500,5 +500,31 @@ export class ReactAutoPatcher {
         });
 
         this.UserPopout.forceUpdateAll();
+    }
+
+    static async patchUploadArea() {
+        const selector = '.' + WebpackModules.getClassName('uploadArea');
+        this.UploadArea = await ReactComponents.getComponent('UploadArea', {selector});
+
+        const reflect = Reflection(selector);
+        const stateNode = reflect.getComponentStateNode(this.UploadArea);
+        const callback = function(e) {
+            if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            stateNode.clearDragging();
+            Modals.confirm("Function not ready", `You tried to install "${e.dataTransfer.files[0].path}", but installing .bd files isn't ready yet.`)
+            // Possibly something like Events.emit('install-file', e.dataTransfer.files[0]);
+        };
+
+        // Remove their handler, add ours, then readd theirs to give ours priority to stop theirs when we get a .bd file.
+        reflect.element.removeEventListener('drop', stateNode.handleDrop);
+        reflect.element.addEventListener('drop', callback);
+        reflect.element.addEventListener('drop', stateNode.handleDrop);
+
+        this.unpatchUploadArea = function() {
+            reflect.element.removeEventListener('drop', callback);
+        };
     }
 }

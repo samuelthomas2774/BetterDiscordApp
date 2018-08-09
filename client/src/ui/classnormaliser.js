@@ -10,17 +10,19 @@
 
 import { Module, WebpackModules } from 'modules';
 
-const randClass = new RegExp(`^(?!da-)((?:[A-Za-z]|[0-9]|-)+)-(?:[A-Za-z]|[0-9]|-|_){6}$`);
+const normalizedPrefix = 'da';
+const randClass = new RegExp(`^(?!${normalizedPrefix}-)((?:[A-Za-z]|[0-9]|-)+)-(?:[A-Za-z]|[0-9]|-|_){6}$`);
 
 export default class ClassNormaliser extends Module {
 
     init() {
         this.patchClassModules(WebpackModules.getModule(this.moduleFilter.bind(this), false));
+        this.normalizeElement(document.querySelector('#app-mount'));
     }
 
     patchClassModules(modules) {
         for (let module of modules) {
-            this.patchClassModule('da', module);
+            this.patchClassModule(normalizedPrefix, module);
         }
     }
 
@@ -58,6 +60,19 @@ export default class ClassNormaliser extends Module {
                 const camelCase = match.split('-').map((s, i) => i ? s[0].toUpperCase() + s.slice(1) : s).join('');
                 classNames[baseClassName] += ` ${componentName}-${camelCase}`;
             }
+        }
+    }
+
+    normalizeElement(element) {
+        if (!(element instanceof Element)) return;
+        if (element.children && element.children.length) this.normalizeElement(element.children[0]);
+        if (element.nextElementSibling) this.normalizeElement(element.nextElementSibling);
+        const classes = element.classList;
+        for (let c = 0, clen = classes.length; c < clen; c++) {
+            if (!randClass.test(classes[c])) continue;
+            const match = classes[c].match(randClass)[1];
+            const newClass = match.split('-').map((s, i) => i ? s[0].toUpperCase() + s.slice(1) : s).join('');
+            element.classList.add(`${normalizedPrefix}-${newClass}`);
         }
     }
 

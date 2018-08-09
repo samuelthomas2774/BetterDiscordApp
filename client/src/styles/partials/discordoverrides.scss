@@ -1,20 +1,22 @@
-[class*="guildsWrapper-"] {
-    padding-top: 49px !important;
+body:not(.bd-hide-button) {
+    [class*="guildsWrapper-"] {
+        padding-top: 49px !important;
 
-    .platform-osx & {
-        margin-top: 26px;
+        .platform-osx & {
+            margin-top: 26px;
+        }
     }
-}
 
-[class*="guildsWrapper-"] + [class*="flex"] {
-    border-radius: 0 0 0 5px;
-}
+    [class*="guildsWrapper-"] + [class*="flex"] {
+        border-radius: 0 0 0 5px;
+    }
 
-[class*="unreadMentionsIndicatorTop-"] {
-    top: 49px;
+    [class*="unreadMentionsIndicatorTop-"] {
+        top: 49px;
 
-    .platform-osx & {
-        top: 50px;
+        .platform-osx & {
+            top: 50px;
+        }
     }
 }
 

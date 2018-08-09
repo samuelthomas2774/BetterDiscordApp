@@ -43,9 +43,22 @@
         }
     }
 
+    &.bd-hide-button {
+        transition: opacity 0.4s ease-out;
+        opacity: 0;
+
+        &.bd-active {
+            transition-timing-function: ease-in;
+        }
+    }
+
     &.bd-active {
-        background: transparent;
         opacity: 1;
+    }
+
+    &.bd-active,
+    &.bd-hide-button {
+        background: transparent;
         box-shadow: none;
 
         .bd-settings-button-btn {

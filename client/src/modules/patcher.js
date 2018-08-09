@@ -13,14 +13,15 @@ import { ClientLogger as Logger } from 'common';
 
 export class Patcher {
 
-    static get patches() { return this._patches || (this._patches = {}) }
+    static get patches() { return this._patches || (this._patches = []) }
 
     static getPatchesByCaller(id) {
+        if (!id) return [];
         const patches = [];
-        for (const patch in this.patches) {
-            if (this.patches.hasOwnProperty(patch)) {
-                if (this.patches[patch].caller === id) patches.push(this.patches[patch]);
-            }
+        for (const patch of this.patches) {
+            for (const childPatch of patch.children) {
+				if (childPatch.caller === id) patches.push(childPatch);
+			}
         }
         return patches;
     }
@@ -30,9 +31,7 @@ export class Patcher {
             patches = this.getPatchesByCaller(patches);
 
         for (const patch of patches) {
-            for (const child of patch.children) {
-                child.unpatch();
-            }
+            patch.unpatch();
         }
     }
 
@@ -45,7 +44,7 @@ export class Patcher {
     static overrideFn(patch) {
         return function () {
             let retVal = undefined;
-            if (!patch.children) return patch.originalFunction.apply(this, arguments);
+            if (!patch.children || !patch.children.length) return patch.originalFunction.apply(this, arguments);
             for (const superPatch of patch.children.filter(c => c.type === 'before')) {
                 try {
                     superPatch.callback(this, arguments);
@@ -60,7 +59,8 @@ export class Patcher {
             } else {
                 for (const insteadPatch of insteads) {
                     try {
-                        retVal = insteadPatch.callback(this, arguments);
+                        const tempReturn = insteadPatch.callback(this, arguments, patch.originalFunction.bind(this));
+                        if (typeof(tempReturn) !== "undefined") retVal = tempReturn;
                     } catch (err) {
                         Logger.err(`Patcher:${patch.id}`, err);
                     }
@@ -69,7 +69,8 @@ export class Patcher {
 
             for (const slavePatch of patch.children.filter(c => c.type === 'after')) {
                 try {
-                    slavePatch.callback(this, arguments, retVal, r => retVal = r);
+                    const tempReturn = slavePatch.callback(this, arguments, retVal, r => retVal = r);
+                    if (typeof(tempReturn) !== "undefined") retVal = tempReturn;
                 } catch (err) {
                     Logger.err(`Patcher:${patch.id}`, err);
                 }
@@ -95,13 +96,13 @@ export class Patcher {
             revert: () => { // Calling revert will destroy any patches added to the same module after this
                 patch.module[patch.functionName] = patch.originalFunction;
                 patch.proxyFunction = null;
-                patch.slaves = patch.supers = [];
+                patch.children = [];
             },
             counter: 0,
             children: []
         };
         patch.proxyFunction = module[functionName] = this.overrideFn(patch);
-        return this.patches[id] = patch;
+        return this.patches.push(patch), patch;
     }
 
     static before() { return this.pushChildPatch(...arguments, 'before') }
@@ -115,7 +116,7 @@ export class Patcher {
             displayName || module.displayName || module.name || module.constructor.displayName || module.constructor.name;
         const patchId = `${displayName}:${functionName}:${caller}`;
 
-        const patch = this.patches[patchId] || this.pushPatch(caller, patchId, module, functionName);
+        const patch = this.patches.find(p => p.module == module && p.functionName == functionName) || this.pushPatch(caller, patchId, module, functionName);
         if (!patch.proxyFunction) this.rePatch(patch);
         const child = {
             caller,
@@ -124,7 +125,11 @@ export class Patcher {
             callback,
             unpatch: () => {
                 patch.children.splice(patch.children.findIndex(cpatch => cpatch.id === child.id && cpatch.type === type), 1);
-                if (patch.children.length <= 0) delete this.patches[patchId];
+                if (patch.children.length <= 0) {
+					let patchNum = this.patches.findIndex(p => p.module == module && p.functionName == functionName);
+					this.patches[patchNum].revert();
+					this.patches.splice(patchNum, 1);
+				}
             }
         };
         patch.children.push(child);

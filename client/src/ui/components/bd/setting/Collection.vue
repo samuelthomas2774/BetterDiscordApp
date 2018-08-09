@@ -10,19 +10,33 @@
 
 <template>
     <div class="bd-formCollection">
-        <template v-for="s in setting.value">
-            <KeyValuePair v-if="setting.subtype === 'kvp'" :setting="s" :key="s.id" />
+        <div v-for="(s, index) in setting.items" class="bd-collectionItem">
+            <KeyValuePair v-if="setting.subtype === 'kvp'" :setting="s" :key="s.id"/>
             <Bool v-else-if="setting.subtype === 'bool'" :setting="s" :key="s.id" />
-        </template>
+            <div class="bd-removeCollectionItem" @click="() => removeItem(index)"><MiMinus/></div>
+        </div>
+        <div class="bd-newCollectionItem" @click="addItem">+</div>
     </div>
 </template>
 
 <script>
+    import { Settings } from 'modules';
+    import { Setting } from 'structs';
     import KeyValuePair from './KeyValuePair.vue';
     import Bool from './Bool.vue';
+
+    import { MiMinus } from '../../common';
     export default {
         props: ['setting'],
-        components: { KeyValuePair, Bool },
-        mounted() { console.log('collection', this.setting) }
+        components: { KeyValuePair, Bool, MiMinus },
+        methods: {
+            removeItem(index) {
+                this.setting.value = this.setting.items.splice(index, 1);
+            },
+            addItem() {
+                const add = new Setting({ type: this.setting.subtype });
+                this.setting.items = this.setting.value = [...this.setting.items, add];
+            }
+        }
     }
 </script>

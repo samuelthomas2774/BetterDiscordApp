@@ -9,7 +9,7 @@
 */
 
 <template>
-    <SidebarButton v-if="item._type === 'button'" :item="item" @click="$emit('click', $event)" />
+    <SidebarButton v-if="item._type === 'button'" :item="item" :active="active" @click="$emit('click', $event)" />
     <SidebarHeader v-else :item="item" />
 </template>
 
@@ -18,7 +18,7 @@
     import { SidebarHeader, SidebarButton } from './';
 
     export default {
-        props: ['item'],
+        props: ['item', 'active'],
         components: {
             SidebarHeader,
             SidebarButton

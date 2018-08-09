@@ -46,22 +46,16 @@ export default class {
         DOM.createElement('div', null, 'bd-toasts').appendTo(DOM.bdToasts);
         DOM.createElement('bd-tooltips').appendTo(DOM.bdBody);
 
-        this.toasts = new Vue({
-            el: '#bd-toasts',
-            components: { BdToasts },
-            template: '<BdToasts />'
+        this.toasts = new (Vue.extend(BdToasts))({
+            el: '#bd-toasts'
         });
 
-        this.modals = new Vue({
-            el: '#bd-modals',
-            components: { BdModals },
-            template: '<BdModals />'
+        this.modals = new (Vue.extend(BdModals))({
+            el: '#bd-modals'
         });
 
-        this.vueInstance = new Vue({
-            el: '#bd-settings',
-            components: { BdSettingsWrapper },
-            template: '<BdSettingsWrapper />'
+        this.vueInstance = new (Vue.extend(BdSettingsWrapper))({
+            el: '#bd-settings'
         });
 
         return this.vueInstance;

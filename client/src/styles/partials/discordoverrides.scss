@@ -1,19 +1,19 @@
-[class*="guildsWrapper-"] {
-    padding-top: 49px !important;
-
-    .platform-osx & {
+body:not(.bd-hide-button) {
+    [class*="guildsWrapper-"] {
+        padding-top: 49px !important;
+    }
+    .platform-osx [class*="guildsWrapper-"] {
         margin-top: 26px;
     }
-}
 
-[class*="guildsWrapper-"] + [class*="flex"] {
-    border-radius: 0 0 0 5px;
-}
+    [class*="guildsWrapper-"] + [class*="flex"] {
+        border-radius: 0 0 0 5px;
+    }
 
-[class*="unreadMentionsIndicatorTop-"] {
-    top: 49px;
-
-    .platform-osx & {
+    [class*="unreadMentionsIndicatorTop-"] {
+        top: 49px;
+    }
+    .platform-osx [class*="unreadMentionsIndicatorTop-"] {
         top: 50px;
     }
 }

@@ -9,8 +9,8 @@
 */
 
 <template>
-    <div class="bd-settings-wrapper" :class="[{active: active}, 'platform-' + this.platform]">
-        <div class="bd-settings-button" :class="{'bd-active': active, 'bd-animating': animating}" @click="active = true">
+    <div class="bd-settings-wrapper" :class="[{active}, 'platform-' + this.platform]">
+        <div class="bd-settings-button" :class="{'bd-active': active, 'bd-animating': animating, 'bd-hide-button': hideButton}" @click="active = true">
             <div v-if="updating === 0" v-tooltip.right="'Checking for updates'" class="bd-settings-button-btn bd-loading"></div>
             <div v-else-if="updating === 2" v-tooltip.right="'Updates available!'" class="bd-settings-button-btn bd-updates"></div>
             <div v-else class="bd-settings-button-btn" :class="[{'bd-loading': !loaded}]"></div>
@@ -36,7 +36,9 @@
                 timeout: null,
                 platform: process.platform,
                 eventHandlers: {},
-                keybindHandler: null
+                keybindHandler: null,
+                hideButton: false,
+                hideButtonToggleHandler: null
             };
         },
         components: {
@@ -80,6 +82,10 @@
 
             const menuKeybind = Settings.getSetting('core', 'default', 'menu-keybind');
             menuKeybind.on('keybind-activated', this.keybindHandler = () => this.active = !this.active);
+
+            const hideButtonSetting = Settings.getSetting('ui', 'default', 'hide-button');
+            hideButtonSetting.on('setting-updated', this.hideButtonToggleHandler = event => this.hideButton = event.value);
+            this.hideButton = hideButtonSetting.value;
         },
         destroyed() {
             for (let event in this.eventHandlers) Events.off(event, this.eventHandlers[event]);
@@ -89,7 +95,12 @@
 
             if (this.keybindHandler) {
                 const menuKeybind = Settings.getSetting('core', 'default', 'menu-keybind');
-                menuKeybind.removeListener('keybind-activated', this.keybindHandler = () => this.active = !this.active);
+                menuKeybind.removeListener('keybind-activated', this.keybindHandler);
+            }
+
+            if (this.hideButtonToggleHandler) {
+                const hideButtonSetting = Settings.getSetting('ui', 'default', 'hide-button');
+                hideButtonSetting.removeListener('setting-updated', this.hideButtonToggleHandler);
             }
         }
     }

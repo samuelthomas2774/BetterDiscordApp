@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, DiscordApi } from 'modules';
+import { Events, DiscordApi, Settings } from 'modules';
 import { remote } from 'electron';
 import DOM from './dom';
 import Vue from './vue';
@@ -17,6 +17,13 @@ import { BdSettingsWrapper, BdModals, BdToasts } from './components';
 export default class {
 
     static initUiEvents() {
+        const hideButtonSetting = Settings.getSetting('ui', 'default', 'hide-button');
+        hideButtonSetting.on('setting-updated', event => {
+            if (event.value) document.body.classList.add('bd-hide-button');
+            else document.body.classList.remove('bd-hide-button');
+        });
+        if (hideButtonSetting.value) document.body.classList.add('bd-hide-button');
+
         this.pathCache = {
             isDm: null,
             server: DiscordApi.currentGuild,

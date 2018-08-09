@@ -22,7 +22,8 @@
         <FileSetting v-if="setting.type === 'file'" :setting="setting" />
         <GuildSetting v-if="setting.type === 'guild'" :setting="setting" />
         <ArraySetting v-if="setting.type === 'array'" :setting="setting" />
-        <KeyValuePair v-if="setting.type === 'kvp'" :setting="setting"/>
+        <Collection v-if="setting.type === 'collection'" :setting="setting" />
+        <KeyValuePair v-if="setting.type === 'kvp'" :setting="setting" />
         <CustomSetting v-if="setting.type === 'custom'" :setting="setting" />
         <div class="bd-form-divider"></div>
     </div>
@@ -42,6 +43,7 @@
     import FileSetting from './File.vue';
     import GuildSetting from './Guild.vue';
     import ArraySetting from './Array.vue';
+    import Collection from './Collection.vue';
     import KeyValuePair from './KeyValuePair.vue';
     import CustomSetting from './Custom.vue';
 
@@ -62,6 +64,7 @@
             FileSetting,
             GuildSetting,
             ArraySetting,
+            Collection,
             KeyValuePair,
             CustomSetting
         },

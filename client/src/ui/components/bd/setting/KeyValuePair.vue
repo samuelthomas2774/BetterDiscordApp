@@ -12,12 +12,11 @@
     <div class="bd-formKvp">
         <div class="bd-formKvpDetails">
             <div class="bd-inputWrapper">
-                <input type="text" class="bd-textInput" :value="setting.value.key" />
+                <input type="text" class="bd-textInput" :value="setting.value.key" @keyup.stop @input="keyChange"/>
             </div>
             <div class="bd-inputWrapper">
-                <input type="text" class="bd-textInput" :value="setting.value.value" />
+                <input type="text" class="bd-textInput" :value="setting.value.value" @keyup.stop @input="valueChange"/>
             </div>
-                <!-- using a text field is temporary -->
         </div>
     </div>
 </template>
@@ -25,7 +24,13 @@
 <script>
     export default {
         props: ['setting'],
-        methods: {},
-        mounted() {console.log('setting', this.setting)}
+        methods: {
+            keyChange(e) {
+                this.setting.value.key = e.target.value;
+            },
+            valueChange(e) {
+                this.setting.value.value = e.target.value;
+            }
+        }
     }
 </script>

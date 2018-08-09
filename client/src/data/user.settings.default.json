@@ -171,10 +171,19 @@
                 "type": "drawer",
                 "settings": [
                     {
-                        "id": "kvp0",
-                        "type": "kvp",
-                        "text": "",
-                        "value": { "key": "kvpKey", "value":  "kvpValue" }
+                        "id": "e2ekvps",
+                        "type": ["kvp"],
+                        "value": [
+                            {
+                                "id": "kvp0",
+                                "type": "kvp",
+                                "text": "",
+                                "value": {
+                                    "key": "kvpKey",
+                                    "value": "kvpValue"
+                                }
+                            }
+                        ]
                     }
                 ]
             }

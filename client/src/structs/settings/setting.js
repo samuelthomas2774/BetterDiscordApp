@@ -19,6 +19,7 @@ import KeybindSetting from './types/keybind';
 import FileSetting from './types/file';
 import GuildSetting from './types/guild';
 import ArraySetting from './types/array';
+import CollectionSetting from './types/collection';
 import KvpSetting from './types/kvp';
 import CustomSetting from './types/custom';
 
@@ -26,7 +27,7 @@ export default class Setting {
 
     constructor(args, ...merge) {
         args = args.args || args;
-
+        if (args.type instanceof Array) return new CollectionSetting(args, ...merge);
         if (args.type === 'color') args.type = 'colour';
 
         if (args.type === 'bool') return new BoolSetting(args, ...merge);

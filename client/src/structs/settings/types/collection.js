@@ -1,5 +1,5 @@
 /**
- * BetterDiscord String Setting Struct
+ * BetterDiscord Collection Setting Struct
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -8,14 +8,22 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import Setting from './basesetting';
+import BaseSetting from './basesetting';
+import Setting from '../setting';
 
-export default class KvpSetting extends Setting {
+export default class CollectionSetting extends BaseSetting {
+
+    constructor(args) {
+        super(args);
+        this.subtype = args.type[0];
+        args.type = 'collection';
+        this.sub = new Setting({ type: this.subtype });
+    }
 
     /**
      * The value to use when the setting doesn't have a value.
      */
     get defaultValue() {
-        return { key: 'Key', value: 'Value' };
+        return [];
     }
 }

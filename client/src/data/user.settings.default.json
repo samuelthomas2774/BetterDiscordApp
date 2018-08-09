@@ -175,9 +175,6 @@
                         "type": ["kvp"],
                         "value": [
                             {
-                                "id": "kvp0",
-                                "type": "kvp",
-                                "text": "",
                                 "value": {
                                     "key": "kvpKey",
                                     "value": "kvpValue"

@@ -26,10 +26,10 @@
         props: ['setting'],
         methods: {
             keyChange(e) {
-                this.setting.value.key = e.target.value;
+                this.setting.value = { key: e.target.value, value: this.setting.value.value }
             },
             valueChange(e) {
-                this.setting.value.value = e.target.value;
+                this.setting.value = { key: this.setting.value.key, value: e.target.value }
             }
         }
     }

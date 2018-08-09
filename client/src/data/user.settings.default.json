@@ -8,22 +8,6 @@
                 "id": "default",
                 "settings": [
                     {
-                        "id": "test-setting",
-                        "type": "bool",
-                        "text": "Test Setting",
-                        "hint": "Test Setting",
-                        "value": false,
-                        "disabled": false
-                    },
-                    {
-                        "id": "test-setting2",
-                        "type": "bool",
-                        "text": "Test Setting 2",
-                        "hint": "Test Setting 2",
-                        "value": true,
-                        "disabled": false
-                    },
-                    {
                         "id": "voice-disconnect",
                         "type": "bool",
                         "text": "Voice Disconnect",
@@ -55,7 +39,7 @@
                         "id": "debugger-keybind",
                         "type": "keybind",
                         "text": "Debugger keybind",
-                        "hint": "When this keybind is activated the developer tools will be opened and Discord will be paused."
+                        "hint": "Open developer tools and pause"
                     },
                     {
                         "id": "ignore-content-manager-errors",
@@ -159,8 +143,41 @@
     },
     {
         "id": "security",
-        "text": "Security",
+        "text": "Security and Privacy",
         "headertext": "Security Settings",
-        "settings": []
+        "settings": [
+            {
+                "id": "default",
+                "settings": [
+                    {
+                        "id": "tracking-protection",
+                        "type": "bool",
+                        "text": "Tracking Protection",
+                        "hint": "Disable any Discord tracking",
+                        "value": false
+                    },
+                    {
+                        "id": "e2ee",
+                        "type": "bool",
+                        "text": "E2EE",
+                        "hint": "End-to-end encryption",
+                        "value": false
+                    }
+                ]
+            },
+            {
+                "id": "e2eedb",
+                "name": "E2EE Database",
+                "type": "drawer",
+                "settings": [
+                    {
+                        "id": "kvp0",
+                        "type": "kvp",
+                        "text": "",
+                        "value": { "key": "kvpKey", "value":  "kvpValue" }
+                    }
+                ]
+            }
+        ]
     }
 ]

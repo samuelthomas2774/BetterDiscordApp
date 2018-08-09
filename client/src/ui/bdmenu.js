@@ -42,7 +42,7 @@ export const BdMenuItems = new class {
         this.addSettingsSet('Internal', 'core', 'Core');
         this.addSettingsSet('Internal', 'ui', 'UI');
         this.addSettingsSet('Internal', 'emotes', 'Emotes');
-        this.addSettingsSet('Internal', 'security', 'Security');
+        this.addSettingsSet('Internal', 'security', 'Security and Privacy');
 
         this.add({category: 'Internal', contentid: 'css', text: 'CSS Editor'});
         this.add({category: 'External', contentid: 'plugins', text: 'Plugins'});

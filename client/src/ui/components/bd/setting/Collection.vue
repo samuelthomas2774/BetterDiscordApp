@@ -14,18 +14,18 @@
             <Setting :setting="s" :key="s.id" />
             <div class="bd-removeCollectionItem" @click="removeItem(s)"><MiMinus/></div>
         </div>
-        <div class="bd-newCollectionItem" @click="addItem">+</div>
+        <div class="bd-newCollectionItem" @click="addItem"><MiPlus/></div>
     </div>
 </template>
 
 <script>
     import Setting from './Setting.vue';
-    import { MiMinus } from '../../common';
+    import { MiMinus, MiPlus } from '../../common';
 
     export default {
         props: ['setting'],
         components: {
-            MiMinus
+            MiMinus, MiPlus
         },
         methods: {
             removeItem(item) {

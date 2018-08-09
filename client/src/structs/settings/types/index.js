@@ -9,4 +9,5 @@ export { default as KeybindSetting } from './keybind';
 export { default as FileSetting } from './file';
 export { default as GuildSetting } from './guild';
 export { default as ArraySetting } from './array';
+export { default as KvpSetting } from './kvp';
 export { default as CustomSetting } from './custom';

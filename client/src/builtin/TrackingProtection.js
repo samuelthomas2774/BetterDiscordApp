@@ -24,7 +24,9 @@ export default new class E2EE extends BuiltinModule {
 
     enabled(e) {
         if (Patcher.getPatchesByCaller('BD:TrackingProtection').length) return;
-        MonkeyPatch('BD:TrackingProtection', WebpackModules.getModuleByProps(['track'])).instead('track', this.track);
+        const trackingModule = WebpackModules.getModuleByProps(['track']);
+        if (!trackingModule) return; // TODO Log it
+        MonkeyPatch('BD:TrackingProtection', trackingModule).instead('track', this.track);
     }
 
     disabled(e) {

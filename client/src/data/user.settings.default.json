@@ -173,14 +173,7 @@
                     {
                         "id": "e2ekvps",
                         "type": ["kvp"],
-                        "value": [
-                            {
-                                "value": {
-                                    "key": "kvpKey",
-                                    "value": "kvpValue"
-                                }
-                            }
-                        ]
+                        "value": []
                     }
                 ]
             }

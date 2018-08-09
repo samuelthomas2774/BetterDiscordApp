@@ -150,6 +150,13 @@
                 "id": "default",
                 "settings": [
                     {
+                        "id": "tracking-protection",
+                        "type": "bool",
+                        "text": "Tracking Protection",
+                        "hint": "Completely disabled any Discord tracking",
+                        "value": false
+                    },
+                    {
                         "id": "e2ee",
                         "type": "bool",
                         "text": "E2EE",

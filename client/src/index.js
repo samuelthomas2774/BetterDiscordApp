@@ -12,7 +12,7 @@ import { DOM, BdUI, BdMenu, Modals, Reflection, Toasts } from 'ui';
 import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi, BdWebApi, Connectivity } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
-import { EmoteModule, ReactDevtoolsModule, VueDevtoolsModule } from 'builtin';
+import { EmoteModule, ReactDevtoolsModule, VueDevtoolsModule, TrackingProtection } from 'builtin';
 import electron from 'electron';
 import path from 'path';
 
@@ -75,6 +75,7 @@ class BetterDiscord {
         try {
             ReactDevtoolsModule.init();
             VueDevtoolsModule.init();
+            TrackingProtection.init();
             await Database.init();
             await Settings.loadSettings();
             await ModuleManager.initModules();

@@ -1,10 +1,9 @@
 body:not(.bd-hide-button) {
     [class*="guildsWrapper-"] {
         padding-top: 49px !important;
-
-        .platform-osx & {
-            margin-top: 26px;
-        }
+    }
+    .platform-osx [class*="guildsWrapper-"] {
+        margin-top: 26px;
     }
 
     [class*="guildsWrapper-"] + [class*="flex"] {
@@ -13,10 +12,9 @@ body:not(.bd-hide-button) {
 
     [class*="unreadMentionsIndicatorTop-"] {
         top: 49px;
-
-        .platform-osx & {
-            top: 50px;
-        }
+    }
+    .platform-osx [class*="unreadMentionsIndicatorTop-"] {
+        top: 50px;
     }
 }
 

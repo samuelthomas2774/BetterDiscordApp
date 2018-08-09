@@ -11,19 +11,20 @@
 <template>
     <div class="bd-form-item" :class="{'bd-form-item-changed': setting.changed, 'bd-disabled': disabled, 'bd-form-item-noheader': !setting.text, 'bd-form-item-fullwidth': setting.fullwidth}">
         <BoolSetting v-if="setting.type === 'bool'" :setting="setting" />
-        <StringSetting v-if="setting.type === 'text' && !setting.multiline" :setting="setting" />
-        <MultilineTextSetting v-if="setting.type === 'text' && setting.multiline" :setting="setting" />
-        <NumberSetting v-if="setting.type === 'number'" :setting="setting" />
-        <DropdownSetting v-if="setting.type === 'dropdown'" :setting="setting" />
-        <RadioSetting v-if="setting.type === 'radio'" :setting="setting" />
-        <SliderSetting v-if="setting.type === 'slider'" :setting="setting" />
-        <ColourSetting v-if="setting.type === 'colour'" :setting="setting" />
-        <KeybindSetting v-if="setting.type === 'keybind'" :setting="setting" />
-        <FileSetting v-if="setting.type === 'file'" :setting="setting" />
-        <GuildSetting v-if="setting.type === 'guild'" :setting="setting" />
-        <ArraySetting v-if="setting.type === 'array'" :setting="setting" />
-        <KeyValuePair v-if="setting.type === 'kvp'" :setting="setting"/>
-        <CustomSetting v-if="setting.type === 'custom'" :setting="setting" />
+        <StringSetting v-else-if="setting.type === 'text' && !setting.multiline" :setting="setting" />
+        <MultilineTextSetting v-else-if="setting.type === 'text' && setting.multiline" :setting="setting" />
+        <NumberSetting v-else-if="setting.type === 'number'" :setting="setting" />
+        <DropdownSetting v-else-if="setting.type === 'dropdown'" :setting="setting" />
+        <RadioSetting v-else-if="setting.type === 'radio'" :setting="setting" />
+        <SliderSetting v-else-if="setting.type === 'slider'" :setting="setting" />
+        <ColourSetting v-else-if="setting.type === 'colour'" :setting="setting" />
+        <KeybindSetting v-else-if="setting.type === 'keybind'" :setting="setting" />
+        <FileSetting v-else-if="setting.type === 'file'" :setting="setting" />
+        <GuildSetting v-else-if="setting.type === 'guild'" :setting="setting" />
+        <ArraySetting v-else-if="setting.type === 'array'" :setting="setting" />
+        <Collection v-else-if="setting.type === 'collection'" :setting="setting" />
+        <KeyValuePair v-else-if="setting.type === 'kvp'" :setting="setting" />
+        <CustomSetting v-else-if="setting.type === 'custom'" :setting="setting" />
         <div class="bd-form-divider"></div>
     </div>
 </template>
@@ -42,6 +43,7 @@
     import FileSetting from './File.vue';
     import GuildSetting from './Guild.vue';
     import ArraySetting from './Array.vue';
+    import Collection from './Collection.vue';
     import KeyValuePair from './KeyValuePair.vue';
     import CustomSetting from './Custom.vue';
 
@@ -62,6 +64,7 @@
             FileSetting,
             GuildSetting,
             ArraySetting,
+            Collection,
             KeyValuePair,
             CustomSetting
         },

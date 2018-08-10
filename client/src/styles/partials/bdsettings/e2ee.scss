@@ -9,12 +9,19 @@
         cursor: pointer;
         opacity: .8;
         transition: opacity .2s ease-in-out;
+
         &:hover {
             opacity: 1;
         }
 
         &.bd-e2eeLock {
-            fill: #cc3e3e;
+            &.bd-error {
+                fill: #cc3e3e;
+            }
+
+            &.bd-ok {
+                fill: $colbdgreen;
+            }
         }
     }
 

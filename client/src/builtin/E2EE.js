@@ -15,14 +15,17 @@ import { VueInjector, Reflection } from 'ui';
 import E2EEComponent from './E2EEComponent.vue';
 import aes256 from 'aes256';
 
+const seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
+
 export default new class E2EE extends BuiltinModule {
+
+    constructor() {
+        super();
+        this.master = this.encrypt(seed, 'temporarymasterkey');
+    }
 
     get settingPath() {
         return ['security', 'default', 'e2ee'];
-    }
-
-    get master() {
-        return 'temporarymasterkey';
     }
 
     get database() {
@@ -59,7 +62,7 @@ export default new class E2EE extends BuiltinModule {
     handleSubmit(component, args, retVal) {
         const key = this.getKey(DiscordApi.currentChannel.id);
         if (!key) return;
-        component.props.value = this.encrypt(this.decrypt(this.master, key), component.props.value);
+        component.props.value = this.encrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.value);
     }
 
     disabled(e) {

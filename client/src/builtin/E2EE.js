@@ -26,7 +26,9 @@ export default new class E2EE extends BuiltinModule {
 
     setMaster(key) {
         seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
-        this.master = this.encrypt(seed, key);
+        const newMaster = this.encrypt(seed, key);
+        // TODO re-encrypt everything with new master
+        return (this.master = newMaster);
     }
 
     get settingPath() {

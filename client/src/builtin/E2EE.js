@@ -15,13 +15,18 @@ import { VueInjector, Reflection } from 'ui';
 import E2EEComponent from './E2EEComponent.vue';
 import aes256 from 'aes256';
 
-const seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
+let seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
 
 export default new class E2EE extends BuiltinModule {
 
     constructor() {
         super();
         this.master = this.encrypt(seed, 'temporarymasterkey');
+    }
+
+    setMaster(key) {
+        seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
+        this.master = this.encrypt(seed, key);
     }
 
     get settingPath() {

@@ -151,7 +151,7 @@
     {
         "id": "security",
         "text": "Security and Privacy",
-        "headertext": "Security Settings",
+        "headertext": "Security and Privacy Settings",
         "settings": [
             {
                 "id": "default",

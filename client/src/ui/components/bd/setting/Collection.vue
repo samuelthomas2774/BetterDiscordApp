@@ -11,7 +11,7 @@
 <template>
     <div class="bd-formCollection">
         <div v-for="s in setting.items" class="bd-collectionItem">
-            <Setting :setting="s" :key="s.id" />
+            <Setting :setting="s" :hide-divider="true" :key="s.id" />
             <div class="bd-removeCollectionItem" @click="removeItem(s)"><MiMinus/></div>
         </div>
         <div class="bd-newCollectionItem" @click="addItem"><MiPlus/></div>

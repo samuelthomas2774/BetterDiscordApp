@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
 
-    div:first-child {
+    > :first-child {
         flex: 1 1 auto;
     }
 
@@ -11,6 +11,10 @@
         flex-grow: 1;
         margin-top: 5px;
 
+        > :first-child {
+            flex: 1 0 auto;
+        }
+
         .bd-removeCollectionItem {
             width: 20px;
             flex: 0 1 auto;
@@ -18,7 +22,6 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            margin-bottom: 30px;
 
             &:hover {
                 svg {
@@ -41,6 +44,7 @@
         justify-content: center;
         align-items: center;
         margin-right: 2px;
+        margin-top: 10px;
 
         svg {
             width: 16px;

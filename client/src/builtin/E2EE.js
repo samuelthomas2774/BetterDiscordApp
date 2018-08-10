@@ -8,8 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Settings } from 'modules';
 import BuiltinModule from './BuiltinModule';
-import { WebpackModules, ReactComponents, MonkeyPatch, Patcher } from 'modules';
+import { WebpackModules, ReactComponents, MonkeyPatch, Patcher, DiscordApi } from 'modules';
 import { VueInjector, Reflection } from 'ui';
 import E2EEComponent from './E2EEComponent.vue';
 import aes256 from 'aes256';
@@ -20,10 +21,32 @@ export default new class E2EE extends BuiltinModule {
         return ['security', 'default', 'e2ee'];
     }
 
+    get master() {
+        return 'temporarymasterkey';
+    }
+
+    get database() {
+        return Settings.getSet('security').settings.find(s => s.id === 'e2eedb').settings[0].value;
+    }
+
+    encrypt(key, content, prefix = '$:') {
+        return prefix + aes256.encrypt(key, content);
+    }
+
+    decrypt(key, content, prefix = '$:') {
+        return aes256.decrypt(key, content.substr(2));
+    }
+
+    getKey(channelId) {
+        const haveKey = this.database.find(kvp => kvp.value.key === channelId);
+        if (!haveKey) return null;
+        return haveKey.value.value;
+    }
+
     async enabled(e) {
         const ctaComponent = await ReactComponents.getComponent('ChannelTextArea');
         MonkeyPatch('BD:E2EE', ctaComponent.component.prototype).after('render', this.render);
-        MonkeyPatch('BD:E2EE', ctaComponent.component.prototype).before('handleSubmit', this.handleSubmit);
+        MonkeyPatch('BD:E2EE', ctaComponent.component.prototype).before('handleSubmit', this.handleSubmit.bind(this));
     }
 
     render(component, args, retVal) {
@@ -34,7 +57,9 @@ export default new class E2EE extends BuiltinModule {
     }
 
     handleSubmit(component, args, retVal) {
-        component.props.value = aes256.encrypt('randomkey', component.props.value);
+        const key = this.getKey(DiscordApi.currentChannel.id);
+        if (!key) return;
+        component.props.value = this.encrypt(this.decrypt(this.master, key), component.props.value);
     }
 
     disabled(e) {

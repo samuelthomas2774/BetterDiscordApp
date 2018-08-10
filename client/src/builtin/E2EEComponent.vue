@@ -12,17 +12,17 @@
     <div class="bd-e2eeTaContainer">
         <template v-if="error">
             <div class="bd-e2eeTaBtn bd-e2eeLock bd-error">
-                <MiLock v-tooltip="'E2EE ERROR!'" />
+                <MiLock v-tooltip="error" />
             </div>
         </template>
         <template v-else-if="state === 'loading'">
             <div class="bd-e2eeTaBtn bd-e2eeLock bd-warn">
-                <MiLock v-tooltip="'E2EE is loading'" />
+                <MiLock v-tooltip="'Loading'" />
             </div>
         </template>
         <template v-else>
             <div class="bd-e2eeTaBtn bd-e2eeLock bd-ok">
-                <MiLock v-tooltip="'E2EE Ready!'" />
+                <MiLock v-tooltip="'Ready!'" />
             </div>
         </template>
         <div class="bd-taDivider"></div>
@@ -30,6 +30,8 @@
 </template>
 
 <script>
+    import { E2EE } from 'builtin';
+    import { DiscordApi } from 'modules';
     import { MiLock } from '../ui/components/common/MaterialIcon';
     export default {
         components: { MiLock },
@@ -39,6 +41,19 @@
                 error: null
             };
         },
-        methods: {}
+        methods: {},
+        mounted() {
+            if (!E2EE.master) {
+                this.error = 'No master key set!';
+                return;
+            }
+            const haveKey = E2EE.getKey(DiscordApi.currentChannel.id);
+            if (!haveKey) {
+                this.error = 'No key for channel!';
+                return;
+            }
+            this.state = 'OK';
+            this.error = null;
+        }
     }
 </script>

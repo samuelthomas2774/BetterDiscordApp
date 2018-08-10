@@ -44,11 +44,14 @@
     }
 
     &.bd-hide-button {
-        transition: opacity 0.4s ease-out;
-        opacity: 0;
+        animation: bd-fade-out 0.4s ease-out;
 
         &.bd-active {
-            transition-timing-function: ease-in;
+            animation: bd-fade-in 0.4s ease-in;
+        }
+
+        &:not(.bd-active):not(.bd-animating) {
+            display: none;
         }
     }
 

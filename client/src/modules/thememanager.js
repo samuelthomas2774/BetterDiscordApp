@@ -10,6 +10,8 @@
 
 import ContentManager from './contentmanager';
 import Theme from './theme';
+import { FileUtils } from 'common';
+import path from 'path';
 
 export default class ThemeManager extends ContentManager {
 
@@ -34,13 +36,27 @@ export default class ThemeManager extends ContentManager {
 
     static get loadContent() { return this.loadTheme }
     static async loadTheme(paths, configs, info, main) {
+        if (!main && info.type === 'sass') {
+            try {
+                await FileUtils.fileExists(path.join(paths.contentPath, main = 'index.scss'));
+            } catch (err) {
+                try {
+                    await FileUtils.fileExists(path.join(paths.contentPath, main = 'index.sass'));
+                } catch (err) {
+                    main = 'index.scss';
+                }
+            }
+        }
+
+        const mainPath = path.join(paths.contentPath, main || 'index.css');
+
         try {
             const instance = new Theme({
                 configs, info, main,
                 paths: {
                     contentPath: paths.contentPath,
                     dirName: paths.dirName,
-                    mainPath: paths.mainPath
+                    mainPath
                 }
             });
             if (instance.enabled) {

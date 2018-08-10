@@ -190,7 +190,6 @@ export default class {
 
             const configPath = path.resolve(contentPath, 'config.json');
             const readConfig = await FileUtils.readJsonFromFile(configPath);
-            const mainPath = path.join(contentPath, readConfig.main || 'index.js');
 
             const defaultConfig = new SettingsSet({
                 settings: readConfig.defaultConfig,
@@ -239,8 +238,7 @@ export default class {
 
             const paths = {
                 contentPath,
-                dirName,
-                mainPath
+                dirName
             };
 
             const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies, readConfig.permissions, readConfig.mainExport);
@@ -278,7 +276,7 @@ export default class {
 
             const index = this.getContentIndex(content);
 
-            delete Globals.require.cache[Globals.require.resolve(content.paths.mainPath)];
+            if (this.unloadContentHook) this.unloadContentHook(content, force, reload);
 
             if (reload) {
                 const newcontent = await this.preloadContent(content.dirName, true, index);

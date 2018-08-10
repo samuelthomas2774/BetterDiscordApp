@@ -12,6 +12,7 @@ import { Permissions } from 'modules';
 import { Modals } from 'ui';
 import { ErrorEvent } from 'structs';
 import { ClientLogger as Logger } from 'common';
+import path from 'path';
 import Globals from './globals';
 import ContentManager from './contentmanager';
 import ExtModuleManager from './extmodulemanager';
@@ -97,7 +98,8 @@ export default class extends ContentManager {
             }
         }
 
-        const pluginExports = Globals.require(paths.mainPath);
+        const mainPath = path.join(paths.contentPath, main || 'index.js');
+        const pluginExports = Globals.require(mainPath);
 
         const pluginFunction = mainExport ? pluginExports[mainExport]
             : pluginExports.__esModule ? pluginExports.default : pluginExports;
@@ -113,7 +115,7 @@ export default class extends ContentManager {
             paths: {
                 contentPath: paths.contentPath,
                 dirName: paths.dirName,
-                mainPath: paths.mainPath
+                mainPath
             }
         });
 
@@ -126,6 +128,10 @@ export default class extends ContentManager {
 
     static get unloadPlugin() { return this.unloadContent }
     static get reloadPlugin() { return this.reloadContent }
+
+    static unloadContentHook(plugin, force, reload) {
+        delete Globals.require.cache[Globals.require.resolve(plugin.paths.mainPath)];
+    }
 
     /**
      * Stops a plugin.

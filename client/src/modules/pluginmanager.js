@@ -13,6 +13,7 @@ import { Modals } from 'ui';
 import { ErrorEvent } from 'structs';
 import { ClientLogger as Logger } from 'common';
 import path from 'path';
+import semver from 'semver';
 import Globals from './globals';
 import ContentManager from './contentmanager';
 import ExtModuleManager from './extmodulemanager';
@@ -90,9 +91,17 @@ export default class extends ContentManager {
         const deps = {};
         if (dependencies) {
             for (const [key, value] of Object.entries(dependencies)) {
-                const extModule = ExtModuleManager.findModule(key);
+                let extModule = ExtModuleManager.findModule(key);
+                if (!extModule) {
+                    // Try refreshing modules
+                    await ExtModuleManager.refreshContent();
+                    extModule = ExtModuleManager.findModule(key);
+                }
                 if (!extModule) {
                     throw {message: `Dependency ${key}:${value} is not loaded.`};
+                }
+                if (!semver.satisfies(extModule.version, value)) {
+                    throw {message: `${info.name} requires ${key}:${value}, version ${extModule.version} is installed.`};
                 }
                 deps[key] = extModule.__require;
             }

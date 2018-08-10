@@ -10,6 +10,7 @@
 
 import { Utils, ClientLogger as Logger, AsyncEventEmitter } from 'common';
 import { Modals } from 'ui';
+import semver from 'semver';
 import Database from './database';
 
 export default class Content extends AsyncEventEmitter {
@@ -54,7 +55,7 @@ export default class Content extends AsyncEventEmitter {
     get icon() { return this.info.icon }
     get description() { return this.info.description }
     get authors() { return this.info.authors }
-    get version() { return this.info.version }
+    get version() { return '' + semver.coerce('' + this.info.version) }
     get loadedTimestamp() { return this.__internals.loaded }
     get startedTimestamp() { return this.__internals.started }
     get stoppedTimestamp() { return this.__internals.stopped }

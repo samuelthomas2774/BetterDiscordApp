@@ -8,6 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Settings } from 'modules';
+
 let toasts = 0;
 
 export default class Toasts {
@@ -24,6 +26,8 @@ export default class Toasts {
      * @returns {Promise} This promise resolves when the toast is removed from the DOM.
      */
     static async push(message, options = {}) {
+        if (!this.enabled) return;
+
         const {type = 'basic', icon, additionalClasses, timeout = 3000} = options;
         const toast = {id: toasts++, message, type, icon, additionalClasses, closing: false};
         this.stack.push(toast);
@@ -70,6 +74,18 @@ export default class Toasts {
      */
     static get stack() {
         return this._stack || (this._stack = []);
+    }
+
+    static get setting() {
+        return Settings.getSetting('ui', 'default', 'enable-toasts');
+    }
+
+    static get enabled() {
+        return this.setting.value;
+    }
+
+    static set enabled(enabled) {
+        this.setting.value = enabled;
     }
 
 }

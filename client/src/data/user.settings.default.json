@@ -93,6 +93,13 @@
                         "hint": "When this is enabled you can use Ctrl/Cmd + B to open the BetterDiscord settings menu.",
                         "value": false,
                         "disabled": false
+                    },
+                    {
+                        "id": "enable-toasts",
+                        "type": "bool",
+                        "text": "Enable Toasts",
+                        "hint": "Allows plugins to show toasts.",
+                        "value": true
                     }
                 ]
             }

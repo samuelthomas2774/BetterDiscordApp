@@ -23,16 +23,20 @@
             align-items: center;
             cursor: pointer;
 
-            &:hover {
-                svg {
-                    fill: #FFF;
-                }
-            }
-
             svg {
                 width: 16px;
                 height: 16px;
                 fill: #ccc;
+            }
+
+            &:not(.bd-disabled):hover {
+                svg {
+                    fill: #fff;
+                }
+            }
+
+            &.bd-disabled {
+                opacity: 0.5;
             }
         }
     }

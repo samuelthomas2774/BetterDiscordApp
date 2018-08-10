@@ -39,12 +39,12 @@ export default new class E2EE extends BuiltinModule {
         return Settings.getSet('security').settings.find(s => s.id === 'e2eedb').settings[0].value;
     }
 
-    encrypt(key, content, prefix = '$:') {
+    encrypt(key, content, prefix = '') {
         return prefix + aes256.encrypt(key, content);
     }
 
-    decrypt(key, content, prefix = '$:') {
-        return aes256.decrypt(key, content.substr(2));
+    decrypt(key, content, prefix = '') {
+        return aes256.decrypt(key, content.replace(prefix, ''));
     }
 
     getKey(channelId) {
@@ -88,7 +88,7 @@ export default new class E2EE extends BuiltinModule {
     handleSubmitCta(component, args, retVal) {
         const key = this.getKey(DiscordApi.currentChannel.id);
         if (!key) return;
-        component.props.value = this.encrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.value);
+        component.props.value = this.encrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.value, '$:');
     }
 
     async disabled(e) {

@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-e2eeTaContainer">
-        <div class="bd-e2eeTaBtn bd-e2eeLock">
+        <div class="bd-e2eeTaBtn bd-e2eeLock bd-error">
             <MiLock v-tooltip="'E2EE'" />
         </div>
         <div class="bd-taDivider"></div>

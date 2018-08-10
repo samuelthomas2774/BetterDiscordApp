@@ -21,6 +21,7 @@ import GuildSetting from './types/guild';
 import ArraySetting from './types/array';
 import CollectionSetting from './types/collection';
 import KvpSetting from './types/kvp';
+import SecureKvpSetting from './types/securekvp';
 import CustomSetting from './types/custom';
 
 export default class Setting {
@@ -44,6 +45,7 @@ export default class Setting {
         else if (args.type === 'array') return new ArraySetting(args, ...merge);
         else if (args.type === 'collection') return new CollectionSetting(args, ...merge);
         else if (args.type === 'kvp') return new KvpSetting(args, ...merge);
+        else if (args.type === 'securekvp') return new SecureKvpSetting(args, ...merge);
         else if (args.type === 'custom') return new CustomSetting(args, ...merge);
         else throw {message: `Setting type ${args.type} unknown`};
     }

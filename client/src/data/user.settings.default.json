@@ -172,7 +172,7 @@
                 "settings": [
                     {
                         "id": "e2ekvps",
-                        "type": ["kvp"],
+                        "type": [ "securekvp" ],
                         "value": []
                     }
                 ]

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Events, DiscordApi } from 'modules';
+import { Events, DiscordApi, Settings } from 'modules';
 import { remote } from 'electron';
 import DOM from './dom';
 import Vue from './vue';
@@ -17,6 +17,13 @@ import { BdSettingsWrapper, BdModals, BdToasts } from './components';
 export default class {
 
     static initUiEvents() {
+        const hideButtonSetting = Settings.getSetting('ui', 'default', 'hide-button');
+        hideButtonSetting.on('setting-updated', event => {
+            if (event.value) document.body.classList.add('bd-hide-button');
+            else document.body.classList.remove('bd-hide-button');
+        });
+        if (hideButtonSetting.value) document.body.classList.add('bd-hide-button');
+
         this.pathCache = {
             isDm: null,
             server: DiscordApi.currentGuild,
@@ -46,22 +53,16 @@ export default class {
         DOM.createElement('div', null, 'bd-toasts').appendTo(DOM.bdToasts);
         DOM.createElement('bd-tooltips').appendTo(DOM.bdBody);
 
-        this.toasts = new Vue({
-            el: '#bd-toasts',
-            components: { BdToasts },
-            template: '<BdToasts />'
+        this.toasts = new (Vue.extend(BdToasts))({
+            el: '#bd-toasts'
         });
 
-        this.modals = new Vue({
-            el: '#bd-modals',
-            components: { BdModals },
-            template: '<BdModals />'
+        this.modals = new (Vue.extend(BdModals))({
+            el: '#bd-modals'
         });
 
-        this.vueInstance = new Vue({
-            el: '#bd-settings',
-            components: { BdSettingsWrapper },
-            template: '<BdSettingsWrapper />'
+        this.vueInstance = new (Vue.extend(BdSettingsWrapper))({
+            el: '#bd-settings'
         });
 
         return this.vueInstance;

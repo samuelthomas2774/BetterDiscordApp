@@ -122,6 +122,9 @@
             }
         }
 
+        &.bd-stop .bd-sidebar-region {
+            z-index: 3004;
+        }
         &.bd-stop .bd-content-region {
             z-index: 3003;
         }

@@ -9,8 +9,8 @@
 */
 
 <template>
-    <div class="bd-settings" :class="{active: active, 'bd-settings-out': activeIndex === -1 && lastActiveIndex >= 0}" @keyup="$emit('close')">
-        <SidebarView :contentVisible="this.activeIndex >= 0 || this.lastActiveIndex >= 0" :animating="this.animating" :class="{'bd-stop': !first}">
+    <div class="bd-settings" :class="{active, 'bd-settings-out': !item && animating}" @keyup="$emit('close')">
+        <SidebarView :contentVisible="item" :animating="animating" :class="{'bd-stop': item}">
             <Sidebar slot="sidebar">
                 <div class="bd-settings-x" @click="$emit('close')">
                     <MiClose size="17"/>
@@ -18,9 +18,10 @@
                 </div>
                 <template v-for="(category, text) in sidebar">
                     <SidebarItem :item="{text, type: 'header'}" />
-                    <SidebarItem v-for="item in category" :item="item" :key="item.id" @click="itemOnClick(item.id)" />
+                    <SidebarItem v-for="i in category" :key="i.id" :item="i" :active="item && i.id === item.id" @click="itemOnClick(i.id)" />
                 </template>
             </Sidebar>
+
             <div slot="sidebarfooter" class="bd-info">
                 <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
                 <div @click="openGithub" v-tooltip="'GitHub'" class="bd-material-button">
@@ -33,25 +34,28 @@
                     <MiWeb size="16" />
                 </div>
             </div>
+
             <ContentColumn slot="content">
-                <div v-for="item in sidebarItems" v-if="activeContent(item.contentid) || animatingContent(item.contentid)" :class="{active: activeContent(item.contentid), animating: animatingContent(item.contentid)}">
-                    <template v-if="item.component">
-                        <component :is="item.component" :SettingsWrapper="SettingsWrapper" />
-                    </template>
+                <transition name="bd-contentcolumn" @before-enter="animating++" @after-enter="animating--" @enter-cancelled="animating--" @before-leave="animating++" @after-leave="animating--" @leave-cancelled="animating--">
+                    <div v-if="item" :key="item.id">
+                        <template v-if="item.component">
+                            <component :is="item.component" :SettingsWrapper="SettingsWrapper" />
+                        </template>
 
-                    <SettingsWrapper v-if="typeof item.set === 'string'" :headertext="Settings.getSet(item.set).headertext">
-                        <SettingsPanel :settings="Settings.getSet(item.set)" :schemes="Settings.getSet(item.set).schemes" />
-                    </SettingsWrapper>
-                    <SettingsWrapper v-else-if="item.set" :headertext="item.set.headertext">
-                        <SettingsPanel :settings="item.set" :schemes="item.set.schemes" />
-                    </SettingsWrapper>
+                        <SettingsWrapper v-else-if="typeof item.set === 'string'" :headertext="Settings.getSet(item.set).headertext">
+                            <SettingsPanel :settings="Settings.getSet(item.set)" :schemes="Settings.getSet(item.set).schemes" />
+                        </SettingsWrapper>
+                        <SettingsWrapper v-else-if="item.set" :headertext="item.set.headertext">
+                            <SettingsPanel :settings="item.set" :schemes="item.set.schemes" />
+                        </SettingsWrapper>
 
-                    <ConnectivityView v-if="item.contentid === 'connectivity'"/>
-                    <CssEditorView v-if="item.contentid === 'css'" />
-                    <PluginsView v-if="item.contentid === 'plugins'" />
-                    <ThemesView v-if="item.contentid === 'themes'" />
-                    <UpdaterView v-if="item.contentid === 'updater'" />
-                </div>
+                        <ConnectivityView v-else-if="item.contentid === 'connectivity'" />
+                        <CssEditorView v-else-if="item.contentid === 'css'" />
+                        <PluginsView v-else-if="item.contentid === 'plugins'" />
+                        <ThemesView v-else-if="item.contentid === 'themes'" />
+                        <UpdaterView v-else-if="item.contentid === 'updater'" />
+                    </div>
+                </transition>
             </ContentColumn>
         </SidebarView>
     </div>
@@ -69,13 +73,10 @@
     export default {
         data() {
             return {
-                BdMenuItems,
-                activeIndex: -1,
-                lastActiveIndex: -1,
-                animating: false,
-                first: true,
+                animating: 0,
+                item: null,
+                items: BdMenuItems.items,
                 Settings,
-                timeout: null,
                 SettingsWrapper,
                 openMenuHandler: null
             };
@@ -87,12 +88,9 @@
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         computed: {
-            sidebarItems() {
-                return this.BdMenuItems.items;
-            },
             sidebar() {
                 const categories = {};
-                for (let item of this.sidebarItems) {
+                for (let item of this.items) {
                     if (item.hidden) continue;
                     const category = categories[item.category] || (categories[item.category] = []);
                     category.push(item);
@@ -102,42 +100,10 @@
         },
         methods: {
             itemOnClick(id) {
-                if (this.animating || id === this.activeIndex) return;
-                const activeItem = this.sidebarItems.find(item => item.id === this.activeIndex);
-                if (activeItem) activeItem.active = false;
-                this.sidebarItems.find(item => item.id === id).active = true;
-                this.animating = true;
-                this.lastActiveIndex = this.activeIndex;
-                this.activeIndex = id;
-
-                if (this.timeout) clearTimeout(this.timeout);
-                this.timeout = setTimeout(() => {
-                    this.first = false;
-                    this.animating = false;
-                    this.lastActiveIndex = -1;
-                    this.timeout = null;
-                }, 400);
-            },
-            activeContent(s) {
-                const item = this.sidebarItems.find(item => item.contentid === s);
-                return item && item.id === this.activeIndex;
-            },
-            animatingContent(s) {
-                const item = this.sidebarItems.find(item => item.contentid === s);
-                return item && item.id === this.lastActiveIndex;
+                this.item = this.items.find(item => item.id === id);
             },
             closeContent() {
-                if (this.activeIndex >= 0) this.sidebarItems.find(item => item.id === this.activeIndex).active = false;
-                this.first = true;
-                this.lastActiveIndex = this.activeIndex;
-                this.activeIndex = -1;
-
-                if (this.timeout) clearTimeout(this.timeout);
-                this.timeout = setTimeout(() => {
-                    this.animating = false;
-                    this.lastActiveIndex = -1;
-                    this.timeout = null;
-                }, 400);
+                this.item = null;
             },
             openGithub() {
                 shell.openExternal('https://github.com/JsSucks/BetterDiscordApp');
@@ -156,7 +122,7 @@
             }
         },
         created() {
-            Events.on('bd-open-menu', this.openMenuHandler = item => item && this.itemOnClick(this.sidebarItems.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
+            Events.on('bd-open-menu', this.openMenuHandler = item => item && this.itemOnClick(this.items.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
         },
         destroyed() {
             if (this.openMenuHandler) Events.off('bd-open-menu', this.openMenuHandler);

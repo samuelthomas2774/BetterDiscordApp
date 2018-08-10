@@ -16,6 +16,6 @@ export default class KvpSetting extends Setting {
      * The value to use when the setting doesn't have a value.
      */
     get defaultValue() {
-        return { key: 'Channel ID', value: 'Encryption Key' };
+        return { key: 'Key', value: 'Value' };
     }
 }

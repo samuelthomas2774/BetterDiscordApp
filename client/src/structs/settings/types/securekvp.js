@@ -11,12 +11,6 @@
 import Kvp from './kvp';
 
 export default class SecureKvpSetting extends Kvp {
-
-    constructor(args, ...merge) {
-        super(args, ...merge);
-        window.skvp = this;
-    }
-
     /**
      * The value to use when the setting doesn't have a value.
      */

@@ -40,9 +40,8 @@
             },
             valueBlur(e) {
                 if (!this.valueChanged) return;
-                const encrypted = aes256.encrypt(this.masterKey, e.target.value);
-                if (encrypted === this.setting.value.value) return;
-                this.setting.value = { key: this.setting.value.key, value: encrypted }
+                const value = aes256.encrypt(this.masterKey, e.target.value);
+                this.setting.value = { key: this.setting.value.key, value }
                 this.valueChanged = false;
             },
             keyUpKey(e) {

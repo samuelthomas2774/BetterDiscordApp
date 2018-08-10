@@ -22,6 +22,7 @@
     "node-sass": "^4.9.2"
   },
   "devDependencies": {
+    "aes256": "^1.0.4",
     "archiver": "^2.1.1",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",

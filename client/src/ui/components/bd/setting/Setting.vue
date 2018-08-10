@@ -24,6 +24,7 @@
         <ArraySetting v-else-if="setting.type === 'array'" :setting="setting" />
         <Collection v-else-if="setting.type === 'collection'" :setting="setting" />
         <KeyValuePair v-else-if="setting.type === 'kvp'" :setting="setting" />
+        <SecureKeyValuePair v-else-if="setting.type === 'securekvp'" :setting="setting" />
         <CustomSetting v-else-if="setting.type === 'custom'" :setting="setting" />
         <div class="bd-form-divider"></div>
     </div>
@@ -45,6 +46,7 @@
     import ArraySetting from './Array.vue';
     import Collection from './Collection.vue';
     import KeyValuePair from './KeyValuePair.vue';
+    import SecureKeyValuePair from './SecureKeyValuePair.vue';
     import CustomSetting from './Custom.vue';
 
     export default {
@@ -66,6 +68,7 @@
             ArraySetting,
             Collection,
             KeyValuePair,
+            SecureKeyValuePair,
             CustomSetting
         },
         computed: {

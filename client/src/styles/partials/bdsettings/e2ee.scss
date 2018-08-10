@@ -31,11 +31,37 @@
     }
 
     .bd-taDivider {
-        background-color: hsla(0,0%,100%,.1);
+        background-color: rgba(255, 255, 255, 0.1);
         box-sizing: border-box;
-        height: 80%;
         position: relative;
         top: 10%;
         width: 1px;
+        height: 37px;
+        margin-top: 5px;
+    }
+}
+
+.bd-e2eeMdContainer {
+    position: relative;
+    display: inline-block;
+    top: 4px;
+
+    .bd-e2eeMdBtn {
+        cursor: pointer;
+
+        &.bd-e2eeLock {
+            &.bd-error {
+                fill: #cc3e3e;
+            }
+
+            &.bd-ok {
+                fill: $colbdgreen;
+            }
+
+            &.bd-warn {
+                fill: #ccab3e;
+                animation: bd-pulse 2s ease-in-out infinite;
+            }
+        }
     }
 }

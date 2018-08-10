@@ -53,27 +53,48 @@ export default new class E2EE extends BuiltinModule {
         return haveKey.value.value;
     }
 
-    async enabled(e) {
-        const ctaComponent = await ReactComponents.getComponent('ChannelTextArea');
-        MonkeyPatch('BD:E2EE', ctaComponent.component.prototype).after('render', this.render);
-        MonkeyPatch('BD:E2EE', ctaComponent.component.prototype).before('handleSubmit', this.handleSubmit.bind(this));
+    async patchMessageContent() {
+        const selector = '.' + WebpackModules.getClassName('container', 'containerCozy', 'containerCompact', 'edited');
+        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector });
+        MonkeyPatch('BD:E2EE', MessageContent.component.prototype).after('render', this.renderMessageContent.bind(this));
     }
 
-    render(component, args, retVal) {
+    async enabled(e) {
+        this.patchMessageContent();
+        const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
+        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', { selector });
+        MonkeyPatch('BD:E2EE', ChannelTextArea.component.prototype).after('render', this.renderCta);
+        MonkeyPatch('BD:E2EE', ChannelTextArea.component.prototype).before('handleSubmit', this.handleSubmitCta.bind(this));
+        ChannelTextArea.forceUpdateAll();
+    }
+
+    renderMessageContent(component, args, retVal) {
+        const key = this.getKey(DiscordApi.currentChannel.id);
+        if (!key) return;
+        const markup = retVal.props.children[1].props;
+        if (!markup || !markup.children || markup.children.length < 2) return;
+        if (typeof markup.children[1][0] !== 'string') return;
+        const textContent = markup.children[1][0];
+        if (!textContent.startsWith('$:')) return;
+        markup.children[1][0] = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), textContent);
+    }
+
+    renderCta(component, args, retVal) {
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
         const inner = retVal.props.children.find(child => child.props.className && child.props.className.includes('inner'));
-
-        inner.props.children.splice(0, 0, VueInjector.createReactElement(E2EEComponent, {}, true));
+        inner.props.children.splice(0, 0, VueInjector.createReactElement(E2EEComponent, {}, false));
     }
 
-    handleSubmit(component, args, retVal) {
+    handleSubmitCta(component, args, retVal) {
         const key = this.getKey(DiscordApi.currentChannel.id);
         if (!key) return;
         component.props.value = this.encrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.value);
     }
 
-    disabled(e) {
+    async disabled(e) {
         for (const patch of Patcher.getPatchesByCaller('BD:E2EE')) patch.unpatch();
+        const ctaComponent = await ReactComponents.getComponent('ChannelTextArea');
+        ctaComponent.forceUpdateAll();
     }
 
 }

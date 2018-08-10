@@ -10,9 +10,21 @@
 
 <template>
     <div class="bd-e2eeTaContainer">
-        <div class="bd-e2eeTaBtn bd-e2eeLock bd-error">
-            <MiLock v-tooltip="'E2EE'" />
-        </div>
+        <template v-if="error">
+            <div class="bd-e2eeTaBtn bd-e2eeLock bd-error">
+                <MiLock v-tooltip="'E2EE ERROR!'" />
+            </div>
+        </template>
+        <template v-else-if="state === 'loading'">
+            <div class="bd-e2eeTaBtn bd-e2eeLock bd-warn">
+                <MiLock v-tooltip="'E2EE is loading'" />
+            </div>
+        </template>
+        <template v-else>
+            <div class="bd-e2eeTaBtn bd-e2eeLock bd-ok">
+                <MiLock v-tooltip="'E2EE Ready!'" />
+            </div>
+        </template>
         <div class="bd-taDivider"></div>
     </div>
 </template>
@@ -22,7 +34,10 @@
     export default {
         components: { MiLock },
         data() {
-            return {};
+            return {
+                state: 'loading',
+                error: null
+            };
         },
         methods: {}
     }

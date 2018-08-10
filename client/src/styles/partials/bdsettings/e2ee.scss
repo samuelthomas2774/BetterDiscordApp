@@ -25,6 +25,7 @@
 
             &.bd-warn {
                 fill: #ccab3e;
+                animation: bd-pulse 2s ease-in-out infinite;
             }
         }
     }

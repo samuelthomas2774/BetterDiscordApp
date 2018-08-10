@@ -11,7 +11,7 @@
 import BuiltinModule from './BuiltinModule';
 import { WebpackModules, ReactComponents, MonkeyPatch, Patcher } from 'modules';
 import { VueInjector, Reflection } from 'ui';
-import EmoteComponent from './EmoteComponent.vue';
+import E2EEComponent from './E2EEComponent.vue';
 import aes256 from 'aes256';
 
 export default new class E2EE extends BuiltinModule {
@@ -30,11 +30,7 @@ export default new class E2EE extends BuiltinModule {
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
         const inner = retVal.props.children.find(child => child.props.className && child.props.className.includes('inner'));
 
-        inner.props.children.splice(0, 0, VueInjector.createReactElement(EmoteComponent, {
-            src: 'https://static-cdn.jtvnw.net/emoticons/v1/354/1.0',
-            name: '4Head',
-            hasWrapper: false
-        }, true));
+        inner.props.children.splice(0, 0, VueInjector.createReactElement(E2EEComponent, {}, true));
     }
 
     handleSubmit(component, args, retVal) {

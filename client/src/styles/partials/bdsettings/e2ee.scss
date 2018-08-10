@@ -1,0 +1,24 @@
+.bd-e2eeTaContainer {
+    display: flex;
+
+    .bd-e2eeTaBtn {
+        padding: 10px;
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: row;
+        cursor: pointer;
+
+        &.bd-e2eeLock {
+            fill: #cc3e3e;
+        }
+    }
+
+    .bd-taDivider {
+        background-color: hsla(0,0%,100%,.1);
+        box-sizing: border-box;
+        height: 80%;
+        position: relative;
+        top: 10%;
+        width: 1px;
+    }
+}

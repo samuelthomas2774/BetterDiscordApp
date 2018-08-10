@@ -7,6 +7,11 @@
         flex: 1 1 auto;
         flex-direction: row;
         cursor: pointer;
+        opacity: .8;
+        transition: opacity .2s ease-in-out;
+        &:hover {
+            opacity: 1;
+        }
 
         &.bd-e2eeLock {
             fill: #cc3e3e;

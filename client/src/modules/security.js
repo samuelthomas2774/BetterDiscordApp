@@ -13,7 +13,7 @@ import aes256 from 'aes256';
 export default class Security {
 
     static encrypt(key, content, prefix = '') {
-        if (key instanceof Array) return this.deepDecrypt(key, content, prefix);
+        if (key instanceof Array) return this.deepEncrypt(key, content, prefix);
         return `${prefix}${aes256.encrypt(key, content)}`;
     }
 

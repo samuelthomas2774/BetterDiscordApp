@@ -53,39 +53,61 @@ export default new class E2EE extends BuiltinModule {
         return haveKey.value.value;
     }
 
-    async patchMessageContent() {
-        const selector = '.' + WebpackModules.getClassName('container', 'containerCozy', 'containerCompact', 'edited');
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector });
-        MonkeyPatch('BD:E2EE', MessageContent.component.prototype).after('render', this.renderMessageContent.bind(this));
-    }
-
     async enabled(e) {
         this.patchMessageContent();
         const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
-        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', { selector });
-        MonkeyPatch('BD:E2EE', ChannelTextArea.component.prototype).after('render', this.renderCta);
-        MonkeyPatch('BD:E2EE', ChannelTextArea.component.prototype).before('handleSubmit', this.handleSubmitCta.bind(this));
-        ChannelTextArea.forceUpdateAll();
+        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
+        this.patchChannelTextArea(cta);
+        this.patchChannelTextAreaSubmit(cta);
+        cta.forceUpdateAll();
+    }
+
+    async patchMessageContent() {
+        const selector = '.' + WebpackModules.getClassName('container', 'containerCozy', 'containerCompact', 'edited');
+        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector });
+        MonkeyPatch('BD:E2EE', MessageContent.component.prototype).before('render', this.renderMessageContent.bind(this));
     }
 
     renderMessageContent(component, args, retVal) {
         const key = this.getKey(DiscordApi.currentChannel.id);
-        if (!key) return;
-        const markup = retVal.props.children[1].props;
-        if (!markup || !markup.children || markup.children.length < 2) return;
-        if (typeof markup.children[1][0] !== 'string') return;
-        const textContent = markup.children[1][0];
-        if (!textContent.startsWith('$:')) return;
-        markup.children[1][0] = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), textContent);
+        if (!key) return; // We don't have a key for this channel
+
+        const Message = WebpackModules.getModuleByPrototypes(['isMentioned']);
+        const MessageParser = WebpackModules.getModuleByName('MessageParser');
+        const currentChannel = DiscordApi.currentChannel.discordObject;
+
+        if (!component.props || !component.props.message) return;
+        const { content } = component.props.message;
+        if (typeof content !== 'string') return; // Ignore any non string content
+        if (!content.startsWith('$:')) return; // Not an encrypted string
+        let decrypt;
+        try {
+            decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.message.content);
+        } catch (err) { return } // Ignore errors such as non empty
+
+        // Create a new message to parse it properly
+        const create  = Message.create(MessageParser.createMessage(currentChannel, MessageParser.parse(currentChannel, decrypt).content));
+        if (!create.content || !create.contentParsed) return;
+
+        component.props.message.content = create.content;
+        component.props.message.contentParsed = create.contentParsed;
     }
 
-    renderCta(component, args, retVal) {
+    patchChannelTextArea(cta) {
+        MonkeyPatch('BD:E2EE', cta.component.prototype).after('render', this.renderChannelTextArea);
+    }
+
+    renderChannelTextArea(component, args, retVal) {
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
         const inner = retVal.props.children.find(child => child.props.className && child.props.className.includes('inner'));
         inner.props.children.splice(0, 0, VueInjector.createReactElement(E2EEComponent, {}, false));
     }
 
-    handleSubmitCta(component, args, retVal) {
+    patchChannelTextAreaSubmit(cta) {
+        MonkeyPatch('BD:E2EE', cta.component.prototype).before('handleSubmit', this.handleChannelTextAreaSubmit.bind(this));
+    }
+
+    handleChannelTextAreaSubmit(component, args, retVal) {
         const key = this.getKey(DiscordApi.currentChannel.id);
         if (!key) return;
         component.props.value = this.encrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.value, '$:');

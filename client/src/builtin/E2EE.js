@@ -62,6 +62,16 @@ export default new class E2EE extends BuiltinModule {
         return haveKey.value.value;
     }
 
+    setKey(channelId, key) {
+        const items = Settings.getSetting('security', 'e2eedb', 'e2ekvps').items;
+        const index = items.findIndex(kvp => kvp.value.key === channelId);
+        if (index > -1) {
+          items[index].value = {key: channelId, value: key};
+          return;
+        }
+        Settings.getSetting('security', 'e2eedb', 'e2ekvps').addItem({ value: { key: channelId, value: key } });
+    }
+
     async enabled(e) {
         this.patchDispatcher();
         this.patchMessageContent();
@@ -79,7 +89,7 @@ export default new class E2EE extends BuiltinModule {
 
             const key = this.getKey(event.message.channel_id);
             if (!key) return; // We don't have a key for this channel
-        
+
             if (typeof event.message.content !== 'string') return; // Ignore any non string content
             if (!event.message.content.startsWith('$:')) return; // Not an encrypted string
             let decrypt;
@@ -91,10 +101,10 @@ export default new class E2EE extends BuiltinModule {
             const Permissions = WebpackModules.getModuleByName('GuildPermissions');
             const DiscordConstants = WebpackModules.getModuleByName('DiscordConstants');
             const currentChannel = DiscordApi.Channel.fromId(event.message.channel_id).discordObject;
-    
+
             // Create a generic message object to parse mentions with
             const parsed = MessageParser.parse(currentChannel, decrypt).content;
-    
+
             if (userMentionPattern.test(parsed))
                 event.message.mentions = parsed.match(userMentionPattern).map(m => {return {id: m.replace(/[^0-9]/g, '')}});
             if (roleMentionPattern.test(parsed))
@@ -122,7 +132,7 @@ export default new class E2EE extends BuiltinModule {
         const Permissions = WebpackModules.getModuleByName('GuildPermissions');
         const DiscordConstants = WebpackModules.getModuleByName('DiscordConstants');
         const currentChannel = DiscordApi.Channel.fromId(component.props.message.channel_id).discordObject;
-        
+
         if (typeof component.props.message.content !== 'string') return; // Ignore any non string content
         if (!component.props.message.content.startsWith('$:')) return; // Not an encrypted string
         let decrypt;

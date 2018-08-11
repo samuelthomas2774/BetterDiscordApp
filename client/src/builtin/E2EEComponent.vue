@@ -37,23 +37,31 @@
     import { MiLock } from '../ui/components/common/MaterialIcon';
     import contextMenu from 'vue-context-menu';
     import { clipboard } from 'electron';
+    import { Toasts } from 'ui';
 
     function generatePublicKey() {
-        const userID = location.pathname.split("/")[3];
-        const publicKeyMessage = `My public key is: \`${E2EE.createKeyExchange(userID)}\`. Please give me your public key if you haven't done so and add my public key by pasting it in the chat textbox, right clicking the lock icon, and selecting \`Receive Public Key\`.`;
+        const dmChannelID = location.pathname.split("/")[3];
+        const publicKeyMessage = `My public key is: \`${E2EE.createKeyExchange(dmChannelID)}\`. Please give me your public key if you haven't done so and add my public key by pasting it in the chat textbox, right clicking the lock icon, and selecting \`Receive Public Key\`.`;
         const chatInput = document.getElementsByClassName('da-textArea')[0];
         chatInput.value = publicKeyMessage;
-        chatInput._valueTracker.setValue(publicKeyMessage);
-        chatInput[Object.keys(chatInput).find(k => k.startsWith('__reactInternalInstance'))].memoizedProps.value = publicKeyMessage;
+        const evt = { currentTarget: chatInput };
+        chatInput[Object.keys(chatInput).find(k => k.startsWith('__reactEventHandlers'))].onChange.call(chatInput, evt);
     }
 
     function computeSharedSecret() {
         try {
-          const userID = location.pathname.split("/")[3];
-          const otherPublicKey = document.getElementsByClassName("da-textArea")[0].value;
-          const secret = E2EE.computeSecret(userID, otherPublicKey);
-          clipboard.writeText(secret);
-        } catch (e) {}
+          const dmChannelID = location.pathname.split("/")[3];
+          const chatInput = document.getElementsByClassName('da-textArea')[0];
+          const otherPublicKey = chatInput.value;
+          const secret = E2EE.computeSecret(dmChannelID, otherPublicKey);
+          E2EE.setKey(dmChannelID, secret);
+          chatInput.value = "";
+          const evt = { currentTarget: chatInput };
+          chatInput[Object.keys(chatInput).find(k => k.startsWith('__reactEventHandlers'))].onChange.call(chatInput, evt);
+          Toasts.success("Encryption key has been set for this DM channel.");
+        } catch (e) {
+          throw e;
+        }
     }
 
     export default {

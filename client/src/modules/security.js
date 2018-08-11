@@ -16,7 +16,7 @@ export default class Security {
         return `${prefix}${aes256.encrypt(key, content)}`;
     }
 
-    static deepDecrypt(keys, content, prefix) {
+    static deepDecrypt(keys, content, prefix = '') {
         let decrypt = null;
         for (const key of keys.reverse()) {
             if (decrypt === null) decrypt = this.decrypt(key, content, prefix);
@@ -29,7 +29,7 @@ export default class Security {
         return aes256.decrypt(key, content.replace(prefix, ''));
     }
 
-    static deepEncrypt(keys, content, prefix) {
+    static deepEncrypt(keys, content, prefix = '') {
         let encrypt = null;
         for (const key of keys) {
             if (encrypt === null) encrypt = this.encrypt(key, content, prefix);

@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-e2eeTaContainer" @contextmenu.prevent="location.pathname.match(/\/channels\/@me\/\d+/) && $refs.ee2eLockContextMenu.open()">
+    <div class="bd-e2eeTaContainer" @contextmenu.prevent="channelType === 'DM' && $refs.ee2eLockContextMenu.open()">
         <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
             <MiLock v-tooltip="error" />
         </div>
@@ -24,7 +24,7 @@
         </div>
 
         <div class="bd-taDivider"></div>
-        <context-menu id="bd-e2eeLockContextMenu" class="bd-e2eeLockContextMenu" ref="ee2eLockContextMenu" v-if="location.pathname.match(/\/channels\/@me\/\d+/)">
+        <context-menu id="bd-e2eeLockContextMenu" class="bd-e2eeLockContextMenu" ref="ee2eLockContextMenu" v-if="channelType === 'DM'">
             <li class="bd-e2eeLockContextMenuOption" @click="generatePublicKey()">Generate Public Key</li>
             <li class="bd-e2eeLockContextMenuOption" @click="computeSharedSecret()">Receive Public Key</li>
         </context-menu>
@@ -72,7 +72,7 @@
                 E2EE,
                 state: 'loading',
                 error: null,
-                location: window.location
+                channelType: DiscordApi.currentChannel.type
             };
         },
         methods: { generatePublicKey, computeSharedSecret },

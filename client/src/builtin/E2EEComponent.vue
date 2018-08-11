@@ -60,7 +60,8 @@
           chatInput[Object.keys(chatInput).find(k => k.startsWith('__reactEventHandlers'))].onChange.call(chatInput, evt);
           Toasts.success("Encryption key has been set for this DM channel.");
         } catch (e) {
-          throw e;
+          Toasts.error("Invalid public key. Please set up a new key exchange.");
+          console.error(e);
         }
     }
 

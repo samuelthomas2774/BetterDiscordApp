@@ -201,11 +201,15 @@ export default new class E2EE extends BuiltinModule {
     }
 
     computeSecret(userID, otherKey) {
-        const secret = this.ecdh[userID].computeSecret(otherKey, 'base64', 'base64');
-        delete this.ecdh[userID];
-        const hash = crypto.createHash('sha256');
-        hash.update(secret);
-        return hash.digest('base64');
+        try {
+            const secret = this.ecdh[userID].computeSecret(otherKey, 'base64', 'base64');
+            delete this.ecdh[userID];
+            const hash = crypto.createHash('sha256');
+            hash.update(secret);
+            return hash.digest('base64');
+        } catch (e) {
+            throw e;
+        }
     }
 
     handleChannelTextAreaSubmit(component, args, retVal) {

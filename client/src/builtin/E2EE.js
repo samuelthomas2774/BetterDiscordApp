@@ -22,6 +22,7 @@ export default new class E2EE extends BuiltinModule {
     constructor() {
         super();
         this.master = this.encrypt(seed, 'temporarymasterkey');
+        this.encryptNewMessages = true;
     }
 
     setMaster(key) {
@@ -36,7 +37,7 @@ export default new class E2EE extends BuiltinModule {
     }
 
     get database() {
-        return Settings.getSet('security').settings.find(s => s.id === 'e2eedb').settings[0].value;
+        return Settings.getSetting('security', 'e2eedb', 'e2ekvps').value;
     }
 
     encrypt(key, content, prefix = '') {
@@ -109,7 +110,7 @@ export default new class E2EE extends BuiltinModule {
 
     handleChannelTextAreaSubmit(component, args, retVal) {
         const key = this.getKey(DiscordApi.currentChannel.id);
-        if (!key) return;
+        if (!this.encryptNewMessages || !key) return;
         component.props.value = this.encrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.value, '$:');
     }
 

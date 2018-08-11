@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-e2eeTaContainer" @contextmenu.prevent="location.pathname.match(/\/channels\/@me\/\d+/) && $refs.ee2eContextMenu.open()">
+    <div class="bd-e2eeTaContainer" @contextmenu.prevent="location.pathname.match(/\/channels\/@me\/\d+/) && $refs.ee2eLockContextMenu.open()">
         <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
             <MiLock v-tooltip="error" />
         </div>
@@ -24,9 +24,9 @@
         </div>
 
         <div class="bd-taDivider"></div>
-        <context-menu id="context-menu" ref="ee2eContextMenu" v-if="location.pathname.match(/\/channels\/@me\/\d+/)">
-            <li @click="generatePublicKey()">Generate Public Key</li>
-            <li @click="computeSharedSecret()">Receive Public Key</li>
+        <context-menu id="bd-e2eeLockContextMenu" class="bd-e2eeLockContextMenu" ref="ee2eLockContextMenu" v-if="location.pathname.match(/\/channels\/@me\/\d+/)">
+            <li class="bd-e2eeLockContextMenuOption" @click="generatePublicKey()">Generate Public Key</li>
+            <li class="bd-e2eeLockContextMenuOption" @click="computeSharedSecret()">Receive Public Key</li>
         </context-menu>
     </div>
 </template>
@@ -48,10 +48,12 @@
     }
 
     function computeSharedSecret() {
-        const userID = location.pathname.split("/")[3];
-        const otherPublicKey = document.getElementsByClassName("da-textArea")[0].value;
-        const secret = E2EE.computeSecret(userID, otherPublicKey);
-        clipboard.writeText(secret);
+        try {
+          const userID = location.pathname.split("/")[3];
+          const otherPublicKey = document.getElementsByClassName("da-textArea")[0].value;
+          const secret = E2EE.computeSecret(userID, otherPublicKey);
+          clipboard.writeText(secret);
+        } catch (e) {}
     }
 
     export default {

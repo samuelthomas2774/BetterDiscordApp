@@ -10,21 +10,19 @@
 
 <template>
     <div class="bd-e2eeTaContainer">
-        <template v-if="error">
-            <div class="bd-e2eeTaBtn bd-e2eeLock bd-error">
-                <MiLock v-tooltip="error" />
-            </div>
-        </template>
-        <template v-else-if="state === 'loading'">
-            <div class="bd-e2eeTaBtn bd-e2eeLock bd-warn">
-                <MiLock v-tooltip="'Loading'" />
-            </div>
-        </template>
-        <template v-else>
-            <div class="bd-e2eeTaBtn bd-e2eeLock bd-ok">
-                <MiLock v-tooltip="'Ready!'" />
-            </div>
-        </template>
+        <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
+            <MiLock v-tooltip="error" />
+        </div>
+        <div v-else-if="state === 'loading'" class="bd-e2eeTaBtn bd-e2eeLock bd-loading bd-warn">
+            <MiLock v-tooltip="'Loading'" />
+        </div>
+        <div v-else-if="!E2EE.encryptNewMessages" class="bd-e2eeTaBtn bd-e2eeLock bd-warn" @click="E2EE.encryptNewMessages = true">
+            <MiLock v-tooltip="'New messages will not be encrypted.'" />
+        </div>
+        <div v-else class="bd-e2eeTaBtn bd-e2eeLock bd-ok" @click="E2EE.encryptNewMessages = false">
+            <MiLock v-tooltip="'Ready!'" />
+        </div>
+
         <div class="bd-taDivider"></div>
     </div>
 </template>
@@ -33,10 +31,12 @@
     import { E2EE } from 'builtin';
     import { DiscordApi } from 'modules';
     import { MiLock } from '../ui/components/common/MaterialIcon';
+
     export default {
         components: { MiLock },
         data() {
             return {
+                E2EE,
                 state: 'loading',
                 error: null
             };

@@ -60,8 +60,25 @@
 
             &.bd-warn {
                 fill: #ccab3e;
+            }
+
+            &.bd-loading {
                 animation: bd-pulse 2s ease-in-out infinite;
             }
+        }
+    }
+}
+
+.bd-e2eeMessageButtonWrap {
+    .bd-e2eeMessageButton {
+        fill: #99aab5;
+        margin-left: 6px;
+        margin-right: -2px;
+        opacity: .4;
+        transition: opacity .2s ease;
+
+        &:hover {
+            opacity: 1;
         }
     }
 }

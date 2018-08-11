@@ -12,7 +12,9 @@ import { Settings } from 'modules';
 import BuiltinModule from './BuiltinModule';
 import { WebpackModules, ReactComponents, MonkeyPatch, Patcher, DiscordApi } from 'modules';
 import { VueInjector, Reflection } from 'ui';
+import { ClientLogger as Logger } from 'common';
 import E2EEComponent from './E2EEComponent.vue';
+import E2EEMessageButton from './E2EEMessageButton.vue';
 import aes256 from 'aes256';
 
 let seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
@@ -66,10 +68,11 @@ export default new class E2EE extends BuiltinModule {
     async patchMessageContent() {
         const selector = '.' + WebpackModules.getClassName('container', 'containerCozy', 'containerCompact', 'edited');
         const MessageContent = await ReactComponents.getComponent('MessageContent', { selector });
-        MonkeyPatch('BD:E2EE', MessageContent.component.prototype).before('render', this.renderMessageContent.bind(this));
+        MonkeyPatch('BD:E2EE', MessageContent.component.prototype).before('render', this.beforeRenderMessageContent.bind(this));
+        MonkeyPatch('BD:E2EE', MessageContent.component.prototype).after('render', this.renderMessageContent.bind(this));
     }
 
-    renderMessageContent(component, args, retVal) {
+    beforeRenderMessageContent(component, args, retVal) {
         const key = this.getKey(DiscordApi.currentChannel.id);
         if (!key) return; // We don't have a key for this channel
 
@@ -86,12 +89,22 @@ export default new class E2EE extends BuiltinModule {
             decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.message.content);
         } catch (err) { return } // Ignore errors such as non empty
 
+        component.props.message.bd_encrypted = true;
+
         // Create a new message to parse it properly
-        const create  = Message.create(MessageParser.createMessage(currentChannel, MessageParser.parse(currentChannel, decrypt).content));
+        const create = Message.create(MessageParser.createMessage(currentChannel, MessageParser.parse(currentChannel, decrypt).content));
         if (!create.content || !create.contentParsed) return;
 
         component.props.message.content = create.content;
         component.props.message.contentParsed = create.contentParsed;
+    }
+
+    renderMessageContent(component, args, retVal) {
+        if (!component.props.message.bd_encrypted) return;
+
+        retVal.props.children[0].props.children.props.children.props.children.unshift(VueInjector.createReactElement(E2EEMessageButton, {
+            message: component.props.message
+        }));
     }
 
     patchChannelTextArea(cta) {
@@ -101,7 +114,7 @@ export default new class E2EE extends BuiltinModule {
     renderChannelTextArea(component, args, retVal) {
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
         const inner = retVal.props.children.find(child => child.props.className && child.props.className.includes('inner'));
-        inner.props.children.splice(0, 0, VueInjector.createReactElement(E2EEComponent, {}, false));
+        inner.props.children.splice(0, 0, VueInjector.createReactElement(E2EEComponent));
     }
 
     patchChannelTextAreaSubmit(cta) {

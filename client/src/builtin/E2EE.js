@@ -16,6 +16,7 @@ import { ClientLogger as Logger } from 'common';
 import E2EEComponent from './E2EEComponent.vue';
 import E2EEMessageButton from './E2EEMessageButton.vue';
 import aes256 from 'aes256';
+import crypto from 'crypto';
 
 let seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
 
@@ -37,6 +38,7 @@ export default new class E2EE extends BuiltinModule {
     get settingPath() {
         return ['security', 'default', 'e2ee'];
     }
+
 
     get database() {
         return Settings.getSetting('security', 'e2eedb', 'e2ekvps').value;
@@ -119,6 +121,28 @@ export default new class E2EE extends BuiltinModule {
 
     patchChannelTextAreaSubmit(cta) {
         MonkeyPatch('BD:E2EE', cta.component.prototype).before('handleSubmit', this.handleChannelTextAreaSubmit.bind(this));
+    }
+
+    get ecdh() {
+        if (!this._ecdh) this._ecdh = {};
+        return this._ecdh;
+    }
+
+    createKeyExchange(userID) {
+        this.ecdh[userID] = crypto.createECDH('secp521r1');
+        return this.ecdh[userID].generateKeys('base64');
+    }
+
+    publicKeyFor(userID) {
+        return this.ecdh[userID].getPublicKey('base64');
+    }
+
+    computeSecret(userID, otherKey) {
+        const secret = this.ecdh[userID].computeSecret(otherKey, 'base64', 'base64');
+        delete this.ecdh[userID];
+        const hash = crypto.createHash('sha256');
+        hash.update(secret);
+        return hash.digest('base64');
     }
 
     handleChannelTextAreaSubmit(component, args, retVal) {

@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-e2eeTaContainer">
+    <div class="bd-e2eeTaContainer" @contextmenu.prevent="location.pathname.match(/\/channels\/@me\/\d+/) && $refs.ee2eContextMenu.open()">
         <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
             <MiLock v-tooltip="error" />
         </div>
@@ -24,6 +24,10 @@
         </div>
 
         <div class="bd-taDivider"></div>
+        <context-menu id="context-menu" ref="ee2eContextMenu" v-if="location.pathname.match(/\/channels\/@me\/\d+/)">
+            <li @click="generatePublicKey()">Generate Public Key</li>
+            <li @click="computeSharedSecret()">Receive Public Key</li>
+        </context-menu>
     </div>
 </template>
 
@@ -31,17 +35,36 @@
     import { E2EE } from 'builtin';
     import { DiscordApi } from 'modules';
     import { MiLock } from '../ui/components/common/MaterialIcon';
+    import contextMenu from 'vue-context-menu';
+    import { clipboard } from 'electron';
+
+    function generatePublicKey() {
+        const userID = location.pathname.split("/")[3];
+        const publicKeyMessage = `My public key is: \`${E2EE.createKeyExchange(userID)}\`. Please give me your public key if you haven't done so and add my public key by pasting it in the chat textbox, right clicking the lock icon, and selecting \`Receive Public Key\`.`;
+        const chatInput = document.getElementsByClassName('da-textArea')[0];
+        chatInput.value = publicKeyMessage;
+        chatInput._valueTracker.setValue(publicKeyMessage);
+        chatInput[Object.keys(chatInput).find(k => k.startsWith('__reactInternalInstance'))].memoizedProps.value = publicKeyMessage;
+    }
+
+    function computeSharedSecret() {
+        const userID = location.pathname.split("/")[3];
+        const otherPublicKey = document.getElementsByClassName("da-textArea")[0].value;
+        const secret = E2EE.computeSecret(userID, otherPublicKey);
+        clipboard.writeText(secret);
+    }
 
     export default {
-        components: { MiLock },
+        components: { MiLock, contextMenu },
         data() {
             return {
                 E2EE,
                 state: 'loading',
-                error: null
+                error: null,
+                location: window.location
             };
         },
-        methods: {},
+        methods: { generatePublicKey, computeSharedSecret },
         mounted() {
             if (!E2EE.master) {
                 this.error = 'No master key set!';

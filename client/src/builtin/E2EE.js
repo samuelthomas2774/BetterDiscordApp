@@ -135,6 +135,11 @@ export default new class E2EE extends BuiltinModule {
 
         const cached = Cache.find('e2ee:images', item => item.src === src);
         if (cached) {
+            if (cached.invalidKey) {
+                component.props.className = 'bd-encryptedImageBadKey';
+                component.props.readyState = 'READY';
+                return;
+            }
             Logger.info('E2EE', 'Returning encrypted image from cache');
             try {
                 const decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), haveKey), cached.image);
@@ -159,6 +164,7 @@ export default new class E2EE extends BuiltinModule {
                 const data = image.slice(0, -64);
                 const validateHmac = await this.createHmac(data);
                 if (hmac !== validateHmac) {
+                    Cache.push('e2ee:images', { src, invalidKey: true });
                     console.log('INVALID HMAC!');
                     return;
                 }

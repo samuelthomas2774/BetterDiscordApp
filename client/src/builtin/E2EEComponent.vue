@@ -27,7 +27,7 @@
             </div>
             <template slot="popover">
                 <div @click="toggleEncrypt" :class="{'bd-warn': !E2EE.encryptNewMessages, 'bd-ok': E2EE.encryptNewMessages}"><MiLock size="16" v-tooltip="'Toggle Encryption'" /></div>
-                <div v-close-popover @click="showUploadDialog" v-if="!error"><MiPlus size="16" v-tooltip="'Upload Encrypted Image'" /></div>
+                <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus size="16" v-tooltip="'Upload Encrypted Image'" /></div>
             </template>
         </v-popover>
         <div class="bd-taDivider"></div>
@@ -42,11 +42,11 @@
     import { remote } from 'electron';
     import { E2EE } from 'builtin';
     import { DiscordApi, Security } from 'modules';
-    import { MiLock, MiPlus } from '../ui/components/common/MaterialIcon';
+    import { MiLock, MiPlus, MiImagePlus } from '../ui/components/common/MaterialIcon';
     import { Toasts } from 'ui';
 
     export default {
-        components: { MiLock, MiPlus },
+        components: { MiLock, MiPlus, MiImagePlus },
         data() {
             return {
                 E2EE,

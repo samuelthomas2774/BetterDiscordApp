@@ -18,7 +18,6 @@ import { Utils } from 'common';
 import E2EEComponent from './E2EEComponent.vue';
 import E2EEMessageButton from './E2EEMessageButton.vue';
 import aes256 from 'aes256';
-import nodecrypto from 'node-crypto';
 
 let seed = Security.randomBytes();
 

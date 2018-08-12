@@ -69,8 +69,9 @@
                 canvas.height = img.height;
                 canvas.width = img.width;
                 const arrBuffer = await Utils.canvasToArrayBuffer(canvas);
-                const encodedBytes = new TextEncoder().encode(E2EE.encrypt(img.src.replace('data:;base64,', '')));
-
+                const encrypted = E2EE.encrypt(img.src.replace('data:;base64,', ''));
+                const hmac = await E2EE.createHmac(encrypted);
+                const encodedBytes = new TextEncoder().encode(encrypted + hmac);
                 Uploader.upload(DiscordApi.currentChannel.id, FileActions.makeFile(new Uint8Array([...new Uint8Array(arrBuffer), ...encodedBytes]), 'bde2ee.png'));
             },
             toggleEncrypt() {

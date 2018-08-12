@@ -18,6 +18,7 @@ import { Utils } from 'common';
 import E2EEComponent from './E2EEComponent.vue';
 import E2EEMessageButton from './E2EEMessageButton.vue';
 import aes256 from 'aes256';
+import crypto from 'node-crypto';
 
 let seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
 
@@ -58,6 +59,12 @@ export default new class E2EE extends BuiltinModule {
         return aes256.decrypt(key, content.replace(prefix, ''));
     }
 
+    async createHmac(data) {
+        const haveKey = this.getKey(DiscordApi.currentChannel.id);
+        if (!haveKey) return null;
+        return Security.createHmac(haveKey, data);
+    }
+
     getKey(channelId) {
         const haveKey = this.database.find(kvp => kvp.value.key === channelId);
         if (!haveKey) return null;
@@ -65,7 +72,6 @@ export default new class E2EE extends BuiltinModule {
     }
 
     async enabled(e) {
-        window.sec = Security;
         this.patchMessageContent();
         const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
         const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
@@ -141,22 +147,32 @@ export default new class E2EE extends BuiltinModule {
         component.props.readyState = 'LOADING';
         Logger.info('E2EE', 'Decrypting image: ' + src);
         request.get(src, { encoding: 'binary' }).then(res => {
-            const arr = new Uint8Array(new ArrayBuffer(res.length));
-            for (let i = 0; i < res.length; i++) arr[i] = res.charCodeAt(i);
+            (async () => {
+                const arr = new Uint8Array(new ArrayBuffer(res.length));
+                for (let i = 0; i < res.length; i++) arr[i] = res.charCodeAt(i);
 
-            const aobindex = Utils.aobscan(arr, [73, 69, 78, 68]) + 8;
-            const sliced = arr.slice(aobindex);
-            const image = new TextDecoder().decode(sliced);
+                const aobindex = Utils.aobscan(arr, [73, 69, 78, 68]) + 8;
+                const sliced = arr.slice(aobindex);
+                const image = new TextDecoder().decode(sliced);
 
-            Cache.push('e2ee:images', { src, image });
+                const hmac = image.slice(-64);
+                const data = image.slice(0, -64);
+                const validateHmac = await this.createHmac(data);
+                if (hmac !== validateHmac) {
+                    console.log('INVALID HMAC!');
+                    return;
+                }
 
-            if (!component || !component.props) {
-                Logger.warn('E2EE', 'Component seems to be gone');
-                return;
-            }
+                Cache.push('e2ee:images', { src, image: data });
 
-            component.props.decrypting = false;
-            component.forceUpdate();
+                if (!component || !component.props) {
+                    Logger.warn('E2EE', 'Component seems to be gone');
+                    return;
+                }
+
+                component.props.decrypting = false;
+                component.forceUpdate();
+            })();
         }).catch(err => {
             console.log('request error', err);
         });

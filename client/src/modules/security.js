@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import nodecrypto from 'node-crypto';
 import aes256 from 'aes256';
 
 export default class Security {
@@ -38,6 +39,19 @@ export default class Security {
             else decrypt = this.decrypt(key, decrypt, prefix);
         }
         return decrypt;
+    }
+
+    static async createHmac(key, data, algorithm = 'sha256') {
+        const hmac = nodecrypto.createHmac(algorithm, key);
+        return new Promise((resolve, reject) => {
+            hmac.on('readable', () => {
+                const data = hmac.read();
+                if (data) return resolve(data.toString('hex'));
+                reject(null);
+            });
+            hmac.write(data);
+            hmac.end();
+        });
     }
 
 }

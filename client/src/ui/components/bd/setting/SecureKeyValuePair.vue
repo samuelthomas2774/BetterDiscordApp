@@ -23,6 +23,8 @@
 
 <script>
     import aes256 from 'aes256';
+    import { DiscordApi } from 'modules';
+
     export default {
         data() {
             return {
@@ -52,6 +54,10 @@
                 if (e.key !== 'Enter') return;
                 e.target.blur();
             }
+        },
+        beforeMount() {
+            if (this.setting.value.key !== 'PlaceholderKey') return;
+            this.setting.value.key = DiscordApi.currentChannel.id || 'Key';
         }
     }
 </script>

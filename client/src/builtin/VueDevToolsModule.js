@@ -28,16 +28,16 @@ export default new class VueDevtoolsModule extends BuiltinModule {
     }
 
     enabled(e) {
-        electron.remote.BrowserWindow.getAllWindows()[0].webContents.on('devtools-opened', this.devToolsOpened);
+        // electron.remote.BrowserWindow.getAllWindows()[0].webContents.on('devtools-opened', this.devToolsOpened);
     }
 
     disabled(e) {
-        electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
-        electron.remote.BrowserWindow.getAllWindows()[0].webContents.removeListener('devtools-opened', this.devToolsOpened);
+        // electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
+        // electron.remote.BrowserWindow.getAllWindows()[0].webContents.removeListener('devtools-opened', this.devToolsOpened);
     }
 
     devToolsOpened() {
-         electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
+        electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
         electron.webFrame.registerURLSchemeAsPrivileged('chrome-extension');
         try {
             const res = electron.remote.BrowserWindow.addDevToolsExtension(path.join(Globals.getPath('ext'), 'extensions', 'vdt'));

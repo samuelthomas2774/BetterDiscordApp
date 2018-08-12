@@ -10,7 +10,7 @@
 
 import { Settings } from 'modules';
 import BuiltinModule from './BuiltinModule';
-import { WebpackModules, ReactComponents, MonkeyPatch, Patcher, DiscordApi } from 'modules';
+import { WebpackModules, ReactComponents, MonkeyPatch, Patcher, DiscordApi, Security } from 'modules';
 import { VueInjector, Reflection } from 'ui';
 import { ClientLogger as Logger } from 'common';
 import { request } from 'vendor';
@@ -20,7 +20,7 @@ import E2EEMessageButton from './E2EEMessageButton.vue';
 import aes256 from 'aes256';
 
 let seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
-const decryptCache = [];
+const imageCache = [];
 
 export default new class E2EE extends BuiltinModule {
 
@@ -46,6 +46,12 @@ export default new class E2EE extends BuiltinModule {
     }
 
     encrypt(key, content, prefix = '') {
+        if (!content) {
+            // Get key for current channel and encrypt
+            const haveKey = this.getKey(DiscordApi.currentChannel.id);
+            if (!haveKey) return 'nokey';
+            return this.encrypt(this.decrypt(this.decrypt(seed, this.master), haveKey), key);
+        }
         return prefix + aes256.encrypt(key, content);
     }
 
@@ -60,6 +66,7 @@ export default new class E2EE extends BuiltinModule {
     }
 
     async enabled(e) {
+        window.sec = Security;
         this.patchMessageContent();
         const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
         const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
@@ -106,52 +113,49 @@ export default new class E2EE extends BuiltinModule {
 
     renderMessageContent(component, args, retVal) {
         if (!component.props.message.bd_encrypted) return;
-
-        retVal.props.children[0].props.children.props.children.props.children.unshift(VueInjector.createReactElement(E2EEMessageButton, {
-            message: component.props.message
-        }));
+        retVal.props.children[0].props.children.props.children.props.children.unshift(VueInjector.createReactElement(E2EEMessageButton));
     }
 
     beforeRenderImageWrapper(component, args, retVal) {
         if (!component.props || !component.props.src) return;
         if (component.props.decrypting) return;
+        component.props.decrypting = true;
 
-        const src = component.props.src;
+        const src = component.props.original || component.props.src.split('?')[0];
         if (!src.includes('bde2ee')) return;
+        component.props.className = 'bd-encryptedImage';
 
-        const alreadyDecrypted = decryptCache.find(item => item.src === component.props.src);
-        if (alreadyDecrypted) {
-            component.props.className = 'bd-decryptedImage';
-            component.props.src = component.props.original = alreadyDecrypted.encodedImage;
-            component.props.width = alreadyDecrypted.width;
-            component.props.height = alreadyDecrypted.height;
+        const haveKey = this.getKey(DiscordApi.currentChannel.id);
+        if (!haveKey) return;
+
+        const cached = imageCache.find(item => item.src === src);
+        if (cached) {
+            Logger.info('E2EE', 'Returning encrypted image from cache');
+            try {
+                const decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), haveKey), cached.image);
+                component.props.className = 'bd-decryptedImage';
+                component.props.src = component.props.original = decrypt;
+            } catch (err) { return } finally { component.props.readyState = 'READY' }
             return;
         }
 
-        let resolution = null;
-        try {
-            resolution = src.match(/_(.*?)\./)[1].split('x');
-        } catch (err) { }
-
-        component.props.className = 'bd-encryptedImage';
-        component.props.decrypting = true;
-
-        request.get(component.props.src, { encoding: 'binary' }).then(res => {
+        component.props.readyState = 'LOADING';
+        Logger.info('E2EE', 'Decrypting image: ' + src);
+        request.get(src, { encoding: 'binary' }).then(res => {
             const arr = new Uint8Array(new ArrayBuffer(res.length));
             for (let i = 0; i < res.length; i++) arr[i] = res.charCodeAt(i);
+
             const aobindex = Utils.aobscan(arr, [73, 69, 78, 68]) + 8;
+            const sliced = arr.slice(aobindex);
+            const image = new TextDecoder().decode(sliced);
 
-            const sliced = arr.slice(aobindex, arr.length - aobindex);
-            const encoded = Utils.arrayBufferToBase64(sliced);
-            const base64enc = 'data:image/png;base64,' + encoded;
+            imageCache.push({ src, image });
 
-            if (!component || !component.props) return;
-            if (resolution && resolution.length >= 2) {
-                component.props.width = parseInt(resolution[0]);
-                component.props.height = parseInt(resolution[1]);
+            if (!component || !component.props) {
+                Logger.warn('E2EE', 'Component seems to be gone');
+                return;
             }
 
-            decryptCache.push({ src, width: component.props.width, height: component.props.height, encodedImage: base64enc });
             component.props.decrypting = false;
             component.forceUpdate();
         }).catch(err => {

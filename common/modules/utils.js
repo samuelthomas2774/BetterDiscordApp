@@ -211,6 +211,34 @@ export class Utils {
         }
         return window.btoa(binary);
     }
+
+    static async getImageFromBuffer(buffer) {
+        if (!(buffer instanceof Blob)) buffer = new Blob([buffer]);
+        const reader = new FileReader();
+        reader.readAsDataURL(buffer);
+        await new Promise(r => {
+            reader.onload = r
+        });
+        const img = new Image();
+        img.src = reader.result;
+        return await new Promise(resolve => {
+            img.onload = () => {
+                resolve(img);
+            }
+        });
+    }
+
+    static async canvasToArrayBuffer(canvas, mime = 'image/png') {
+        const reader = new FileReader();
+        return new Promise(resolve => {
+            canvas.toBlob(blob => {
+                reader.addEventListener('loadend', () => {
+                    resolve(reader.result);
+                });
+                reader.readAsArrayBuffer(blob);
+            }, mime);
+        });
+    }
 }
 
 export class FileUtils {

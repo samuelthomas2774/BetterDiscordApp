@@ -16,7 +16,7 @@ export default class Cache {
     }
 
     /**
-     * Get something from cache
+     * Push something to cache
      * @param {String} where Cache identifier
      * @param {any} data Data to push
      */

@@ -7,18 +7,102 @@
         flex: 1 1 auto;
         flex-direction: row;
         cursor: pointer;
+        opacity: .8;
+        transition: opacity .2s ease-in-out;
+
+        &:hover {
+            opacity: 1;
+        }
 
         &.bd-e2eeLock {
-            fill: #cc3e3e;
+            &.bd-error {
+                fill: #cc3e3e;
+            }
+
+            &.bd-ok {
+                fill: $colbdgreen;
+            }
+
+            &.bd-warn {
+                fill: #ccab3e;
+                animation: bd-pulse 2s ease-in-out infinite;
+            }
         }
     }
 
     .bd-taDivider {
-        background-color: hsla(0,0%,100%,.1);
+        background-color: rgba(255, 255, 255, 0.1);
         box-sizing: border-box;
-        height: 80%;
         position: relative;
         top: 10%;
         width: 1px;
+        height: 37px;
+        margin-top: 5px;
+    }
+
+    .bd-e2eeLockContextMenu {
+
+        border: none;
+
+        .ctx-menu {
+            background: #23272A;
+            border-radius: 4px;
+            box-shadow: none;
+            padding: 0;
+
+            .bd-e2eeLockContextMenuOption {
+                background: #23272A;
+                color: #99AAB5;
+                padding: 8px 8px;
+                font-weight: 500;
+                cursor: default;
+
+                &:hover {
+                    background: #000000;
+                }
+            }
+        }
+    }
+}
+
+.bd-e2eeMdContainer {
+    position: relative;
+    display: inline-block;
+    top: 4px;
+
+    .bd-e2eeMdBtn {
+        cursor: pointer;
+
+        &.bd-e2eeLock {
+            &.bd-error {
+                fill: #cc3e3e;
+            }
+
+            &.bd-ok {
+                fill: $colbdgreen;
+            }
+
+            &.bd-warn {
+                fill: #ccab3e;
+            }
+
+            &.bd-loading {
+                animation: bd-pulse 2s ease-in-out infinite;
+            }
+        }
+    }
+}
+
+.bd-e2eeMessageButtonWrap {
+    .bd-e2eeMessageButton {
+        fill: #99aab5;
+        margin-left: 6px;
+        margin-right: -2px;
+        opacity: .4;
+        transition: opacity .2s ease;
+
+        &:hover {
+            opacity: 1;
+        }
     }
 }

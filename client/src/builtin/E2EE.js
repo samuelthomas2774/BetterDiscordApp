@@ -20,7 +20,7 @@ import E2EEMessageButton from './E2EEMessageButton.vue';
 import aes256 from 'aes256';
 import crypto from 'node-crypto';
 
-let seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
+let seed = crypto.randomBytes(64).toString('hex');
 
 export default new class E2EE extends BuiltinModule {
 
@@ -31,7 +31,7 @@ export default new class E2EE extends BuiltinModule {
     }
 
     setMaster(key) {
-        seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
+        seed = crypto.randomBytes(64).toString('hex');
         const newMaster = this.encrypt(seed, key);
         // TODO re-encrypt everything with new master
         return (this.master = newMaster);

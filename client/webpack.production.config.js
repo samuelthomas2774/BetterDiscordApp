@@ -38,6 +38,7 @@ module.exports = {
         util: 'require("util")',
         process: 'require("process")',
         net: 'require("net")',
+        crypto: 'require("crypto")',
         request: 'require(require("path").join(require("electron").remote.app.getAppPath(), "node_modules", "request"))',
         sparkplug: 'require("./sparkplug")',
         crypto: 'require("crypto")'

@@ -190,6 +190,29 @@ export default new class E2EE extends BuiltinModule {
         if (!this._ecdh) this._ecdh = {};
         return this._ecdh;
     }
+    
+    get ecdh() {
+        if (!this._ecdh) this._ecdh = {};
+        return this._ecdh;
+    }
+
+    createKeyExchange(userID) {
+        this.ecdh[userID] = crypto.createECDH('secp521r1');
+        return this.ecdh[userID].generateKeys('base64');
+    }
+
+    publicKeyFor(userID) {
+        return this.ecdh[userID].getPublicKey('base64');
+    }
+
+    computeSecret(userID, otherKey) {
+        const secret = this.ecdh[userID].computeSecret(otherKey, 'base64', 'base64');
+        delete this.ecdh[userID];
+        // Hashing the shared secret future-proofs against some possible attacks.
+        const hash = crypto.createHash('sha256');
+        hash.update(secret);
+        return hash.digest('base64');
+    }
 
     createKeyExchange(dmChannelID) {
         this.ecdh[dmChannelID] = crypto.createECDH('secp521r1');

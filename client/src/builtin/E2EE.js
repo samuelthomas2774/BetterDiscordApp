@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Settings } from 'modules';
+import { Settings, Cache } from 'modules';
 import BuiltinModule from './BuiltinModule';
 import { WebpackModules, ReactComponents, MonkeyPatch, Patcher, DiscordApi, Security } from 'modules';
 import { VueInjector, Reflection } from 'ui';
@@ -20,7 +20,6 @@ import E2EEMessageButton from './E2EEMessageButton.vue';
 import aes256 from 'aes256';
 
 let seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
-const imageCache = [];
 
 export default new class E2EE extends BuiltinModule {
 
@@ -128,7 +127,7 @@ export default new class E2EE extends BuiltinModule {
         const haveKey = this.getKey(DiscordApi.currentChannel.id);
         if (!haveKey) return;
 
-        const cached = imageCache.find(item => item.src === src);
+        const cached = Cache.find('e2ee:images', item => item.src === src);
         if (cached) {
             Logger.info('E2EE', 'Returning encrypted image from cache');
             try {
@@ -149,7 +148,7 @@ export default new class E2EE extends BuiltinModule {
             const sliced = arr.slice(aobindex);
             const image = new TextDecoder().decode(sliced);
 
-            imageCache.push({ src, image });
+            Cache.push('e2ee:images', { src, image });
 
             if (!component || !component.props) {
                 Logger.warn('E2EE', 'Component seems to be gone');

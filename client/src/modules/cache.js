@@ -8,17 +8,28 @@
  * LICENSE file in the root directory of this source tree.
 */
 const CACHE = [];
+
 export default class Cache {
 
     static get cache() {
         return CACHE;
     }
 
+    /**
+     * Get something from cache
+     * @param {String} where Cache identifier
+     * @param {any} data Data to push
+     */
     static push(where, data) {
         if (!this.cache[where]) this.cache[where] = [];
         this.cache[where].push(data);
     }
 
+    /**
+     * Find something in cache
+     * @param {String} where Cache identifier
+     * @param {Function} what Find callback
+     */
     static find(where, what) {
         if (!this.cache[where]) this.cache[where] = [];
         return this.cache[where].find(what);

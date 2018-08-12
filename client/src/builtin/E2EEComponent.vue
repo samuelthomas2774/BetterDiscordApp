@@ -75,8 +75,8 @@
                 Uploader.upload(DiscordApi.currentChannel.id, FileActions.makeFile(new Uint8Array([...new Uint8Array(arrBuffer), ...encodedBytes]), 'bde2ee.png'));
             },
             toggleEncrypt() {
-                const newState = !this.E2EE.encryptNewMessages;
-                this.E2EE.encryptNewMessages = newState;
+                const newState = !E2EE.encryptNewMessages;
+                E2EE.encryptNewMessages = newState;
                 if (!newState) {
                     Toasts.warning('New messages will not be encrypted');
                     return;

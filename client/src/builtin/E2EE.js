@@ -136,7 +136,7 @@ export default new class E2EE extends BuiltinModule {
         const cached = Cache.find('e2ee:images', item => item.src === src);
         if (cached) {
             if (cached.invalidKey) {
-                component.props.className = 'bd-encryptedImageBadKey';
+                component.props.className = 'bd-encryptedImage bd-encryptedImageBadKey';
                 component.props.readyState = 'READY';
                 return;
             }

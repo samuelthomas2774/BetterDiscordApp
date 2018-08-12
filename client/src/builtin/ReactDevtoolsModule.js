@@ -28,12 +28,12 @@ export default new class ReactDevtoolsModule extends BuiltinModule {
     }
 
     enabled(e) {
-        // electron.remote.BrowserWindow.getAllWindows()[0].webContents.on('devtools-opened', this.devToolsOpened);
+        electron.remote.BrowserWindow.getAllWindows()[0].webContents.on('devtools-opened', this.devToolsOpened);
     }
 
     disabled(e) {
-        // 7electron.remote.BrowserWindow.removeDevToolsExtension('React Developer Tools');
-        // electron.remote.BrowserWindow.getAllWindows()[0].webContents.removeListener('devtools-opened', this.devToolsOpened);
+        electron.remote.BrowserWindow.removeDevToolsExtension('React Developer Tools');
+        electron.remote.BrowserWindow.getAllWindows()[0].webContents.removeListener('devtools-opened', this.devToolsOpened);
     }
 
     devToolsOpened() {

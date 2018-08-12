@@ -133,7 +133,7 @@ export default new class E2EE extends BuiltinModule {
             try {
                 const decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), haveKey), cached.image);
                 component.props.className = 'bd-decryptedImage';
-                component.props.src = component.props.original = decrypt;
+                component.props.src = component.props.original = 'data:;base64,' + decrypt;
             } catch (err) { return } finally { component.props.readyState = 'READY' }
             return;
         }

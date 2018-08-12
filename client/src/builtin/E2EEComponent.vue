@@ -68,9 +68,8 @@
                 const canvas = document.createElement('canvas');
                 canvas.height = img.height;
                 canvas.width = img.width;
-
                 const arrBuffer = await Utils.canvasToArrayBuffer(canvas);
-                const encodedBytes = new TextEncoder().encode(E2EE.encrypt(img.src));
+                const encodedBytes = new TextEncoder().encode(E2EE.encrypt(img.src.replace('data:;base64,', '')));
 
                 Uploader.upload(DiscordApi.currentChannel.id, FileActions.makeFile(new Uint8Array([...new Uint8Array(arrBuffer), ...encodedBytes]), 'bde2ee.png'));
             },

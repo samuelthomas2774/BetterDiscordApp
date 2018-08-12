@@ -41,6 +41,10 @@ export default class Security {
         return decrypt;
     }
 
+    static randomBytes(length = 64, to = 'hex') {
+        return nodecrypto.randomBytes(length).toString(to);
+    }
+
     static async createHmac(key, data, algorithm = 'sha256') {
         const hmac = nodecrypto.createHmac(algorithm, key);
         return new Promise((resolve, reject) => {

@@ -16,7 +16,7 @@
 
         &.bd-e2eeLock {
             &.bd-error {
-                fill: #cc3e3e;
+                fill: $colerr;
             }
 
             &.bd-ok {
@@ -24,7 +24,7 @@
             }
 
             &.bd-warn {
-                fill: #ccab3e;
+                fill: $colwarn;
                 animation: bd-pulse 2s ease-in-out infinite;
             }
         }
@@ -45,13 +45,13 @@
     position: relative;
     display: inline-block;
     top: 4px;
-    E2EE.encryptNewMessages
+
     .bd-e2eeMdBtn {
         cursor: pointer;
 
         &.bd-e2eeLock {
             &.bd-error {
-                fill: #cc3e3e;
+                fill: $colerr;
             }
 
             &.bd-ok {
@@ -59,7 +59,7 @@
             }
 
             &.bd-warn {
-                fill: #ccab3e;
+                fill: $colwarn;
             }
 
             &.bd-loading {
@@ -93,7 +93,7 @@
     }
 
     .bd-warn svg {
-        fill: #ccab3e;
+        fill: $colwarn;
     }
 
     .bd-popover-wrapper,

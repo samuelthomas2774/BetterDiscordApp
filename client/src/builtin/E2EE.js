@@ -165,7 +165,7 @@ export default new class E2EE extends BuiltinModule {
                 const validateHmac = await this.createHmac(data);
                 if (hmac !== validateHmac) {
                     Cache.push('e2ee:images', { src, invalidKey: true });
-                    if (component && component.props) component.props.readyState = 'READY';
+                    if (component && component.props) component.forceUpdate();
                     return;
                 }
 

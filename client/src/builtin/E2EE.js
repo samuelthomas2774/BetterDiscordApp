@@ -17,6 +17,10 @@ import E2EEComponent from './E2EEComponent.vue';
 import E2EEMessageButton from './E2EEMessageButton.vue';
 import aes256 from 'aes256';
 
+const userMentionPattern = new RegExp(`<@!?([0-9]{10,})>`, "g");
+const roleMentionPattern = new RegExp(`<@&([0-9]{10,})>`, "g");
+const everyoneMentionPattern = new RegExp(`(?:\\s+|^)@everyone(?:\\s+|$)`);
+
 let seed = Math.random().toString(36).replace(/[^a-z]+/g, '');
 
 export default new class E2EE extends BuiltinModule {
@@ -57,12 +61,45 @@ export default new class E2EE extends BuiltinModule {
     }
 
     async enabled(e) {
+        this.patchDispatcher();
         this.patchMessageContent();
         const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
         const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
         this.patchChannelTextArea(cta);
         this.patchChannelTextAreaSubmit(cta);
         cta.forceUpdateAll();
+    }
+
+    patchDispatcher() {
+        const Dispatcher = WebpackModules.getModuleByName('Dispatcher');
+        MonkeyPatch('BD:E2EE', Dispatcher).before('dispatch', (_, [event]) => {
+            if (event.type !== "MESSAGE_CREATE") return;
+
+            const key = this.getKey(event.message.channel_id);
+            if (!key) return; // We don't have a key for this channel
+        
+            if (typeof event.message.content !== 'string') return; // Ignore any non string content
+            if (!event.message.content.startsWith('$:')) return; // Not an encrypted string
+            let decrypt;
+            try {
+                decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), event.message.content);
+            } catch (err) { return } // Ignore errors such as non empty
+
+            const MessageParser = WebpackModules.getModuleByName('MessageParser');
+            const Permissions = WebpackModules.getModuleByName('GuildPermissions');
+            const DiscordConstants = WebpackModules.getModuleByName('DiscordConstants');
+            const currentChannel = DiscordApi.Channel.fromId(event.message.channel_id).discordObject;
+    
+            // Create a generic message object to parse mentions with
+            const parsed = MessageParser.parse(currentChannel, decrypt).content;
+    
+            if (userMentionPattern.test(parsed))
+                event.message.mentions = parsed.match(userMentionPattern).map(m => {return {id: m.replace(/[^0-9]/g, '')}});
+            if (roleMentionPattern.test(parsed))
+                event.message.mention_roles = parsed.match(roleMentionPattern).map(m => m.replace(/[^0-9]/g, ''));
+            if (everyoneMentionPattern.test(parsed))
+                event.message.mention_everyone = Permissions.can(DiscordConstants.Permissions.MENTION_EVERYONE, currentChannel);
+        });
     }
 
     async patchMessageContent() {
@@ -72,29 +109,45 @@ export default new class E2EE extends BuiltinModule {
         MonkeyPatch('BD:E2EE', MessageContent.component.prototype).after('render', this.renderMessageContent.bind(this));
     }
 
-    beforeRenderMessageContent(component, args, retVal) {
-        const key = this.getKey(DiscordApi.currentChannel.id);
+    beforeRenderMessageContent(component) {
+        if (!component.props || !component.props.message) return;
+
+        const key = this.getKey(component.props.message.channel_id);
         if (!key) return; // We don't have a key for this channel
 
         const Message = WebpackModules.getModuleByPrototypes(['isMentioned']);
         const MessageParser = WebpackModules.getModuleByName('MessageParser');
-        const currentChannel = DiscordApi.currentChannel.discordObject;
-
-        if (!component.props || !component.props.message) return;
-        const { content } = component.props.message;
-        if (typeof content !== 'string') return; // Ignore any non string content
-        if (!content.startsWith('$:')) return; // Not an encrypted string
+        const Permissions = WebpackModules.getModuleByName('GuildPermissions');
+        const DiscordConstants = WebpackModules.getModuleByName('DiscordConstants');
+        const currentChannel = DiscordApi.Channel.fromId(component.props.message.channel_id).discordObject;
+        
+        if (typeof component.props.message.content !== 'string') return; // Ignore any non string content
+        if (!component.props.message.content.startsWith('$:')) return; // Not an encrypted string
         let decrypt;
         try {
             decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.message.content);
         } catch (err) { return } // Ignore errors such as non empty
 
-        component.props.message.bd_encrypted = true;
+        component.props.message.bd_encrypted = true; // signal as encrypted
+
+        // Create a generic message object to parse mentions with
+        const message = MessageParser.createMessage(currentChannel.id, MessageParser.parse(currentChannel, decrypt).content);
+
+        if (userMentionPattern.test(message.content))
+            message.mentions = message.content.match(userMentionPattern).map(m => {return {id: m.replace(/[^0-9]/g, '')}});
+        if (roleMentionPattern.test(message.content))
+            message.mention_roles = message.content.match(roleMentionPattern).map(m => m.replace(/[^0-9]/g, ''));
+        if (everyoneMentionPattern.test(message.content))
+            message.mention_everyone = Permissions.can(DiscordConstants.Permissions.MENTION_EVERYONE, currentChannel);
 
         // Create a new message to parse it properly
-        const create = Message.create(MessageParser.createMessage(currentChannel, MessageParser.parse(currentChannel, decrypt).content));
+        const create = Message.create(message);
         if (!create.content || !create.contentParsed) return;
 
+        component.props.message.mentions = create.mentions;
+        component.props.message.mentionRoles = create.mentionRoles;
+        component.props.message.mentionEveryone = create.mentionEveryone;
+        component.props.message.mentioned = create.mentioned;
         component.props.message.content = create.content;
         component.props.message.contentParsed = create.contentParsed;
     }

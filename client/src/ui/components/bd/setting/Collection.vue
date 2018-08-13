@@ -11,10 +11,10 @@
 <template>
     <div class="bd-formCollection">
         <div v-for="s in setting.items" class="bd-collectionItem">
-            <Setting :setting="s" :key="s.id" />
-            <div class="bd-removeCollectionItem" @click="removeItem(s)"><MiMinus/></div>
+            <Setting :setting="s" :hide-divider="true" :key="s.id" />
+            <div class="bd-removeCollectionItem" :class="{'bd-disabled': setting.disabled || setting.min && setting.items.length <= setting.min}" @click="removeItem(s)"><MiMinus/></div>
         </div>
-        <div class="bd-newCollectionItem" @click="addItem"><MiPlus/></div>
+        <div v-if="!setting.disabled && !setting.max || setting.items.length < setting.max" class="bd-newCollectionItem" @click="addItem"><MiPlus/></div>
     </div>
 </template>
 
@@ -29,9 +29,11 @@
         },
         methods: {
             removeItem(item) {
+                if (this.setting.disabled || this.setting.min && this.setting.items.length <= this.setting.min) return;
                 this.setting.removeItem(item);
             },
             addItem() {
+                if (this.setting.disabled || this.setting.max && this.setting.items.length >= this.setting.max) return;
                 this.setting.addItem();
             }
         },

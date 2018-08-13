@@ -18,9 +18,9 @@ import { ClientLogger as Logger } from 'common';
 
 /**
  * A callback that modifies method logic. This callback is called on each call of the original method and is provided all data about original call. Any of the data can be modified if necessary, but do so wisely.
- * 
+ *
  * The third argument for the callback will be `undefined` for `before` patches. `originalFunction` for `instead` patches and `returnValue` for `after` patches.
- * 
+ *
  * @callback Patcher~patchCallback
  * @param {object} thisObject - `this` in the context of the original function.
  * @param {arguments} arguments - The original arguments of the original function.
@@ -42,8 +42,8 @@ export class Patcher {
         const patches = [];
         for (const patch of this.patches) {
             for (const childPatch of patch.children) {
-				if (childPatch.caller === id) patches.push(childPatch);
-			}
+                if (childPatch.caller === id) patches.push(childPatch);
+            }
         }
         return patches;
     }
@@ -135,7 +135,7 @@ export class Patcher {
     /**
      * This method patches onto another function, allowing your code to run beforehand.
      * Using this, you are also able to modify the incoming arguments before the original method is run.
-     * 
+     *
      * @param {string} caller - Name of the caller of the patch function. Using this you can undo all patches with the same name using {@link Patcher#unpatchAll}.
      * @param {object} unresolvedModule - Object with the function to be patched. Can also patch an object's prototype.
      * @param {string} functionName - Name of the method to be patched
@@ -148,7 +148,7 @@ export class Patcher {
     /**
      * This method patches onto another function, allowing your code to run afterwards.
      * Using this, you are also able to modify the return value, using the return of your code instead.
-     * 
+     *
      * @param {string} caller - Name of the caller of the patch function. Using this you can undo all patches with the same name using {@link Patcher#unpatchAll}.
      * @param {object} unresolvedModule - Object with the function to be patched. Can also patch an object's prototype.
      * @param {string} functionName - Name of the method to be patched
@@ -161,7 +161,7 @@ export class Patcher {
     /**
      * This method patches onto another function, allowing your code to run instead, preventing the running of the original code.
      * Using this, you are also able to modify the return value, using the return of your code instead.
-     * 
+     *
      * @param {string} caller - Name of the caller of the patch function. Using this you can undo all patches with the same name using {@link Patcher#unpatchAll}.
      * @param {object} unresolvedModule - Object with the function to be patched. Can also patch an object's prototype.
      * @param {string} functionName - Name of the method to be patched
@@ -175,7 +175,7 @@ export class Patcher {
      * This method patches onto another function, allowing your code to run before, instead or after the original function.
      * Using this you are able to modify the incoming arguments before the original function is run as well as the return
      * value before the original function actually returns.
-     * 
+     *
      * @param {string} caller - Name of the caller of the patch function. Using this you can undo all patches with the same name using {@link Patcher#unpatchAll}.
      * @param {object} unresolvedModule - Object with the function to be patched. Can also patch an object's prototype.
      * @param {string} functionName - Name of the method to be patched
@@ -201,10 +201,10 @@ export class Patcher {
             unpatch: () => {
                 patch.children.splice(patch.children.findIndex(cpatch => cpatch.id === child.id && cpatch.type === type), 1);
                 if (patch.children.length <= 0) {
-					const patchNum = this.patches.findIndex(p => p.module == module && p.functionName == functionName);
-					this.patches[patchNum].revert();
-					this.patches.splice(patchNum, 1);
-				}
+                    const patchNum = this.patches.findIndex(p => p.module == module && p.functionName == functionName);
+                    this.patches[patchNum].revert();
+                    this.patches.splice(patchNum, 1);
+                }
             }
         };
         patch.children.push(child);

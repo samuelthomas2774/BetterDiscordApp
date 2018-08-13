@@ -65,14 +65,17 @@ export default class ClassNormaliser extends Module {
 
     normalizeElement(element) {
         if (!(element instanceof Element)) return;
-        if (element.children && element.children.length) this.normalizeElement(element.children[0]);
-        if (element.nextElementSibling) this.normalizeElement(element.nextElementSibling);
+
         const classes = element.classList;
         for (let c = 0, clen = classes.length; c < clen; c++) {
             if (!randClass.test(classes[c])) continue;
             const match = classes[c].match(randClass)[1];
             const newClass = match.split('-').map((s, i) => i ? s[0].toUpperCase() + s.slice(1) : s).join('');
             element.classList.add(`${normalizedPrefix}-${newClass}`);
+        }
+
+        for (let child of element.children) {
+            this.normalizeElement(child);
         }
     }
 

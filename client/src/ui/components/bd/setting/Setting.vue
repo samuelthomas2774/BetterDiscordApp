@@ -26,7 +26,8 @@
         <KeyValuePair v-else-if="setting.type === 'kvp'" :setting="setting" />
         <SecureKeyValuePair v-else-if="setting.type === 'securekvp'" :setting="setting" />
         <CustomSetting v-else-if="setting.type === 'custom'" :setting="setting" />
-        <div class="bd-form-divider"></div>
+
+        <div v-if="!hideDivider" class="bd-form-divider"></div>
     </div>
 </template>
 
@@ -51,7 +52,8 @@
 
     export default {
         props: [
-            'setting'
+            'setting',
+            'hide-divider'
         ],
         components: {
             BoolSetting,

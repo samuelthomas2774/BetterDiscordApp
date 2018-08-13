@@ -330,7 +330,8 @@ export default class PluginApi {
             success: this.showSuccessToast.bind(this),
             error: this.showErrorToast.bind(this),
             info: this.showInfoToast.bind(this),
-            warning: this.showWarningToast.bind(this)
+            warning: this.showWarningToast.bind(this),
+            get enabled() { return Toasts.enabled }
         };
     }
 

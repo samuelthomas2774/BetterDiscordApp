@@ -81,6 +81,8 @@ gulp.task('node-sass-bindings', function () {
     ]);
 });
 
+gulp.task('build-release', gulp.parallel('release-package', 'client', 'core', 'sparkplug', 'core-modules', 'index', 'css-editor', gulp.series('dependencies', 'node-sass-bindings')));
+
 gulp.task('release', gulp.series(function () {
     return del(['release/**/*']);
-}, gulp.parallel('release-package', 'client', 'core', 'sparkplug', 'core-modules', 'index', 'css-editor', gulp.series('dependencies', 'node-sass-bindings'))));
+}, 'build-release'));

@@ -47,7 +47,7 @@
         methods: {
             keyupListener(e) {
                 if (Modals.stack.length || !this.active || e.which !== 27) return;
-                if (this.$refs.settings.activeIndex !== -1) this.$refs.settings.closeContent();
+                if (this.$refs.settings.item) this.$refs.settings.closeContent();
                 else this.active = false;
                 e.stopImmediatePropagation();
             },

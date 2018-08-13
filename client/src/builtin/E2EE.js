@@ -19,13 +19,13 @@ import E2EEComponent from './E2EEComponent.vue';
 import E2EEMessageButton from './E2EEMessageButton.vue';
 import aes256 from 'aes256';
 
-let seed = Security.randomBytes();
+const TEMP_KEY = 'temporarymasterkey';
+let seed;
 
 export default new class E2EE extends BuiltinModule {
 
     constructor() {
         super();
-        this.master = this.encrypt(seed, 'temporarymasterkey');
         this.encryptNewMessages = true;
     }
 
@@ -71,6 +71,10 @@ export default new class E2EE extends BuiltinModule {
     }
 
     async enabled(e) {
+        seed = Security.randomBytes();
+        // TODO Input modal for key
+        this.master = this.encrypt(seed, TEMP_KEY);
+
         this.patchMessageContent();
         const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
         const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });

@@ -65,7 +65,7 @@ export default new class E2EE extends BuiltinModule {
     async createHmac(data) {
         const haveKey = this.getKey(DiscordApi.currentChannel.id);
         if (!haveKey) return null;
-        return Security.createHmac(haveKey, data);
+        return Security.createHmac(Security.decrypt(seed, [this.master, haveKey]), data);
     }
 
     getKey(channelId) {

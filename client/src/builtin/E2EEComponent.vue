@@ -9,7 +9,11 @@
 */
 
 <template>
+<<<<<<< Updated upstream
     <div class="bd-e2eeTaContainer" @contextmenu.prevent="channelType === 'DM' && $refs.ee2eLockContextMenu.open()">
+=======
+    <div class="bd-e2eeTaContainer" @contextmenu.prevent="currentChannel.type === 'DM' && $refs.ee2eLockContextMenu.open()">
+>>>>>>> Stashed changes
         <v-popover popoverClass="bd-popover bd-e2eePopover" placement="top">
             <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
                 <MiLock v-tooltip="error" />
@@ -28,6 +32,9 @@
             <template slot="popover">
                 <div @click="toggleEncrypt" :class="{'bd-warn': !E2EE.encryptNewMessages, 'bd-ok': E2EE.encryptNewMessages}"><MiLock size="16" v-tooltip="'Toggle Encryption'" /></div>
                 <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus size="16" v-tooltip="'Upload Encrypted Image'" /></div>
+                <!-- Using these icons for now -->
+                <div v-close-popover @click="generatePublicKey" v-if="currentChannel.type === 'DM'"><MiPencil size="16" v-tooltip="'Generate Public Key'" /></div>
+                <div v-close-popover @click="receivePublicKey" v-if="currentChannel.type === 'DM' && E2EE.ecdhStorage[currentChannel.id]"><MiRefresh size="16" v-tooltip="'Receive Public Key'" /></div>
             </template>
         </v-popover>
         <div class="bd-taDivider"></div>
@@ -46,18 +53,26 @@
     import { remote } from 'electron';
     import { E2EE } from 'builtin';
     import { DiscordApi, Security } from 'modules';
+<<<<<<< Updated upstream
     import { MiLock, MiPlus, MiImagePlus } from '../ui/components/common/MaterialIcon';
     import contextMenu from 'vue-context-menu';
+=======
+    import { MiLock, MiPlus, MiImagePlus, MiPencil, MiRefresh } from '../ui/components/common/MaterialIcon';
+>>>>>>> Stashed changes
     import { Toasts } from 'ui';
 
     export default {
-        components: { MiLock, MiPlus, MiImagePlus },
+        components: { MiLock, MiPlus, MiImagePlus, MiPencil, MiRefresh },
         data() {
             return {
                 E2EE,
                 state: 'loading',
                 error: null,
+<<<<<<< Updated upstream
                 channelType: DiscordApi.currentChannel.type
+=======
+                currentChannel: DiscordApi.currentChannel
+>>>>>>> Stashed changes
             };
         },
         methods: {
@@ -90,12 +105,17 @@
                 Toasts.success('New messages will be encrypted');
             },
             generatePublicKey() {
+<<<<<<< Updated upstream
                 const dmChannelID = location.pathname.split("/")[3];
+=======
+                const dmChannelID = DiscordApi.currentChannel.id;
+>>>>>>> Stashed changes
                 const publicKeyMessage = `My public key is: \`${E2EE.createKeyExchange(dmChannelID)}\`. Please give me your public key if you haven't done so and add my public key by pasting it in the chat textbox, right clicking the lock icon, and selecting \`Receive Public Key\`.`;
                 const chatInput = document.getElementsByClassName('da-textArea')[0];
                 chatInput.value = publicKeyMessage;
                 const evt = { currentTarget: chatInput };
                 chatInput[Object.keys(chatInput).find(k => k.startsWith('__reactEventHandlers'))].onChange.call(chatInput, evt);
+<<<<<<< Updated upstream
             },
             computeSharedSecret() {
                 try {
@@ -111,6 +131,25 @@
                 } catch (e) {
                   Toasts.error("Invalid public key. Please set up a new key exchange.");
                   console.error(e);
+=======
+                this.$forceUpdate();
+            },
+            receivePublicKey() {
+                try {
+                    const dmChannelID = DiscordApi.currentChannel.id;
+                    const chatInput = document.getElementsByClassName('da-textArea')[0];
+                    const otherPublicKey = chatInput.value;
+                    const secret = E2EE.computeSecret(dmChannelID, otherPublicKey);
+                    E2EE.setKey(dmChannelID, secret);
+                    chatInput.value = "";
+                    const evt = { currentTarget: chatInput };
+                    chatInput[Object.keys(chatInput).find(k => k.startsWith('__reactEventHandlers'))].onChange.call(chatInput, evt);
+                    Toasts.success("Encryption key has been set for this DM channel.");
+                    this.$forceUpdate();
+                } catch (e) {
+                    Toasts.error("Invalid public key. Please set up a new key exchange.");
+                    console.error(e);
+>>>>>>> Stashed changes
                 }
             }
         },

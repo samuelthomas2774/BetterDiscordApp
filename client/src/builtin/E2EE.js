@@ -90,8 +90,6 @@ export default new class E2EE extends BuiltinModule {
         Settings.getSetting('security', 'e2eedb', 'e2ekvps').addItem({ value: { key: channelId, value: key } });
     }
 
-<<<<<<< Updated upstream
-=======
     get ecdhStorage() {
         return this._ecdhStorage || (this._ecdhStorage = {});
     }
@@ -115,7 +113,6 @@ export default new class E2EE extends BuiltinModule {
         }
     }
 
->>>>>>> Stashed changes
     async enabled(e) {
         seed = Security.randomBytes();
         // TODO Input modal for key

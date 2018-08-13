@@ -20,7 +20,6 @@ export default class Security {
 
     static decrypt(key, content, prefix = '') {
         if (key instanceof Array || content instanceof Array) {
-            console.log('deep decrypting');
             return this.deepDecrypt(key, content, prefix);
         }
         return aes256.decrypt(key, content.replace(prefix, ''));

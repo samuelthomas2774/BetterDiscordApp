@@ -130,7 +130,7 @@
 }
 
 .bd-encryptedImage::before {
-    // content: "Encrypted Image";
+    content: "";
     position: absolute;
     background: $colbdgreen;
     width: 100%;

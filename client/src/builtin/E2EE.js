@@ -90,6 +90,32 @@ export default new class E2EE extends BuiltinModule {
         Settings.getSetting('security', 'e2eedb', 'e2ekvps').addItem({ value: { key: channelId, value: key } });
     }
 
+<<<<<<< Updated upstream
+=======
+    get ecdhStorage() {
+        return this._ecdhStorage || (this._ecdhStorage = {});
+    }
+
+    createKeyExchange(dmChannelID) {
+        this.ecdhStorage[dmChannelID] = Security.createECDH();
+        return Security.generateECDHKeys(this.ecdhStorage[dmChannelID]);
+    }
+
+    publicKeyFor(dmChannelID) {
+        return Security.getECDHPublicKey(this.ecdhStorage[dmChannelID]);
+    }
+
+    computeSecret(dmChannelID, otherKey) {
+        try {
+            const secret = Security.computeECDHSecret(this.ecdhStorage[dmChannelID], otherKey);
+            delete this.ecdhStorage[dmChannelID];
+            return Security.sha256(secret);
+        } catch (e) {
+            throw e;
+        }
+    }
+
+>>>>>>> Stashed changes
     async enabled(e) {
         seed = Security.randomBytes();
         // TODO Input modal for key

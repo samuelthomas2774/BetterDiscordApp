@@ -80,4 +80,26 @@ export default class Security {
         });
     }
 
+    static createECDH() {
+        return nodecrypto.createECDH('secp521r1');
+    }
+
+    static sha256(text) {
+        const hash = nodecrypto.createHash('sha256');
+        hash.update(text);
+        return hash.digest('base64');
+    }
+
+    static generateECDHKeys(ecdh) {
+        return ecdh.generateKeys('base64');
+    }
+
+    static getECDHPublicKey(ecdh) {
+        return ecdh.getPublicKey('base64');
+    }
+
+    static computeECDHSecret(ecdh, otherPublicKey) {
+        return ecdh.computeSecret(otherPublicKey, 'base64', 'base64');
+    }
+
 }

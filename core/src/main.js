@@ -257,9 +257,11 @@ export class BetterDiscord {
         session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
             for (let [header, values] of Object.entries(details.responseHeaders)) {
                 if (!header.match(/^Content-Security-Policy(-Report-Only)?$/i)) continue;
+
                 details.responseHeaders[header] = values.map(value => {
                     const policy = new ContentSecurityPolicy(value);
                     for (const [key, value] of Object.entries(CSP)) {
+                        if (!policy.get(key)) continue;
                         policy.add(key, value.join(' '));
                     }
                     return policy.toString();

@@ -17,7 +17,6 @@ import { request } from 'vendor';
 import { Utils } from 'common';
 import E2EEComponent from './E2EEComponent.vue';
 import E2EEMessageButton from './E2EEMessageButton.vue';
-import aes256 from 'aes256';
 
 const TEMP_KEY = 'temporarymasterkey';
 let seed;
@@ -31,7 +30,7 @@ export default new class E2EE extends BuiltinModule {
 
     setMaster(key) {
         seed = Security.randomBytes();
-        const newMaster = this.encrypt(seed, key);
+        const newMaster = Security.encrypt(seed, key);
         // TODO re-encrypt everything with new master
         return (this.master = newMaster);
     }
@@ -45,17 +44,22 @@ export default new class E2EE extends BuiltinModule {
     }
 
     encrypt(key, content, prefix = '') {
+        if (!key) {
+            // Encrypt something with master
+            return Security.encrypt(Security.decrypt(seed, this.master), content);
+        }
+
         if (!content) {
             // Get key for current channel and encrypt
             const haveKey = this.getKey(DiscordApi.currentChannel.id);
             if (!haveKey) return 'nokey';
-            return this.encrypt(this.decrypt(this.decrypt(seed, this.master), haveKey), key);
+            return Security.encrypt(Security.decrypt(seed, [this.master, haveKey]), key);
         }
-        return prefix + aes256.encrypt(key, content);
+        return prefix + Security.encrypt(key, content);
     }
 
     decrypt(key, content, prefix = '') {
-        return aes256.decrypt(key, content.replace(prefix, ''));
+        return Security.decrypt(key, content, prefix);
     }
 
     async createHmac(data) {
@@ -71,9 +75,10 @@ export default new class E2EE extends BuiltinModule {
     }
 
     async enabled(e) {
+        window._sec = Security;
         seed = Security.randomBytes();
         // TODO Input modal for key
-        this.master = this.encrypt(seed, TEMP_KEY);
+        this.master = Security.encrypt(seed, TEMP_KEY);
 
         this.patchMessageContent();
         const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
@@ -106,7 +111,7 @@ export default new class E2EE extends BuiltinModule {
         if (!content.startsWith('$:')) return; // Not an encrypted string
         let decrypt;
         try {
-            decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.message.content);
+            decrypt = Security.decrypt(seed, [this.master, key, component.props.message.content]);
         } catch (err) { return } // Ignore errors such as non empty
 
         component.props.message.bd_encrypted = true;
@@ -121,7 +126,11 @@ export default new class E2EE extends BuiltinModule {
 
     renderMessageContent(component, args, retVal) {
         if (!component.props.message.bd_encrypted) return;
-        retVal.props.children[0].props.children.props.children.props.children.unshift(VueInjector.createReactElement(E2EEMessageButton));
+        try {
+            retVal.props.children[0].props.children.props.children.props.children.unshift(VueInjector.createReactElement(E2EEMessageButton));
+        } catch (err) {
+            Logger.err('E2EE', err.message);
+        }
     }
 
     beforeRenderImageWrapper(component, args, retVal) {
@@ -145,7 +154,7 @@ export default new class E2EE extends BuiltinModule {
             }
             Logger.info('E2EE', 'Returning encrypted image from cache');
             try {
-                const decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), haveKey), cached.image);
+                const decrypt = Security.decrypt(seed, [this.master, haveKey, cached.image]);
                 component.props.className = 'bd-decryptedImage';
                 component.props.src = component.props.original = 'data:;base64,' + decrypt;
             } catch (err) { return } finally { component.props.readyState = 'READY' }
@@ -207,7 +216,7 @@ export default new class E2EE extends BuiltinModule {
     handleChannelTextAreaSubmit(component, args, retVal) {
         const key = this.getKey(DiscordApi.currentChannel.id);
         if (!this.encryptNewMessages || !key) return;
-        component.props.value = this.encrypt(this.decrypt(this.decrypt(seed, this.master), key), component.props.value, '$:');
+        component.props.value = Security.encrypt(Security.decrypt(seed, [this.master, key]), component.props.value, '$:');
     }
 
     async disabled(e) {

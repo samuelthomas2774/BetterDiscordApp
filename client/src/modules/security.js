@@ -14,16 +14,20 @@ import aes256 from 'aes256';
 export default class Security {
 
     static encrypt(key, content, prefix = '') {
-        if (key instanceof Array) return this.deepEncrypt(key, content, prefix);
+        if (key instanceof Array || content instanceof Array) return this.deepEncrypt(key, content, prefix);
         return `${prefix}${aes256.encrypt(key, content)}`;
     }
 
     static decrypt(key, content, prefix = '') {
-        if (key instanceof Array) return this.deepDecrypt(key, content, prefix);
+        if (key instanceof Array || content instanceof Array) {
+            console.log('deep decrypting');
+            return this.deepDecrypt(key, content, prefix);
+        }
         return aes256.decrypt(key, content.replace(prefix, ''));
     }
 
     static deepEncrypt(keys, content, prefix = '') {
+        if (content && content instanceof Array) return this.deepEncryptContent(keys, content, prefix);
         let encrypt = null;
         for (const key of keys) {
             if (encrypt === null) encrypt = this.encrypt(key, content, prefix);
@@ -32,11 +36,30 @@ export default class Security {
         return encrypt;
     }
 
+    static deepEncryptContent(key, contents, prefix = '') {
+        let encrypt = null;
+        for (const content of contents) {
+            if (encrypt === null) encrypt = this.encrypt(key, content, prefix);
+            else encrypt = this.encrypt(encrypt, content, prefix);
+        }
+        return encrypt;
+    }
+
     static deepDecrypt(keys, content, prefix = '') {
+        if (content && content instanceof Array) return this.deepDecryptContent(keys, content, prefix);
         let decrypt = null;
         for (const key of keys.reverse()) {
             if (decrypt === null) decrypt = this.decrypt(key, content, prefix);
             else decrypt = this.decrypt(key, decrypt, prefix);
+        }
+        return decrypt;
+    }
+
+    static deepDecryptContent(key, contents, prefix = '') {
+        let decrypt = null;
+        for (const content of contents) {
+            if (decrypt === null) decrypt = this.decrypt(key, content, prefix);
+            else decrypt = this.decrypt(decrypt, content, prefix);
         }
         return decrypt;
     }

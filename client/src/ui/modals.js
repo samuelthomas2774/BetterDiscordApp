@@ -163,12 +163,12 @@ export default class Modals {
      * @param {String} text A string that will be displayed in the modal body
      * @return {Modal}
      */
-    static confirm(title, text) {
-        return this.add(this.createConfirmModal(title, text));
+    static confirm(title, text, confirmText, cancelText) {
+        return this.add(this.createConfirmModal(title, text, confirmText, cancelText));
     }
 
-    static createConfirmModal(title, text) {
-        const modal = { title, text };
+    static createConfirmModal(title, text, confirmText, cancelText) {
+        const modal = { title, text, confirmText, cancelText };
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = () => resolve(true);
             modal.beforeClose = () => reject();

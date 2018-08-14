@@ -100,6 +100,8 @@ export default new class E2EE extends BuiltinModule {
             if (ECDH_STORAGE.hasOwnProperty(dmChannelID)) {
                 delete ECDH_STORAGE[dmChannelID];
                 Toasts.error('Key exchange expired!');
+                if (this.preExchangeState) this.encryptNewMessages = this.preExchangeState;
+                this.preExchangeState = null;
             }
         }, 30000);
         return Security.generateECDHKeys(ECDH_STORAGE[dmChannelID]);
@@ -131,9 +133,9 @@ export default new class E2EE extends BuiltinModule {
         const splitContent = component.props.message.content.split('\n');
         if (splitContent.length < 5) return;
         const [tagstart, begin, key, end, tagend] = splitContent;
-        console.log(component);
+
         try {
-            await Modals.confirm('Key Exhcange', 'Public key received. Accept?').promise;
+            await Modals.confirm('Key Exhchange', 'Public key received. Accept?', 'Accept', 'Reject').promise;
             // We already sent our key
             if (!ECDH_STORAGE.hasOwnProperty(channelId)) {
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${this.createKeyExchange(channelId)}\n-----END PUBLIC KEY-----\n\`\`\``;

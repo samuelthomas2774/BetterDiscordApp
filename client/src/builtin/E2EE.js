@@ -151,6 +151,7 @@ export default new class E2EE extends BuiltinModule {
 
     // TODO Received exchange should also expire if not accepted in time
     async handlePublicKey(e) {
+        if (!DiscordApi.currentChannel) return;
         if (DiscordApi.currentChannel.type !== 'DM') return;
         const { id, content, author, channelId } = e.args;
         if (author.id === DiscordApi.currentUser.id || channelId !== DiscordApi.currentChannel.id) return;

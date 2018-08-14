@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Settings, Cache } from 'modules';
+import { Settings, Cache, Events } from 'modules';
 import BuiltinModule from './BuiltinModule';
 import { WebpackModules, ReactComponents, MonkeyPatch, Patcher, DiscordApi, Security } from 'modules';
 import { VueInjector, Reflection, Modals, Toasts } from 'ui';
@@ -34,6 +34,33 @@ export default new class E2EE extends BuiltinModule {
         super();
         this.encryptNewMessages = true;
         this.ecdhDate = START_DATE;
+        this.handlePublicKey = this.handlePublicKey.bind(this);
+    }
+
+    async enabled(e) {
+        Events.on('discord:MESSAGE_CREATE', this.handlePublicKey);
+        seed = Security.randomBytes();
+        let newMaster = '';
+        try {
+            newMaster = await Modals.input('E2EE', 'Master Key:', true).promise;
+        } catch (err) {
+            Toasts.error('Failed to set master key!');
+        }
+        this.master = Security.encrypt(seed, newMaster);
+        this.patchDispatcher();
+        this.patchMessageContent();
+        const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
+        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
+        this.patchChannelTextArea(cta);
+        this.patchChannelTextAreaSubmit(cta);
+        cta.forceUpdateAll();
+    }
+
+    async disabled(e) {
+        Events.off('discord:MESSAGE_CREATE', this.handlePublicKey);
+        for (const patch of Patcher.getPatchesByCaller('BD:E2EE')) patch.unpatch();
+        const ctaComponent = await ReactComponents.getComponent('ChannelTextArea');
+        ctaComponent.forceUpdateAll();
     }
 
     setMaster(key) {
@@ -122,24 +149,16 @@ export default new class E2EE extends BuiltinModule {
     }
 
     // TODO Received exchange should also expire if not accepted in time
-    // TODO Bug: If exchange is done fast enough it sometimes ask you to accept your own sent key. Should move this to socket event anyways.
-    async handlePublicKey(component) {
-        if (!component.props.channel || component.props.channel.type !== 1) return;
-        if (component.props.message.author.id === DiscordApi.currentUser.id) return;
-        if (component.props.message.state !== 'SENT') return;
-        //if(component.props.message.state)
-        const channelId = component.props.channel.id;
-        if (component.props.message.timestamp.diff(this.ecdhDate) < 0) {
-            this.ecdhDate = new Date();
-            return;
-        }
-        this.ecdhDate = new Date();
-        const splitContent = component.props.message.content.split('\n');
-        if (splitContent.length < 5) return;
-        const [tagstart, begin, key, end, tagend] = splitContent;
+    async handlePublicKey(e) {
+        if (DiscordApi.currentChannel.type !== 'DM') return;
+        const { id, content, author, channelId } = e.args;
+        if (author.id === DiscordApi.currentUser.id || channelId !== DiscordApi.currentChannel.id) return;
+
+        const [tagstart, begin, key, end, tagend] = content.split('\n');
+        if (begin !== '-----BEGIN PUBLIC KEY-----' || end !== '-----END PUBLIC KEY-----') return;
 
         try {
-            await Modals.confirm('Key Exhchange', `Key exchange request from: ${component.props.message.author.tag}`, 'Accept', 'Reject').promise;
+            await Modals.confirm('Key Exchange', `Key exchange request from: ${author.username}#${author.discriminator}`, 'Accept', 'Reject').promise;
             // We already sent our key
             if (!ECDH_STORAGE.hasOwnProperty(channelId)) {
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${this.createKeyExchange(channelId)}\n-----END PUBLIC KEY-----\n\`\`\``;
@@ -152,27 +171,9 @@ export default new class E2EE extends BuiltinModule {
             if (this.preExchangeState) this.encryptNewMessages = this.preExchangeState;
             this.preExchangeState = null;
         } catch (err) {
+            console.log(err);
             return;
         }
-
-    }
-
-    async enabled(e) {
-        seed = Security.randomBytes();
-        let newMaster = '';
-        try {
-            newMaster = await Modals.input('E2EE', 'Master Key:', true).promise;
-        } catch (err) {
-            Toasts.error('Failed to set master key!');
-        }
-        this.master = Security.encrypt(seed, newMaster);
-        this.patchDispatcher();
-        this.patchMessageContent();
-        const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
-        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
-        this.patchChannelTextArea(cta);
-        this.patchChannelTextAreaSubmit(cta);
-        cta.forceUpdateAll();
     }
 
     patchDispatcher() {
@@ -218,7 +219,6 @@ export default new class E2EE extends BuiltinModule {
 
     beforeRenderMessageContent(component) {
         if (!component.props || !component.props.message) return;
-        this.handlePublicKey(component);
 
         const key = this.getKey(component.props.message.channel_id);
         if (!key) return; // We don't have a key for this channel
@@ -354,11 +354,4 @@ export default new class E2EE extends BuiltinModule {
         if (!this.encryptNewMessages || !key) return;
         component.props.value = Security.encrypt(Security.decrypt(seed, [this.master, key]), component.props.value, '$:');
     }
-
-    async disabled(e) {
-        for (const patch of Patcher.getPatchesByCaller('BD:E2EE')) patch.unpatch();
-        const ctaComponent = await ReactComponents.getComponent('ChannelTextArea');
-        ctaComponent.forceUpdateAll();
-    }
-
 }

@@ -144,6 +144,7 @@ export default new class E2EE extends BuiltinModule {
                 WebpackModules.getModuleByName('DraftActions').saveDraft(channelId, publicKeyMessage);
             }
             const secret = this.computeSecret(channelId, key);
+            this.setKey(channelId, secret);
             Toasts.success('Key exchange complete!');
         } catch (err) {
             return;

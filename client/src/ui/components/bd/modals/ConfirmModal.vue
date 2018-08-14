@@ -13,8 +13,8 @@
         <div slot="body" class="bd-modal-basic-body">{{ modal.text }}</div>
         <div slot="footer" class="bd-modal-controls">
             <div class="bd-flex-grow"></div>
-            <div class="bd-button" @click="modal.close">Cancel</div>
-            <div class="bd-button bd-ok" @click="() => { modal.confirm(); modal.close(); }">OK</div>
+            <div class="bd-button" @click="modal.close">{{ modal.cancelText || 'Cancel' }}</div>
+            <div class="bd-button bd-ok" @click="() => { modal.confirm(); modal.close(); }">{{ modal.confirmText || 'OK' }}</div>
         </div>
     </Modal>
 </template>

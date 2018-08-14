@@ -56,6 +56,7 @@ const KnownModules = {
     UserNameResolver: Filters.byProperties(['getName']),
     UserNoteStore: Filters.byProperties(['getNote']),
     UserNoteActions: Filters.byProperties(['updateNote']),
+    DraftActions: Filters.byProperties(['changeDraft']),
 
     /* Emoji Store and Utils */
     EmojiInfo: Filters.byProperties(['isEmojiDisabled']),

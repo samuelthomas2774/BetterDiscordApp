@@ -61,6 +61,7 @@
     "vue": "^2.5.17",
     "vue-codemirror": "^4.0.5",
     "vue-color": "^2.4.6",
+    "vue-context-menu": "^2.0.6",
     "vue-loader": "^13.7.2",
     "vue-material-design-icons": "^1.6.0",
     "vue-template-compiler": "^2.5.17",

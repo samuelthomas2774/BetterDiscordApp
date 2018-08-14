@@ -54,6 +54,45 @@ export class Utils {
     }
 
     /**
+     * Finds a value, subobject, or array from a tree that matches a specific filter. Great for patching render functions.
+     * @param {object} tree React tree to look through. Can be a rendered object or an internal instance.
+     * @param {callable} searchFilter Filter function to check subobjects against.
+     */
+    static findInReactTree(tree, searchFilter) {
+        return this.findInTree(tree, searchFilter, {walkable: ['props', 'children', 'child', 'sibling']});
+    }
+
+    /**
+     * Finds a value, subobject, or array from a tree that matches a specific filter.
+     * @param {object} tree Tree that should be walked
+     * @param {callable} searchFilter Filter to check against each object and subobject
+     * @param {object} options Additional options to customize the search
+     * @param {Array<string>|null} [options.walkable=null] Array of strings to use as keys that are allowed to be walked on. Null value indicates all keys are walkable
+     * @param {Array<string>} [options.ignore=[]] Array of strings to use as keys to exclude from the search, most helpful when `walkable = null`.
+     */
+    static findInTree(tree, searchFilter, {walkable = null, ignore = []}) {
+        if (searchFilter(tree)) return tree;
+        if (typeof tree !== "object" || tree == null) return undefined;
+    
+        let tempReturn = undefined;
+        if (tree instanceof Array) {
+            for (let value of tree) {
+                tempReturn = this.findInTree(value, searchFilter, {walkable, ignore});
+                if (typeof tempReturn != "undefined") return tempReturn;
+            }
+        }
+        else {
+            const toWalk = walkable == null ? Object.keys(tree) : walkable;
+            for (let key of toWalk) {
+                if (!tree.hasOwnProperty(key) || ignore.includes(key)) continue;
+                tempReturn = this.findInTree(tree[key], searchFilter, {walkable, ignore});
+                if (typeof tempReturn != "undefined") return tempReturn;
+            }
+        }
+        return tempReturn;
+    }
+
+    /**
      * Checks if two or more values contain the same data.
      * @param {Any} ...value The value to compare
      * @return {Boolean}
@@ -175,6 +214,69 @@ export class Utils {
             i++;
         } while (!value);
         return value;
+    }
+
+    /**
+     * Finds the index of array of bytes in another array
+     * @param {Array} haystack The array to find aob in
+     * @param {Array} needle The aob to find
+     * @return {Number} aob index, -1 if not found
+     */
+    static aobscan(haystack, needle) {
+        for (let h = 0; h < haystack.length - needle.length + 1; ++h) {
+            let found = true;
+            for (let n = 0; n < needle.length; ++n) {
+                if (needle[n] === null ||
+                    needle[n] === '??' ||
+                    haystack[h + n] === needle[n]) continue;
+                found = false;
+                break;
+            }
+            if (found) return h;
+        }
+        return -1;
+    }
+
+    /**
+     * Convert buffer to base64 encoded string
+     * @param {any} buffer buffer to convert
+     * @returns {String} base64 encoded string from buffer
+     */
+    static arrayBufferToBase64(buffer) {
+        let binary = '';
+        const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+    }
+
+    static async getImageFromBuffer(buffer) {
+        if (!(buffer instanceof Blob)) buffer = new Blob([buffer]);
+        const reader = new FileReader();
+        reader.readAsDataURL(buffer);
+        await new Promise(r => {
+            reader.onload = r
+        });
+        const img = new Image();
+        img.src = reader.result;
+        return await new Promise(resolve => {
+            img.onload = () => {
+                resolve(img);
+            }
+        });
+    }
+
+    static async canvasToArrayBuffer(canvas, mime = 'image/png') {
+        const reader = new FileReader();
+        return new Promise(resolve => {
+            canvas.toBlob(blob => {
+                reader.addEventListener('loadend', () => {
+                    resolve(reader.result);
+                });
+                reader.readAsArrayBuffer(blob);
+            }, mime);
+        });
     }
 }
 

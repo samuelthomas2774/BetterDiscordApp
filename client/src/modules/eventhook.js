@@ -9,6 +9,7 @@
 */
 
 import { WebpackModules } from './webpackmodules';
+import { MonkeyPatch } from './patcher';
 import Events from './events';
 import EventListener from './eventlistener';
 
@@ -21,6 +22,7 @@ import * as SocketStructs from '../structs/socketstructs';
 export default class extends EventListener {
 
     init() {
+        this.ignoreMultiple = -1;
         this.hook();
     }
 
@@ -35,15 +37,21 @@ export default class extends EventListener {
     }
 
     hook() {
-        const self = this;
         const Events = WebpackModules.getModuleByName('Events');
-
+        MonkeyPatch('BD:EVENTS', Events.prototype).after('emit', (obj, args, retVal) => {
+            const eventId = args.length >= 3 ? args[2].id || -1 : -1;
+            if (eventId === this.ignoreMultiple) return;
+            this.ignoreMultiple = eventId;
+            if (obj.webSocket) this.wsc = obj.webSocket;
+            this.emit(...args);
+        });
+        /*
         const orig = Events.prototype.emit;
         Events.prototype.emit = function (...args) {
             orig.call(this, ...args);
             self.wsc = this;
             self.emit(...args);
-        };
+        };*/
     }
 
     /**

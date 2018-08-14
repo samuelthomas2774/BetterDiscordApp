@@ -121,6 +121,7 @@ export default new class E2EE extends BuiltinModule {
         }
     }
 
+    // TODO Received exchange should also expire if not accepted in time
     // TODO Bug: If exchange is done fast enough it sometimes ask you to accept your own sent key. Should move this to socket event anyways.
     async handlePublicKey(component) {
         if (!component.props.channel || component.props.channel.type !== 1) return;

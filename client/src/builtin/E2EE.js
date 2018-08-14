@@ -121,7 +121,7 @@ export default new class E2EE extends BuiltinModule {
         }
     }
 
-    // TODO Bug: If exchange is done fast enough it sometimes ask you to accept your own sent key
+    // TODO Bug: If exchange is done fast enough it sometimes ask you to accept your own sent key. Should move this to socket event anyways.
     async handlePublicKey(component) {
         if (!component.props.channel || component.props.channel.type !== 1) return;
         if (component.props.message.author.id === DiscordApi.currentUser.id) return;
@@ -138,7 +138,8 @@ export default new class E2EE extends BuiltinModule {
         const [tagstart, begin, key, end, tagend] = splitContent;
 
         try {
-            await Modals.confirm('Key Exhchange', 'Public key received. Accept?', 'Accept', 'Reject').promise;
+            console.log(component.props.message.author);
+            await Modals.confirm('Key Exhchange', `Key exchange request from: ${component.props.message.author.tag}`, 'Accept', 'Reject').promise;
             // We already sent our key
             if (!ECDH_STORAGE.hasOwnProperty(channelId)) {
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${this.createKeyExchange(channelId)}\n-----END PUBLIC KEY-----\n\`\`\``;

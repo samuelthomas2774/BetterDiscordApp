@@ -1,0 +1,52 @@
+/**
+ * BetterDiscord Input Modal Component
+ * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
+ * All rights reserved.
+ * https://betterdiscord.net
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+*/
+
+<template>
+    <Modal :class="['bd-modal-basic', {'bd-modal-out': modal.closing}]" :headerText="modal.title" @close="modal.close">
+        <div slot="body" class="bd-modal-basic-body bd-inputModalBody bd-form-textinput">
+            {{ modal.text }}
+            <input ref="input" type="text" @keyup.stop="keyup"/><!-- TODO Option for masked input -->
+        </div>
+        <div slot="footer" class="bd-modal-controls">
+            <div class="bd-flex-grow"></div>
+            <div class="bd-button bd-ok" @click="() => { modal.confirm(value); modal.close(); }">OK</div>
+        </div>
+    </Modal>
+</template>
+
+<script>
+    // Imports
+    import { Modal } from '../../common';
+
+    export default {
+        data() {
+            return {
+                value: ''
+            }
+        },
+        props: ['modal'],
+        components: {
+            Modal
+        },
+        methods: {
+            keyup(e) {
+                if (e.key === 'Enter') {
+                    this.modal.confirm(this.value);
+                    this.modal.close();
+                    return;
+                }
+                this.value = e.target.value;
+            }
+        },
+        mounted() {
+            this.$refs.input.focus();
+        }
+    }
+</script>

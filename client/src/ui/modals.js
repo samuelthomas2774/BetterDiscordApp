@@ -16,6 +16,7 @@ import ConfirmModal from './components/bd/modals/ConfirmModal.vue';
 import ErrorModal from './components/bd/modals/ErrorModal.vue';
 import SettingsModal from './components/bd/modals/SettingsModal.vue';
 import PermissionModal from './components/bd/modals/PermissionModal.vue';
+import InputModal from './components/bd/modals/InputModal.vue';
 
 let modals = 0;
 
@@ -174,6 +175,19 @@ export default class Modals {
             modal.beforeClose = () => reject();
         });
         return new Modal(modal, ConfirmModal);
+    }
+
+    static input(title, text) {
+        return this.add(this.createInputModal(title, text));
+    }
+
+    static createInputModal(title, text) {
+        const modal = { title, text };
+        modal.promise = new Promise((resolve, reject) => {
+            modal.confirm = value => resolve(value);
+            modal.beforeClose = () => reject();
+        });
+        return new Modal(modal, InputModal);
     }
 
     /**

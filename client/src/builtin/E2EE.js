@@ -159,8 +159,13 @@ export default new class E2EE extends BuiltinModule {
 
     async enabled(e) {
         seed = Security.randomBytes();
-        // TODO Input modal for key
-        this.master = Security.encrypt(seed, TEMP_KEY);
+        let newMaster = '';
+        try {
+            newMaster = await Modals.input('E2EE', 'Master Key:').promise;
+        } catch (err) {
+            Toasts.error('Failed to set master key!');
+        }
+        this.master = Security.encrypt(seed, newMaster);
         this.patchDispatcher();
         this.patchMessageContent();
         const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');

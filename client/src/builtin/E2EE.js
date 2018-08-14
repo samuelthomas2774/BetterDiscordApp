@@ -131,20 +131,21 @@ export default new class E2EE extends BuiltinModule {
         const splitContent = component.props.message.content.split('\n');
         if (splitContent.length < 5) return;
         const [tagstart, begin, key, end, tagend] = splitContent;
-
+        console.log(component);
         try {
             await Modals.confirm('Key Exhcange', 'Public key received. Accept?').promise;
             // We already sent our key
             if (!ECDH_STORAGE.hasOwnProperty(channelId)) {
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${this.createKeyExchange(channelId)}\n-----END PUBLIC KEY-----\n\`\`\``;
+                this.preExchangeState = this.encryptNewMessages;
                 if (this.encryptNewMessages) this.encryptNewMessages = false;
                 WebpackModules.getModuleByName('DraftActions').saveDraft(channelId, publicKeyMessage);
             }
             const secret = this.computeSecret(channelId, key);
             this.setKey(channelId, secret);
             Toasts.success('Key exchange complete!');
-            if (this.preEchangeState) this.encryptNewMessages = this.preEchangeState;
-            this.preEchangeState = null;
+            if (this.preExchangeState) this.encryptNewMessages = this.preExchangeState;
+            this.preExchangeState = null;
         } catch (err) {
             return;
         }

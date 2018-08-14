@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-e2eeTaContainer" @contextmenu.prevent="currentChannel.type === 'DM' && $refs.ee2eLockContextMenu.open()">
+    <div class="bd-e2eeTaContainer">
         <v-popover popoverClass="bd-popover bd-e2eePopover" placement="top">
             <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
                 <MiLock v-tooltip="error" />
@@ -29,15 +29,11 @@
                 <div @click="toggleEncrypt" :class="{'bd-warn': !E2EE.encryptNewMessages, 'bd-ok': E2EE.encryptNewMessages}"><MiLock size="16" v-tooltip="'Toggle Encryption'" /></div>
                 <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus size="16" v-tooltip="'Upload Encrypted Image'" /></div>
                 <!-- Using these icons for now -->
-                <div v-close-popover @click="generatePublicKey" v-if="currentChannel.type === 'DM'"><MiPencil size="16" v-tooltip="'Generate Public Key'" /></div>
-                <div v-close-popover @click="receivePublicKey" v-if="currentChannel.type === 'DM' && E2EE.ecdhStorage[currentChannel.id]"><MiRefresh size="16" v-tooltip="'Receive Public Key'" /></div>
+                <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiPencil size="16" v-tooltip="'Generate Public Key'" /></div>
+                <div v-close-popover @click="receivePublicKey" v-if="DiscordApi.currentChannel.type === 'DM' && E2EE.ecdhStorage[DiscordApi.currentChannel.id]"><MiRefresh size="16" v-tooltip="'Receive Public Key'" /></div>
             </template>
         </v-popover>
         <div class="bd-taDivider"></div>
-        <context-menu id="bd-e2eeLockContextMenu" class="bd-e2eeLockContextMenu" ref="ee2eLockContextMenu" v-if="channelType === 'DM'">
-            <li class="bd-e2eeLockContextMenuOption" @click="generatePublicKey()">Generate Public Key</li>
-            <li class="bd-e2eeLockContextMenuOption" @click="computeSharedSecret()">Receive Public Key</li>
-        </context-menu>
     </div>
 </template>
 
@@ -59,7 +55,7 @@
                 E2EE,
                 state: 'loading',
                 error: null,
-                currentChannel: DiscordApi.currentChannel
+                DiscordApi
             };
         },
         methods: {

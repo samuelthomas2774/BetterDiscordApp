@@ -139,7 +139,6 @@ export default new class E2EE extends BuiltinModule {
             // We already sent our key
             if (!ECDH_STORAGE.hasOwnProperty(channelId)) {
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${this.createKeyExchange(channelId)}\n-----END PUBLIC KEY-----\n\`\`\``;
-                this.preExchangeState = this.encryptNewMessages;
                 if (this.encryptNewMessages) this.encryptNewMessages = false;
                 WebpackModules.getModuleByName('DraftActions').saveDraft(channelId, publicKeyMessage);
             }

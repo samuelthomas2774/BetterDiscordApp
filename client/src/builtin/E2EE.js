@@ -31,7 +31,6 @@ export default new class E2EE extends BuiltinModule {
 
     constructor() {
         super();
-        window.nodecrypto = nodecrypto;
         this.encryptNewMessages = true;
         this.ecdhDate = START_DATE;
     }
@@ -147,6 +146,8 @@ export default new class E2EE extends BuiltinModule {
             const secret = this.computeSecret(channelId, key);
             this.setKey(channelId, secret);
             Toasts.success('Key exchange complete!');
+            if (this.preEchangeState) this.encryptNewMessages = this.preEchangeState;
+            this.preEchangeState = null;
         } catch (err) {
             return;
         }

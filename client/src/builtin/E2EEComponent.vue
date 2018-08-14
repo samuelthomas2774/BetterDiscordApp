@@ -92,6 +92,7 @@
                     Toasts.warning('Key exchange for channel already in progress!');
                     return;
                 }
+                E2EE.preEchangeState = E2EE.encryptNewMessages;
                 E2EE.encryptNewMessages = false; // Disable encrypting new messages so we won't encrypt public keys
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${keyExchange}\n-----END PUBLIC KEY-----\n\`\`\``;
                 WebpackModules.getModuleByName('DraftActions').saveDraft(DiscordApi.currentChannel.id, publicKeyMessage);

@@ -44,7 +44,7 @@
     import { Utils } from 'common';
     import { remote } from 'electron';
     import { E2EE } from 'builtin';
-    import { DiscordApi, Security } from 'modules';
+    import { DiscordApi, Security, WebpackModules } from 'modules';
     import { MiLock, MiPlus, MiImagePlus, MiPencil, MiRefresh } from '../ui/components/common/MaterialIcon';
     import { Toasts } from 'ui';
 
@@ -88,13 +88,8 @@
                 Toasts.success('New messages will be encrypted');
             },
             generatePublicKey() {
-                const dmChannelID = DiscordApi.currentChannel.id;
-                const publicKeyMessage = `My public key is: \`${E2EE.createKeyExchange(dmChannelID)}\`. Please give me your public key if you haven't done so and add my public key by pasting it in the chat textbox, right clicking the lock icon, and selecting \`Receive Public Key\`.`;
-                const chatInput = document.getElementsByClassName('da-textArea')[0];
-                chatInput.value = publicKeyMessage;
-                const evt = { currentTarget: chatInput };
-                chatInput[Object.keys(chatInput).find(k => k.startsWith('__reactEventHandlers'))].onChange.call(chatInput, evt);
-                this.$forceUpdate();
+                const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${E2EE.createKeyExchange(DiscordApi.currentChannel.id)}\n-----END PUBLIC KEY-----\n\`\`\``;
+                WebpackModules.getModuleByName('DraftActions').saveDraft(DiscordApi.currentChannel.id, publicKeyMessage);
             },
             receivePublicKey() {
                 try {

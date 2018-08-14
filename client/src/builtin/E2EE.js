@@ -37,6 +37,7 @@ export default new class E2EE extends BuiltinModule {
         this.handlePublicKey = this.handlePublicKey.bind(this);
     }
 
+    // TODO Handle bad master key
     async enabled(e) {
         Events.on('discord:MESSAGE_CREATE', this.handlePublicKey);
         seed = Security.randomBytes();

@@ -30,7 +30,6 @@
                 <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus size="16" v-tooltip="'Upload Encrypted Image'" /></div>
                 <!-- Using these icons for now -->
                 <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiPencil size="16" v-tooltip="'Generate Public Key'" /></div>
-                <div v-close-popover @click="receivePublicKey" v-if="DiscordApi.currentChannel.type === 'DM' && E2EE.ecdhStorage[DiscordApi.currentChannel.id]"><MiRefresh size="16" v-tooltip="'Receive Public Key'" /></div>
             </template>
         </v-popover>
         <div class="bd-taDivider"></div>
@@ -97,23 +96,6 @@
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${keyExchange}\n-----END PUBLIC KEY-----\n\`\`\``;
                 WebpackModules.getModuleByName('DraftActions').saveDraft(DiscordApi.currentChannel.id, publicKeyMessage);
                 Toasts.info('Key exhange started. Expires in 30 seconds');
-            },
-            receivePublicKey() {
-                try {
-                    const dmChannelID = DiscordApi.currentChannel.id;
-                    const chatInput = document.getElementsByClassName('da-textArea')[0];
-                    const otherPublicKey = chatInput.value;
-                    const secret = E2EE.computeSecret(dmChannelID, otherPublicKey);
-                    E2EE.setKey(dmChannelID, secret);
-                    chatInput.value = "";
-                    const evt = { currentTarget: chatInput };
-                    chatInput[Object.keys(chatInput).find(k => k.startsWith('__reactEventHandlers'))].onChange.call(chatInput, evt);
-                    Toasts.success("Encryption key has been set for this DM channel.");
-                    this.$forceUpdate();
-                } catch (e) {
-                    Toasts.error("Invalid public key. Please set up a new key exchange.");
-                    console.error(e);
-                }
             }
         },
         mounted() {

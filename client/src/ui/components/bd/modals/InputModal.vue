@@ -47,7 +47,6 @@
             }
         },
         mounted() {
-            window.t = this;
             this.$refs.input.focus();
         }
     }

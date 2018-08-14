@@ -29,7 +29,7 @@
                 <div @click="toggleEncrypt" :class="{'bd-warn': !E2EE.encryptNewMessages, 'bd-ok': E2EE.encryptNewMessages}"><MiLock size="16" v-tooltip="'Toggle Encryption'" /></div>
                 <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus size="16" v-tooltip="'Upload Encrypted Image'" /></div>
                 <!-- Using these icons for now -->
-                <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiPencil size="16" v-tooltip="'Generate Public Key'" /></div>
+                <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiPencil size="16" v-tooltip="'Begin Key Exchange'" /></div>
             </template>
         </v-popover>
         <div class="bd-taDivider"></div>

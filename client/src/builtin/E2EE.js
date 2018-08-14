@@ -121,6 +121,7 @@ export default new class E2EE extends BuiltinModule {
         }
     }
 
+    // TODO Bug: If exchange is done fast enough it sometimes ask you to accept your own sent key
     async handlePublicKey(component) {
         if (!component.props.channel || component.props.channel.type !== 1) return;
         if (component.props.message.author.id === DiscordApi.currentUser.id) return;

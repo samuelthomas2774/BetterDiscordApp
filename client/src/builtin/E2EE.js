@@ -25,6 +25,7 @@ const everyoneMentionPattern = new RegExp(`(?:\\s+|^)@everyone(?:\\s+|$)`);
 
 const START_DATE = new Date();
 const TEMP_KEY = 'temporarymasterkey';
+const ECDH_STORAGE = {};
 let seed;
 
 export default new class E2EE extends BuiltinModule {
@@ -92,30 +93,26 @@ export default new class E2EE extends BuiltinModule {
         Settings.getSetting('security', 'e2eedb', 'e2ekvps').addItem({ value: { key: channelId, value: key } });
     }
 
-    get ecdhStorage() {
-        return this._ecdhStorage || (this._ecdhStorage = {});
-    }
-
     createKeyExchange(dmChannelID) {
-        if (this.ecdhStorage.hasOwnProperty(dmChannelID)) return null;
-        this.ecdhStorage[dmChannelID] = Security.createECDH();
+        if (ECDH_STORAGE.hasOwnProperty(dmChannelID)) return null;
+        ECDH_STORAGE[dmChannelID] = Security.createECDH();
         setTimeout(() => {
-            if (this.ecdhStorage.hasOwnProperty(dmChannelID)) {
-                delete this.ecdhStorage[dmChannelID];
+            if (ECDH_STORAGE.hasOwnProperty(dmChannelID)) {
+                delete ECDH_STORAGE[dmChannelID];
                 Toasts.error('Key exchange expired!');
             }
         }, 30000);
-        return Security.generateECDHKeys(this.ecdhStorage[dmChannelID]);
+        return Security.generateECDHKeys(ECDH_STORAGE[dmChannelID]);
     }
 
     publicKeyFor(dmChannelID) {
-        return Security.getECDHPublicKey(this.ecdhStorage[dmChannelID]);
+        return Security.getECDHPublicKey(ECDH_STORAGE[dmChannelID]);
     }
 
     computeSecret(dmChannelID, otherKey) {
         try {
-            const secret = Security.computeECDHSecret(this.ecdhStorage[dmChannelID], otherKey);
-            delete this.ecdhStorage[dmChannelID];
+            const secret = Security.computeECDHSecret(ECDH_STORAGE[dmChannelID], otherKey);
+            delete ECDH_STORAGE[dmChannelID];
             return Security.hash('sha384', secret, 'hex');
         } catch (e) {
             throw e;
@@ -138,7 +135,7 @@ export default new class E2EE extends BuiltinModule {
         try {
             await Modals.confirm('Key Exhcange', 'Public key received. Accept?').promise;
             // We already sent our key
-            if (!this.ecdhStorage.hasOwnProperty(channelId)) {
+            if (!ECDH_STORAGE.hasOwnProperty(channelId)) {
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${this.createKeyExchange(channelId)}\n-----END PUBLIC KEY-----\n\`\`\``;
                 if (this.encryptNewMessages) this.encryptNewMessages = false;
                 WebpackModules.getModuleByName('DraftActions').saveDraft(channelId, publicKeyMessage);

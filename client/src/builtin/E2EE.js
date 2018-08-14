@@ -11,7 +11,7 @@
 import { Settings, Cache } from 'modules';
 import BuiltinModule from './BuiltinModule';
 import { WebpackModules, ReactComponents, MonkeyPatch, Patcher, DiscordApi, Security } from 'modules';
-import { VueInjector, Reflection } from 'ui';
+import { VueInjector, Reflection, Modals, Toasts } from 'ui';
 import { ClientLogger as Logger } from 'common';
 import { request } from 'vendor';
 import { Utils } from 'common';
@@ -23,6 +23,7 @@ const userMentionPattern = new RegExp(`<@!?([0-9]{10,})>`, "g");
 const roleMentionPattern = new RegExp(`<@&([0-9]{10,})>`, "g");
 const everyoneMentionPattern = new RegExp(`(?:\\s+|^)@everyone(?:\\s+|$)`);
 
+const START_DATE = new Date();
 const TEMP_KEY = 'temporarymasterkey';
 let seed;
 
@@ -31,6 +32,7 @@ export default new class E2EE extends BuiltinModule {
     constructor() {
         super();
         this.encryptNewMessages = true;
+        this.ecdhDate = START_DATE;
     }
 
     setMaster(key) {
@@ -95,7 +97,15 @@ export default new class E2EE extends BuiltinModule {
     }
 
     createKeyExchange(dmChannelID) {
+        console.log(this.ecdhStorage);
+        if (this.ecdhStorage.hasOwnProperty(dmChannelID)) return null;
         this.ecdhStorage[dmChannelID] = Security.createECDH();
+        setTimeout(() => {
+            if (this.ecdhStorage.hasOwnProperty(dmChannelID)) {
+                delete this.ecdhStorage[dmChannelID];
+                Toasts.error('Key exchange expired!');
+            }
+        }, 30000);
         return Security.generateECDHKeys(this.ecdhStorage[dmChannelID]);
     }
 
@@ -111,6 +121,34 @@ export default new class E2EE extends BuiltinModule {
         } catch (e) {
             throw e;
         }
+    }
+
+    async handlePublicKey(component) {
+        if (!component.props.channel || component.props.channel.type !== 1) return;
+        if (component.props.message.author.id === DiscordApi.currentUser.id) return;
+        const channelId = component.props.channel.id;
+        if (component.props.message.timestamp.diff(this.ecdhDate) < 0) {
+            this.ecdhDate = new Date();
+            return;
+        }
+        this.ecdhDate = new Date();
+        const splitContent = component.props.message.content.split('\n');
+        if (splitContent.length < 5) return;
+        const [tagstart, begin, key, end, tagend] = splitContent;
+
+        try {
+            await Modals.confirm('Key Exhcange', 'Public key received. Accept?').promise;
+            // We already sent our key
+            if (!this.ecdhStorage.hasOwnProperty(channelId)) {
+                const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${this.createKeyExchange(channelId)}\n-----END PUBLIC KEY-----\n\`\`\``;
+                WebpackModules.getModuleByName('DraftActions').saveDraft(channelId, publicKeyMessage);
+            }
+            const secret = this.computeSecret(channelId, key);
+            Toasts.success('Key exchange complete!');
+        } catch (err) {
+            return;
+        }
+
     }
 
     async enabled(e) {
@@ -169,6 +207,7 @@ export default new class E2EE extends BuiltinModule {
 
     beforeRenderMessageContent(component) {
         if (!component.props || !component.props.message) return;
+        this.handlePublicKey(component);
 
         const key = this.getKey(component.props.message.channel_id);
         if (!key) return; // We don't have a key for this channel
@@ -297,32 +336,6 @@ export default new class E2EE extends BuiltinModule {
 
     patchChannelTextAreaSubmit(cta) {
         MonkeyPatch('BD:E2EE', cta.component.prototype).before('handleSubmit', this.handleChannelTextAreaSubmit.bind(this));
-    }
-
-    get ecdh() {
-        if (!this._ecdh) this._ecdh = {};
-        return this._ecdh;
-    }
-
-    createKeyExchange(dmChannelID) {
-        this.ecdh[dmChannelID] = nodecrypto.createECDH('secp521r1');
-        return this.ecdh[dmChannelID].generateKeys('base64');
-    }
-
-    publicKeyFor(dmChannelID) {
-        return this.ecdh[dmChannelID].getPublicKey('base64');
-    }
-
-    computeSecret(dmChannelID, otherKey) {
-        try {
-            const secret = this.ecdh[dmChannelID].computeSecret(otherKey, 'base64', 'base64');
-            delete this.ecdh[dmChannelID];
-            const hash = nodecrypto.createHash('sha256');
-            hash.update(secret);
-            return hash.digest('base64');
-        } catch (e) {
-            throw e;
-        }
     }
 
     handleChannelTextAreaSubmit(component, args, retVal) {

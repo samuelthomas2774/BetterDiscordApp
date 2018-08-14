@@ -88,8 +88,15 @@
                 Toasts.success('New messages will be encrypted');
             },
             generatePublicKey() {
-                const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${E2EE.createKeyExchange(DiscordApi.currentChannel.id)}\n-----END PUBLIC KEY-----\n\`\`\``;
+                const keyExchange = E2EE.createKeyExchange(DiscordApi.currentChannel.id);
+                if (keyExchange === null) {
+                    Toasts.warning('Key exchange for channel already in progress!');
+                    return;
+                }
+
+                const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${keyExchange}\n-----END PUBLIC KEY-----\n\`\`\``;
                 WebpackModules.getModuleByName('DraftActions').saveDraft(DiscordApi.currentChannel.id, publicKeyMessage);
+                Toasts.info('Key exhange started. Expires in 30 seconds');
             },
             receivePublicKey() {
                 try {

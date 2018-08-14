@@ -138,7 +138,6 @@ export default new class E2EE extends BuiltinModule {
         const [tagstart, begin, key, end, tagend] = splitContent;
 
         try {
-            console.log(component.props.message.author);
             await Modals.confirm('Key Exhchange', `Key exchange request from: ${component.props.message.author.tag}`, 'Accept', 'Reject').promise;
             // We already sent our key
             if (!ECDH_STORAGE.hasOwnProperty(channelId)) {

@@ -98,7 +98,6 @@ export default new class E2EE extends BuiltinModule {
     }
 
     createKeyExchange(dmChannelID) {
-        console.log(this.ecdhStorage);
         if (this.ecdhStorage.hasOwnProperty(dmChannelID)) return null;
         this.ecdhStorage[dmChannelID] = Security.createECDH();
         setTimeout(() => {

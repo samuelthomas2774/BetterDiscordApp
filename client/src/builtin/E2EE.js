@@ -305,7 +305,7 @@ export default new class E2EE extends BuiltinModule {
     }
 
     createKeyExchange(dmChannelID) {
-        this.ecdh[dmChannelID] = crypto.createECDH('secp521r1');
+        this.ecdh[dmChannelID] = nodecrypto.createECDH('secp521r1');
         return this.ecdh[dmChannelID].generateKeys('base64');
     }
 
@@ -317,7 +317,7 @@ export default new class E2EE extends BuiltinModule {
         try {
             const secret = this.ecdh[dmChannelID].computeSecret(otherKey, 'base64', 'base64');
             delete this.ecdh[dmChannelID];
-            const hash = crypto.createHash('sha256');
+            const hash = nodecrypto.createHash('sha256');
             hash.update(secret);
             return hash.digest('base64');
         } catch (e) {

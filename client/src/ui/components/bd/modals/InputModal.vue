@@ -12,7 +12,8 @@
     <Modal :class="['bd-modal-basic', {'bd-modal-out': modal.closing}]" :headerText="modal.title" @close="modal.close">
         <div slot="body" class="bd-modal-basic-body bd-inputModalBody bd-form-textinput">
             {{ modal.text }}
-            <input ref="input" type="text" @keyup.stop="keyup"/><!-- TODO Option for masked input -->
+            <input v-if="modal.password" ref="input" type="password" @keyup.stop="keyup" />
+            <input v-else ref="input" type="text" @keyup.stop="keyup"/>
         </div>
         <div slot="footer" class="bd-modal-controls">
             <div class="bd-flex-grow"></div>
@@ -46,6 +47,7 @@
             }
         },
         mounted() {
+            window.t = this;
             this.$refs.input.focus();
         }
     }

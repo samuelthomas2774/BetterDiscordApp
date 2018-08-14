@@ -177,12 +177,12 @@ export default class Modals {
         return new Modal(modal, ConfirmModal);
     }
 
-    static input(title, text) {
-        return this.add(this.createInputModal(title, text));
+    static input(title, text, password = false) {
+        return this.add(this.createInputModal(title, text, password));
     }
 
-    static createInputModal(title, text) {
-        const modal = { title, text };
+    static createInputModal(title, text, password = false) {
+        const modal = { title, text, password };
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = value => resolve(value);
             modal.beforeClose = () => reject();

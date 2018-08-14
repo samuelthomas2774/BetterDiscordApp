@@ -161,7 +161,7 @@ export default new class E2EE extends BuiltinModule {
         seed = Security.randomBytes();
         let newMaster = '';
         try {
-            newMaster = await Modals.input('E2EE', 'Master Key:').promise;
+            newMaster = await Modals.input('E2EE', 'Master Key:', true).promise;
         } catch (err) {
             Toasts.error('Failed to set master key!');
         }

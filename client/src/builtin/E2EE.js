@@ -37,24 +37,21 @@ export default new class E2EE extends BuiltinModule {
         this.handlePublicKey = this.handlePublicKey.bind(this);
     }
 
-    // TODO Handle bad master key
     async enabled(e) {
-        Events.on('discord:MESSAGE_CREATE', this.handlePublicKey);
-        seed = Security.randomBytes();
-        let newMaster = '';
         try {
-            newMaster = await Modals.input('E2EE', 'Master Key:', true).promise;
+            const newMaster = await Modals.input('Open Database', 'Master Password', true).promise;
+            this.setMaster(newMaster);
+            this.patchDispatcher();
+            this.patchMessageContent();
+            const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
+            const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
+            this.patchChannelTextArea(cta);
+            this.patchChannelTextAreaSubmit(cta);
+            cta.forceUpdateAll();
         } catch (err) {
-            Toasts.error('Failed to set master key!');
+            Settings.getSetting(...this.settingPath).value = false;
+            Toasts.error('Invalid master password! E2EE Disabled');
         }
-        this.master = Security.encrypt(seed, newMaster);
-        this.patchDispatcher();
-        this.patchMessageContent();
-        const selector = '.' + WebpackModules.getClassName('channelTextArea', 'emojiButton');
-        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
-        this.patchChannelTextArea(cta);
-        this.patchChannelTextAreaSubmit(cta);
-        cta.forceUpdateAll();
     }
 
     async disabled(e) {

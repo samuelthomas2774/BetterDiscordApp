@@ -31,6 +31,7 @@ export default new class E2EE extends BuiltinModule {
 
     constructor() {
         super();
+        window.nodecrypto = nodecrypto;
         this.encryptNewMessages = true;
         this.ecdhDate = START_DATE;
     }
@@ -117,7 +118,7 @@ export default new class E2EE extends BuiltinModule {
         try {
             const secret = Security.computeECDHSecret(this.ecdhStorage[dmChannelID], otherKey);
             delete this.ecdhStorage[dmChannelID];
-            return Security.sha256(secret);
+            return Security.hash('sha384', secret, 'hex');
         } catch (e) {
             throw e;
         }

@@ -80,8 +80,14 @@ export default class Security {
         });
     }
 
-    static createECDH() {
-        return nodecrypto.createECDH('secp521r1');
+    static createECDH(curve = 'secp384r1') {
+        return nodecrypto.createECDH(curve);
+    }
+
+    static hash(algorithm, data, encoding) {
+        const hash = nodecrypto.createHash(algorithm);
+        hash.update(data);
+        return hash.digest(encoding);
     }
 
     static sha256(text) {

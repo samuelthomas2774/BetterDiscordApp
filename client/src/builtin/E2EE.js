@@ -124,6 +124,8 @@ export default new class E2EE extends BuiltinModule {
     async handlePublicKey(component) {
         if (!component.props.channel || component.props.channel.type !== 1) return;
         if (component.props.message.author.id === DiscordApi.currentUser.id) return;
+        if (component.props.message.state !== 'SENT') return;
+        //if(component.props.message.state)
         const channelId = component.props.channel.id;
         if (component.props.message.timestamp.diff(this.ecdhDate) < 0) {
             this.ecdhDate = new Date();

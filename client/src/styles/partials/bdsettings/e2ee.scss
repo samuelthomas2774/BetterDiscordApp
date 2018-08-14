@@ -39,6 +39,30 @@
         height: 37px;
         margin-top: 5px;
     }
+
+    .bd-e2eeLockContextMenu {
+
+        border: none;
+
+        .ctx-menu {
+            background: #23272A;
+            border-radius: 4px;
+            box-shadow: none;
+            padding: 0;
+
+            .bd-e2eeLockContextMenuOption {
+                background: #23272A;
+                color: #99AAB5;
+                padding: 8px 8px;
+                font-weight: 500;
+                cursor: default;
+
+                &:hover {
+                    background: #000000;
+                }
+            }
+        }
+    }
 }
 
 .bd-e2eeMdContainer {

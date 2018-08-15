@@ -1,6 +1,6 @@
 <template>
     <Modal :headerText="modal.event.header" @close="modal.close"
-           :class="{'bd-err': modal.event.type && modal.event.type === 'err', 'bd-modal-out': modal.closing}">
+           :class="{'bd-err': modal.event.type && modal.event.type === 'err', 'bd-modalOut': modal.closing}">
         <MiError v-if="modal.event.type === 'err'" slot="icon" size="20"/>
         <div slot="body">
             <div v-for="(content, index) in modal.event.content">

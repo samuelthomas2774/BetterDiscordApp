@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div v-for="(emote, index) in emotes" class="bd-autocompleteRow" :key="index">
-                <div class="bd-autocompleteSelector bd-selectable" :class="{'bd-selected': index === selectedIndex, 'bd-emote-favourite': isFavourite(emote)}" @mouseover="selected = emote.id" @click="inject(emote)">
+                <div class="bd-autocompleteSelector bd-selectable" :class="{'bd-selected': index === selectedIndex, 'bd-emoteFavourite': isFavourite(emote)}" @mouseover="selected = emote.id" @click="inject(emote)">
                     <div class="bd-autocompleteField">
                         <img :src="emote.src" :alt="emote.name" />
                         <div class="bd-flexGrow">{{emote.id}}</div>

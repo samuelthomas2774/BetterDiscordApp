@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div :class="['bd-modal', {'bd-modal-scrolled': scrolled}]">
+    <div :class="['bd-modal', {'bd-modalScrolled': scrolled}]">
         <div class="bd-modalInner">
             <div class="bd-modalHeader">
                 <div class="bd-modalIcon">

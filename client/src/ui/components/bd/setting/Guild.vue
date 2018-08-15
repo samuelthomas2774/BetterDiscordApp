@@ -15,7 +15,7 @@
         </div>
         <div class="bd-hint">{{ setting.hint }}</div>
         <div class="bd-guilds">
-            <div class="bd-guild" :class="{'bd-active': isGuildSelected(guild), 'bd-guild-has-icon': guild.icon}" :style="{backgroundImage: `url('${getGuildIconURL(guild)}')`}" @click="() => isGuildSelected(guild) ? unselectGuild(guild) : selectGuild(guild)" v-for="guild in guilds" v-if="guild" v-tooltip="guild.name">
+            <div class="bd-guild" :class="{'bd-active': isGuildSelected(guild), 'bd-guildHasIcon': guild.icon}" :style="{backgroundImage: `url('${getGuildIconURL(guild)}')`}" @click="() => isGuildSelected(guild) ? unselectGuild(guild) : selectGuild(guild)" v-for="guild in guilds" v-if="guild" v-tooltip="guild.name">
                 <div class="bd-guildText" v-if="!guild.icon">{{ getGuildIconText(guild) }}</div>
             </div>
         </div>

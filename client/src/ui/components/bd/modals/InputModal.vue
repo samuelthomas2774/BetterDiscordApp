@@ -9,7 +9,7 @@
 */
 
 <template>
-    <Modal :class="['bd-modalBasic', {'bd-modal-out': modal.closing}]" :headerText="modal.title" @close="modal.close">
+    <Modal :class="['bd-modalBasic', {'bd-modalOut': modal.closing}]" :headerText="modal.title" @close="modal.close">
         <div slot="body" class="bd-modalBasicBody bd-inputModalBody bd-formTextinput">
             {{ modal.text }}
             <input v-if="modal.password" ref="input" type="password" @keyup.stop="keyup" />

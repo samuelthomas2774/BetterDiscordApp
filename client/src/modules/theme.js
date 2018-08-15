@@ -79,11 +79,9 @@ export default class Theme extends Content {
                 css: result.css.toString(),
                 files: result.stats.includedFiles
             };
-        } else {
-            return {
-                css: await FileUtils.readFile(this.paths.mainPath)
-            };
         }
+
+        return { css: await FileUtils.readFile(this.paths.mainPath) }
     }
 
     /**

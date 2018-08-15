@@ -287,7 +287,9 @@ export default class {
                     newcontent.start(false);
                 }
                 return newcontent;
-            } else this.localContent.splice(index, 1);
+            }
+
+            this.localContent.splice(index, 1);
         } catch (err) {
             Logger.err(this.moduleName, err);
             throw err;

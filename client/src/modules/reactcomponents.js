@@ -111,13 +111,11 @@ class Helpers {
             if (match) {
                 if (selector.child) {
                     return getDirectChild(item, selector.child);
-                }
-                else if (selector.successor) {
+                } else if (selector.successor) {
                     return this.getFirstChild(parent, key, selector.successor);
                 }
-                else {
-                    return { item, parent, key };
-                }
+
+                return { item, parent, key };
             }
         };
         return this.returnFirst(this.recursiveChildren(rootParent, rootKey), checkFilter.bind(null, selector)) || {};

@@ -25,17 +25,18 @@
         ],
         "prefer-template": "warn",
         "no-return-await": "error",
-        "indent": [ "error", 4 ],
+        "indent": [ "warn", 4 ],
         "no-lonely-if": "error",
         "no-multiple-empty-lines": [
             "warn",
             { "max": 1 }
         ],
-        "no-tabs": "error",
-        "no-trailing-spaces": "error",
-        "no-unneeded-ternary": "error",
+        "no-tabs": "warn",
+        "no-trailing-spaces": "warn",
+        "no-unneeded-ternary": "warn",
         "no-useless-constructor": "warn",
         "no-var": "error",
-        "prefer-const": "error"
+        "prefer-const": "error",
+        "no-else-return": "error"
     }
 }

@@ -150,7 +150,7 @@ export default class Theme extends Content {
     set watchfiles(files) {
         if (!files) files = [];
 
-        for (let file of files) {
+        for (const file of files) {
             if (!this.watchfiles.includes(file)) {
                 this.filewatcher.add(file);
                 this.watchfiles.push(file);
@@ -158,7 +158,7 @@ export default class Theme extends Content {
             }
         }
 
-        for (let index in this.watchfiles) {
+        for (const index in this.watchfiles) {
             let file = this.watchfiles[index];
             while (file && !files.find(f => f === file)) {
                 this.filewatcher.remove(file);

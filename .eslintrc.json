@@ -1,0 +1,41 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 8,
+        "sourceType": "module"
+    },
+    "env": {
+        "browser": true,
+        "node": true
+    },
+    "plugins": [
+        "vue"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:vue/recommended"
+    ],
+    "rules": {
+        "no-unused-vars": "off",
+        "no-console": "off",
+        "no-empty": "off",
+        "quotes": [
+            "error",
+            "single",
+            { "allowTemplateLiterals": true }
+        ],
+        "prefer-template": "warn",
+        "no-return-await": "error",
+        "indent": [ "error", 4 ],
+        "no-lonely-if": "error",
+        "no-multiple-empty-lines": [
+            "warn",
+            { "max": 1 }
+        ],
+        "no-tabs": "error",
+        "no-trailing-spaces": "error",
+        "no-unneeded-ternary": "error",
+        "no-useless-constructor": "warn",
+        "no-var": "error",
+        "prefer-const": "error"
+    }
+}

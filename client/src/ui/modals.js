@@ -128,7 +128,7 @@ export default class Modals {
      */
     static closeAll(force) {
         const promises = [];
-        for (let modal of this.stack)
+        for (const modal of this.stack)
             promises.push(modal.close(force));
         return Promise.all(promises);
     }
@@ -235,14 +235,14 @@ export default class Modals {
         if (errors.length) {
             const modal = this.error({
                 header:
-                    (PluginManager.errors.length && ThemeManager.errors.length ? '' :
-                    (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName) + ' - ') +
+                    `${(PluginManager.errors.length && ThemeManager.errors.length ? '' :
+                        `${PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName  } - `) +
                     (PluginManager.errors.length ? `${PluginManager.errors.length} ${PluginManager.contentType}${PluginManager.errors.length !== 1 ? 's' : ''}` : '') +
                     (PluginManager.errors.length && ThemeManager.errors.length ? ' and ' : '') +
-                    (ThemeManager.errors.length ? `${ThemeManager.errors.length} ${ThemeManager.contentType}${ThemeManager.errors.length !== 1 ? 's' : ''}` : '') +
-                    ' failed to load',
+                    (ThemeManager.errors.length ? `${ThemeManager.errors.length} ${ThemeManager.contentType}${ThemeManager.errors.length !== 1 ? 's' : ''}` : '')
+                    } failed to load`,
                 module: (PluginManager.errors.length && ThemeManager.errors.length ? 'Content Manager' :
-                        (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName)),
+                    (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName)),
                 type: 'err',
                 content: errors
             });
@@ -294,7 +294,7 @@ export default class Modals {
      * @return {Modal}
      */
     static contentSettings(content, headertext, options) {
-        return this.settings(content.settings, headertext ? headertext : content.name + ' Settings', options);
+        return this.settings(content.settings, headertext ? headertext : `${content.name} Settings`, options);
     }
 
     /**

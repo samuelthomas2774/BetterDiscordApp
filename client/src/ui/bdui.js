@@ -17,6 +17,7 @@ import { BdSettingsWrapper, BdModals, BdToasts } from './components';
 export default class {
 
     static initUiEvents() {
+        document.body.classList.add('bd-v2');
         const hideButtonSetting = Settings.getSetting('ui', 'default', 'hide-button');
         hideButtonSetting.on('setting-updated', event => {
             if (event.value) document.body.classList.add('bd-hideButton');

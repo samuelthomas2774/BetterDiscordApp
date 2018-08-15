@@ -12,7 +12,7 @@
     <div class="bd-settings" :class="{active, 'bd-settingsOut': !item && animating}" @keyup="$emit('close')">
         <SidebarView :contentVisible="item" :animating="animating" :class="{'bd-stop': item}">
             <Sidebar slot="sidebar">
-                <div class="bd-settings" @click="$emit('close')">
+                <div class="bd-settingsX" @click="$emit('close')">
                     <MiClose size="17"/>
                     <span class="bd-xText">ESC</span>
                 </div>
@@ -122,10 +122,10 @@
             }
         },
         created() {
-            Events.on('bd-openMenu', this.openMenuHandler = item => item && this.itemOnClick(this.items.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
+            Events.on('bd-open-menu', this.openMenuHandler = item => item && this.itemOnClick(this.items.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
         },
         destroyed() {
-            if (this.openMenuHandler) Events.off('bd-openMenu', this.openMenuHandler);
+            if (this.openMenuHandler) Events.off('bd-open-menu', this.openMenuHandler);
         }
     }
 </script>

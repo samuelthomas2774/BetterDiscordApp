@@ -42,7 +42,7 @@
             async openDialog(e) {
                 if (this.setting.disabled) return;
 
-                const filenames = await ClientIPC.send('bd-nativeOpen', this.setting.dialogOptions);
+                const filenames = await ClientIPC.send('bd-native-open', this.setting.dialogOptions);
                 if (filenames)
                     this.setting.value = filenames;
             },

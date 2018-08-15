@@ -10,20 +10,20 @@
         flex-direction: column;
         flex-grow: 1;
 
-        &.bd-contentcolumnEnterActive,
-        &.bd-contentcolumnLeaveActive {
+        &.bd-contentcolumn-enter-active,
+        &.bd-contentcolumn-leave-active {
             transition: opacity 0.4s ease;
         }
 
-        &.bd-contentcolumnEnterTo {
+        &.bd-contentcolumn-enter-to {
             opacity: 1;
         }
 
-        &.bd-contentcolumnLeaveTo {
+        &.bd-contentcolumn-leave-to {
             opacity: 0;
         }
 
-        &.bd-contentcolumnLeaveActive {
+        &.bd-contentcolumn-leave-active {
             position: absolute;
             width: 590px;
             pointer-events: none;

@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-formItem" :class="{'bd-formItemChanged': setting.changed, 'bd-disabled': disabled, 'bd-formItem-noheader': !setting.text, 'bd-formItem-fullwidth': setting.fullwidth}">
+    <div class="bd-formItem" :class="{'bd-formItemChanged': setting.changed, 'bd-disabled': disabled, 'bd-formItemNoheader': !setting.text, 'bd-formItemFullwidth': setting.fullwidth}">
         <BoolSetting v-if="setting.type === 'bool'" :setting="setting" />
         <StringSetting v-else-if="setting.type === 'text' && !setting.multiline" :setting="setting" />
         <MultilineTextSetting v-else-if="setting.type === 'text' && setting.multiline" :setting="setting" />

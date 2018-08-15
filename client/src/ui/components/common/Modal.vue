@@ -16,7 +16,7 @@
                     <slot name="icon" />
                 </div>
                 <span class="bd-modalHeadertext">{{ headerText }}</span>
-                <div class="bd-modal" @click="$emit('close', $event.shiftKey, $event)">
+                <div class="bd-modalX" @click="$emit('close', $event.shiftKey, $event)">
                     <MiClose size="18" />
                 </div>
             </div>

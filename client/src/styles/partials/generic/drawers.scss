@@ -4,7 +4,7 @@
     .bd-settingsCategory > & {
         border-bottom: 1px solid rgba(114, 118, 126, 0.3);
 
-        .bd-drawerContents > .bd-formItem:last-child > .bd-form-divider:last-child {
+        .bd-drawerContents > .bd-formItem:last-child > .bd-formDivider:last-child {
             display: none;
         }
     }
@@ -44,7 +44,7 @@
         margin-top: -100%;
         opacity: 0;
 
-        > .bd-formItem:last-child > .bd-form-divider:last-child {
+        > .bd-formItem:last-child > .bd-formDivider:last-child {
             display: none;
         }
     }

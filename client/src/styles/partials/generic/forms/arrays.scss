@@ -1,5 +1,5 @@
 .bd-formSettingsarray {
-    .bd-button.bd-button-primary {
+    .bd-button.bd-buttonPrimary {
         padding: 3px 8px;
         border-radius: 3px;
         font-size: 12px;
@@ -26,11 +26,11 @@
             }
 
             .bd-settingsPanel {
-                .bd-settingsCategories:last-child .bd-form-item:last-child .bd-form-divider {
+                .bd-settingsCategories:last-child .bd-formItem:last-child .bd-formDivider {
                     margin-bottom: 0;
                 }
 
-                .bd-settingsCategory:only-child > div > .bd-form-item.bd-form-item-noheader:only-child {
+                .bd-settingsCategory:only-child > div > .bd-formItem.bd-formItemNoheader:only-child {
                     .bd-formTextinput,
                     .bd-formNumberinput {
                         + .bd-formDivider {
@@ -70,7 +70,7 @@
                 }
             }
 
-            &:last-child .bd-settingsCategories:last-child .bd-form-item:last-child .bd-form-divider {
+            &:last-child .bd-settingsCategories:last-child .bd-formItem:last-child .bd-formDivider {
                 display: none;
             }
         }

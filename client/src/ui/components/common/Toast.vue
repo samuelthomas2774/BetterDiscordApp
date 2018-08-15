@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div :class="['bd-toast', 'bd-toast-' + type, {'bd-toast-has-icon': type !== 'basic' || icon, 'bd-toast-closing': closing}]">
+    <div :class="['bd-toast', 'bd-toast' + type.charAt(0).toUpperCase() + type.slice(1), {'bd-toastHasIcon': type !== 'basic' || icon, 'bd-toastClosing': closing}]">
         <div class="bd-toastIcon" v-if="type !== 'basic' || icon">
             <img v-if="icon" :src="icon" width="20" height="20" />
             <MiSuccess v-else-if="type === 'success'" size="20" />

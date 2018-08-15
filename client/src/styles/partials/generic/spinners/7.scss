@@ -4,8 +4,8 @@
     position: relative;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    -webkit-animation: bd-spinner7-anim 1s cubic-bezier(.4,0,0,1) infinite;
-    animation: bd-spinner7-anim 1s cubic-bezier(.4,0,0,1) infinite;
+    -webkit-animation: bd-spinner7Anim 1s cubic-bezier(.4,0,0,1) infinite;
+    animation: bd-spinner7Anim 1s cubic-bezier(.4,0,0,1) infinite;
 
     &::before {
         content: "";
@@ -16,8 +16,8 @@
         border-radius: 50%;
         left: 0px;
         top: 16px;
-        -webkit-animation: bd-spinner7-anim-before 1s cubic-bezier(.2,0,0,.2) infinite;
-        animation: bd-spinner7-anim-before 1s cubic-bezier(.2,0,0,.2) infinite;
+        -webkit-animation: bd-spinner7AnimBefore 1s cubic-bezier(.2,0,0,.2) infinite;
+        animation: bd-spinner7AnimBefore 1s cubic-bezier(.2,0,0,.2) infinite;
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
     }
@@ -31,8 +31,8 @@
         border-radius: 50%;
         left: 15px;
         top: 16px;
-        -webkit-animation: bd-spinner7-anim-after 1s cubic-bezier(.4,0,0,1) infinite;
-        animation: bd-spinner7-anim-after 1s cubic-bezier(.4,0,0,1) infinite;
+        -webkit-animation: bd-spinner7AnimAfter 1s cubic-bezier(.4,0,0,1) infinite;
+        animation: bd-spinner7AnimAfter 1s cubic-bezier(.4,0,0,1) infinite;
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
         -webkit-box-shadow: 15px 0 0 0 #fff;
@@ -40,7 +40,7 @@
     }
 }
 
-@-webkit-keyframes bd-spinner7-anim {
+@-webkit-keyframes bd-spinner7Anim {
     0% {
         -webkit-transform: translate(0,0)rotate(0.01deg);
         transform: translate(0,0)rotate(0.01deg);
@@ -52,7 +52,7 @@
     }
 }
 
-@keyframes bd-spinner7-anim {
+@keyframes bd-spinner7Anim {
     0% {
         -webkit-transform: translate(0,0)rotate(0.01deg);
         transform: translate(0,0)rotate(0.01deg);
@@ -64,7 +64,7 @@
     }
 }
 
-@-webkit-keyframes bd-spinner7-anim-before {
+@-webkit-keyframes bd-spinner7AnimBefore {
     0% {
         -webkit-transform: scale(1)rotate(0.01deg);
         transform: scale(1)rotate(0.01deg);
@@ -81,7 +81,7 @@
     }
 }
 
-@keyframes bd-spinner7-anim-before {
+@keyframes bd-spinner7AnimBefore {
     0% {
         -webkit-transform: scale(1)rotate(0.01deg);
         transform: scale(1)rotate(0.01deg);
@@ -98,7 +98,7 @@
     }
 }
 
-@-webkit-keyframes bd-spinner7-anim-after {
+@-webkit-keyframes bd-spinner7AnimAfter {
     0% {
         opacity: 1;
         -webkit-transform: translate(0,0)rotate(0.01deg);
@@ -116,7 +116,7 @@
     }
 }
 
-@keyframes bd-spinner7-anim-after {
+@keyframes bd-spinner7AnimAfter {
     0% {
         opacity: 1;
         -webkit-transform: translate(0,0)rotate(0.01deg);

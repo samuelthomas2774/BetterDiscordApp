@@ -44,14 +44,14 @@
             }
         },
         created() {
-            Events.on('bd-refreshModals', this.eventListener = () => {
+            Events.on('bd-refresh-modals', this.eventListener = () => {
                 this.$forceUpdate();
             });
 
             window.addEventListener('keyup', this.keyupListener);
         },
         destroyed() {
-            if (this.eventListener) Events.off('bd-refreshModals', this.eventListener);
+            if (this.eventListener) Events.off('bd-refresh-modals', this.eventListener);
             window.removeEventListener('keyup', this.keyupListener);
         },
         methods: {

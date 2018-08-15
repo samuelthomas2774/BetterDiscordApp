@@ -2,8 +2,8 @@
     width: 40px;
     height: 40px;
     position: relative;
-    -webkit-animation: bd-spinner4-anim 1s cubic-bezier(0.9, -0.64, 0.05, 1.44) infinite;
-    animation: bd-spinner4-anim 1s cubic-bezier(0.9, -0.64, 0.05, 1.44) infinite;
+    -webkit-animation: bd-spinner4Anim 1s cubic-bezier(0.9, -0.64, 0.05, 1.44) infinite;
+    animation: bd-spinner4Anim 1s cubic-bezier(0.9, -0.64, 0.05, 1.44) infinite;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 
@@ -34,7 +34,7 @@
     }
 }
 
-@-webkit-keyframes bd-spinner4-anim {
+@-webkit-keyframes bd-spinner4Anim {
     0% {
         -webkit-transform: rotate(0deg);
         transform: rotate(0deg);
@@ -46,7 +46,7 @@
     }
 }
 
-@keyframes bd-spinner4-anim {
+@keyframes bd-spinner4Anim {
     0% {
         -webkit-transform: rotate(0deg);
         transform: rotate(0deg);

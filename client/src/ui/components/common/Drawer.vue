@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div :class="['bd-drawer', {'bd-drawer-open': open, 'bd-animating': animating}]">
+    <div :class="['bd-drawer', {'bd-drawerOpen': open, 'bd-animating': animating}]">
         <div class="bd-formHeader bd-drawerHeader" @click="() => open = !open">
             <span class="bd-formHeaderText">{{ label }}</span>
             <span class="bd-formHeaderButton bd-drawerOpenButton">

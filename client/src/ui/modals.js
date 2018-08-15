@@ -236,16 +236,16 @@ export default class Modals {
 
         const pmErrCount = PluginManager.errors.length;
         const tmErrCount = ThemeManager.errors.length;
-        const bothErr = pmErrCount && tmErrCount;
+        const failedModule = pmErrCount && tmErrCount ? 'Content Manager' : pmErrCount ? 'Plugin Manager' : 'Theme Manager';
 
         const modal = this.error({
             header: `
-                    ${bothErr ? '' : pmErrCount ? PluginManager.moduleName : ThemeManager.moduleName} - 
+                    ${failedModule} - 
                     ${pmErrCount ? `${pmErrCount} ${PluginManager.contentType}${pmErrCount !== 1 ? 's' : ''}` : ''}
                     ${pmErrCount && tmErrCount ? ' and ' : ''}
                     ${tmErrCount ? `${tmErrCount} ${ThemeManager.contentType}${tmErrCount !== 1 ? 's' : ''}` : ''} failed to load
                     `,
-            module: bothErr ? 'Content Manager' : pmErrCount ? PluginManager.moduleName : ThemeManager.moduleName,
+            module: failedModule,
             type: 'err',
             content: errors
         });

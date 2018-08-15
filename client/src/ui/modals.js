@@ -232,28 +232,30 @@ export default class Modals {
     static showContentManagerErrors(clear = true) {
         // Get any errors from PluginManager and ThemeManager
         const errors = ([]).concat(PluginManager.errors).concat(ThemeManager.errors);
-        if (errors.length) {
-            const modal = this.error({
-                header:
-                    `${(PluginManager.errors.length && ThemeManager.errors.length ? '' :
-                        `${PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName  } - `) +
-                    (PluginManager.errors.length ? `${PluginManager.errors.length} ${PluginManager.contentType}${PluginManager.errors.length !== 1 ? 's' : ''}` : '') +
-                    (PluginManager.errors.length && ThemeManager.errors.length ? ' and ' : '') +
-                    (ThemeManager.errors.length ? `${ThemeManager.errors.length} ${ThemeManager.contentType}${ThemeManager.errors.length !== 1 ? 's' : ''}` : '')
-                    } failed to load`,
-                module: (PluginManager.errors.length && ThemeManager.errors.length ? 'Content Manager' :
-                    (PluginManager.errors.length ? PluginManager.moduleName : ThemeManager.moduleName)),
-                type: 'err',
-                content: errors
-            });
+        if (!errors.length) return;
 
-            if (clear) {
-                PluginManager._errors = [];
-                ThemeManager._errors = [];
-            }
+        const pmErrCount = PluginManager.errors.length;
+        const tmErrCount = ThemeManager.errors.length;
+        const bothErr = pmErrCount && tmErrCount;
 
-            return modal;
+        const modal = this.error({
+            header: `
+                    ${bothErr ? '' : pmErrCount ? PluginManager.moduleName : ThemeManager.moduleName} - 
+                    ${pmErrCount ? `${pmErrCount} ${PluginManager.contentType}${pmErrCount !== 1 ? 's' : ''}` : ''}
+                    ${pmErrCount && tmErrCount ? ' and ' : ''}
+                    ${tmErrCount ? `${tmErrCount} ${ThemeManager.contentType}${tmErrCount !== 1 ? 's' : ''}` : ''} failed to load
+                    `,
+            module: bothErr ? 'Content Manager' : pmErrCount ? PluginManager.moduleName : ThemeManager.moduleName,
+            type: 'err',
+            content: errors
+        });
+
+        if (clear) {
+            PluginManager._errors = [];
+            ThemeManager._errors = [];
         }
+
+        return modal;
     }
 
     /**

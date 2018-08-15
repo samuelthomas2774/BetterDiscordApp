@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-settings" :class="{active, 'bd-settingsOut': !item && animating}" @keyup="$emit('close')">
+    <div class="bd-settings" :class="{'bd-active': active, 'bd-settingsOut': !item && animating}" @keyup="$emit('close')">
         <SidebarView :contentVisible="item" :animating="animating" :class="{'bd-stop': item}">
             <Sidebar slot="sidebar">
                 <div class="bd-settingsX" @click="$emit('close')">

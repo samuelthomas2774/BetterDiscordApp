@@ -4,7 +4,7 @@
     margin-top: 10px;
     padding: 10px 0;
     border-radius: 0;
-    border-bottom: 1px solid rgba(114, 118, 126, 0.3);
+    border-bottom: 1px solid rgba(114, 118, 126, .3);
 
     &:hover {
         transform: scale(1.005);
@@ -16,7 +16,7 @@
     }
 
     .bd-remoteCardLikes {
-        color: red;
+        color: #f00;
         font-size: 12px;
         font-weight: 600;
     }
@@ -45,7 +45,7 @@
     .bd-remoteCardThumb {
         height: 100px;
         width: 180px;
-        background: rgba(0,0,0,.1);
+        background: rgba(0, 0, 0, .1);
         border-radius: 3px;
     }
 

@@ -28,14 +28,15 @@
         margin-top: 5px;
         margin-bottom: 0;
         line-height: 20px;
-        border-bottom: 0px solid rgba(114, 118, 126, 0.1);
+        border-bottom: 0 solid rgba(114, 118, 126, .1);
     }
 
     .bd-disabled & {
-        opacity: 0.6;
+        opacity: .6;
 
-        &, input {
-            cursor: not-allowed !important;
+        &,
+        input {
+            cursor: not-allowed !important; // sass-lint:disable-line no-important
         }
     }
 }

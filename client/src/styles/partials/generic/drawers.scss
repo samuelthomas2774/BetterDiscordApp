@@ -2,10 +2,14 @@
     margin-bottom: 15px;
 
     .bd-settingsCategory > & {
-        border-bottom: 1px solid rgba(114, 118, 126, 0.3);
+        border-bottom: 1px solid rgba(114, 118, 126, .3);
 
-        .bd-drawerContents > .bd-formItem:last-child > .bd-formDivider:last-child {
-            display: none;
+        .bd-drawerContents > .bd-formItem {
+            &:last-child > .bd-formDivider {
+                &:last-child {
+                    display: none;
+                }
+            }
         }
     }
 
@@ -14,7 +18,7 @@
         cursor: pointer;
 
         &:hover {
-            color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, .25);
         }
     }
 
@@ -22,12 +26,13 @@
         position: relative;
         margin-right: 15px;
 
-        .bd-chevron1, .bd-chevron2 {
+        .bd-chevron1,
+        .bd-chevron2 {
             position: absolute;
         }
 
         svg {
-            transition: transform 0.5s ease;
+            transition: transform .5s ease;
             transform: none;
         }
     }
@@ -39,13 +44,17 @@
     .bd-drawerContents {
         // margin-top is set in JavaScript when the drawer is animating
         // It still needs to be set here for it to animate
-        transition: transform 0.2s ease, margin-top 0.2s ease, opacity 0.2s ease;
+        transition: transform .2s ease, margin-top .2s ease, opacity .2s ease;
         transform: scaleY(0) translateY(0%);
         margin-top: -100%;
         opacity: 0;
 
-        > .bd-formItem:last-child > .bd-formDivider:last-child {
-            display: none;
+        > .bd-formItem {
+            &:last-child > .bd-formDivider {
+                &:last-child {
+                    display: none;
+                }
+            }
         }
     }
 
@@ -57,28 +66,31 @@
     }
 
     &.bd-drawerOpen {
-        > .bd-drawerHeader .bd-drawerOpenButton {
-            .bd-chevron1 {
-                svg {
-                    transform: rotate(90deg)
+        > .bd-drawerHeader {
+            .bd-drawerOpenButton {
+                .bd-chevron1 {
+                    svg {
+                        transform: rotate(90deg);
+                    }
                 }
             }
 
             .bd-chevron2 {
                 margin-left: -4px;
+
                 svg {
-                    transform: rotate(270deg)
+                    transform: rotate(270deg);
                 }
             }
         }
 
         > .bd-drawerContentsWrap > .bd-drawerContents {
             transform: scaleY(1) translateY(0%);
-            margin-top: 0%;
+            margin-top: 0;
             opacity: 1;
 
             &::after {
-                content: "";
+                content: '';
                 display: block;
                 margin-top: 15px;
             }

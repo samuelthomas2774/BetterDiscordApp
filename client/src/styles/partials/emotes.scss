@@ -14,7 +14,7 @@
 
     img {
         height: 32px;
-        margin: 0 .05em 0 .1em !important;
+        margin: 0 .05em 0 .1em !important; // sass-lint:disable-line no-important
         min-height: 22px;
         min-width: 22px;
         object-fit: contain;
@@ -44,14 +44,23 @@
             transition: fill .1s ease;
         }
 
-        &.bd-active svg {
-            fill: #fff;
+        &.bd-active {
+            svg {
+                fill: #fff;
+            }
         }
     }
 
-    &.bd-selected .bd-emoteFavouriteButton,
-    &:hover .bd-emoteFavouriteButton {
-        display: block;
+    &.bd-selected {
+        .bd-emoteFavouriteButton {
+            display: block;
+        }
+    }
+
+    &:hover {
+        .bd-emoteFavouriteButton {
+            display: block;
+        }
     }
 }
 

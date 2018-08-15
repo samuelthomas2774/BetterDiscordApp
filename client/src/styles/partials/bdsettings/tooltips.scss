@@ -10,7 +10,7 @@ bd-tooltips {
 .bd-popover {
     background-color: #000;
     border-radius: 5px;
-    box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, .2);
     color: #dcddde;
     contain: layout;
     font-size: 14px;
@@ -34,7 +34,7 @@ bd-tooltips {
         position: absolute;
     }
 
-    &[x-placement^="top"] {
+    &[x-placement^='top'] {
         margin-bottom: 10px;
 
         .bd-tooltipArrow,
@@ -45,18 +45,18 @@ bd-tooltips {
         }
     }
 
-    &[x-placement^="bottom"] {
+    &[x-placement^='bottom'] {
         margin-top: 10px;
 
         .bd-tooltipArrow,
         .bd-popoverArrow {
-            border-width: 0 5px 5px 5px;
+            border-width: 0 5px 5px;
             top: -5px;
             border-bottom-color: #000;
         }
     }
 
-    &[x-placement^="right"] {
+    &[x-placement^='right'] {
         margin-left: 10px;
 
         .bd-tooltipArrow,
@@ -67,7 +67,7 @@ bd-tooltips {
         }
     }
 
-    &[x-placement^="left"] {
+    &[x-placement^='left'] {
         margin-right: 10px;
 
         .bd-tooltipArrow,

@@ -1,9 +1,12 @@
+// sass-lint:disable force-element-nesting force-pseudo-nesting
 .bd-formSettingsarray {
-    .bd-button.bd-buttonPrimary {
-        padding: 3px 8px;
-        border-radius: 3px;
-        font-size: 12px;
-        font-weight: 400;
+    .bd-button {
+        .bd-buttonPrimary {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 400;
+        }
     }
 
     .bd-settingsarrayItems {

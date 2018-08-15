@@ -40,7 +40,7 @@
             text-align: center;
 
             &::after {
-                content: "";
+                content: '';
                 background-color: #4f545c;
                 height: 24px;
                 width: 2px;
@@ -65,7 +65,7 @@
         overflow: hidden;
 
         &::before {
-            content: "";
+            content: '';
             background-color: $colbdgreen;
             height: 8px;
             width: 5px;
@@ -90,9 +90,9 @@
             height: 24px;
             position: relative;
             pointer-events: none;
-            background: #FFF;
+            background: #fff;
             border: 1px solid #dcddde;
-            box-shadow: 0 3px 1px 0 rgba(0,0,0,.05), 0 2px 2px 0 rgba(0,0,0,.1), 0 3px 3px 0 rgba(0,0,0,.05);
+            box-shadow: 0 3px 1px 0 rgba(0, 0, 0, .05), 0 2px 2px 0 rgba(0, 0, 0, .1), 0 3px 3px 0 rgba(0, 0, 0, .05);
             margin-left: -5px;
             border-radius: 3px;
             box-sizing: border-box;

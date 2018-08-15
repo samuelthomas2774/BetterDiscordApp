@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-sidebarView" :class="{active: contentVisible, animating: animating}">
+    <div class="bd-sidebarView" :class="{'bd-active': contentVisible, animating: animating}">
         <div class="bd-sidebarRegion bd-flexCol">
             <div class="bd-settingswrap">
                 <ScrollerWrap dark="true">

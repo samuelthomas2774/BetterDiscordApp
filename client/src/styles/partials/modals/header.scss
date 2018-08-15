@@ -3,7 +3,6 @@
     padding: 15px;
     flex: 0 0;
     -webkit-transition: -webkit-box-shadow .1s ease-out;
-    transition: -webkit-box-shadow .1s ease-out;
     transition: box-shadow .1s ease-out;
 
     .bd-modalHeadertext {
@@ -14,8 +13,10 @@
         padding: 1px;
     }
 
-    .bd-modalIcon .bd-materialDesignIcon {
-        margin-right: 5px;
+    .bd-modalIcon {
+        .bd-materialDesignIcon {
+            margin-right: 5px;
+        }
     }
 
     .bd-modalX {
@@ -44,7 +45,9 @@
     }
 }
 
-.bd-modalScrolled .bd-modalHeader {
-    -webkit-box-shadow: 0 1px 0 0 rgba(24,25,28,.3), 0 1px 2px 0 rgba(24,25,28,.3);
-    box-shadow: 0 1px 0 0 rgba(24,25,28,.3), 0 1px 2px 0 rgba(24,25,28,.3);
+.bd-modalScrolled {
+    .bd-modalHeader {
+        -webkit-box-shadow: 0 1px 0 0 rgba(24, 25, 28, .3), 0 1px 2px 0 rgba(24, 25, 28, .3);
+        box-shadow: 0 1px 0 0 rgba(24, 25, 28, .3), 0 1px 2px 0 rgba(24, 25, 28, .3);
+    }
 }

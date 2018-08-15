@@ -1,6 +1,6 @@
 .bd-settingsSchemes {
     margin-bottom: 15px;
-    border-bottom: 1px solid rgba(114, 118, 126, 0.3);
+    border-bottom: 1px solid rgba(114, 118, 126, .3);
 
     .bd-settingsSchemesContainer {
         margin-right: -15px;
@@ -28,7 +28,7 @@
         height: 120px;
         border: 2px solid $coldimwhite;
         border-radius: 3px;
-        transition: border-color 0.2s ease;
+        transition: border-color .2s ease;
         margin-bottom: 15px;
         background: center / cover no-repeat #2f3136;
     }

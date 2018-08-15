@@ -12,13 +12,11 @@
         margin-left: 15px;
     }
 
-    input[type="text"],
-    input[type="number"],
-    input[type="password"] {
+    input {
         background: transparent;
-        border: none;
+        border: 0;
         color: #b9bbbe;
-        border-bottom: 2px solid rgba(114, 118, 126, 0.3);
+        border-bottom: 2px solid rgba(114, 118, 126, .3);
         outline: none;
         line-height: 24px;
         font-size: 100%;
@@ -56,34 +54,9 @@
 
 .bd-formTextarea {
     .bd-formTextareaWrap,
-    textarea.bd-textarea {
-        margin-top: 15px;
-        background: rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(0, 0, 0, 0.3);
-        border-radius: 3px;
-        color: #b9bbbe;
-        overflow-y: scroll;
-        max-height: 140px;
-        transition: border-color .2s ease, color .2s ease;
-
-        &:focus {
-            color: #fff;
-            border-color: #040405;
-        }
-
-        @include scrollbar;
-    }
-
-    div[contenteditable],
-    textarea {
-        padding: 11px;
-        cursor: text;
-        min-height: 45px;
-    }
-
     textarea {
         background: transparent;
-        border: none;
+        border: 0;
         resize: none;
         outline: none;
         width: 100%;
@@ -92,17 +65,48 @@
         box-sizing: border-box;
         overflow-y: visible;
         max-height: 140px;
+        padding: 11px;
+        cursor: text;
+        min-height: 45px;
+
+        &.bd-textarea {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, .1);
+            border: 1px solid rgba(0, 0, 0, .3);
+            border-radius: 3px;
+            color: #b9bbbe;
+            overflow-y: scroll;
+            max-height: 140px;
+            transition: border-color .2s ease, color .2s ease;
+
+            &:focus {
+                color: #fff;
+                border-color: #040405;
+            }
+
+            @include scrollbar;
+        }
+    }
+
+    div {
+        &[contenteditable] {
+            padding: 11px;
+            cursor: text;
+            min-height: 45px;
+        }
     }
 }
 
 .bd-number {
     position: relative;
 
-    input[type="number"] {
-        &::-webkit-inner-spin-button,
-        ::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+    input {
+        &[type='number'] {
+            &::-webkit-inner-spin-button,
+            ::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
         }
     }
 
@@ -124,8 +128,14 @@
                 border-width: 2.5px 5px 5px;
             }
 
-            &:hover .bd-upArrow {
-                border-color: transparent transparent rgb(200, 200, 200);
+            &:hover {
+                &.bd-upArrow {
+                    border-color: transparent transparent rgb(200, 200, 200);
+                }
+
+                .bd-downArrow {
+                    border-color: rgb(200, 200, 200) transparent transparent;
+                }
             }
 
             .bd-downArrow {
@@ -133,17 +143,13 @@
                 border-style: solid;
                 border-width: 5px 5px 2.5px;
             }
-
-            &:hover .bd-downArrow {
-                border-color: rgb(200, 200, 200) transparent transparent;
-            }
         }
     }
 }
 
 .bd-textInput {
-    background-color: rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, .1);
+    border: 1px solid rgba(0, 0, 0, .3);
     border-radius: 3px;
     box-sizing: border-box;
     color: #f6f6f7;
@@ -162,7 +168,7 @@
     transition: all .5s ease-in-out;
 
     &::before {
-        content: "Search by name, description or tag...";
+        content: 'Search by name, description or tag...';
         color: #f6f6f7;
         position: relative;
         top: -20px;

@@ -1,5 +1,5 @@
 @keyframes bd-slidein {
-    0% {
+    0%  {
         transform: translateX(-100%);
         opacity: .2;
     }
@@ -95,7 +95,7 @@
 
 @keyframes bd-modalIn {
     0% {
-        transform: scale(0.8);
+        transform: scale(.8);
         opacity: 0;
     }
 
@@ -126,7 +126,7 @@
     }
 
     100% {
-        transform: scale(0.8);
+        transform: scale(.8);
         opacity: 0;
     }
 }
@@ -144,19 +144,24 @@
 }
 
 @keyframes bd-warnShake {
-    10%, 90% {
+    10%,
+    90% {
         transform: translate3d(-4px, -4px, 0);
     }
 
-    20%, 80% {
+    20%,
+    80% {
         transform: translate3d(4px, 4px, 0);
     }
 
-    30%, 50%, 70% {
+    30%,
+    50%,
+    70% {
         transform: translate3d(-4px, 4px, 0);
     }
 
-    40%, 60% {
+    40%,
+    60% {
         transform: translate3d(4px, -4px, 0);
     }
 }
@@ -202,14 +207,14 @@
 
 @keyframes bd-keybindPulse {
     0% {
-        box-shadow: 0 0 6px rgba(240,71,71,.3)
+        box-shadow: 0 0 6px rgba(240, 71, 71, .3);
     }
 
     50% {
-        box-shadow: 0 0 10px rgba(240,71,71,.6)
+        box-shadow: 0 0 10px rgba(240, 71, 71, .6);
     }
 
     100% {
-        box-shadow: 0 0 6px rgba(240,71,71,.3)
+        box-shadow: 0 0 6px rgba(240, 71, 71, .3);
     }
 }

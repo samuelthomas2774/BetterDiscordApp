@@ -5,14 +5,14 @@
     width: 70px;
     height: 48px;
     left: 0;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 2px 0 rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 2px 0 rgba(0, 0, 0, .06);
     opacity: 1;
 
-    .platform-darwin & {
+    .platform-darwin & { // sass-lint:disable-line class-name-format
         top: 27px;
     }
 
-    .platform-linux & {
+    .platform-linux & { // sass-lint:disable-line class-name-format
         top: 0;
     }
 
@@ -25,12 +25,14 @@
         height: 100%;
         cursor: pointer;
         filter: grayscale(100%);
-        opacity: 0.5;
-        transition: all 0.4s ease-in-out;
+        opacity: .5;
+        transition: all .4s ease-in-out;
 
-        &:not(.bd-loading):hover {
-            filter: none;
-            opacity: 1;
+        &:not(.bd-loading) {
+            &:hover {
+                filter: none;
+                opacity: 1;
+            }
         }
 
         &.bd-loading {
@@ -38,20 +40,22 @@
         }
 
         &.bd-updates {
-            filter: hue-rotate(250deg) !important;
-            opacity: 1 !important;
+            filter: hue-rotate(250deg) !important; // sass-lint:disable-line no-important
+            opacity: 1 !important; // sass-lint:disable-line no-important
         }
     }
 
     &.bd-hideButton {
-        animation: bd-fadeOut 0.4s ease-out;
+        animation: bd-fadeOut .4s ease-out;
 
         &.bd-active {
-            animation: bd-fadeIn 0.4s ease-in;
+            animation: bd-fadeIn .4s ease-in;
         }
 
-        &:not(.bd-active):not(.bd-animating) {
-            display: none;
+        &:not(.bd-active) {
+            &:not(.bd-animating) {
+                display: none;
+            }
         }
     }
 

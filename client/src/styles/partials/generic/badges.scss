@@ -3,13 +3,28 @@
     margin-top: 8px;
     flex: 1 1 auto;
 
-    + [class*="profileBadges"] {
+    + [class*='profileBadges'] {
         display: inline-flex;
     }
 }
 
 .bd-profileBadges {
     display: flex;
+
+    &.bd-profileBadgesNametag {
+        display: inline-block;
+        margin-left: 6px;
+        height: 11px;
+
+        .bd-profileBadge {
+            width: 12px;
+            height: 12px;
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
 }
 
 .bd-profileBadge {
@@ -28,24 +43,9 @@
     background-image: $logoSmallBw;
     filter: brightness(10);
 
-    .theme-light [class*="topSectionNormal-"] .bd-profileBadgesProfileModal > &,
-    .theme-light :not(.bd-profileBadgesProfileModal) > & {
+    .theme-light [class*='topSectionNormal-'] .bd-profileBadgesProfileModal > &, // sass-lint:disable-line force-element-nesting class-name-format
+    .theme-light :not(.bd-profileBadgesProfileModal) > & { // sass-lint:disable-line class-name-format
         background-image: $logoSmallLight;
         filter: none;
-    }
-}
-
-.bd-profileBadges.bd-profileBadgesNametag {
-    display: inline-block;
-    margin-left: 6px;
-    height: 11px;
-
-    .bd-profileBadge {
-        width: 12px;
-        height: 12px;
-
-        &:last-child {
-            margin-right: 0;
-        }
     }
 }

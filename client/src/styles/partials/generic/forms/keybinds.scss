@@ -2,8 +2,8 @@
     padding: 10px;
     display: flex;
     margin-top: 10px;
-    background-color: rgba(0,0,0,.1);
-    border: 1px solid rgba(0,0,0,.3);
+    background-color: rgba(0, 0, 0, .1);
+    border: 1px solid rgba(0, 0, 0, .3);
     transition: border .15s ease;
     border-radius: 3px;
     box-sizing: border-box;
@@ -17,7 +17,7 @@
 
     &.bd-keybindUnset {
         .bd-keybindSelected {
-            color: hsla(240,6%,97%,.3);
+            color: hsla(240, 6%, 97%, .3);
             font-weight: 600;
         }
     }

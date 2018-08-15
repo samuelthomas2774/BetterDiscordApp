@@ -25,7 +25,7 @@
 
         &:hover {
             border-radius: 30%;
-            background-color: $colbdblue;
+            background-color: $colbdgreen;
 
             &.bd-guildHasIcon {
                 background-color: rgb(47, 49, 54);
@@ -33,8 +33,8 @@
         }
 
         &.bd-active {
-            background-color: $colbdblue;
-            box-shadow: 0 0 7px 2px $colbdblue;
+            background-color: $colbdgreen;
+            box-shadow: 0 0 7px 2px $colbdgreen;
 
             &.bd-guildHasIcon {
                 background-color: rgb(47, 49, 54);

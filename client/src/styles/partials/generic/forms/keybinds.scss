@@ -1,7 +1,6 @@
 .bd-keybind {
     padding: 10px;
     display: flex;
-    // width: 180px;
     margin-top: 10px;
     background-color: rgba(0,0,0,.1);
     border: 1px solid rgba(0,0,0,.3);
@@ -43,10 +42,4 @@
             background-color: rgba($colerr, .3);
         }
     }
-}
-
-@keyframes bd-keybindPulse {
-    0% { box-shadow: 0 0 6px rgba(240,71,71,.3) }
-    50% { box-shadow: 0 0 10px rgba(240,71,71,.6) }
-    100% { box-shadow: 0 0 6px rgba(240,71,71,.3) }
 }

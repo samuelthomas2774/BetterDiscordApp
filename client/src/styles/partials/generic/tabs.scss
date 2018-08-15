@@ -27,7 +27,7 @@
         &:hover,
         &.bd-active {
             background: transparent;
-            border-bottom-color: $colbdblue;
+            border-bottom-color: $colbdgreen;
             color: #fff;
 
             .bd-materialDesignIcon {
@@ -87,12 +87,10 @@
     }
 
     .bd-settingswrapHeader & {
-        // margin-top: -17px;
         margin-bottom: -20px;
 
         .bd-button {
             font-size: 16px;
-           // padding: 18px 0 17px;
         }
 
         .bd-materialButton {

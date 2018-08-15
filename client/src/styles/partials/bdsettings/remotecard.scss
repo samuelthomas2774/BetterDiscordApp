@@ -1,16 +1,13 @@
 .bd-remoteCard {
     display: flex;
     flex-direction: column;
-    // background: rgba(0,0,0,.1);
     margin-top: 10px;
     padding: 10px 0;
     border-radius: 0;
     border-bottom: 1px solid rgba(114, 118, 126, 0.3);
 
     &:hover {
-        // background: rgba(0,0,0,.2);
         transform: scale(1.005);
-        // box-shadow: 0px 0px 5px rgba(0,0,0,.5);
     }
 
     .bd-remoteCardTitle {

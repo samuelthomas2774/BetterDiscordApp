@@ -81,16 +81,3 @@
         z-index: 3001;
     }
 }
-
-@keyframes bd-settingsButtonPulse {
-    0% {
-        filter: grayscale(100%);
-    }
-    50% {
-        filter: grayscale(0%);
-        opacity: 1;
-    }
-    100% {
-        filter: grayscale(100%);
-    }
-}

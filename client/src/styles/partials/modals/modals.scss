@@ -69,11 +69,11 @@
 
     .bd-modalTitlelink {
         cursor: pointer;
-        color: $colbdblue;
+        color: $colbdgreen;
 
         &:hover {
             text-decoration: underline;
-            color: lighten($colbdblue, 5%);
+            color: lighten($colbdgreen, 5%);
         }
     }
 

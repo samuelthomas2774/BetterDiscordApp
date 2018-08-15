@@ -33,7 +33,6 @@
             position: relative;
             top: -6px;
             width: 24px;
-
             color: #72767d;
             font-size: 10px;
             font-weight: 700;
@@ -67,7 +66,7 @@
 
         &::before {
             content: "";
-            background-color: $colbdblue;
+            background-color: $colbdgreen;
             height: 8px;
             width: 5px;
             display: block;
@@ -75,7 +74,7 @@
         }
 
         .bd-sliderBarFilled {
-            background-color: $colbdblue;
+            background-color: $colbdgreen;
             height: 8px;
             width: 100%;
             margin-top: -8px;

@@ -10,11 +10,11 @@
     text-align: center;
     user-select: none;
     font-weight: 500;
-    background: $colbdblue;
+    background: $colbdgreen;
 
 
     &:not(.bd-disabled):hover {
-        background: darken($colbdblue, 5%);
+        background: darken($colbdgreen, 5%);
     }
 
     &.bd-disabled {

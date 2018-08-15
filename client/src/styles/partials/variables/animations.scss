@@ -94,22 +94,53 @@
 }
 
 @keyframes bd-modalIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    90% { transform: scale(1.01); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    90% {
+        transform: scale(1.01);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
+
 @keyframes bd-modalOut {
-    0% { transform: scale(1); opacity: 1; }
-    10% { transform: scale(1.01); opacity: 1; }
-    90% { opacity: 0; }
-    100% { transform: scale(0.8); opacity: 0; }
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    10% {
+        transform: scale(1.01);
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
 }
 
 @keyframes bd-backdropIn {
-    0% { opacity: 0; }
+    0% {
+        opacity: 0;
+    }
 }
+
 @keyframes bd-backdropOut {
-    100% { opacity: 0; }
+    100% {
+        opacity: 0;
+    }
 }
 
 @keyframes bd-warnShake {
@@ -141,5 +172,44 @@
 
     100% {
         opacity: 1;
+    }
+}
+
+@keyframes bd-settingsButtonPulse {
+    0% {
+        filter: grayscale(100%);
+    }
+
+    50% {
+        filter: grayscale(0%);
+        opacity: 1;
+    }
+
+    100% {
+        filter: grayscale(100%);
+    }
+}
+
+@keyframes bd-colourpickerSlidein {
+    0% {
+        right: 20px;
+    }
+
+    100% {
+        right: 0;
+    }
+}
+
+@keyframes bd-keybindPulse {
+    0% {
+        box-shadow: 0 0 6px rgba(240,71,71,.3)
+    }
+
+    50% {
+        box-shadow: 0 0 10px rgba(240,71,71,.6)
+    }
+
+    100% {
+        box-shadow: 0 0 6px rgba(240,71,71,.3)
     }
 }

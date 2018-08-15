@@ -40,12 +40,6 @@
         border: 1px solid #72767d;
 
         .bd-radioControl {
-            // background: rgb(50, 50, 50);
-            // border: 1px solid rgb(114, 118, 125);
-            // border-radius: 50%;
-            // width: 12px;
-            // height: 12px;
-            // transition: background-color .1s;
             margin: 1px;
             opacity: 0;
         }
@@ -67,8 +61,8 @@
     }
 
     &.bd-radioSelected {
-        background-color: $colbdblue;
-        border-color: $colbdblue;
+        background-color: $colbdgreen;
+        border-color: $colbdgreen;
 
         .bd-radioControlWrap {
             border-color: #fff;

@@ -26,19 +26,19 @@
         margin-top: 10px;
 
         &.bd-toastError {
-            background: #f04747;
+            background: $colerr;
         }
 
         &.bd-toastInfo {
-            background: #4a90e2;
+            background: $colbdblue;
         }
 
         &.bd-toastWarning {
-            background: #FFA600;
+            background: $colwarn;
         }
 
         &.bd-toastSuccess {
-            background: #43b581;
+            background: $colbdgreen;
         }
 
         &.bd-toastHasIcon {

@@ -1,4 +1,4 @@
-.bd-profile-badges-wrap {
+.bd-profileBadgesWrap {
     display: inline-flex;
     margin-top: 8px;
     flex: 1 1 auto;
@@ -8,11 +8,11 @@
     }
 }
 
-.bd-profile-badges {
+.bd-profileBadges {
     display: flex;
 }
 
-.bd-profile-badge {
+.bd-profileBadge {
     background-position: 50%;
     background-repeat: no-repeat;
     background-size: cover;
@@ -22,25 +22,25 @@
     margin-right: 6px;
 }
 
-.bd-profile-badge-developer,
-.bd-profile-badge-webdev,
-.bd-profile-badge-contributor {
+.bd-profileBadgeDeveloper,
+.bd-profileBadgeWebdev,
+.bd-profileBadgeContributor {
     background-image: $logoSmallBw;
     filter: brightness(10);
 
-    .theme-light [class*="topSectionNormal-"] .bd-profile-badges-profile-modal > &,
-    .theme-light :not(.bd-profile-badges-profile-modal) > & {
+    .theme-light [class*="topSectionNormal-"] .bd-profileBadgesProfileModal > &,
+    .theme-light :not(.bd-profileBadgesProfileModal) > & {
         background-image: $logoSmallLight;
         filter: none;
     }
 }
 
-.bd-profile-badges.bd-profile-badges-nametag {
+.bd-profileBadges.bd-profileBadges-nametag {
     display: inline-block;
     margin-left: 6px;
     height: 11px;
 
-    .bd-profile-badge {
+    .bd-profileBadge {
         width: 12px;
         height: 12px;
 
@@ -50,13 +50,13 @@
     }
 }
 
-// .member-username .bd-profile-badges {
+// .member-username .bd-profileBadges {
 //     display: inline-block;
 //     height: 17px;
 //     width: 14px;
 //
 //     .bd-badge,
-//     .bd-badge-c {
+//     .bd-badge {
 //         width: 14px;
 //         height: 16px;
 //         background-position: center;

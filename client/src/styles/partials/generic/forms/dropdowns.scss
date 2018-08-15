@@ -1,10 +1,10 @@
-.bd-form-dropdown {
+.bd-formDropdown {
     h3 + .bd-dropdown {
         width: 180px;
         margin-left: 15px;
     }
 
-    .bd-form-item-fullwidth & {
+    .bd-formItemFullwidth & {
         .bd-dropdown {
             margin-top: 10px;
         }
@@ -15,7 +15,7 @@
     position: relative;
     width: 100%;
 
-    .bd-dropdown-current {
+    .bd-dropdownCurrent {
         color: #f6f6f7;
         background: rgba(0,0,0,.1);
         border: 1px solid rgba(0,0,0,.3);
@@ -27,15 +27,15 @@
         box-sizing: border-box;
         display: flex;
 
-        .bd-dropdown-text {
+        .bd-dropdownText {
             flex: 1 1 auto;
         }
 
-        .bd-dropdown-arrow-wrap {
+        .bd-dropdownArrowWrap {
             flex: 0 0 auto;
             margin-left: 10px;
 
-            .bd-dropdown-arrow {
+            .bd-dropdownArrow {
                 border-color: rgb(153, 153, 153) transparent transparent;
                 border-style: solid;
                 border-width: 5px 5px 2.5px;
@@ -48,24 +48,24 @@
         &:hover {
             border-color: #040405;
 
-            .bd-dropdown-arrow-wrap .bd-dropdown-arrow {
+            .bd-dropdownArrowWrap .bd-dropdownArrow {
                 border-color: #f6f6f7 transparent transparent;
             }
         }
     }
 
     &.bd-active {
-        .bd-dropdown-current {
+        .bd-dropdownCurrent {
             border-color: #040405;
         }
 
-        .bd-dropdown-arrow-wrap .bd-dropdown-arrow {
+        .bd-dropdownArrowWrap .bd-dropdownArrow {
             transform: rotateX(180deg) translateY(2px);
             border-color: #f6f6f7 transparent transparent;
         }
     }
 
-    .bd-dropdown-options {
+    .bd-dropdownOptions {
         position: absolute;
         z-index: 5;
         top: calc(100% - 2.5px);
@@ -78,7 +78,7 @@
         border-bottom-right-radius: 3px;
         overflow-y: scroll;
 
-        .bd-dropdown-option {
+        .bd-dropdownOption {
             color: white;
             padding: 11px;
             cursor: pointer;
@@ -87,7 +87,7 @@
                 background-color: rgba(0, 0, 0, 0.1);
             }
 
-            &.bd-dropdown-option-selected {
+            &.bd-dropdownOptionSelected {
                 background-color: rgba(0, 0, 0, 0.2);
             }
         }

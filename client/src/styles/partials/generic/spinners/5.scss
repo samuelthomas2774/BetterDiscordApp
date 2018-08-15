@@ -1,4 +1,4 @@
-.bd-spinner-5 {
+.bd-spinner5 {
     width: 40px;
     height: 40px;
     position: relative;
@@ -14,8 +14,8 @@
         border-radius: 5px;
         left: 5px;
         bottom: 10px;
-        -webkit-animation: bd-spinner-anim-before 2s cubic-bezier(0.4, 0, 0, 1) infinite;
-        animation: bd-spinner-5-anim-before 2s cubic-bezier(0.4, 0, 0, 1) -1s infinite;
+        -webkit-animation: bd-spinnerAnimBefore 2s cubic-bezier(0.4, 0, 0, 1) infinite;
+        animation: bd-spinner5-anim-before 2s cubic-bezier(0.4, 0, 0, 1) -1s infinite;
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
     }
@@ -29,14 +29,14 @@
         border-radius: 5px;
         left: 5px;
         top: 10px;
-        -webkit-animation: bd-spinner-anim-after 2s cubic-bezier(0.4, 0, 0, 1) infinite;
-        animation: bd-spinner-5-anim-after 2s cubic-bezier(0.4, 0, 0, 1) infinite;
+        -webkit-animation: bd-spinnerAnimAfter 2s cubic-bezier(0.4, 0, 0, 1) infinite;
+        animation: bd-spinner5-anim-after 2s cubic-bezier(0.4, 0, 0, 1) infinite;
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
     }
 }
 
-@-webkit-keyframes bd-spinner-5-anim-before {
+@-webkit-keyframes bd-spinner5-anim-before {
     0% {
         left: 0px;
         width: 10px;
@@ -68,7 +68,7 @@
     }
 }
 
-@keyframes bd-spinner-5-anim-before {
+@keyframes bd-spinner5-anim-before {
     0% {
         left: 0px;
         width: 10px;

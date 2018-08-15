@@ -1,15 +1,15 @@
 .bd-drawer {
     margin-bottom: 15px;
 
-    .bd-settings-category > & {
+    .bd-settingsCategory > & {
         border-bottom: 1px solid rgba(114, 118, 126, 0.3);
 
-        .bd-drawer-contents > .bd-form-item:last-child > .bd-form-divider:last-child {
+        .bd-drawerContents > .bd-formItem:last-child > .bd-form-divider:last-child {
             display: none;
         }
     }
 
-    .bd-form-header {
+    .bd-formHeader {
         margin-top: 0;
         cursor: pointer;
 
@@ -18,11 +18,11 @@
         }
     }
 
-    .bd-drawer-open-button {
+    .bd-drawerOpenButton {
         position: relative;
         margin-right: 15px;
 
-        .bd-chevron-1, .bd-chevron-2 {
+        .bd-chevron1, .bd-chevron2 {
             position: absolute;
         }
 
@@ -32,11 +32,11 @@
         }
     }
 
-    .bd-drawer-contents-wrap {
+    .bd-drawerContentsWrap {
         min-height: 5px;
     }
 
-    .bd-drawer-contents {
+    .bd-drawerContents {
         // margin-top is set in JavaScript when the drawer is animating
         // It still needs to be set here for it to animate
         transition: transform 0.2s ease, margin-top 0.2s ease, opacity 0.2s ease;
@@ -44,27 +44,27 @@
         margin-top: -100%;
         opacity: 0;
 
-        > .bd-form-item:last-child > .bd-form-divider:last-child {
+        > .bd-formItem:last-child > .bd-form-divider:last-child {
             display: none;
         }
     }
 
     &.bd-animating,
-    &:not(.bd-drawer-open) {
-        > .bd-drawer-contents-wrap {
+    &:not(.bd-drawerOpen) {
+        > .bd-drawerContentsWrap {
             overflow: hidden;
         }
     }
 
-    &.bd-drawer-open {
-        > .bd-drawer-header .bd-drawer-open-button {
-            .bd-chevron-1 {
+    &.bd-drawerOpen {
+        > .bd-drawerHeader .bd-drawerOpenButton {
+            .bd-chevron1 {
                 svg {
                     transform: rotate(90deg)
                 }
             }
 
-            .bd-chevron-2 {
+            .bd-chevron2 {
                 margin-left: -4px;
                 svg {
                     transform: rotate(270deg)
@@ -72,7 +72,7 @@
             }
         }
 
-        > .bd-drawer-contents-wrap > .bd-drawer-contents {
+        > .bd-drawerContentsWrap > .bd-drawerContents {
             transform: scaleY(1) translateY(0%);
             margin-top: 0%;
             opacity: 1;

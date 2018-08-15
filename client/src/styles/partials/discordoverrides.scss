@@ -1,4 +1,4 @@
-body:not(.bd-hide-button) {
+body:not(.bd-hideButton) {
     [class*="guildsWrapper-"] {
         padding-top: 49px !important;
     }
@@ -23,6 +23,6 @@ body:not(.bd-hide-button) {
     z-index: 900;
 }
 
-.bd-settings-wrapper.platform-linux {
+.bd-settingsWrapper.platform-linux {
     transform: none;
 }

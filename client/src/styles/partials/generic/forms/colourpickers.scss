@@ -1,11 +1,11 @@
-.bd-colourpicker-swatch {
+.bd-colourpickerSwatch {
     width: 50px;
     height: 30px;
     border-radius: 3px;
     border: 1px solid hsla(0,0%,100%,.1);
 }
 
-.bd-form-colourpicker {
+.bd-formColourpicker {
     position: relative;
 
     .vc-chrome {
@@ -36,12 +36,12 @@
         }
 
         &:not(.bd-hide) {
-            animation: bd-colourpicker-slidein 0.1s ease-in;
+            animation: bd-colourpickerSlidein 0.1s ease-in;
         }
     }
 }
 
-@keyframes bd-colourpicker-slidein {
+@keyframes bd-colourpickerSlidein {
     0% {
         right: 20px;
     }

@@ -1,4 +1,4 @@
-.bd-content-column {
+.bd-contentColumn {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -10,20 +10,20 @@
         flex-direction: column;
         flex-grow: 1;
 
-        &.bd-contentcolumn-enter-active,
-        &.bd-contentcolumn-leave-active {
+        &.bd-contentcolumnEnterActive,
+        &.bd-contentcolumnLeaveActive {
             transition: opacity 0.4s ease;
         }
 
-        &.bd-contentcolumn-enter-to {
+        &.bd-contentcolumnEnterTo {
             opacity: 1;
         }
 
-        &.bd-contentcolumn-leave-to {
+        &.bd-contentcolumnLeaveTo {
             opacity: 0;
         }
 
-        &.bd-contentcolumn-leave-active {
+        &.bd-contentcolumnLeaveActive {
             position: absolute;
             width: 590px;
             pointer-events: none;

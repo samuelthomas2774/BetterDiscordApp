@@ -1,13 +1,13 @@
-.bd-form-textinput,
-.bd-form-numberinput {
+.bd-formTextinput,
+.bd-formNumberinput {
     h3 {
-        + .bd-textinput-wrapper,
+        + .bd-textinputWrapper,
         + .bd-number {
             width: 180px;
         }
     }
 
-    .bd-textinput-wrapper,
+    .bd-textinputWrapper,
     .bd-number {
         margin-left: 15px;
     }
@@ -31,12 +31,12 @@
         }
     }
 
-    .bd-form-item-fullwidth & {
+    .bd-formItemFullwidth & {
         .bd-title {
             flex-direction: column;
         }
 
-        .bd-textinput-wrapper,
+        .bd-textinputWrapper,
         .bd-number {
             width: 100%;
             margin-top: 10px;
@@ -49,13 +49,13 @@
     }
 }
 
-.bd-textinput-wrapper,
+.bd-textinputWrapper,
 .bd-number {
     width: 100%;
 }
 
-.bd-form-textarea {
-    .bd-form-textarea-wrap,
+.bd-formTextarea {
+    .bd-formTextareaWrap,
     textarea.bd-textarea {
         margin-top: 15px;
         background: rgba(0, 0, 0, 0.1);
@@ -106,7 +106,7 @@
         }
     }
 
-    .bd-number-spinner {
+    .bd-numberSpinner {
         position: absolute;
         top: 0;
         right: 0;
@@ -118,23 +118,23 @@
             cursor: pointer;
             font-size: 0;
 
-            .bd-up-arrow {
+            .bd-upArrow {
                 border-color: transparent transparent rgb(153, 153, 153);
                 border-style: solid;
                 border-width: 2.5px 5px 5px;
             }
 
-            &:hover .bd-up-arrow {
+            &:hover .bd-upArrow {
                 border-color: transparent transparent rgb(200, 200, 200);
             }
 
-            .bd-down-arrow {
+            .bd-downArrow {
                 border-color: rgb(153, 153, 153) transparent transparent;
                 border-style: solid;
                 border-width: 5px 5px 2.5px;
             }
 
-            &:hover .bd-down-arrow {
+            &:hover .bd-downArrow {
                 border-color: rgb(200, 200, 200) transparent transparent;
             }
         }

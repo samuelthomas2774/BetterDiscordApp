@@ -20,7 +20,7 @@
             flex: 0 0;
         }
 
-        .bd-material-button {
+        .bd-materialButton {
             margin: -1px 0 -1px 4px;
         }
 
@@ -30,7 +30,7 @@
             border-bottom-color: $colbdblue;
             color: #fff;
 
-            .bd-material-design-icon {
+            .bd-materialDesignIcon {
                 fill: #fff;
             }
         }
@@ -45,26 +45,26 @@
         }
     }
 
-    .bd-material-button-wrap {
+    .bd-materialButtonWrap {
         margin-right: 15px;
         flex: 0 0;
         padding: 17px 0 18px;
 
-        .bd-material-button {
+        .bd-materialButton {
             margin: 0;
         }
     }
 
     .bd-button,
-    .bd-material-button-wrap {
-        .bd-material-button {
+    .bd-materialButtonWrap {
+        .bd-materialButton {
             width: 16px;
             height: 16px;
             flex: 0 0;
             cursor: pointer;
 
             .material-design-icon,
-            .bd-material-design-icon {
+            .bd-materialDesignIcon {
                 display: flex;
                 align-items: center;
                 fill: #87909c;
@@ -79,14 +79,14 @@
             &:hover {
                 background-color: transparent;
 
-                .bd-material-design-icon {
+                .bd-materialDesignIcon {
                     fill: #fff;
                 }
             }
         }
     }
 
-    .bd-settingswrap-header & {
+    .bd-settingswrapHeader & {
         // margin-top: -17px;
         margin-bottom: -20px;
 
@@ -95,7 +95,7 @@
            // padding: 18px 0 17px;
         }
 
-        .bd-material-button {
+        .bd-materialButton {
             width: 18px;
             height: 18px;
         }

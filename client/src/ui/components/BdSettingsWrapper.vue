@@ -9,11 +9,11 @@
 */
 
 <template>
-    <div class="bd-settings-wrapper" :class="[{active}, 'platform-' + this.platform]">
-        <div class="bd-settings-button" :class="{'bd-active': active, 'bd-animating': animating, 'bd-hide-button': hideButton}" @click="active = true">
-            <div v-if="updating === 0" v-tooltip.right="'Checking for updates'" class="bd-settings-button-btn bd-loading"></div>
-            <div v-else-if="updating === 2" v-tooltip.right="'Updates available!'" class="bd-settings-button-btn bd-updates"></div>
-            <div v-else class="bd-settings-button-btn" :class="[{'bd-loading': !loaded}]"></div>
+    <div class="bd-settingsWrapper" :class="[{active}, 'platform-' + this.platform]">
+        <div class="bd-settingsButton" :class="{'bd-active': active, 'bd-animating': animating, 'bd-hide-button': hideButton}" @click="active = true">
+            <div v-if="updating === 0" v-tooltip.right="'Checking for updates'" class="bd-settingsButtonBtn bd-loading"></div>
+            <div v-else-if="updating === 2" v-tooltip.right="'Updates available!'" class="bd-settingsButtonBtn bd-updates"></div>
+            <div v-else class="bd-settingsButtonBtn" :class="[{'bd-loading': !loaded}]"></div>
         </div>
         <BdSettings ref="settings" :active="active" @close="active = false" />
     </div>
@@ -71,8 +71,8 @@
         },
         created() {
             Events.on('ready', this.eventHandlers.ready = e => this.loaded = true);
-            Events.on('bd-open-menu', this.eventHandlers['bd-open-menu'] = item => this.active = true);
-            Events.on('bd-close-menu', this.eventHandlers['bd-close-menu'] = () => this.active = false);
+            Events.on('bd-openMenu', this.eventHandlers['bd-openMenu'] = item => this.active = true);
+            Events.on('bd-closeMenu', this.eventHandlers['bd-closeMenu'] = () => this.active = false);
             Events.on('update-check-start', this.eventHandlers['update-check-start'] = e => this.updating = 0);
             Events.on('update-check-end', this.eventHandlers['update-check-end'] = e => this.updating = 1);
             Events.on('updates-available', this.eventHandlers['updates-available'] = e => this.updating = 2);

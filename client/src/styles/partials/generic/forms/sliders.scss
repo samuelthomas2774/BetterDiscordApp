@@ -1,9 +1,9 @@
-.bd-form-slider {
+.bd-formSlider {
     h3 + .bd-slider {
         margin-left: 15px;
     }
 
-    .bd-form-item-fullwidth & {
+    .bd-formItemFullwidth & {
         .bd-title {
             flex-direction: column;
         }
@@ -19,15 +19,15 @@
     min-height: 24px;
     min-width: 180px;
 
-    .bd-slider-container {
+    .bd-sliderContainer {
         padding-top: 8px;
         padding-bottom: 8px;
     }
 
-    .bd-slider-points {
+    .bd-sliderPoints {
         padding: 0 5px;
 
-        .bd-slider-point {
+        .bd-sliderPoint {
             left: 0;
             margin-left: -12px;
             position: relative;
@@ -52,13 +52,13 @@
                 margin-left: 11px;
             }
 
-            + .bd-slider-point {
+            + .bd-sliderPoint {
                 top: -14px;
             }
         }
     }
 
-    .bd-slider-bar {
+    .bd-sliderBar {
         background-color: #4f545c;
         height: 8px;
         border-radius: 4px;
@@ -74,7 +74,7 @@
             margin-left: -5px;
         }
 
-        .bd-slider-bar-filled {
+        .bd-sliderBarFilled {
             background-color: $colbdblue;
             height: 8px;
             width: 100%;
@@ -82,11 +82,11 @@
         }
     }
 
-    .bd-slider-thumb-wrap {
+    .bd-sliderThumbWrap {
         margin: -16px 0;
         padding: 0 5px;
 
-        .bd-slider-thumb {
+        .bd-sliderThumb {
             width: 10px;
             height: 24px;
             position: relative;

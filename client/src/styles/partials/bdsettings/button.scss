@@ -1,4 +1,4 @@
-.bd-settings-button {
+.bd-settingsButton {
     position: absolute;
     z-index: 1;
     top: 22px;
@@ -16,7 +16,7 @@
         top: 0;
     }
 
-    .bd-settings-button-btn {
+    .bd-settingsButtonBtn {
         background-image: $logoSmallBw;
         background-size: 50% 50%;
         background-repeat: no-repeat;
@@ -34,7 +34,7 @@
         }
 
         &.bd-loading {
-            animation: bd-settings-button-pulse 1.5s infinite;
+            animation: bd-settingsButtonPulse 1.5s infinite;
         }
 
         &.bd-updates {
@@ -43,11 +43,11 @@
         }
     }
 
-    &.bd-hide-button {
-        animation: bd-fade-out 0.4s ease-out;
+    &.bd-hideButton {
+        animation: bd-fadeOut 0.4s ease-out;
 
         &.bd-active {
-            animation: bd-fade-in 0.4s ease-in;
+            animation: bd-fadeIn 0.4s ease-in;
         }
 
         &:not(.bd-active):not(.bd-animating) {
@@ -60,11 +60,11 @@
     }
 
     &.bd-active,
-    &.bd-hide-button {
+    &.bd-hideButton {
         background: transparent;
         box-shadow: none;
 
-        .bd-settings-button-btn {
+        .bd-settingsButtonBtn {
             background-image: $logoBigBw;
             background-size: 100% 100%;
             filter: none;
@@ -82,7 +82,7 @@
     }
 }
 
-@keyframes bd-settings-button-pulse {
+@keyframes bd-settingsButtonPulse {
     0% {
         filter: grayscale(100%);
     }

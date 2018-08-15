@@ -25,8 +25,8 @@ bd-tooltips {
         content: none;
     }
 
-    .bd-tooltip-arrow,
-    .bd-popover-arrow {
+    .bd-tooltipArrow,
+    .bd-popoverArrow {
         border: 5px solid transparent;
         height: 0;
         pointer-events: none;
@@ -37,8 +37,8 @@ bd-tooltips {
     &[x-placement^="top"] {
         margin-bottom: 10px;
 
-        .bd-tooltip-arrow,
-        .bd-popover-arrow {
+        .bd-tooltipArrow,
+        .bd-popoverArrow {
             margin-left: -5px;
             border-top-color: #000;
             bottom: -10px;
@@ -48,8 +48,8 @@ bd-tooltips {
     &[x-placement^="bottom"] {
         margin-top: 10px;
 
-        .bd-tooltip-arrow,
-        .bd-popover-arrow {
+        .bd-tooltipArrow,
+        .bd-popoverArrow {
             border-width: 0 5px 5px 5px;
             top: -5px;
             border-bottom-color: #000;
@@ -59,8 +59,8 @@ bd-tooltips {
     &[x-placement^="right"] {
         margin-left: 10px;
 
-        .bd-tooltip-arrow,
-        .bd-popover-arrow {
+        .bd-tooltipArrow,
+        .bd-popoverArrow {
             border-width: 5px 5px 5px 0;
             left: -5px;
             border-right-color: #000;
@@ -70,25 +70,25 @@ bd-tooltips {
     &[x-placement^="left"] {
         margin-right: 10px;
 
-        .bd-tooltip-arrow,
-        .bd-popover-arrow {
+        .bd-tooltipArrow,
+        .bd-popoverArrow {
             border-width: 5px 0 5px 5px;
             right: -5px;
             border-left-color: #000;
         }
     }
 
-    .bd-material-button {
+    .bd-materialButton {
         cursor: pointer;
 
         &:hover {
-            .bd-material-design-icon {
+            .bd-materialDesignIcon {
                 fill: #fff;
             }
         }
     }
 
-    .bd-material-design-icon {
+    .bd-materialDesignIcon {
         fill: #414245;
 
         &:hover {

@@ -1,4 +1,4 @@
-.bd-sidebar-region {
+.bd-sidebarRegion {
     .bd-settingswrap {
         display: flex;
         height: 100%;
@@ -11,13 +11,13 @@
     }
 }
 
-.bd-content-region {
+.bd-contentRegion {
     .bd-settingswrap {
         display: flex;
         flex-direction: column;
         flex-grow: 1;
 
-        > .bd-scroller-wrap {
+        > .bd-scrollerWrap {
             flex-grow: 1;
 
             > .bd-scroller {
@@ -29,7 +29,7 @@
             }
         }
 
-        .bd-settingswrap-header {
+        .bd-settingswrapHeader {
             outline: 0;
             padding: 0;
             margin: 30px 20px 20px;
@@ -37,7 +37,7 @@
             display: flex;
             flex: 0 0 auto;
 
-            .bd-settingswrap-header-text {
+            .bd-settingswrapHeaderText {
                 color: $colbdblue;
                 text-transform: uppercase;
                 font-weight: 600;
@@ -46,22 +46,22 @@
             }
         }
 
-        .bd-settingswrap-item {
-            .bd-settingswrap-button-big {
+        .bd-settingswrapItem {
+            .bd-settingswrapButtonBig {
                 width: 150px;
                 height: 50px;
                 border-radius: 5px;
                 margin-bottom: 20px;
             }
 
-            .bd-settingswrap-item-desc {
+            .bd-settingswrapItemDesc {
                 color: #72767d;
                 font-size: 14px;
                 font-weight: 500;
                 line-height: 20px;
             }
 
-            .bd-settingswrap-infobox {
+            .bd-settingswrapInfobox {
                 display: flex;
                 align-items: stretch;
                 background: rgba(32,34,37,.6);
@@ -73,7 +73,7 @@
                 position: relative;
                 margin-bottom: 20px;
 
-                .bd-settingswrap-infobox-child {
+                .bd-settingswrapInfoboxChild {
                     background-size: 100% 100%;
 
                     .bd-wrapper {
@@ -110,14 +110,14 @@
             }
         }
 
-        .bd-settingswrap-subheader {
+        .bd-settingswrapSubheader {
             color: #f6f6f7;
             text-transform: uppercase;
             margin-bottom: 20px;
             font-weight: 600;
         }
 
-        .bd-settingswrap-contents {
+        .bd-settingswrapContents {
             padding: 0 20px;
             margin-bottom: 84px;
         }

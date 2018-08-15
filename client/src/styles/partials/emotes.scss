@@ -1,9 +1,9 @@
-.bd-emote-outer {
+.bd-emoteOuter {
     display: inline-block;
     height: 32px;
     user-select: none;
 
-    .bd-is-emote {
+    .bd-isEmote {
         font-size: 0;
     }
 }
@@ -24,8 +24,8 @@
 }
 
 .bd-emotewrapper,
-.bd-autocomplete-selector {
-    .bd-emote-favourite-button {
+.bd-autocompleteSelector {
+    .bd-emoteFavouriteButton {
         display: none;
         width: 16px;
         height: 16px;
@@ -49,14 +49,14 @@
         }
     }
 
-    &.bd-selected .bd-emote-favourite-button,
-    &:hover .bd-emote-favourite-button {
+    &.bd-selected .bd-emoteFavouriteButton,
+    &:hover .bd-emoteFavouriteButton {
         display: block;
     }
 }
 
-.bd-autocomplete-selector {
-    .bd-emote-favourite-button {
+.bd-autocompleteSelector {
+    .bd-emoteFavouriteButton {
         margin-left: 8px;
         margin-right: 0;
         opacity: .5;

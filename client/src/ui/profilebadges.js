@@ -141,7 +141,7 @@ export default class extends Module {
 
             if (!retVal) {
                 setRetVal(ReactHelpers.React.createElement('div', {
-                    className: 'bd-profile-badges-wrap',
+                    className: 'bd-profileBadgesWrap',
                     children: element
                 }));
             } else retVal.props.children.splice(0, 0, element);

@@ -1,5 +1,5 @@
-.bd-modal-footer {
-    .bd-footer-alert {
+.bd-modalFooter {
+    .bd-footerAlert {
         margin: -64px 10px 10px;
         height: 0;
         display: flex;
@@ -15,7 +15,7 @@
 
         &.bd-warn {
             background-color: $colerr;
-            animation: bd-warn-shake 0.4s;
+            animation: bd-warnShake 0.4s;
         }
 
         &.bd-active {
@@ -24,7 +24,7 @@
             transform: none;
         }
 
-        .bd-footer-alert-text {
+        .bd-footerAlertText {
             flex: 1 1 auto;
             color: #fff;
             font-weight: 700;

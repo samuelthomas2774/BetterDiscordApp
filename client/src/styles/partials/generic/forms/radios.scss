@@ -1,19 +1,19 @@
-.bd-form-radio {
+.bd-formRadio {
     display: flex;
 
-    .bd-form-radio-details {
+    .bd-formRadioDetails {
         flex: 1 1 auto;
     }
 
-    .bd-radio-group {
+    .bd-radioGroup {
         width: 180px;
         margin-left: 15px;
     }
 
-    .bd-form-item-fullwidth & {
+    .bd-formItemFullwidth & {
         flex-direction: column;
 
-        .bd-radio-group {
+        .bd-radioGroup {
             width: 100%;
             margin-top: 10px;
             margin-left: 0;
@@ -30,7 +30,7 @@
     cursor: pointer;
     display: flex;
 
-    .bd-radio-control-wrap {
+    .bd-radioControlWrap {
         flex: 0 0 auto;
         margin: -3px;
         margin-right: 10px;
@@ -39,7 +39,7 @@
         border-radius: 3px;
         border: 1px solid #72767d;
 
-        .bd-radio-control {
+        .bd-radioControl {
             // background: rgb(50, 50, 50);
             // border: 1px solid rgb(114, 118, 125);
             // border-radius: 50%;
@@ -51,7 +51,7 @@
         }
     }
 
-    .bd-radio-text {
+    .bd-radioText {
         flex: 1 1 auto;
         color: white;
         word-wrap: break-word;
@@ -66,15 +66,15 @@
         border-color: #040405;
     }
 
-    &.bd-radio-selected {
+    &.bd-radioSelected {
         background-color: $colbdblue;
         border-color: $colbdblue;
 
-        .bd-radio-control-wrap {
+        .bd-radioControlWrap {
             border-color: #fff;
             background-color: #fff;
 
-            .bd-radio-control {
+            .bd-radioControl {
                 opacity: 1;
             }
         }

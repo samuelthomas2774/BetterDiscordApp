@@ -46,7 +46,7 @@
         }
     }
 
-    .bd-spinner-7 {
+    .bd-spinner7 {
         opacity: .3;
     }
 
@@ -56,11 +56,11 @@
     }
 }
 
-.bd-button-group {
+.bd-buttonGroup {
     display: flex;
 
     .bd-button,
-    .bd-material-button {
+    .bd-materialButton {
         &:first-of-type {
             border-top-left-radius: 6px;
             border-bottom-left-radius: 6px;

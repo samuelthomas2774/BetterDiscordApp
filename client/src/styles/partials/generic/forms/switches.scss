@@ -1,4 +1,4 @@
-.bd-setting-switch {
+.bd-settingSwitch {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -9,7 +9,7 @@
     transition: opacity 0.2s ease;
 }
 
-.bd-switch-wrapper {
+.bd-switchWrapper {
     flex: 0 0 auto;
     user-select: none;
     position: relative;

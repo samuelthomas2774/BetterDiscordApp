@@ -41,6 +41,7 @@ export default new class E2EE extends BuiltinModule {
         try {
             const newMaster = await Modals.input('Open Database', 'Master Password', true).promise;
             this.setMaster(newMaster);
+            Events.on('discord:MESSAGE_CREATE', this.handlePublicKey);
             this.patchDispatcher();
             this.patchMessageContent();
             const selector = `.${WebpackModules.getClassName('channelTextArea', 'emojiButton')}`;

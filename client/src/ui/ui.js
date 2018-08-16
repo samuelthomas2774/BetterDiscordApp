@@ -9,3 +9,5 @@ export { default as Reflection } from './reflection';
 
 export { default as ProfileBadges } from './profilebadges';
 export { default as ClassNormaliser } from './classnormaliser';
+
+export { default as VrWrapper } from './vrwrapper';

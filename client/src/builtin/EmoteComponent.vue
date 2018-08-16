@@ -1,11 +1,5 @@
 <template>
-    <span class="bd-emotewrapper" :class="{'bd-emoteFavourite': favourite, 'bd-emoteNoWrapper': !hasWrapper}" v-tooltip="name" :data-emote-name="name">
-        <img class="bd-emote" :src="src" :alt="`;${name};`" />
-
-        <div class="bd-emoteFavouriteButton" :class="{'bd-active': favourite}" @click="toggleFavourite">
-            <MiStar :size="16" />
-        </div>
-    </span>
+    <img class="emoji" :class="{jumboable}" :src="src" :alt="`;${name};`" v-tooltip="{ content: `;${name};`, delay: { show: 750, hide: 0 } }" />
 </template>
 
 <script>
@@ -17,7 +11,7 @@
         components: {
             MiStar
         },
-        props: ['src', 'name', 'hasWrapper'],
+        props: ['src', 'name', 'hasWrapper', 'jumboable'],
         data() {
             return {
                 EmoteModule
@@ -25,7 +19,7 @@
         },
         computed: {
             favourite() {
-                return EmoteModule.isFavourite(this.name);
+                return false;
             }
         },
         methods: {

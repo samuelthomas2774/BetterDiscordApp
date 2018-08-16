@@ -8,221 +8,136 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch } from 'modules';
-import { VueInjector, Reflection } from 'ui';
-import { Utils, FileUtils, ClientLogger as Logger } from 'common';
+import BuiltinModule from './BuiltinModule';
 import path from 'path';
-import EmoteComponent from './EmoteComponent.vue';
-import Autocomplete from '../ui/components/common/Autocomplete.vue';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
+import { Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache } from 'modules';
 
-const enforceWrapperFrom = (new Date('2018-05-01')).valueOf();
+import Emote from './EmoteComponent.js';
 
-export default new class EmoteModule {
+export default new class EmoteModule extends BuiltinModule {
 
-    constructor() {
-        this.emotes = new Map();
-        this.favourite_emotes = [];
+    get dbpath() { return path.join(Globals.getPath('data'), 'emotes.json') }
+    
+    get database() { return this._db || (this._db = new Map()) }
+
+    get favourites() { return this._favourites || (this._favourites = []) }
+
+    get settingPath() { return ['emotes', 'default', 'enable'] }
+
+    async enabled() {
+
+        if (!this.database.size) {
+            await this.loadLocalDb();
+        }
+
+        this.patchMessageContent();
+        const selector = `.${WebpackModules.getClassName('channelTextArea', 'emojiButton')}`;
+        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
+        MonkeyPatch('BD:EMOTEMODULE', cta.component.prototype).before('handleSubmit', this.handleChannelTextAreaSubmit.bind(this));
     }
 
-    async init() {
-        const dataPath = Globals.getPath('data');
+    async disabled() {
+        for (const patch of Patcher.getPatchesByCaller('BD:EMOTEMODULE')) patch.unpatch();
+    }
 
-        this.enabledSetting = Settings.getSetting('emotes', 'default', 'enable');
-        this.enabledSetting.on('setting-updated', async event => {
-            // Load emotes if we haven't already
-            if (event.value && !this.emotes.size) await this.load(path.join(dataPath, 'emotes.json'));
+    processMarkup(markup) {
+        const newMarkup = [];
+        window.markup = markup;
+        const jumboable = !markup.some(child => {
+            if (typeof child !== 'string') return false;
 
-            // Rerender all messages (or if we're disabling emotes, those that have emotes)
-            for (const message of document.querySelectorAll(event.value ? '.message' : '.bd-emotewrapper')) {
-                Reflection(event.value ? message : message.closest('.message')).forceUpdate();
-            }
+            return / \w+/g.test(child);
         });
 
-        try {
-            if (this.enabledSetting.value) await this.load(path.join(dataPath, 'emotes.json'));
-            else Logger.info('EmoteModule', ['Not loading emotes as they\'re disabled.']);
-        } catch (err) {
-            Logger.err('EmoteModule', [`Failed to load emote data. Make sure you've downloaded the emote data and placed it in ${dataPath}:`, err]);
-            return;
-        }
-
-        try {
-            await Promise.all([
-                this.patchMessageContent(),
-                this.patchChannelTextArea()
-            ]);
-        } catch (err) {
-            Logger.err('EmoteModule', ['Error patching Message / ChannelTextArea', err]);
-        }
-    }
-
-    async load(dataPath) {
-        const emotes = await FileUtils.readJsonFromFile(dataPath);
-        for (const [index, emote] of emotes.entries()) {
-            // Pause every 10000 emotes so the window doesn't freeze
-            if ((index % 10000) === 0)
-                await Utils.wait();
-
-            const uri = emote.type === 2 ? 'https://cdn.betterttv.net/emote/:id/1x'
-                : emote.type === 1 ? 'https://cdn.frankerfacez.com/emoticon/:id/1'
-                    : 'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0';
-
-            // emote.id is the emote's name
-            // emote.src is the emote's URL
-            emote.src = uri.replace(':id', emote.value.id || emote.value);
-            this.emotes.set(emote.id, emote);
-        }
-    }
-
-    /**
-     * Sets an emote as favourite.
-     * @param {String} emote The name of the emote
-     * @param {Boolean} favourite The new favourite state
-     * @param {Boolean} save Whether to save settings
-     * @return {Promise}
-     */
-    setFavourite(emote, favourite, save = true) {
-        emote = emote.id || emote;
-        if (favourite && !this.favourite_emotes.includes(emote)) this.favourite_emotes.push(emote);
-        if (!favourite) Utils.removeFromArray(this.favourite_emotes, emote);
-        if (save) return Settings.saveSettings();
-    }
-
-    addFavourite(emote, save = true) {
-        return this.setFavourite(emote, true, save);
-    }
-
-    removeFavourite(emote, save = true) {
-        return this.setFavourite(emote, false, save);
-    }
-
-    isFavourite(emote) {
-        emote = emote.id || emote;
-        return this.favourite_emotes.includes(emote);
-    }
-
-    get searchCache() {
-        return this._searchCache || (this._searchCache = {});
-    }
-
-    processMarkup(markup, timestamp) {
-        timestamp = timestamp.valueOf();
-        const allowNoWrapper = timestamp < enforceWrapperFrom;
-
-        const newMarkup = [];
         for (const child of markup) {
             if (typeof child !== 'string') {
+                if (typeof child === 'object') {
+                    const isEmoji = Utils.findInReactTree(child, 'emojiName');
+                    if (isEmoji) child.props.children.props.jumboable = jumboable;
+                }
                 newMarkup.push(child);
                 continue;
             }
-            if (!this.testWord(child) && !allowNoWrapper) {
+
+            if (!/:(\w+):/g.test(child)) {
                 newMarkup.push(child);
                 continue;
             }
-            const words = child.split(/([^\s]+)([\s]|$)/g);
-            if (!words) continue;
-            let text = null;
-            for (const [wordIndex, word] of words.entries()) {
-                const emote = this.getEmote(word);
-                if (emote) {
-                    if (text !== null) {
-                        newMarkup.push(text);
-                        text = null;
-                    }
 
-                    newMarkup.push(VueInjector.createReactElement(EmoteComponent, {
-                        src: emote.src,
-                        name: emote.id,
-                        hasWrapper: /;[\w]+;/gmi.test(word)
-                    }));
+            const words = child.split(/([^\s]+)([\s]|$)/g).filter(f => f !== '');
 
+            let s = '';
+            for (const word of words) {
+                const isemote = /:(.*?):/g.exec(word);
+                if (!isemote) {
+                    s += word;
                     continue;
                 }
-                if (text === null) {
-                    text = word;
-                } else {
-                    text += word;
+
+                const emote = this.findByName(isemote[1]);
+                if (!emote) {
+                    s += word;
+                    continue;
                 }
-                if (wordIndex === words.length - 1) {
-                    newMarkup.push(text);
-                }
+
+                newMarkup.push(s);
+                s = '';
+
+                emote.jumboable = jumboable;
+                newMarkup.push(emote.render());
             }
+            if (s !== '') newMarkup.push(s);
         }
+
         return newMarkup;
-    }
-
-    testWord(word) {
-        return !/;[\w]+;/gmi.test(word);
-    }
-
-    findByProp(obj, what, value) {
-        if (obj.hasOwnProperty(what) && obj[what] === value) return obj;
-        if (obj.props && !obj.children) return this.findByProp(obj.props, what, value);
-        if (!obj.children || !obj.children.length) return null;
-        for (const child of obj.children) {
-            if (!child) continue;
-            const findInChild = this.findByProp(child, what, value);
-            if (findInChild) return findInChild;
-        }
-        return null;
-    }
-
-    getEmote(word) {
-        const name = word.replace(/;/g, '');
-        return this.emotes.get(name);
-    }
-
-    filter(regex, limit, start = 0) {
-        const key = `${regex}:${limit}:${start}`;
-        if (this.searchCache.hasOwnProperty(key)) return this.searchCache[key];
-        let index = 0;
-        let startIndex = 0;
-
-        const matching = this.searchCache[key] = [];
-        for (const emote of this.emotes.values()) {
-            if (index >= limit) break;
-            if (regex.test(emote.id)) {
-                if (startIndex < start) {
-                    startIndex++;
-                    continue;
-                }
-                index++;
-                matching.push(emote);
-            }
-        }
-
-        return matching;
     }
 
     async patchMessageContent() {
         const selector = `.${WebpackModules.getClassName('container', 'containerCozy', 'containerCompact', 'edited')}`;
-        const MessageContent = await ReactComponents.getComponent('MessageContent', {selector});
-
-        this.unpatchRender = MonkeyPatch('BD:EmoteModule', MessageContent.component.prototype).after('render', (component, args, retVal) => {
-            try {
-                // First child has all the actual text content, second is the edited timestamp
-                const markup = retVal.props.children[1].props;
-                if (!markup || !markup.children || !this.enabledSetting.value) return;
-                markup.children[1] = this.processMarkup(markup.children[1], component.props.message.editedTimestamp || component.props.message.timestamp);
-            } catch (err) {
-                Logger.err('EmoteModule', err);
-            }
-        });
-
+        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector });
+        MonkeyPatch('BD:EMOTEMODULE', MessageContent.component.prototype).after('render', this.afterRenderMessageContent.bind(this));
         MessageContent.forceUpdateAll();
     }
 
-    async patchChannelTextArea() {
-        const selector = `.${WebpackModules.getClassName('channelTextArea', 'emojiButton')}`;
-        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', {selector});
+    afterRenderMessageContent(component, args, retVal) {
+        const markup = Utils.findInReactTree(retVal, filter =>
+            filter &&
+            filter.className &&
+            filter.className.includes('markup') &&
+            filter.children.length >= 2);
 
-        this.unpatchChannelTextArea = MonkeyPatch('BD:EmoteModule', ChannelTextArea.component.prototype).after('render', (component, args, retVal) => {
-            if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
+        if (!markup) return;
+        markup.children[1] = this.processMarkup(markup.children[1]);
+    }
 
-            retVal.props.children.splice(0, 0, VueInjector.createReactElement(Autocomplete, {}, true));
-        });
+    handleChannelTextAreaSubmit(component, args, retVal) {
+        component.props.value = component.props.value.split(' ').map(word => {
+            const isEmote = /;(.*?);/g.exec(word);
+            return isEmote ? `:${isEmote[1]}:` : word;
+        }).join(' ');
+    }
 
-        ChannelTextArea.forceUpdateAll();
+    async loadLocalDb() {
+        const emotes = await FileUtils.readJsonFromFile(this.dbpath);
+        for (const [index, emote] of emotes.entries()) {
+            const { type, id, src, value } = emote;
+            if (index % 10000 === 0) await Utils.wait();
+
+            this.database.set(id, { id: emote.value.id || value, type });
+        }
+    }
+
+    findByName(name) {
+        const emote = this.database.get(name);
+        if (!emote) return null;
+        return this.parseEmote(name, emote);
+    }
+
+    parseEmote(name, emote) {
+        const { type, id } = emote;
+        if (type < 0 || type > 2) return null;
+        return new Emote(type, id, name);
     }
 
 }

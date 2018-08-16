@@ -86,6 +86,7 @@
     "build_release": "npm run release --prefix client && npm run build --prefix core && npm run release --prefix csseditor",
     "package_release": "node scripts/package-release.js",
     "release": "npm run lint && npm run build_release && gulp release && npm run package_release",
-    "update_release": "npm run build_release && gulp build-release"
+    "update_release": "npm run build_release && gulp build-release",
+	"inject": "node scripts/inject.js"
   }
 }

@@ -63,8 +63,8 @@
                 if (!dialogResult) return;
 
                 const readFile = fs.readFileSync(dialogResult[0]);
-                const FileActions = _bd.WebpackModules.getModuleByProps(["makeFile"]);
-                const Uploader = _bd.WebpackModules.getModuleByProps(["instantBatchUpload"]);
+                const FileActions = WebpackModules.getModuleByProps(["makeFile"]);
+                const Uploader = WebpackModules.getModuleByProps(["instantBatchUpload"]);
 
                 const img = await Utils.getImageFromBuffer(readFile);
 

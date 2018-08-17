@@ -12,8 +12,18 @@ import BuiltinModule from './BuiltinModule';
 import path from 'path';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache } from 'modules';
+import { VueInjector } from 'ui';
 
 import Emote from './EmoteComponent.js';
+import Autocomplete from '../ui/components/common/Autocomplete.vue';
+
+import GlobalAc from '../ui/autocomplete';
+
+const EMOTE_SOURCES = [
+    'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0',
+    'https://cdn.frankerfacez.com/emoticon/:id/1',
+    'https://cdn.betterttv.net/emote/:id/1x'
+]
 
 export default new class EmoteModule extends BuiltinModule {
 
@@ -27,13 +37,14 @@ export default new class EmoteModule extends BuiltinModule {
 
     async enabled() {
 
+        GlobalAc.add(';', this);
+
         if (!this.database.size) {
             await this.loadLocalDb();
         }
 
         this.patchMessageContent();
-        const selector = `.${WebpackModules.getClassName('channelTextArea', 'emojiButton')}`;
-        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
+        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector: WebpackModules.getSelector('channelTextArea', 'emojiButton') });
         MonkeyPatch('BD:EMOTEMODULE', cta.component.prototype).before('handleSubmit', this.handleChannelTextAreaSubmit.bind(this));
     }
 
@@ -43,7 +54,6 @@ export default new class EmoteModule extends BuiltinModule {
 
     processMarkup(markup) {
         const newMarkup = [];
-        window.markup = markup;
         const jumboable = !markup.some(child => {
             if (typeof child !== 'string') return false;
 
@@ -101,7 +111,6 @@ export default new class EmoteModule extends BuiltinModule {
     }
 
     afterRenderMessageContent(component, args, retVal) {
-        console.log(component);
         const markup = Utils.findInReactTree(retVal, filter =>
             filter &&
             filter.className &&
@@ -139,6 +148,25 @@ export default new class EmoteModule extends BuiltinModule {
         const { type, id } = emote;
         if (type < 0 || type > 2) return null;
         return new Emote(type, id, name);
+    }
+
+    search(regex, limit = 10) {
+        if (typeof regex === 'string') regex = new RegExp(regex, 'i');
+        const matching = [];
+
+        for (const [key, value] of this.database.entries()) {
+            if (matching.length >= limit) break;
+            if (regex.test(key)) matching.push({ key, value })
+        }
+
+        return {
+            actype: 'imagetext',
+            items: matching.map(match => {
+                match.value.src = EMOTE_SOURCES[match.value.type].replace(':id', match.value.id);
+                match.value.replaceWith = `;${match.key};`;
+                return match;
+            })
+        };
     }
 
 }

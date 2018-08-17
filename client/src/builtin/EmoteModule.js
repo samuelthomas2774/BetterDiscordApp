@@ -101,6 +101,7 @@ export default new class EmoteModule extends BuiltinModule {
     }
 
     afterRenderMessageContent(component, args, retVal) {
+        console.log(component);
         const markup = Utils.findInReactTree(retVal, filter =>
             filter &&
             filter.className &&

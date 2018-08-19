@@ -43,4 +43,19 @@ export default class {
         }
     }
 
+    /**
+     * Find first in the database
+     * @param {Object} args The record to find
+     * @return {Promise} null if record was not found
+     */
+    static async findOne(args) {
+        try {
+            const find = await this.find(args);
+            if (find && find.length) return find[0];
+            return null;
+        } catch (err) {
+            throw err;
+        }
+    }
+
 }

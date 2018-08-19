@@ -13,7 +13,7 @@ import path from 'path';
 import { request } from 'vendor';
 
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { DiscordApi, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache, Patcher } from 'modules';
+import { DiscordApi, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache, Patcher, Database } from 'modules';
 import { VueInjector } from 'ui';
 
 import Emote from './EmoteComponent.js';
@@ -46,6 +46,12 @@ export default new class EmoteModule extends BuiltinModule {
             await this.loadLocalDb();
         }
 
+        const userData = await Database.find({ 'id': 'EmoteModule' });
+        if (userData && userData.length) {
+            if (userData[0].hasOwnProperty('favourites')) this._favourites = userData[0].favourites;
+            if (userData[0].hasOwnProperty('mostused')) this._mostUsed = userData[0].mostused;
+        }
+
         this.patchMessageContent();
         MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('sendMessage', this.handleSendMessage.bind(this));
         MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('editMessage', this.handleEditMessage.bind(this));
@@ -70,6 +76,7 @@ export default new class EmoteModule extends BuiltinModule {
                 }
             });
         }
+        Database.insertOrUpdate({ 'id': 'EmoteModule' }, { 'id': 'EmoteModule', favourites: this.favourites, mostused: this.mostUsed })
     }
 
     processMarkup(markup) {

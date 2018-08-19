@@ -35,6 +35,24 @@ export default new class EmoteModule extends BuiltinModule {
 
     get favourites() { return this._favourites || (this._favourites = []) }
 
+    get mostUsed() { return this._mostUsed || (this._mostUsed = []) }
+
+    addToMostUsed(emote) {
+        const isMostUsed = this.mostUsed.find(mu => mu.key === emote.name);
+        if (isMostUsed) {
+            isMostUsed.useCount += 1;
+        } else {
+            this.mostUsed.push({
+                key: emote.name,
+                useCount: 1,
+                value: {
+                    src: EMOTE_SOURCES[emote.type].replace(':id', emote.id),
+                    replaceWith: `;${emote.name};`
+                }
+            });
+        }
+    }
+
     get settingPath() { return ['emotes', 'default', 'enable'] }
 
     async enabled() {
@@ -145,7 +163,13 @@ export default new class EmoteModule extends BuiltinModule {
         if (!emoteAsImage || content.split(' ').length > 1) {
             args[1].content = args[1].content.split(' ').map(word => {
                 const isEmote = /;(.*?);/g.exec(word);
-                return isEmote ? `:${isEmote[1]}:` : word;
+                if (isEmote) {
+                    const emote = this.findByName(isEmote[1], true);
+                    if (!emote) return word;
+                    this.addToMostUsed(emote);
+                    return emote ? `:${isEmote[1]}:` : word;
+                }
+                return word;
             }).join(' ');
             return orig(...args);
         }
@@ -155,6 +179,7 @@ export default new class EmoteModule extends BuiltinModule {
 
         const emote = this.findByName(isEmote[1]);
         if (!emote) return orig(...args);
+        this.addToMostUsed(emote);
 
         const FileActions = WebpackModules.getModuleByProps(['makeFile']);
         const Uploader = WebpackModules.getModuleByProps(['instantBatchUpload']);
@@ -177,16 +202,16 @@ export default new class EmoteModule extends BuiltinModule {
         }
     }
 
-    findByName(name) {
+    findByName(name, simple = false) {
         const emote = this.database.get(name);
         if (!emote) return null;
-        return this.parseEmote(name, emote);
+        return this.parseEmote(name, emote, simple);
     }
 
-    parseEmote(name, emote) {
+    parseEmote(name, emote, simple = false) {
         const { type, id } = emote;
         if (type < 0 || type > 2) return null;
-        return new Emote(type, id, name);
+        return simple ? { type, id, name } : new Emote(type, id, name);
     }
 
     acsearch(regex) {
@@ -194,15 +219,15 @@ export default new class EmoteModule extends BuiltinModule {
             return {
                 type: 'imagetext',
                 title: ['Your most used emotes'],
-                items: [{
-                    key: 'cirPrise',
-                    value: {
-                        src: 'https://static-cdn.jtvnw.net/emoticons/v1/4791/1.0',
-                        replaceWith: ';cirPrise;'
+                items: this.mostUsed.sort((a,b) => b.useCount > a.useCount).slice(0, 10).map(mu => {
+                    return {
+                        key: `${mu.key} | ${mu.useCount}`,
+                        value: mu.value
                     }
-                }]
+                })
             }
         }
+
         const results = this.search(regex);
         return {
             type: 'imagetext',

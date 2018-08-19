@@ -118,6 +118,13 @@
                         "type": "bool",
                         "text": "Enable emotes",
                         "value": true
+                    },
+                    {
+                        "id": "emoteasimage",
+                        "type": "bool",
+                        "text": "Image Emote",
+                        "hint": "Send single emotes as images if you have the permission",
+                        "value": true
                     }
                 ]
             }

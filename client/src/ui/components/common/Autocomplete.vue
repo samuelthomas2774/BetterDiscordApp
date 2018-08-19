@@ -14,15 +14,15 @@
             <div class="bd-autocompleteRow">
                 <div class="bd-autocompleteSelector">
                     <div class="bd-autocompleteTitle">
-                        Matching:
-                        <strong>{{sterm}}</strong>
+                        {{search.title[0] || search.title}}
+                        <strong>{{search.title[1] || sterm}}</strong>
                     </div>
                 </div>
             </div>
             <div v-for="(item, index) in search.items" class="bd-autocompleteRow" @mouseover="selectedIndex = index" @click="inject">
                 <div class="bd-autocompleteSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}">
                     <div class="bd-autocompleteField">
-                        <img v-if="search.actype === 'imagetext'" :src="item.value.src" :alt="item.key" />
+                        <img v-if="search.type === 'imagetext'" :src="item.value.src" :alt="item.key" />
                         <div class="bd-flexGrow">{{item.key}}</div>
                     </div>
                 </div>
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-    import { WebpackModules, DiscordApi } from 'modules';
+    import { WebpackModules, DiscordApi, Events } from 'modules';
     export default {
         data() {
             return {
@@ -44,18 +44,19 @@
                 textArea: null
             }
         },
-        props: ['prefix', 'controller', 'textarea'],
+        props: ['prefix', 'controller', 'component'],
         computed: {
         },
         created() {
-            window.addEventListener('keydown', this.keyDown);
-            window.addEventListener('keyup', this.keyUp);
-        },
-        destroyed() {
-            window.removeEventListener('keydown', this.keyDown);
-            window.removeEventListener('keyup', this.keyUp);
+            this.attachListeners();
         },
         methods: {
+            attachListeners() {
+                if (this._isDestroyed) return;
+                if (!this.component._ref || !this.component._ref._textArea) return setTimeout(this.attachListeners, 10);
+                this.component._ref._textArea.addEventListener('keydown', this.keyDown);
+                this.component._ref._textArea.addEventListener('keyup', this.keyUp);
+            },
             keyDown(e) {
                 if (!this.open) return;
 
@@ -63,7 +64,7 @@
 
                 if (key === 'ArrowDown' || key === 'ArrowUp') this.traverse(key);
                 else if (key !== 'Tab' && key !== 'Enter') return;
-                
+
                 e.stopPropagation();
                 e.preventDefault();
             },
@@ -106,15 +107,13 @@
                     return;
                 }
             },
+            insertText(startIndex, text) {
+                this.component._ref._textArea.selectionStart = startIndex;
+                this.component.insertText(text);
+            },
             inject() {
-                if (!this.textArea) return;
-                const { selectionEnd, value } = this.textArea;
-
-                let substr = value.substr(0, selectionEnd);
-                substr = substr.replace(new RegExp(this.fsterm + '$'), this.search.items[this.selectedIndex].value.replaceWith);
-
-                WebpackModules.getModuleByName('DraftActions').saveDraft(DiscordApi.currentChannel.id, substr + value.substr(selectionEnd, value.length));
-                this.textArea.selectionEnd = this.textArea.selectionStart = selectionEnd + this.search.items[this.selectedIndex].value.replaceWith.length - this.fsterm.length;
+                if (!this.component || !this.component._ref || !this.component._ref._textArea) return;
+                this.insertText(this.component._ref._textArea.selectionStart - this.fsterm.length, this.search.items[this.selectedIndex].value.replaceWith);
                 this.open = false;
                 this.search = { type: null, items: [] };
             }

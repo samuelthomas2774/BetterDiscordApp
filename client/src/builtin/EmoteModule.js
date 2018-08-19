@@ -10,8 +10,10 @@
 
 import BuiltinModule from './BuiltinModule';
 import path from 'path';
+import { request } from 'vendor';
+
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache } from 'modules';
+import { DiscordApi, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache, Patcher } from 'modules';
 import { VueInjector } from 'ui';
 
 import Emote from './EmoteComponent.js';
@@ -28,7 +30,7 @@ const EMOTE_SOURCES = [
 export default new class EmoteModule extends BuiltinModule {
 
     get dbpath() { return path.join(Globals.getPath('data'), 'emotes.json') }
-    
+
     get database() { return this._db || (this._db = new Map()) }
 
     get favourites() { return this._favourites || (this._favourites = []) }
@@ -44,8 +46,8 @@ export default new class EmoteModule extends BuiltinModule {
         }
 
         this.patchMessageContent();
-        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector: WebpackModules.getSelector('channelTextArea', 'emojiButton') });
-        MonkeyPatch('BD:EMOTEMODULE', cta.component.prototype).before('handleSubmit', this.handleChannelTextAreaSubmit.bind(this));
+        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('sendMessage', this.handleSendMessage.bind(this));
+        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('editMessage', this.handleEditMessage.bind(this));
     }
 
     async disabled() {
@@ -54,9 +56,9 @@ export default new class EmoteModule extends BuiltinModule {
 
     processMarkup(markup) {
         const newMarkup = [];
+        if (!(markup instanceof Array)) return markup;
         const jumboable = !markup.some(child => {
             if (typeof child !== 'string') return false;
-
             return / \w+/g.test(child);
         });
 
@@ -99,7 +101,7 @@ export default new class EmoteModule extends BuiltinModule {
             }
             if (s !== '') newMarkup.push(s);
         }
-
+        if (newMarkup.length === 1) return newMarkup[0];
         return newMarkup;
     }
 
@@ -121,11 +123,48 @@ export default new class EmoteModule extends BuiltinModule {
         markup.children[1] = this.processMarkup(markup.children[1]);
     }
 
-    handleChannelTextAreaSubmit(component, args, retVal) {
-        component.props.value = component.props.value.split(' ').map(word => {
+    handleEditMessage(component, args, orig) {
+        if (!args.length) return orig(...args);
+        const { content } = args[2];
+        if (!content) return orig(...args);
+        args[2].content = args[2].content.split(' ').map(word => {
             const isEmote = /;(.*?);/g.exec(word);
             return isEmote ? `:${isEmote[1]}:` : word;
         }).join(' ');
+        return orig(...args);
+    }
+
+    async handleSendMessage(component, args, orig) {
+        if (!args.length) return orig(...args);
+        const { content } = args[1];
+        if (!content) return orig(...args);
+
+        const emoteAsImage = Settings.getSetting('emotes', 'default', 'emoteasimage').value &&
+            (DiscordApi.currentChannel.type === 'DM' || DiscordApi.currentChannel.checkPermissions(DiscordApi.modules.DiscordPermissions.ATTACH_FILES));
+
+        if (!emoteAsImage || content.split(' ').length > 1) {
+            args[1].content = args[1].content.split(' ').map(word => {
+                const isEmote = /;(.*?);/g.exec(word);
+                return isEmote ? `:${isEmote[1]}:` : word;
+            }).join(' ');
+            return orig(...args);
+        }
+
+        const isEmote = /;(.*?);/g.exec(content);
+        if (!isEmote) return orig(...args);
+
+        const emote = this.findByName(isEmote[1]);
+        if (!emote) return orig(...args);
+
+        const FileActions = WebpackModules.getModuleByProps(['makeFile']);
+        const Uploader = WebpackModules.getModuleByProps(['instantBatchUpload']);
+
+        request.get(emote.props.src, { encoding: 'binary' }).then(res => {
+            const arr = new Uint8Array(new ArrayBuffer(res.length));
+            for (let i = 0; i < res.length; i++) arr[i] = res.charCodeAt(i);
+            const suffix = arr[0] === 71 && arr[1] === 73 && arr[2] === 70 ? '.gif' : '.png';
+            Uploader.upload(args[0], FileActions.makeFile(arr, `${emote.name}${suffix}`));
+        });
     }
 
     async loadLocalDb() {
@@ -150,6 +189,32 @@ export default new class EmoteModule extends BuiltinModule {
         return new Emote(type, id, name);
     }
 
+    acsearch(regex) {
+        if (regex.length <= 0) {
+            return {
+                type: 'imagetext',
+                title: ['Your most used emotes'],
+                items: [{
+                    key: 'cirPrise',
+                    value: {
+                        src: 'https://static-cdn.jtvnw.net/emoticons/v1/4791/1.0',
+                        replaceWith: ';cirPrise;'
+                    }
+                }]
+            }
+        }
+        const results = this.search(regex);
+        return {
+            type: 'imagetext',
+            title: ['Matching', regex.length],
+            items: results.map(result => {
+                result.value.src = EMOTE_SOURCES[result.value.type].replace(':id', result.value.id);
+                result.value.replaceWith = `;${result.key};`;
+                return result;
+            })
+        }
+    }
+
     search(regex, limit = 10) {
         if (typeof regex === 'string') regex = new RegExp(regex, 'i');
         const matching = [];
@@ -159,14 +224,7 @@ export default new class EmoteModule extends BuiltinModule {
             if (regex.test(key)) matching.push({ key, value })
         }
 
-        return {
-            actype: 'imagetext',
-            items: matching.map(match => {
-                match.value.src = EMOTE_SOURCES[match.value.type].replace(':id', match.value.id);
-                match.value.replaceWith = `;${match.key};`;
-                return match;
-            })
-        };
+        return matching;
     }
 
 }

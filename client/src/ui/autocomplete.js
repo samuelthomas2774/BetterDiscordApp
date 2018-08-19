@@ -6,8 +6,6 @@ import { Utils } from 'common';
 
 export default new class AutoComplete {
 
-    constructor() {}
-
     get sets() {
         return this._sets || (this._sets = {});
     }
@@ -19,10 +17,11 @@ export default new class AutoComplete {
     }
 
     channelTextAreaAfterRender(component, args, retVal) {
-        const inner = Utils.findInReactTree(retVal, filter => filter.className && filter.className.includes('inner'));
-        if (!inner.children) return;
+        const inner = Utils.findInReactTree(retVal, filter => filter && filter.className && filter.className.includes('inner'));
+        if (!inner || !inner.children) return;
         inner.children.splice(0, 0, VueInjector.createReactElement(AutocompleteComponent, {
-            controller: this
+            controller: this,
+            component
         }));
     }
 
@@ -38,7 +37,7 @@ export default new class AutoComplete {
 
     items(prefix, sterm) {
         if (!this.validPrefix(prefix)) return [];
-        return this.sets[prefix].search(sterm);
+        return this.sets[prefix].acsearch(sterm);
     }
 
 }

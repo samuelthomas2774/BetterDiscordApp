@@ -37,6 +37,25 @@ export default new class EmoteModule extends BuiltinModule {
 
     get mostUsed() { return this._mostUsed || (this._mostUsed = []) }
 
+    get settingPath() { return ['emotes', 'default', 'enable'] }
+
+    async enabled() {
+        GlobalAc.add(';', this);
+
+        if (!this.database.size) {
+            await this.loadLocalDb();
+        }
+
+        this.patchMessageContent();
+        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('sendMessage', this.handleSendMessage.bind(this));
+        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('editMessage', this.handleEditMessage.bind(this));
+    }
+
+    async disabled() {
+        for (const patch of Patcher.getPatchesByCaller('BD:EMOTEMODULE')) patch.unpatch();
+        GlobalAc.remove(';');
+    }
+
     addToMostUsed(emote) {
         const isMostUsed = this.mostUsed.find(mu => mu.key === emote.name);
         if (isMostUsed) {
@@ -51,25 +70,6 @@ export default new class EmoteModule extends BuiltinModule {
                 }
             });
         }
-    }
-
-    get settingPath() { return ['emotes', 'default', 'enable'] }
-
-    async enabled() {
-
-        GlobalAc.add(';', this);
-
-        if (!this.database.size) {
-            await this.loadLocalDb();
-        }
-
-        this.patchMessageContent();
-        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('sendMessage', this.handleSendMessage.bind(this));
-        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('editMessage', this.handleEditMessage.bind(this));
-    }
-
-    async disabled() {
-        for (const patch of Patcher.getPatchesByCaller('BD:EMOTEMODULE')) patch.unpatch();
     }
 
     processMarkup(markup) {

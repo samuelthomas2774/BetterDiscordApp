@@ -36,6 +36,10 @@ export default new class AutoComplete {
         this.sets[prefix] = controller;
     }
 
+    remove(prefix) {
+        if (this.sets.hasOwnProperty(prefix)) delete this.sets[prefix];
+    }
+
     validPrefix(prefix) {
         return this.sets.hasOwnProperty(prefix);
     }

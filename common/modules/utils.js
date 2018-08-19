@@ -70,8 +70,11 @@ export class Utils {
      * @param {Array<string>|null} [options.walkable=null] Array of strings to use as keys that are allowed to be walked on. Null value indicates all keys are walkable
      * @param {Array<string>} [options.ignore=[]] Array of strings to use as keys to exclude from the search, most helpful when `walkable = null`.
      */
-    static findInTree(tree, searchFilter, {walkable = null, ignore = []}) {
-        if (searchFilter(tree)) return tree;
+    static findInTree(tree, searchFilter, { walkable = null, ignore = [] }) {
+        if (typeof searchFilter === 'string') {
+            if (tree.hasOwnProperty(searchFilter)) return tree[searchFilter];
+        } else if (searchFilter(tree)) return tree;
+
         if (typeof tree !== 'object' || tree == null) return undefined;
 
         let tempReturn = undefined;

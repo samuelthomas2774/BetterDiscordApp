@@ -399,6 +399,10 @@ class WebpackModules {
         const class_module = await this.waitForModuleByProps([base, ...additional_classes]);
         if (class_module && class_module[base]) return class_module[base].split(' ')[0];
     }
+    static getSelector(base, ...additional_classes) {
+        const gcn = this.getClassName(base, ...additional_classes);
+        if (gcn) return `.${gcn}`;
+    }
 
     /**
      * Returns all loaded modules.

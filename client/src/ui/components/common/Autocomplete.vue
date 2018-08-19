@@ -51,9 +51,6 @@
         created() {
             this.attachListeners();
         },
-        destroyed() {
-            console.log('AUTOCOMPLET EDESTROYED');
-        },
         methods: {
             attachListeners() {
                 if (this._isDestroyed) return;

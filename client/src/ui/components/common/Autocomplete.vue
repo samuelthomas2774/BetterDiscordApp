@@ -111,7 +111,6 @@
                 }
             },
             insertText(startIndex, text) {
-                console.log(this._insertText);
                 this.ta.selectionStart = startIndex;
                 this._insertText(text);
             },

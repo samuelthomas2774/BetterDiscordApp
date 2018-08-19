@@ -16,12 +16,17 @@ export default new class AutoComplete {
         this.initialized = true;
     }
 
+    get latestComponent() {
+        return this._latestComponent;
+    }
+
     channelTextAreaAfterRender(component, args, retVal) {
         const inner = Utils.findInReactTree(retVal, filter => filter && filter.className && filter.className.includes('inner'));
+
         if (!inner || !inner.children) return;
         inner.children.splice(0, 0, VueInjector.createReactElement(AutocompleteComponent, {
             controller: this,
-            component
+            _insertText: component.insertText.bind(component)
         }));
     }
 

@@ -33,6 +33,7 @@
 
 <script>
     import { WebpackModules, DiscordApi, Events } from 'modules';
+    let wtf = null;
     export default {
         data() {
             return {
@@ -44,18 +45,23 @@
                 textArea: null
             }
         },
-        props: ['prefix', 'controller', 'component'],
+        props: ['prefix', 'controller', '_insertText', '_ref'],
         computed: {
         },
         created() {
             this.attachListeners();
         },
+        destroyed() {
+            console.log('AUTOCOMPLET EDESTROYED');
+        },
         methods: {
             attachListeners() {
                 if (this._isDestroyed) return;
-                if (!this.component._ref || !this.component._ref._textArea) return setTimeout(this.attachListeners, 10);
-                this.component._ref._textArea.addEventListener('keydown', this.keyDown);
-                this.component._ref._textArea.addEventListener('keyup', this.keyUp);
+                const ta = document.querySelector('.da-textAreaEdit') || document.querySelector('.da-textArea');
+                if (!ta) return setTimeout(this.attachListeners, 10);
+                this.ta = ta;
+                ta.addEventListener('keydown', this.keyDown);
+                ta.addEventListener('keyup', this.keyUp);
             },
             keyDown(e) {
                 if (!this.open) return;
@@ -108,12 +114,13 @@
                 }
             },
             insertText(startIndex, text) {
-                this.component._ref._textArea.selectionStart = startIndex;
-                this.component.insertText(text);
+                console.log(this._insertText);
+                this.ta.selectionStart = startIndex;
+                this._insertText(text);
             },
             inject() {
-                if (!this.component || !this.component._ref || !this.component._ref._textArea) return;
-                this.insertText(this.component._ref._textArea.selectionStart - this.fsterm.length, this.search.items[this.selectedIndex].value.replaceWith);
+                if (!this.ta) return;
+                this.insertText(this.ta.selectionStart - this.fsterm.length, this.search.items[this.selectedIndex].value.replaceWith);
                 this.open = false;
                 this.search = { type: null, items: [] };
             }

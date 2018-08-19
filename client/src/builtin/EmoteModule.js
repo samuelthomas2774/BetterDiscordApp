@@ -46,10 +46,10 @@ export default new class EmoteModule extends BuiltinModule {
             await this.loadLocalDb();
         }
 
-        const userData = await Database.find({ 'id': 'EmoteModule' });
-        if (userData && userData.length) {
-            if (userData[0].hasOwnProperty('favourites')) this._favourites = userData[0].favourites;
-            if (userData[0].hasOwnProperty('mostused')) this._mostUsed = userData[0].mostused;
+        const userData = await Database.findOne({ 'id': 'EmoteModule' });
+        if (userData) {
+            if (userData.hasOwnProperty('favourites')) this._favourites = userData.favourites;
+            if (userData.hasOwnProperty('mostused')) this._mostUsed = userData.mostused;
         }
 
         this.patchMessageContent();

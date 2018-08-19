@@ -219,7 +219,7 @@ export default new class EmoteModule extends BuiltinModule {
             return {
                 type: 'imagetext',
                 title: ['Your most used emotes'],
-                items: this.mostUsed.sort((a,b) => b.useCount > a.useCount).slice(0, 10).map(mu => {
+                items: this.mostUsed.sort((a,b) => b.useCount - a.useCount).slice(0, 10).map(mu => {
                     return {
                         key: `${mu.key} | ${mu.useCount}`,
                         value: mu.value

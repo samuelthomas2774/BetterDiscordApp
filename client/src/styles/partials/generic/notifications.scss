@@ -46,6 +46,7 @@
 
         .bd-notificationBody {
             padding: 0 10px;
+            flex-grow: 1;
 
             .bd-notificationText {
                 color: #FFF;
@@ -58,6 +59,29 @@
 
         &.bd-closing {
             animation: bd-notif-slideout .5s;
+        }
+    }
+
+    .bd-notificationFooter {
+        height: 20px;
+        padding: 5px;
+        justify-content: flex-end;
+
+        .bd-notificationBtn {
+            cursor: pointer;
+            height: 10px;
+            line-height: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, .1);
+            margin-left: 5px;
+
+            &:hover {
+                background: rgba(255, 255, 255, .2);
+            }
         }
     }
 }

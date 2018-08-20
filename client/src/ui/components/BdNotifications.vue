@@ -17,7 +17,11 @@
             <div class="bd-notificationBody bd-flex">
                 <div class="bd-notificationText">{{notifications[0].text}}</div>
             </div>
-            <div class="bd-notificationFooter bd-flex"></div>
+            <div class="bd-notificationFooter bd-flex">
+                <div class="bd-notificationBtn" v-for="(btn, index) in notifications[0].buttons">
+                    {{btn.text}}
+                </div>
+            </div>
         </div>
     </div>
 </template>

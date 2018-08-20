@@ -71,7 +71,7 @@ export default new class EmoteModule extends BuiltinModule {
     }
 
     async disabled() {
-        // Unpatch all aptches
+        // Unpatch all patches
         for (const patch of Patcher.getPatchesByCaller('BD:EMOTEMODULE')) patch.unpatch();
         // Remove ; prefix from autocomplete
         GlobalAc.remove(';');
@@ -180,7 +180,7 @@ export default new class EmoteModule extends BuiltinModule {
 
     /**
      * Add/update emote to most used
-     * @param {Object} emote
+     * @param {Object} emote emote to add/update
      */
     addToMostUsed(emote) {
         const isMostUsed = this.mostUsed.find(mu => mu.key === emote.name);
@@ -266,7 +266,7 @@ export default new class EmoteModule extends BuiltinModule {
     }
 
     /**
-     * Parsae emote object
+     * Parse emote object
      * @param {String} name Emote name
      * @param {Object} emote Emote object
      * @param {Boolean} simple Simple object or Emote instance

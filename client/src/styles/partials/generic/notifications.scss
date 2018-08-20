@@ -1,7 +1,7 @@
 .bd-notifications {
     position: absolute;
-    left: -300px;
-    top: 0;
+    right: -300px;
+    bottom: 50px;
     z-index: 900000;
 
     .bd-notificationContainer {
@@ -15,11 +15,14 @@
         animation: bd-notif-slidein 1s reverse;
 
         .bd-notificationHeader {
-            height: 20px;
+            height: 10px;
+            justify-content: flex-end;
 
             .bd-notificationDismissBtn {
                 cursor: pointer;
                 opacity: 0;
+                transform: scaleX(-1);
+                margin: 5px;
 
                 &:hover {
                     opacity: 1;
@@ -92,17 +95,17 @@
     }
 
     50% {
-        transform: translatex(315px);
+        transform: translatex(-325px);
     }
 
     100% {
-        transform: translatex(305px);
+        transform: translatex(-315px);
     }
 }
 
 @keyframes bd-notif-slideout {
     0% {
-        transform: translatex(305px);
+        transform: translatex(-315px);
     }
 
     100% {

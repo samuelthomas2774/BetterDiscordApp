@@ -12,7 +12,7 @@
     <div class="bd-notifications">
         <div v-if="notifications.length" class="bd-notificationContainer bd-flex bd-flexCol bd-active" :class="{'bd-closing': dismissing}">
             <div class="bd-notificationHeader bd-flex">
-                <div @click="this.dismissFirst" class="bd-notificationDismissBtn"><MiArrowLeft/></div>
+                <div @click="this.dismissFirst" class="bd-notificationDismissBtn"><MiArrowLeft size="20"/></div>
             </div>
             <div class="bd-notificationBody bd-flex">
                 <div class="bd-notificationText">{{notifications[0].text}}</div>

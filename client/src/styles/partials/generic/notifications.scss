@@ -6,7 +6,7 @@
 
     .bd-notificationContainer {
         position: relative;
-        background: rgb(54, 57, 63);
+        background: #0a0a0a;
         width: 280px;
         height: 130px;
         top: 30px;
@@ -15,27 +15,37 @@
         animation: bd-notif-slidein 1s reverse;
 
         .bd-notificationHeader {
-            height: 24px;
-            border-bottom: 1px solid #484b51;
+            height: 20px;
 
             .bd-notificationDismissBtn {
                 cursor: pointer;
-                border-right: 1px solid #484b51;
+                opacity: 0;
 
                 &:hover {
+                    opacity: 1;
                     background: rgba(0, 0, 0, .1);
+
+                    .bd-materialDesignIcon {
+                        fill: #fff;
+                    }
                 }
 
                 .bd-materialDesignIcon {
-                    fill: #fff;
+                    fill: #aeaeae;
                     display: flex;
-                    height: 24px;
+                    height: 20px;
                 }
             }
         }
 
+        &:hover {
+            .bd-notificationDismissBtn {
+                opacity: 1;
+            }
+        }
+
         .bd-notificationBody {
-            padding: 10px;
+            padding: 0 10px;
 
             .bd-notificationText {
                 color: #FFF;

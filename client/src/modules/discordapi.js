@@ -78,7 +78,7 @@ export default class DiscordApi {
 
     /**
      * A list of loaded channels.
-     * @member {List<Channel>}
+     * @type {List<Channel>}
      */
     static get channels() {
         const channels = Modules.ChannelStore.getChannels();

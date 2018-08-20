@@ -69,11 +69,9 @@ export default new class EmoteModule extends BuiltinModule {
         } else {
             this.mostUsed.push({
                 key: emote.name,
-                useCount: 1,
-                value: {
-                    src: EMOTE_SOURCES[emote.type].replace(':id', emote.id),
-                    replaceWith: `;${emote.name};`
-                }
+                id: emote.id,
+                type: emote.type,
+                useCount: 1
             });
         }
         Database.insertOrUpdate({ 'id': 'EmoteModule' }, { 'id': 'EmoteModule', favourites: this.favourites, mostused: this.mostUsed })
@@ -229,7 +227,10 @@ export default new class EmoteModule extends BuiltinModule {
                 items: this.mostUsed.sort((a,b) => b.useCount - a.useCount).slice(0, 10).map(mu => {
                     return {
                         key: `${mu.key} | ${mu.useCount}`,
-                        value: mu.value
+                        value: {
+                            src: EMOTE_SOURCES[mu.type].replace(':id', mu.id),
+                            replaceWith: `;${mu.key};`
+                        }
                     }
                 })
             }

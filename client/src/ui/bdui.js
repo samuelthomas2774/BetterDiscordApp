@@ -12,7 +12,7 @@ import { Events, DiscordApi, Settings } from 'modules';
 import { remote } from 'electron';
 import DOM from './dom';
 import Vue from './vue';
-import { BdSettingsWrapper, BdModals, BdToasts } from './components';
+import { BdSettingsWrapper, BdModals, BdToasts, BdNotifications } from './components';
 
 export default class {
 
@@ -52,6 +52,7 @@ export default class {
         DOM.createElement('div', null, 'bd-settings').appendTo(DOM.bdBody);
         DOM.createElement('div', null, 'bd-modals').appendTo(DOM.bdModals);
         DOM.createElement('div', null, 'bd-toasts').appendTo(DOM.bdToasts);
+        DOM.createElement('div', null, 'bd-notifications').appendTo(DOM.bdNotifications);
         DOM.createElement('bd-tooltips').appendTo(DOM.bdBody);
 
         this.toasts = new (Vue.extend(BdToasts))({
@@ -64,6 +65,10 @@ export default class {
 
         this.vueInstance = new (Vue.extend(BdSettingsWrapper))({
             el: '#bd-settings'
+        });
+
+        this.notifications = new (Vue.extend(BdNotifications))({
+            el: '#bd-notifications'
         });
 
         return this.vueInstance;

@@ -15,6 +15,9 @@ import { User } from './user';
 
 const reactions = new WeakMap();
 
+/**
+ * Class representing a Discord Reaction
+ */
 export class Reaction {
     constructor(data, message_id, channel_id) {
         if (reactions.has(data)) return reactions.get(data);
@@ -49,6 +52,9 @@ export class Reaction {
 
 const embeds = new WeakMap();
 
+/**
+ * Class representing a Discord Embed
+ */
 export class Embed {
     constructor(data, message_id, channel_id) {
         if (embeds.has(data)) return embeds.get(data);
@@ -88,6 +94,9 @@ export class Embed {
 
 const messages = new WeakMap();
 
+/**
+ * Class representing a Discord Message
+ */
 export class Message {
 
     constructor(data) {
@@ -170,6 +179,9 @@ export class Message {
 
 }
 
+/**
+ * Class representing a default Discord Message
+ */
 export class DefaultMessage extends Message {
     get webhookId() { return this.discordObject.webhookId }
     get type() { return 'DEFAULT' }

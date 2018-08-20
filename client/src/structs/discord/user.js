@@ -1,4 +1,4 @@
-/**
+/*
  * BetterDiscord User Struct
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
@@ -16,6 +16,9 @@ import { Channel } from './channel';
 
 const users = new WeakMap();
 
+/**
+ * Class representing a Discord user
+ */
 export class User {
 
     constructor(data) {
@@ -141,6 +144,9 @@ export class User {
 
 const guild_members = new WeakMap();
 
+/**
+ * Class representing a Discord Guild Member
+ */
 export class GuildMember {
     constructor(data, guild_id) {
         if (guild_members.has(data)) return guild_members.get(data);

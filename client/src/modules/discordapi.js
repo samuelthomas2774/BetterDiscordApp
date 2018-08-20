@@ -69,6 +69,7 @@ export default class DiscordApi {
 
     /**
      * A list of loaded guilds.
+     * @type {List<Guild>}
      */
     static get guilds() {
         const guilds = Modules.GuildStore.getGuilds();
@@ -77,6 +78,7 @@ export default class DiscordApi {
 
     /**
      * A list of loaded channels.
+     * @type {List<Channel>}
      */
     static get channels() {
         const channels = Modules.ChannelStore.getChannels();
@@ -85,6 +87,7 @@ export default class DiscordApi {
 
     /**
      * A list of loaded users.
+     * @type {List<User>}
      */
     static get users() {
         const users = Modules.UserStore.getUsers();
@@ -93,6 +96,7 @@ export default class DiscordApi {
 
     /**
      * An object mapping guild IDs to their member counts.
+     * @type {Object}
      */
     static get memberCounts() {
         return Modules.MemberCountStore.getMemberCounts();
@@ -100,6 +104,7 @@ export default class DiscordApi {
 
     /**
      * A list of guilds in the order they appear in the server list.
+     * @type {List<Guild>}
      */
     static get sortedGuilds() {
         const guilds = Modules.SortedGuildStore.getSortedGuilds();
@@ -108,6 +113,7 @@ export default class DiscordApi {
 
     /**
      * An array of guild IDs in the order they appear in the server list.
+     * @type {Number[]}
      */
     static get guildPositions() {
         return Modules.SortedGuildStore.guildPositions;
@@ -115,6 +121,7 @@ export default class DiscordApi {
 
     /**
      * The currently selected guild.
+     * @type {Guild}
      */
     static get currentGuild() {
         const guild = Modules.GuildStore.getGuild(Modules.SelectedGuildStore.getGuildId());
@@ -123,6 +130,7 @@ export default class DiscordApi {
 
     /**
      * The currently selected channel.
+     * @type {Channel}
      */
     static get currentChannel() {
         const channel = Modules.ChannelStore.getChannel(Modules.SelectedChannelStore.getChannelId());
@@ -131,6 +139,7 @@ export default class DiscordApi {
 
     /**
      * The current user.
+     * @type {User}
      */
     static get currentUser() {
         const user = Modules.UserStore.getCurrentUser();
@@ -139,12 +148,15 @@ export default class DiscordApi {
 
     /**
      * A list of the current user's friends.
+     * @type {List<User>}
      */
     static get friends() {
         const friends = Modules.RelationshipStore.getFriendIDs();
         return List.from(friends, id => User.fromId(id));
     }
-
+    /**
+     * User settings
+     */
     static get UserSettings() {
         return UserSettings;
     }
@@ -162,6 +174,7 @@ export class UserSettings {
 
     /**
      * The user's current status. Either "online", "idle", "dnd" or "invisible".
+     * @type {String}
      */
     static get status() { return Modules.UserSettingsStore.status }
 
@@ -169,11 +182,13 @@ export class UserSettings {
      * The user's selected explicit content filter level.
      * 0 == off, 1 == everyone except friends, 2 == everyone
      * Configurable in the privacy and safety panel.
+     * @type {Number}
      */
     static get explicitContentFilter() { return Modules.UserSettingsStore.explicitContentFilter }
 
     /**
      * Whether to disallow direct messages from server members by default.
+     * @type {Boolean}
      */
     static get defaultGuildsRestricted() { return Modules.UserSettingsStore.defaultGuildsRestricted }
 
@@ -181,6 +196,7 @@ export class UserSettings {
      * An array of guilds to disallow direct messages from their members.
      * This is bypassed if the member is has another mutual guild with this disabled, or the member is friends with the current user.
      * Configurable in each server's privacy settings.
+     * @type {Guild[]}
      */
     static get restrictedGuildIds() { return Modules.UserSettingsStore.restrictedGuilds }
 
@@ -192,6 +208,7 @@ export class UserSettings {
      * An array of flags specifying who should be allowed to add the current user as a friend.
      * If everyone is checked, this will only have one item, "all". Otherwise it has either "mutual_friends", "mutual_guilds", both or neither.
      * Configurable in the privacy and safety panel.
+     * @type {Array}
      */
     static get friendSourceFlags() { return Object.keys(Modules.UserSettingsStore.friendSourceFlags) }
     static get friendSourceEveryone() { return this.friendSourceFlags.include('all') }
@@ -202,72 +219,84 @@ export class UserSettings {
     /**
      * Whether to automatically add accounts from other platforms running on the user's computer.
      * Configurable in the connections panel.
+     * @type {Boolean}
      */
     static get detectPlatformAccounts() { return Modules.UserSettingsStore.detectPlatformAccounts }
 
     /**
      * The number of seconds Discord will wait for activity before sending mobile push notifications.
      * Configurable in the notifications panel.
+     * @type {Number}
      */
     static get afkTimeout() { return Modules.UserSettingsStore.afkTimeout }
 
     /**
      * Whether to display the currently running game as a status message.
      * Configurable in the games panel.
+     * @type {Boolean}
      */
     static get showCurrentGame() { return Modules.UserSettingsStore.showCurrentGame }
 
     /**
      * Whether to show images uploaded directly to Discord.
      * Configurable in the text and images panel.
+     * @type {Boolean}
      */
     static get inlineAttachmentMedia() { return Modules.UserSettingsStore.inlineAttachmentMedia }
 
     /**
      * Whether to show images linked in Discord.
      * Configurable in the text and images panel.
+     * @type {Boolean}
      */
     static get inlineEmbedMedia() { return Modules.UserSettingsStore.inlineEmbedMedia }
 
     /**
      * Whether to automatically play GIFs when the Discord window is active without having to hover the mouse over the image.
      * Configurable in the text and images panel.
+     * @type {Boolean}
      */
     static get autoplayGifs() { return Modules.UserSettingsStore.gifAutoPlay }
 
     /**
      * Whether to show content from HTTP[s] links as embeds.
      * Configurable in the text and images panel.
+     * @type {Boolean}
      */
     static get showEmbeds() { return Modules.UserSettingsStore.renderEmbeds }
 
     /**
      * Whether to show a message's reactions.
      * Configurable in the text and images panel.
+     * @type {Boolean}
      */
     static get showReactions() { return Modules.UserSettingsStore.renderReactions }
 
     /**
      * Whether to play animated emoji.
      * Configurable in the text and images panel.
+     * @type {Boolean}
      */
     static get animateEmoji() { return Modules.UserSettingsStore.animateEmoji }
 
     /**
      * Whether to convert ASCII emoticons to emoji.
      * Configurable in the text and images panel.
+     * @type {Boolean}
      */
     static get convertEmoticons() { return Modules.UserSettingsStore.convertEmoticons }
 
     /**
      * Whether to allow playing text-to-speech messages.
      * Configurable in the text and images panel.
+     * @type {Boolean}
      */
     static get allowTts() { return Modules.UserSettingsStore.enableTTSCommand }
 
     /**
      * The user's selected theme. Either "dark" or "light".
      * Configurable in the appearance panel.
+     * @type {String}
      */
     static get theme() { return Modules.UserSettingsStore.theme }
 
@@ -275,6 +304,7 @@ export class UserSettings {
      * Whether the user has enabled compact mode.
      * `true` if compact mode is enabled, `false` if cozy mode is enabled.
      * Configurable in the appearance panel.
+     * @type {Boolean}
      */
     static get displayCompact() { return Modules.UserSettingsStore.messageDisplayCompact }
 
@@ -282,18 +312,21 @@ export class UserSettings {
      * Whether the user has enabled developer mode.
      * Currently only adds a "Copy ID" option to the context menu on users, guilds and channels.
      * Configurable in the appearance panel.
+     * @type {Boolean}
      */
     static get developerMode() { return Modules.UserSettingsStore.developerMode }
 
     /**
      * The user's selected language code.
      * Configurable in the language panel.
+     * @type {String}
      */
     static get locale() { return Modules.UserSettingsStore.locale }
 
     /**
      * The user's timezone offset in hours.
      * This is not configurable.
+     * @type {Number}
      */
     static get timezoneOffset() { return Modules.UserSettingsStore.timezoneOffset }
 }

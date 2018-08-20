@@ -18,7 +18,7 @@
                 <div class="bd-notificationText">{{notifications[0].text}}</div>
             </div>
             <div class="bd-notificationFooter bd-flex">
-                <div class="bd-notificationBtn" v-for="(btn, index) in notifications[0].buttons">
+                <div class="bd-notificationBtn" v-for="(btn, index) in notifications[0].buttons" @click="() => buttonHandler(index)">
                     {{btn.text}}
                 </div>
             </div>
@@ -47,6 +47,16 @@
                     Notifications.dismiss(0);
                     this.dismissing = false;
                 }, 500);
+            },
+            buttonHandler(index) {
+                if (!this.notifications[0].buttons[index].onClick) return;
+                if (this.notifications[0].buttons[index].onClick()) {
+                    this.dismissing = true;
+                    setTimeout(() => {
+                        Notifications.dismiss(0);
+                        this.dismissing = false;
+                    }, 500);
+                }
             }
         }
     }

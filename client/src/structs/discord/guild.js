@@ -1,4 +1,4 @@
-/**
+/*
  * BetterDiscord Guild Struct
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
@@ -16,6 +16,9 @@ import { GuildMember } from './user';
 
 const roles = new WeakMap();
 
+/**
+ * Class representing a Discord Role
+ */
 export class Role {
     constructor(data, guild_id) {
         if (roles.has(data)) return roles.get(data);
@@ -47,6 +50,9 @@ export class Role {
 
 const emojis = new WeakMap();
 
+/**
+ * Class representing a Discord Emoji
+ */
 export class Emoji {
     constructor(data) {
         if (emojis.has(data)) return emojis.get(data);
@@ -72,6 +78,9 @@ export class Emoji {
 
 const guilds = new WeakMap();
 
+/**
+ * Class representing a Discord Guild
+ */
 export class Guild {
 
     constructor(data) {

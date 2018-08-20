@@ -1,4 +1,4 @@
-/**
+/*
  * BetterDiscord Channel Struct
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
@@ -16,6 +16,9 @@ import { User, GuildMember } from './user';
 
 const channels = new WeakMap();
 
+/**
+ * Class representing a Discord Channel
+ */
 export class Channel {
 
     constructor(data) {
@@ -86,6 +89,7 @@ export class Channel {
 
     /**
      * A list of messages in this channel.
+     * @type {List<Message>}
      */
     get messages() {
         const messages = Modules.MessageStore.getMessages(this.id).toArray();
@@ -126,6 +130,7 @@ export class Channel {
 
     /**
      * Whether this channel is currently selected.
+     * @type {Boolean}
      */
     get isSelected() {
         return DiscordApi.currentChannel === this;

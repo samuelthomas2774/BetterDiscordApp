@@ -8,13 +8,14 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI, BdMenu, Modals, Reflection, Toasts } from 'ui';
+import { DOM, BdUI, BdMenu, Modals, Reflection, Toasts, Notifications } from 'ui';
 import BdCss from './styles/index.scss';
 import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi, BdWebApi, Connectivity, Cache } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { BuiltinManager, EmoteModule, ReactDevtoolsModule, VueDevtoolsModule, TrackingProtection, E2EE } from 'builtin';
 import electron from 'electron';
 import path from 'path';
+import { setTimeout } from 'timers';
 
 const tests = typeof PRODUCTION === 'undefined';
 const ignoreExternal = false;
@@ -27,7 +28,7 @@ class BetterDiscord {
         Logger.log('main', 'BetterDiscord starting');
 
         this._bd = {
-            DOM, BdUI, BdMenu, Modals, Reflection, Toasts,
+            DOM, BdUI, BdMenu, Modals, Reflection, Toasts, Notifications,
 
             Events, CssEditor, Globals, Settings, Database, Updater,
             ModuleManager, PluginManager, ThemeManager, ExtModuleManager,
@@ -90,6 +91,23 @@ class BetterDiscord {
             Events.emit('ready');
             Events.emit('discord-ready');
             BuiltinManager.initAll();
+
+            function showDummyNotif() { // eslint-disable-line no-inner-declarations
+                Notifications.add('Dummy Notification', [
+                    {
+                        text: 'Show Again', onClick: function () {
+                            setTimeout(showDummyNotif, 5000);
+                            return true;
+                        }
+                    },
+                    {
+                        text: 'Ignore', onClick: function () {
+                            return true;
+                        }
+                    }
+                ]);
+            }
+            showDummyNotif();
         } catch (err) {
             Logger.err('main', ['FAILED TO LOAD!', err]);
         }

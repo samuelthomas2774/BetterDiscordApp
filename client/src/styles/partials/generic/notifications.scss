@@ -1,0 +1,115 @@
+.bd-notifications {
+    position: absolute;
+    right: -300px;
+    bottom: 50px;
+    z-index: 900000;
+
+    .bd-notificationContainer {
+        position: relative;
+        background: #202225;
+        width: 280px;
+        height: 130px;
+        top: 30px;
+        border-radius: 5px;
+        box-shadow: 0 0 20px #202225;
+
+        .bd-notificationHeader {
+            height: 10px;
+            justify-content: flex-end;
+
+            .bd-notificationDismissBtn {
+                cursor: pointer;
+                opacity: 0;
+                transform: scaleX(-1);
+                margin: 8px;
+
+                &:hover {
+                    opacity: 1;
+                    background: rgba(0, 0, 0, .1);
+
+                    .bd-materialDesignIcon {
+                        fill: #fff;
+                    }
+                }
+
+                .bd-materialDesignIcon {
+                    fill: #aeaeae;
+                    display: flex;
+                    height: 20px;
+                }
+            }
+        }
+
+        &:hover {
+            .bd-notificationDismissBtn {
+                opacity: 1;
+            }
+        }
+
+        .bd-notificationBody {
+            padding: 10px 25px;
+            flex-grow: 1;
+
+            .bd-notificationText {
+                color: #fff;
+                font-size: 12px;
+            }
+        }
+
+        &.bd-active {
+            animation: bd-notif-slidein 1s forwards;
+        }
+
+        &.bd-closing {
+            animation: bd-notif-slideout .5s;
+        }
+    }
+
+    .bd-notificationFooter {
+        height: 20px;
+        padding: 5px;
+        justify-content: flex-end;
+
+        .bd-notificationBtn {
+            cursor: pointer;
+            height: 10px;
+            line-height: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #aeaeae;
+            padding: 5px 10px;
+            border-radius: 3px;
+            background: rgba(0, 0, 0, .2);
+            margin-left: 5px;
+
+            &:hover {
+                background: rgba(0, 0, 0, .3);
+                color: #fff;
+            }
+        }
+    }
+}
+
+@keyframes bd-notif-slidein {
+    0% {
+        transform: translatex(0);
+    }
+
+    50% {
+        transform: translatex(-325px);
+    }
+
+    100% {
+        transform: translatex(-315px);
+    }
+}
+
+@keyframes bd-notif-slideout {
+    0% {
+        transform: translatex(-315px);
+    }
+
+    100% {
+        transform: translatex(0);
+    }
+}

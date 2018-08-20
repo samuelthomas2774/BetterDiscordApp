@@ -37,7 +37,7 @@ export default class Logger {
         level = Logger.parseLevel(level);
 
         message = typeof message === 'object' && message instanceof Array ? message : [message];
-        console[level]('[%cBetter%cDiscord:%s]', 'color: #3E82E5', '', `${module}${level === 'debug' ? '|DBG' : ''}`, ...message);
+        console[level]('[%cBetter%cDiscord:%s]', 'color: #3ecc9c', '', `${module}${level === 'debug' ? '|DBG' : ''}`, ...message);
 
         const message_string = message.map(m => typeof m === 'string' ? m : node_utils.inspect(m, {showProxy: true})).join(' ');
         this.logs.push(`${level.toUpperCase()} : [${Logger.timestamp}|${module}] ${message_string}`);

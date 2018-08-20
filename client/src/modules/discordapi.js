@@ -68,7 +68,7 @@ export default class DiscordApi {
     static get Message() { return Message }
 
     /**
-     * A list of loaded guilds.
+     * @returns {List} A list of loaded guilds.
      */
     static get guilds() {
         const guilds = Modules.GuildStore.getGuilds();
@@ -76,7 +76,7 @@ export default class DiscordApi {
     }
 
     /**
-     * A list of loaded channels.
+     * @returns {List} A list of loaded channels.
      */
     static get channels() {
         const channels = Modules.ChannelStore.getChannels();
@@ -84,7 +84,7 @@ export default class DiscordApi {
     }
 
     /**
-     * A list of loaded users.
+     * @returns {List} A list of loaded users.
      */
     static get users() {
         const users = Modules.UserStore.getUsers();
@@ -92,14 +92,14 @@ export default class DiscordApi {
     }
 
     /**
-     * An object mapping guild IDs to their member counts.
+     * @returns {Object} An object mapping guild IDs to their member counts.
      */
     static get memberCounts() {
         return Modules.MemberCountStore.getMemberCounts();
     }
 
     /**
-     * A list of guilds in the order they appear in the server list.
+     * @returns {List} A list of guilds in the order they appear in the server list.
      */
     static get sortedGuilds() {
         const guilds = Modules.SortedGuildStore.getSortedGuilds();
@@ -107,14 +107,14 @@ export default class DiscordApi {
     }
 
     /**
-     * An array of guild IDs in the order they appear in the server list.
+     * @returns {Array} An array of guild IDs in the order they appear in the server list.
      */
     static get guildPositions() {
         return Modules.SortedGuildStore.guildPositions;
     }
 
     /**
-     * The currently selected guild.
+     * @returns {Guild} The currently selected guild.
      */
     static get currentGuild() {
         const guild = Modules.GuildStore.getGuild(Modules.SelectedGuildStore.getGuildId());
@@ -122,7 +122,7 @@ export default class DiscordApi {
     }
 
     /**
-     * The currently selected channel.
+     * @returns {Channel} The currently selected channel.
      */
     static get currentChannel() {
         const channel = Modules.ChannelStore.getChannel(Modules.SelectedChannelStore.getChannelId());
@@ -130,7 +130,7 @@ export default class DiscordApi {
     }
 
     /**
-     * The current user.
+     * @returns {User} The current user.
      */
     static get currentUser() {
         const user = Modules.UserStore.getCurrentUser();
@@ -138,7 +138,7 @@ export default class DiscordApi {
     }
 
     /**
-     * A list of the current user's friends.
+     * @returns {List} A list of the current user's friends.
      */
     static get friends() {
         const friends = Modules.RelationshipStore.getFriendIDs();
@@ -161,37 +161,40 @@ export class UserSettings {
     }
 
     /**
-     * The user's current status. Either "online", "idle", "dnd" or "invisible".
+     * @returns {String} The user's current status. Either "online", "idle", "dnd" or "invisible".
      */
     static get status() { return Modules.UserSettingsStore.status }
 
     /**
      * The user's selected explicit content filter level.
-     * 0 == off, 1 == everyone except friends, 2 == everyone
      * Configurable in the privacy and safety panel.
+     *  @returns {Number} 0 == off, 1 == everyone except friends, 2 == everyone
      */
     static get explicitContentFilter() { return Modules.UserSettingsStore.explicitContentFilter }
 
     /**
-     * Whether to disallow direct messages from server members by default.
+     * @returns {Boolean} Whether to disallow direct messages from server members by default.
      */
     static get defaultGuildsRestricted() { return Modules.UserSettingsStore.defaultGuildsRestricted }
 
     /**
-     * An array of guilds to disallow direct messages from their members.
      * This is bypassed if the member is has another mutual guild with this disabled, or the member is friends with the current user.
      * Configurable in each server's privacy settings.
+     * @returns {Array} An array of guilds to disallow direct messages from their members.
      */
     static get restrictedGuildIds() { return Modules.UserSettingsStore.restrictedGuilds }
 
+    /**
+     * @returns {List} List of restricted guilds
+     */
     static get restrictedGuilds() {
         return List.from(this.restrictedGuildIds, id => Guild.fromId(id) || id);
     }
 
     /**
-     * An array of flags specifying who should be allowed to add the current user as a friend.
      * If everyone is checked, this will only have one item, "all". Otherwise it has either "mutual_friends", "mutual_guilds", both or neither.
      * Configurable in the privacy and safety panel.
+     * @returns {Array} An array of flags specifying who should be allowed to add the current user as a friend.
      */
     static get friendSourceFlags() { return Object.keys(Modules.UserSettingsStore.friendSourceFlags) }
     static get friendSourceEveryone() { return this.friendSourceFlags.include('all') }
@@ -200,100 +203,99 @@ export class UserSettings {
     static get friendSourceAnyone() { return this.friendSourceFlags.length > 0 }
 
     /**
-     * Whether to automatically add accounts from other platforms running on the user's computer.
      * Configurable in the connections panel.
+     * @returns {Boolean} Whether to automatically add accounts from other platforms running on the user's computer.
      */
     static get detectPlatformAccounts() { return Modules.UserSettingsStore.detectPlatformAccounts }
 
     /**
-     * The number of seconds Discord will wait for activity before sending mobile push notifications.
      * Configurable in the notifications panel.
+     * @returns {Number} The number of seconds Discord will wait for activity before sending mobile push notifications.
      */
     static get afkTimeout() { return Modules.UserSettingsStore.afkTimeout }
 
     /**
-     * Whether to display the currently running game as a status message.
      * Configurable in the games panel.
+     * @returns {Boolean} Whether to display the currently running game as a status message.
      */
     static get showCurrentGame() { return Modules.UserSettingsStore.showCurrentGame }
 
     /**
-     * Whether to show images uploaded directly to Discord.
      * Configurable in the text and images panel.
+     * @returns {Boolean} Whether to show images uploaded directly to Discord.
      */
     static get inlineAttachmentMedia() { return Modules.UserSettingsStore.inlineAttachmentMedia }
 
     /**
-     * Whether to show images linked in Discord.
      * Configurable in the text and images panel.
+     * @returns {Boolean} Whether to show images linked in Discord.
      */
     static get inlineEmbedMedia() { return Modules.UserSettingsStore.inlineEmbedMedia }
 
     /**
-     * Whether to automatically play GIFs when the Discord window is active without having to hover the mouse over the image.
      * Configurable in the text and images panel.
+     * @returns {Boolean} Whether to automatically play GIFs when the Discord window is active without having to hover the mouse over the image.
      */
     static get autoplayGifs() { return Modules.UserSettingsStore.gifAutoPlay }
 
     /**
-     * Whether to show content from HTTP[s] links as embeds.
      * Configurable in the text and images panel.
+     * @returns {Boolean} Whether to show content from HTTP[s] links as embeds.
      */
     static get showEmbeds() { return Modules.UserSettingsStore.renderEmbeds }
 
     /**
-     * Whether to show a message's reactions.
      * Configurable in the text and images panel.
+     * @returns {Boolean} Whether to show a message's reactions.
      */
     static get showReactions() { return Modules.UserSettingsStore.renderReactions }
 
     /**
-     * Whether to play animated emoji.
      * Configurable in the text and images panel.
+     * @returns {Boolean} Whether to play animated emoji.
      */
     static get animateEmoji() { return Modules.UserSettingsStore.animateEmoji }
 
     /**
-     * Whether to convert ASCII emoticons to emoji.
      * Configurable in the text and images panel.
+     * @returns {Boolean} Whether to convert ASCII emoticons to emoji.
      */
     static get convertEmoticons() { return Modules.UserSettingsStore.convertEmoticons }
 
     /**
-     * Whether to allow playing text-to-speech messages.
      * Configurable in the text and images panel.
+     * @returns {Boolean} Whether to allow playing text-to-speech messages.
      */
     static get allowTts() { return Modules.UserSettingsStore.enableTTSCommand }
 
     /**
-     * The user's selected theme. Either "dark" or "light".
      * Configurable in the appearance panel.
+     * @returns {String} The user's selected theme. Either "dark" or "light".
      */
     static get theme() { return Modules.UserSettingsStore.theme }
 
     /**
-     * Whether the user has enabled compact mode.
-     * `true` if compact mode is enabled, `false` if cozy mode is enabled.
      * Configurable in the appearance panel.
+     * @returns {Boolean} Whether the user has enabled compact mode. `true` if compact mode is enabled, `false` if cozy mode is enabled.
      */
     static get displayCompact() { return Modules.UserSettingsStore.messageDisplayCompact }
 
     /**
-     * Whether the user has enabled developer mode.
      * Currently only adds a "Copy ID" option to the context menu on users, guilds and channels.
      * Configurable in the appearance panel.
+     * @returns {Boolean} Whether the user has enabled developer mode.
      */
     static get developerMode() { return Modules.UserSettingsStore.developerMode }
 
     /**
-     * The user's selected language code.
      * Configurable in the language panel.
+     * @returns {String} The user's selected language code.
      */
     static get locale() { return Modules.UserSettingsStore.locale }
 
     /**
-     * The user's timezone offset in hours.
      * This is not configurable.
+     * @returns {Number} The user's timezone offset in hours.
      */
     static get timezoneOffset() { return Modules.UserSettingsStore.timezoneOffset }
 }

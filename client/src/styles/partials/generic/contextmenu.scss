@@ -1,6 +1,6 @@
 .bd-cm {
     background: #18191c;
-    box-shadow: 0 0 1px rgba(0,0,0,.82), 0 1px 4px rgba(0,0,0,.1);
+    box-shadow: 0 0 1px rgba(0, 0, 0, .82), 0 1px 4px rgba(0, 0, 0, .1);
     border-radius: 5px;
     position: fixed;
     width: 170px;
@@ -29,7 +29,7 @@
 
         &::-webkit-scrollbar-thumb {
             background-clip: padding-box;
-            background-color: rgba(32,34,37,.6);
+            background-color: rgba(32, 34, 37, .6);
             border: 2px solid transparent;
             border-radius: 4px;
             cursor: move;
@@ -42,10 +42,10 @@
         }
     }
 
-    .bd-cmGroup:not(:first-child):not(:empty) {
+    .bd-cmGroup {
         &:not(:first-child) {
             &:not(:empty) {
-                border-top: 1px solid hsla(0,0%, 96.1%, .08);
+                border-top: 1px solid hsla(0, 0%, 96.1%, .08);
             }
         }
     }
@@ -72,7 +72,7 @@
 
     .bd-cmItem {
         cursor: default;
-        color: hsla(0,0%,100%,.6);
+        color: hsla(0, 0%, 100%, .6);
         border-radius: 5px;
         box-sizing: border-box;
         font-size: 13px;
@@ -88,7 +88,7 @@
 
         .bd-cmHint {
             opacity: .8;
-            color: hsla(0,0%,100%,.6);
+            color: hsla(0, 0%, 100%, .6);
         }
 
         span {
@@ -123,7 +123,6 @@
         }
 
         .bd-cmCheckbox {
-            cursor: pointer;
             margin-left: 3px;
             pointer-events: none;
             align-items: center;
@@ -137,8 +136,8 @@
                 vertical-align: top;
                 width: 18px;
 
-                &:before,
-                &:after {
+                &::before,
+                &::after {
                     content: '';
                 }
 
@@ -150,11 +149,11 @@
                             background-color: #7289da;
                             border-color: #7289da;
 
-                            &:after {
+                            &::after {
                                 border-color: #fff;
                                 border-style: solid;
                                 border-width: 0 2px 2px 0;
-                                content: "";
+                                content: '';
                                 display: table;
                                 height: 10px;
                                 left: 4px;
@@ -168,7 +167,7 @@
                 }
 
                 span {
-                    border: 2px solid hsla(0,0%,100%,.2);
+                    border: 2px solid hsla(0, 0%, 100%, .2);
                     border-radius: 2px;
                     bottom: 0;
                     box-sizing: border-box;

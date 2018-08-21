@@ -25,7 +25,7 @@ export default new class TwentyFourHour extends BuiltinModule {
         MonkeyPatch('BD:TwentyFourHour', TimeFormatter).after('calendarFormat', (thisObject, args, returnValue) => {
             const matched = returnValue.match(twelveHour);
             if (!matched || matched.length != 4) return;
-            if (matched[3] == 'AM') return returnValue.replace(matched[0], `${matched[1].padStart(2, '0')}:${matched[2]}`)
+            if (matched[3] == 'AM') return returnValue.replace(matched[0], `${matched[1] == '12' ? '00' : matched[1].padStart(2, '0')}:${matched[2]}`)
             return returnValue.replace(matched[0], `${parseInt(matched[1]) + 12}:${matched[2]}`)
         });
     }

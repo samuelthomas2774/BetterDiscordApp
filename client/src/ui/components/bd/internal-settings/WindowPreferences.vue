@@ -47,7 +47,8 @@
             return {
                 saved: {},
                 settingsSet: null,
-                disabled: false
+                disabled: false,
+                defaultFilePath: path.join(Globals.getPath('data'), 'window.json')
             };
         },
         components: {
@@ -56,7 +57,13 @@
         },
         computed: {
             filePath() {
-                return Globals.require.resolve(path.join(Globals.getPath('data'), 'window'));
+                try {
+                    return Globals.require.resolve(path.join(Globals.getPath('data'), 'window'));
+                }
+                catch (err) {
+                    FileUtils.writeJsonToFile(this.defaultFilePath, {});
+                    return this.defaultFilePath;
+                }
             }
         },
         methods: {
@@ -121,7 +128,7 @@
             this.$options.components.SettingsPanel = SettingsPanel;
         },
         async created() {
-            if (this.filePath !== path.join(Globals.getPath('data'), 'window.json')) {
+            if (this.filePath !== this.defaultFilePath) {
                 this.disabled = true;
                 return;
             }

@@ -11,7 +11,7 @@
 import BuiltinModule from './BuiltinModule';
 
 import { Utils } from 'common';
-import { Settings, Patcher, MonkeyPatch, WebpackModules, ReactComponents } from 'modules';
+import { Settings, Patcher, MonkeyPatch, WebpackModules, ReactComponents, DiscordApi } from 'modules';
 
 export default new class ColoredText extends BuiltinModule {
 
@@ -34,7 +34,7 @@ export default new class ColoredText extends BuiltinModule {
     }
 
     get intensity() {
-        return 1 - this.intensitySetting.value / 100;
+        return 100 - this.intensitySetting.value;
     }
 
     _intensityUpdated() {
@@ -50,10 +50,14 @@ export default new class ColoredText extends BuiltinModule {
     }
 
     injectColoredText(thisObject, args, returnValue) {
-        const ColorShader = WebpackModules.getModuleByName('ColorShader');
+        const TinyColor = WebpackModules.getModuleByName('TinyColor');
         const markup = Utils.findInReactTree(returnValue, m => m && m.props && m.props.className && m.props.className.includes('da-markup'));
         const roleColor = thisObject.props.message.colorString;
-        if (markup && roleColor) markup.props.style = {color: ColorShader.lighten(roleColor, this.intensity)};
+        if (markup && roleColor) markup.props.style = {color: TinyColor.mix(roleColor, this.defaultColor, this.intensity)};
+    }
+
+    get defaultColor() {
+        return DiscordApi.UserSettings.theme == 'light' ? '#747f8d' : '#dcddde';
     }
 
     disabled(e) {

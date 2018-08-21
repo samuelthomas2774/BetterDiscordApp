@@ -74,6 +74,7 @@ const KnownModules = {
     Permissions: Filters.byProperties(['getHighestRole']),
     ColorConverter: Filters.byProperties(['hex2int']),
     ColorShader: Filters.byProperties(['darken']),
+    TinyColor: Filters.byPrototypeFields(['toRgb']),
     ClassResolver: Filters.byProperties(['getClass']),
     ButtonData: Filters.byProperties(['ButtonSizes']),
     IconNames: Filters.byProperties(['IconNames']),

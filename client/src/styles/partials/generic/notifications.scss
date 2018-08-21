@@ -6,12 +6,12 @@
 
     .bd-notificationContainer {
         position: relative;
-        background: #202225;
+        background: #18191c;
         width: 280px;
         height: 130px;
         top: 30px;
         border-radius: 5px;
-        box-shadow: 0 0 20px #202225;
+        box-shadow: 0 0 20px #18191c;
 
         .bd-notificationHeader {
             height: 10px;
@@ -70,6 +70,10 @@
         padding: 5px;
         justify-content: flex-end;
 
+        &:not(:empty) {
+            border-top: 1px solid hsla(0, 0%, 96.1%, .08)
+        }
+
         .bd-notificationBtn {
             cursor: pointer;
             height: 10px;
@@ -79,11 +83,10 @@
             color: #aeaeae;
             padding: 5px 10px;
             border-radius: 3px;
-            background: rgba(0, 0, 0, .2);
+            background: transparent;
             margin-left: 5px;
 
             &:hover {
-                background: rgba(0, 0, 0, .3);
                 color: #fff;
             }
         }

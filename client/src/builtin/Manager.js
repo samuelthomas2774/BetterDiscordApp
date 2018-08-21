@@ -3,6 +3,11 @@ import { default as ReactDevtoolsModule } from './ReactDevtoolsModule';
 import { default as VueDevtoolsModule } from './VueDevToolsModule';
 import { default as TrackingProtection } from './TrackingProtection';
 import { default as E2EE } from './E2EE';
+import { default as ColoredText } from './ColoredText';
+import { default as TwentyFourHour } from './24Hour';
+import { default as KillClyde } from './KillClyde';
+import { default as BlockedMessages } from './BlockedMessages';
+import { default as VoiceDisconnect } from './VoiceDisconnect';
 
 export default class {
     static initAll() {
@@ -11,5 +16,10 @@ export default class {
         VueDevtoolsModule.init();
         TrackingProtection.init();
         E2EE.init();
+        ColoredText.init();
+        TwentyFourHour.init();
+        KillClyde.init();
+        BlockedMessages.init();
+        VoiceDisconnect.init();
     }
 }

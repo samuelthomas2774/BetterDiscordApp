@@ -12,8 +12,7 @@
                         "type": "bool",
                         "text": "Voice Disconnect",
                         "hint": "Disconnect from voice server when Discord closes",
-                        "value": false,
-                        "disabled": true
+                        "value": false
                     },
                     {
                         "id": "menu-keybind",
@@ -100,6 +99,34 @@
                         "text": "Enable Toasts",
                         "hint": "Allows plugins to show toasts.",
                         "value": true
+                    },
+                    {
+                        "id": "colored-text",
+                        "type": "bool",
+                        "text": "Colored Text",
+                        "hint": "Colors messages to match the user's role color.",
+                        "value": false
+                    },
+                    {
+                        "id": "24-hour",
+                        "type": "bool",
+                        "text": "24 Hour Timestamps",
+                        "hint": "Replaces 12 hour timestamps with proper ones.",
+                        "value": false
+                    },
+                    {
+                        "id": "kill-clyde",
+                        "type": "bool",
+                        "text": "Kill Clyde",
+                        "hint": "Prevents Clyde from sending you error messages.",
+                        "value": false
+                    },
+                    {
+                        "id": "blocked-messages",
+                        "type": "bool",
+                        "text": "Prevent Blocked Messages",
+                        "hint": "Hides blocked messages in chat and even hides the new message notification.",
+                        "value": false
                     }
                 ]
             }

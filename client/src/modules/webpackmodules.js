@@ -36,6 +36,7 @@ const KnownModules = {
     ChannelActions: Filters.byProperties(['selectChannel']),
     PrivateChannelActions: Filters.byProperties(['openPrivateChannel']),
     ChannelSelector: Filters.byProperties(['selectGuild', 'selectChannel']),
+    VoiceChannelActions: Filters.byProperties(['selectVoiceChannel']),
 
     /* Current User Info, State and Settings */
     UserInfoStore: Filters.byProperties(['getToken']),
@@ -44,7 +45,7 @@ const KnownModules = {
     UserSettingsUpdater: Filters.byProperties(['updateRemoteSettings']),
     OnlineWatcher: Filters.byProperties(['isOnline']),
     CurrentUserIdle: Filters.byProperties(['getIdleTime']),
-    RelationshipStore: Filters.byProperties(['isBlocked']),
+    RelationshipStore: Filters.byProperties(['isBlocked', 'isFriend']),
     RelationshipManager: Filters.byProperties(['addRelationship']),
     MentionStore: Filters.byProperties(['getMentions']),
 
@@ -135,6 +136,7 @@ const KnownModules = {
     Moment: Filters.byProperties(['parseZone']),
     LocationManager: Filters.byProperties(['createLocation']),
     Timestamps: Filters.byProperties(['fromTimestamp']),
+    TimeFormatter: Filters.byProperties(['dateFormat']),
 
     /* Strings and Utils */
     Strings: Filters.byProperties(['TEXT', 'TEXTAREA_PLACEHOLDER']),

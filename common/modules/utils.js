@@ -11,7 +11,7 @@
 import fs from 'fs';
 import _ from 'lodash';
 import filetype from 'file-type';
-import join from 'path';
+import path from 'path';
 
 export class Utils {
     static overload(fn, cb) {
@@ -504,7 +504,7 @@ export class FileUtils {
         try {
             await this.directoryExists(pathToDir);
             const files = await this.listDirectory(pathToDir);
-            
+
             for (const file of files) {
                 const pathToFile = path.join(pathToDir, file);
                 try {
@@ -515,7 +515,7 @@ export class FileUtils {
                 }
             }
 
-            fs.rmdirSync(path);
+            fs.rmdirSync(pathToDir);
 
             return true;
         } catch (err) {

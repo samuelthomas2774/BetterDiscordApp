@@ -1,0 +1,50 @@
+/**
+ * BetterDiscord Context Menu Component
+ * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
+ * All rights reserved.
+ * https://betterdiscord.net
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+*/
+
+<template>
+    <div class="bd-cm" :class="{'bd-cmRenderLeft': renderLeft}" v-if="activeMenu && activeMenu.menu" :style="calculatePosition()">
+        <CMGroup v-for="(group, index) in activeMenu.menu.groups" :items="group.items" :key="index" :closeMenu="() => {activeMenu.menu = null}" :left="left" :top="top"/>
+    </div>
+</template>
+
+<script>
+    // Imports
+    import { BdContextMenu } from 'ui';
+    import CMGroup from './contextmenu/Group.vue';
+
+    export default {
+        data() {
+            return {
+                activeMenu: BdContextMenu.activeMenu,
+                visibleSub: -1,
+                left: -1,
+                top: -1,
+                renderLeft: false
+            };
+        },
+        components: { CMGroup },
+        methods: {
+            calculatePosition() {
+                if (!this.activeMenu.menu.groups.length) return {};
+                const height = this.activeMenu.menu.groups.reduce((total, group) => total + group.items.length, 0) * 28;
+                this.top = window.innerHeight - this.mouseY - height < 0 ? this.mouseY - height : this.mouseY;
+                this.left = window.innerWidth - this.mouseX - 170 < 0 ? this.mouseX - 170 : this.mouseX;
+                this.renderLeft = (this.left + 170 * 2) > window.innerWidth;
+                return { top: `${this.top}px`, left: `${this.left}px` };
+            }
+        },
+        mounted() {
+            window.addEventListener('contextmenu', e => {
+                this.mouseX = e.clientX;
+                this.mouseY = e.clientY;
+            });
+        }
+    }
+</script>

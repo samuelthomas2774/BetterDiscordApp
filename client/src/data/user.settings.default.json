@@ -129,6 +129,24 @@
                         "value": false
                     }
                 ]
+            },
+            {
+                "id": "advanced",
+                "name": "Advanced",
+                "type": "drawer",
+                "settings": [
+                    {
+                        "id": "colored-text-intensity",
+                        "type": "slider",
+                        "text": "Colored Text Intensity",
+                        "hint": "Intensity of the colored text setting.",
+                        "value": 100,
+                        "min": 0,
+                        "max": 100,
+                        "step": 1,
+                        "unit": "%"
+                    }
+                ]
             }
         ]
     },

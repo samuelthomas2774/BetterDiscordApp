@@ -52,10 +52,11 @@
 
     .bd-cmSub {
         .bd-materialDesignIcon {
-            position: absolute;
-            right: 0;
+            position: relative;
             bottom: 2px;
             fill: hsla(0, 0%, 100%, .6);
+            display: flex;
+            justify-content: flex-end;
 
             svg {
                 height: 20px;
@@ -85,6 +86,10 @@
         white-space: nowrap;
         width: 100%;
         display: flex;
+
+        &.bd-cmSub {
+            padding: 6px 0 6px 9px;
+        }
 
         .bd-cmHint {
             opacity: .8;

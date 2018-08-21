@@ -12,10 +12,13 @@ export class BdContextMenu {
 
     /**
      * Show a context menu
+     * @param {MouseEvent|Object} e MouseEvent or Object { x: 0, y: 0 }
      * @param {Object[]} grops Groups of items to show in context menu
      */
-    static show(groups) {
-        this.activeMenu.menu = { groups };
+    static show(e, groups) {
+        const x = e.x || e.clientX;
+        const y = e.y || e.clientY;
+        this.activeMenu.menu = { x, y, groups };
     }
 
     static get activeMenu() {

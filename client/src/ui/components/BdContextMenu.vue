@@ -33,18 +33,14 @@
         methods: {
             calculatePosition() {
                 if (!this.activeMenu.menu.groups.length) return {};
+                this.mouseX = this.activeMenu.menu.x;
+                this.mouseY = this.activeMenu.menu.y;
                 const height = this.activeMenu.menu.groups.reduce((total, group) => total + group.items.length, 0) * 28;
                 this.top = window.innerHeight - this.mouseY - height < 0 ? this.mouseY - height : this.mouseY;
                 this.left = window.innerWidth - this.mouseX - 170 < 0 ? this.mouseX - 170 : this.mouseX;
                 this.renderLeft = (this.left + 170 * 2) > window.innerWidth;
                 return { top: `${this.top}px`, left: `${this.left}px` };
             }
-        },
-        mounted() {
-            window.addEventListener('contextmenu', e => {
-                this.mouseX = e.clientX;
-                this.mouseY = e.clientY;
-            });
         }
     }
 </script>

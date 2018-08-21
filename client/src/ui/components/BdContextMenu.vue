@@ -9,8 +9,8 @@
 */
 
 <template>
-    <div class="bd-cm" :class="{'bd-cmRenderLeft': renderLeft}" v-if="activeMenu && activeMenu.menu" :style="calculatePosition()">
-        <CMGroup v-for="(group, index) in activeMenu.menu.groups" :items="group.items" :key="index" :closeMenu="() => {activeMenu.menu = null}" :left="left" :top="top"/>
+    <div ref="root" class="bd-cm" :class="{'bd-cmRenderLeft': renderLeft}" v-if="activeMenu && activeMenu.menu" :style="calculatePosition()">
+        <CMGroup v-for="(group, index) in activeMenu.menu.groups" :items="group.items" :key="index" :closeMenu="hide" :left="left" :top="top"/>
     </div>
 </template>
 
@@ -39,7 +39,17 @@
                 this.top = window.innerHeight - this.mouseY - height < 0 ? this.mouseY - height : this.mouseY;
                 this.left = window.innerWidth - this.mouseX - 170 < 0 ? this.mouseX - 170 : this.mouseX;
                 this.renderLeft = (this.left + 170 * 2) > window.innerWidth;
+                window.addEventListener('mouseup', this.clickHide);
                 return { top: `${this.top}px`, left: `${this.left}px` };
+            },
+            hide() {
+                window.removeEventListener('mouseup', this.clickHide);
+                this.activeMenu.menu = null;
+            },
+            clickHide(e) {
+                if (!this.$refs.root) return;
+                if (this.$refs.root.contains(e.target)) return;
+                this.hide();
             }
         }
     }

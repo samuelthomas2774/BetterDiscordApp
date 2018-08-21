@@ -11,7 +11,7 @@
 import fs from 'fs';
 import _ from 'lodash';
 import filetype from 'file-type';
-import { join as pathJoin } from 'path';
+import join from 'path';
 
 export class Utils {
     static overload(fn, cb) {
@@ -500,13 +500,13 @@ export class FileUtils {
      * @param {String} path The directory's path
      * @return {Promise}
      */
-    static async deleteDirectory(path) {
+    static async deleteDirectory(pathToDir) {
         try {
-            await this.directoryExists(path);
-            const files = await this.listDirectory(path);
+            await this.directoryExists(pathToDir);
+            const files = await this.listDirectory(pathToDir);
             
             for (const file of files) {
-                const pathToFile = pathJoin(path, file);
+                const pathToFile = path.join(pathToDir, file);
                 try {
                     await this.directoryExists(pathToFile);
                     await this.deleteDirectory(pathToFile);

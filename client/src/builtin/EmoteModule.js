@@ -56,21 +56,20 @@ export default new class EmoteModule extends BuiltinModule {
         GlobalAc.add(';', this);
 
         // Add favourite button to context menu
-        DiscordContextMenu.add([
+        DiscordContextMenu.add(target => [
             {
                 text: 'Favourite',
                 type: 'toggle',
-                checked: (target) => {
-                    const { alt } = target;
-                    if (!alt) return false;
-                    return this.favourites.find(e => e.alt === alt);
-                },
+                checked: target && target.alt ? this.favourites.find(e => e.alt === target.alt) : false,
                 onChange: (checked, target) => {
                     const { alt } = target;
-                    if (!alt) return false;
-                    const fav = this.favourites.find(e => e.alt === alt);
-                    if (fav) return this._favourites = this._favourites.filter(e => e.alt !== target.alt);
-                    this.favourites.push({ alt: target.alt });
+                    if (checked) {
+                        this.favourites.push({ alt: target.alt });
+                        return true;
+                    }
+                    if (!this._favourites) this._favourites = [];
+                    this._favourites = this._favourites.filter(e => e.alt !== target.alt);
+                    return false;
                 }
             }
         ], filter => filter.closest('.bd-emote'));

@@ -78,7 +78,7 @@ export class DiscordContextMenu {
                 top,
                 left,
                 closeMenu: () => WebpackModules.getModuleByProps(['closeContextMenu']).closeContextMenu(),
-                items: menu.items
+                items: typeof menu.items === 'function' ? menu.items(target) : menu.items
             }));
         }
     }

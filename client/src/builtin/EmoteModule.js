@@ -60,16 +60,18 @@ export default new class EmoteModule extends BuiltinModule {
             {
                 text: 'Favourite',
                 type: 'toggle',
-                checked: target && target.alt ? this.favourites.find(e => e.alt === target.alt) : false,
+                checked: target && target.alt ? this.favourites.find(e => e.name === target.alt.replace(/;/g, '')) : false,
                 onChange: (checked, target) => {
                     const { alt } = target;
-                    if (checked) {
-                        this.favourites.push({ alt: target.alt });
-                        return true;
-                    }
-                    if (!this._favourites) this._favourites = [];
-                    this._favourites = this._favourites.filter(e => e.alt !== target.alt);
-                    return false;
+                    if (!alt) return false;
+
+                    const name = alt.replace(/;/g, '');
+
+                    if (!checked) return this.removeFavourite(name);
+
+                    const emote = this.findByName(name, true);
+                    if (!emote) return false;
+                    return this.addFavourite(emote);
                 }
             }
         ], filter => filter.closest('.bd-emote'));
@@ -89,6 +91,20 @@ export default new class EmoteModule extends BuiltinModule {
         this.patchSendAndEdit();
         const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: WebpackModules.getSelector('imageWrapper') });
         MonkeyPatch('BD:EMOTEMODULE', ImageWrapper.component.prototype).after('render', this.beforeRenderImageWrapper.bind(this));
+    }
+
+    addFavourite(emote) {
+        if (this.favourites.find(e => e.name === emote.name)) return true;
+        this.favourites.push(emote);
+        Database.insertOrUpdate({ 'id': 'EmoteModule' }, { 'id': 'EmoteModule', favourites: this.favourites, mostused: this.mostUsed })
+        return true;
+    }
+
+    removeFavourite(name) {
+        if (!this.favourites.find(e => e.name === name)) return false;
+        this._favourites = this._favourites.filter(e => e.name !== name);
+        Database.insertOrUpdate({ 'id': 'EmoteModule' }, { 'id': 'EmoteModule', favourites: this.favourites, mostused: this.mostUsed })
+        return false;
     }
 
     async disabled() {

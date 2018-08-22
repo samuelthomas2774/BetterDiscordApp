@@ -18,11 +18,9 @@
     .bd-cm {
         left: 170px;
         max-height: 270px;
-        overflow-y: auto;
         contain: layout;
         flex: 1;
         min-height: 1px;
-        margin-left: 170px;
 
         &::-webkit-scrollbar {
             height: 8px;

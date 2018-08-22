@@ -11,14 +11,15 @@
 <template>
     <div class="bd-cmGroup">
         <template v-for="(item, index) in items">
-            <CMToggle v-if="item.type === 'toggle'" :item="item" @click="item.checked = item.onChange(!item.checked)" />
-            <div v-else-if="item.type === 'sub'" class="bd-cmItem bd-cmSub" @mouseenter="subMenuMouseEnter($event, index, item)" @mouseleave="subMenuMouseLeave($event, index, item)">
+            <div v-if="item.type === 'sub'" class="bd-cmItem bd-cmSub" @mouseenter="subMenuMouseEnter($event, index, item)" @mouseleave="subMenuMouseLeave($event, index, item)">
                 {{item.text}}
                 <MiChevronDown />
-                <div class="bd-cm" v-if="index === visibleSub" :style="subStyle">
-                    <CMGroup :items="item.items" :top="subTop" :left="left" @close="$emit('close')" />
+                <div v-if="index === visibleSub" :class="['bd-cm', {'bd-cmRenderLeft': subRenderLeft}]" :style="subStyle">
+                    <CMGroup :items="item.items" :top="subTop" :left="subLeft" @close="$emit('close')" />
                 </div>
             </div>
+
+            <CMToggle v-else-if="item.type === 'toggle'" :item="item" @click="item.checked = item.onChange(!item.checked)" />
             <CMButton v-else :item="item" @click="item.onClick ? item.onClick($event) : undefined; item.type === 'button' ? $emit('close') : undefined" />
         </template>
     </div>
@@ -41,7 +42,8 @@
                 visibleSub: -1,
                 subStyle: {},
                 subTop: 0,
-                subLeft: 0
+                subLeft: 0,
+                subRenderLeft: false
             };
         },
         methods: {
@@ -50,7 +52,9 @@
                 this.subTop = this.top + subHeight + e.target.offsetTop > window.innerHeight ?
                     this.top - subHeight + e.target.offsetTop + e.target.offsetHeight :
                     this.top + e.target.offsetTop;
-                this.subStyle = { top: `${this.subTop}px`, left: `${this.left}px` };
+                this.subRenderLeft = (this.left + 170 * 2) > window.innerWidth;
+                this.subLeft = this.left + (!this.subRenderLeft ? e.target.clientWidth : 0);
+                this.subStyle = { top: `${this.subTop - 2}px`, left: `${this.subLeft}px` };
                 this.visibleSub = index;
             },
             subMenuMouseLeave(e, index, sub) {

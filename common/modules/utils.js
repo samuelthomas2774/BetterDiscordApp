@@ -11,6 +11,7 @@
 import fs from 'fs';
 import _ from 'lodash';
 import filetype from 'file-type';
+import path from 'path';
 
 export class Utils {
     static overload(fn, cb) {
@@ -492,5 +493,33 @@ export class FileUtils {
         if (typeof buffer === 'string') buffer = await this.readFileBuffer(buffer);
         if (!type) type = (await this.getFileType(buffer)).mime;
         return `data:${type};base64,${buffer.toString('base64')}`;
+    }
+
+    /**
+     * Delete a directory
+     * @param {String} path The directory's path
+     * @return {Promise}
+     */
+    static async deleteDirectory(pathToDir) {
+        try {
+            await this.directoryExists(pathToDir);
+            const files = await this.listDirectory(pathToDir);
+
+            for (const file of files) {
+                const pathToFile = path.join(pathToDir, file);
+                try {
+                    await this.directoryExists(pathToFile);
+                    await this.deleteDirectory(pathToFile);
+                } catch (err) {
+                    fs.unlinkSync(pathToFile);
+                }
+            }
+
+            fs.rmdirSync(pathToDir);
+
+            return true;
+        } catch (err) {
+            throw err;
+        }
     }
 }

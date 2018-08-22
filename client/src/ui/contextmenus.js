@@ -51,7 +51,7 @@ export class DiscordContextMenu {
      * @param {any} items items to add
      * @param {Function} [filter] filter function for target filtering
      */
-    static add(id, items, filter) {
+    static add(items, filter) {
         if (!this.patched) this.patch();
         const menu = { items, filter };
         this.menus.push(menu);
@@ -71,8 +71,8 @@ export class DiscordContextMenu {
         this.patched = true;
         const self = this;
         MonkeyPatch('BD:DiscordCMOCM', WebpackModules.getModuleByProps(['openContextMenu'])).instead('openContextMenu', (_, [e, fn], originalFn) => {
-            const overrideFn = function (...args) {
-                const res = fn(...args);
+            const overrideFn = function () {
+                const res = fn.apply(this, arguments);
                 if (!res.hasOwnProperty('type')) return res;
                 if (!res.type.prototype || !res.type.prototype.render || res.type.prototype.render.__patched) return res;
                 MonkeyPatch('BD:DiscordCMRender', res.type.prototype).after('render', (c, a, r) => self.renderCm(c, a, r, res));
@@ -91,7 +91,7 @@ export class DiscordContextMenu {
         if (!retVal.props.children) return;
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
 
-        for (const menu of this.menus.filter(menu => { if (!menu.filter) return true; return menu.filter(target)})) {
+        for (const menu of this.menus.filter(menu => !menu.filter || menu.filter(target))) {
             retVal.props.children.push(VueInjector.createReactElement(CMGroup, {
                 target,
                 top,

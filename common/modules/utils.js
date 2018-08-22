@@ -177,9 +177,9 @@ export class Utils {
      * @param {Any} item The item to remove from the array
      * @return {Array}
      */
-    static removeFromArray(array, item) {
+    static removeFromArray(array, item, filter) {
         let index;
-        while ((index = array.indexOf(item)) > -1)
+        while ((index = filter ? array.findIndex(item) : array.indexOf(item)) > -1)
             array.splice(index, 1);
         return array;
     }

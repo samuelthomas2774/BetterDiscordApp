@@ -420,28 +420,38 @@ export default class PluginApi {
      */
 
     get emotes() {
-        return EmoteModule.emotes;
+        return EmoteModule.database;
     }
-    get favourite_emotes() {
-        return EmoteModule.favourite_emotes;
+    get favouriteEmotes() {
+        return EmoteModule.favourites;
+    }
+    get mostUsedEmotes() {
+        return EmoteModule.mostUsed;
     }
     setFavouriteEmote(emote, favourite) {
-        return EmoteModule.setFavourite(emote, favourite);
+        return EmoteModule[favourite ? 'removeFavourite' : 'addFavourite'](emote);
     }
     addFavouriteEmote(emote) {
         return EmoteModule.addFavourite(emote);
     }
     removeFavouriteEmote(emote) {
-        return EmoteModule.addFavourite(emote);
+        return EmoteModule.removeFavourite(emote);
     }
     isFavouriteEmote(emote) {
         return EmoteModule.isFavourite(emote);
     }
     getEmote(emote) {
-        return EmoteModule.getEmote(emote);
+        return EmoteModule.findByName(emote, true);
     }
-    filterEmotes(regex, limit, start = 0) {
-        return EmoteModule.filterEmotes(regex, limit, start);
+    getEmoteUseCount(emote) {
+        const mostUsed = EmoteModule.mostUsed.find(mu => mu.key === emote.name);
+        return mostUsed ? mostUsed.useCount : 0;
+    }
+    incrementEmoteUseCount(emote) {
+        return EmoteModule.addToMostUsed(emote);
+    }
+    searchEmotes(regex, limit) {
+        return EmoteModule.search(regex, limit);
     }
     get Emotes() {
         return Object.defineProperties({
@@ -450,13 +460,18 @@ export default class PluginApi {
             removeFavourite: this.removeFavouriteEmote.bind(this),
             isFavourite: this.isFavouriteEmote.bind(this),
             getEmote: this.getEmote.bind(this),
-            filter: this.filterEmotes.bind(this)
+            getUseCount: this.getEmoteUseCount.bind(this),
+            incrementUseCount: this.incrementEmoteUseCount.bind(this),
+            search: this.searchEmotes.bind(this)
         }, {
             emotes: {
                 get: () => this.emotes
             },
-            favourite_emotes: {
-                get: () => this.favourite_emotes
+            favourites: {
+                get: () => this.favouriteEmotes
+            },
+            mostused: {
+                get: () => this.mostUsedEmotes
             }
         });
     }

@@ -160,7 +160,7 @@ export default new class EmoteModule extends BuiltinModule {
             const arr = new Uint8Array(new ArrayBuffer(res.length));
             for (let i = 0; i < res.length; i++) arr[i] = res.charCodeAt(i);
             const suffix = arr[0] === 71 && arr[1] === 73 && arr[2] === 70 ? '.gif' : '.png';
-            Uploader.upload(args[0], FileActions.makeFile(arr, `${emote.name}${suffix}`));
+            Uploader.upload(args[0], FileActions.makeFile(arr, `${emote.name}.bdemote${suffix}`));
         });
     }
 

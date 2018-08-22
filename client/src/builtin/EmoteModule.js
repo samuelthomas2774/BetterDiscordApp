@@ -14,7 +14,7 @@ import { request } from 'vendor';
 
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { DiscordApi, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache, Patcher, Database } from 'modules';
-import { VueInjector } from 'ui';
+import { VueInjector, DiscordContextMenu } from 'ui';
 
 import Emote from './EmoteComponent.js';
 import Autocomplete from '../ui/components/common/Autocomplete.vue';
@@ -54,6 +54,16 @@ export default new class EmoteModule extends BuiltinModule {
     async enabled() {
         // Add ; prefix for autocomplete
         GlobalAc.add(';', this);
+
+        // Add favourite button to context menu
+        DiscordContextMenu.add([
+            {
+                text: 'Favourite',
+                type: 'toggle',
+                checked: false,
+                onChange: e => e
+            }
+        ], filter => filter.closest('.bd-emote'));
 
         if (!this.database.size) {
             await this.loadLocalDb();
@@ -97,7 +107,7 @@ export default new class EmoteModule extends BuiltinModule {
      */
     async patchMessageContent() {
         const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: WebpackModules.getSelector('container', 'containerCozy', 'containerCompact', 'edited') });
-        MonkeyPatch('BD:EMOTEMODULE', MessageContent.component.prototype).before('render', this.afterRenderMessageContent.bind(this));
+        MonkeyPatch('BD:EMOTEMODULE', MessageContent.component.prototype).after('render', this.afterRenderMessageContent.bind(this));
         MessageContent.forceUpdateAll();
     }
 

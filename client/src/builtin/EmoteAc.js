@@ -9,18 +9,7 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import path from 'path';
-import { request } from 'vendor';
-
-import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { DiscordApi, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache, Patcher, Database } from 'modules';
-import { VueInjector, DiscordContextMenu } from 'ui';
-
 import EmoteModule from './EmoteModule';
-
-import Emote from './EmoteComponent.js';
-import Autocomplete from '../ui/components/common/Autocomplete.vue';
-
 import GlobalAc from '../ui/autocomplete';
 
 const EMOTE_SOURCES = [

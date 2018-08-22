@@ -56,7 +56,7 @@ export default new class EmoteModule extends BuiltinModule {
         GlobalAc.add(';', this);
 
         // Add favourite button to context menu
-        DiscordContextMenu.add(target => [
+        this.removeFavCm = DiscordContextMenu.add('BD:EmoteModule:FavCM', target => [
             {
                 text: 'Favourite',
                 type: 'toggle',
@@ -96,6 +96,7 @@ export default new class EmoteModule extends BuiltinModule {
         for (const patch of Patcher.getPatchesByCaller('BD:EMOTEMODULE')) patch.unpatch();
         // Remove ; prefix from autocomplete
         GlobalAc.remove(';');
+        if (this.removeFavCm) this.removeFavCm();
     }
 
     /**

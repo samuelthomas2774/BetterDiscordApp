@@ -35,12 +35,18 @@ export class DiscordContextMenu {
 
     /**
      * add items to Discord context menu
+     * @param {any} id unique id for group
      * @param {any} items items to add
      * @param {Function} [filter] filter function for target filtering
      */
-    static add(items, filter) {
+    static add(id, items, filter) {
         if (!this.patched) this.patch();
-        this.menus.push({ items, filter });
+        this.menus.push({ id, items, filter });
+        return () => this.remove(id);
+    }
+
+    static remove(id) {
+        this._menus = this._menus.filter(menu => menu.id !== id);
     }
 
     static get menus() {

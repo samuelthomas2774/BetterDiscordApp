@@ -63,4 +63,10 @@ export default new class EmoteAc extends BuiltinModule {
         }
     }
 
+    toggle(sterm) {
+        if (sterm.length > 1) return false;
+
+        return true;
+    }
+
 }

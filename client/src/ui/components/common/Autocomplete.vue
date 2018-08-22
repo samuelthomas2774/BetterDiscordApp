@@ -66,7 +66,9 @@
                 const { which, key } = e;
 
                 if (key === 'ArrowDown' || key === 'ArrowUp') this.traverse(key);
-                else if (key !== 'Tab' && key !== 'Enter') return;
+                else if (key === 'ArrowLeft' || key === 'ArrowRight') {
+                    if (!this.toggle(e)) return;
+                } else if (key !== 'Tab' && key !== 'Enter') return;
 
                 e.stopPropagation();
                 e.preventDefault();
@@ -119,6 +121,12 @@
                 this.insertText(this.ta.selectionStart - this.fsterm.length, this.search.items[this.selectedIndex].value.replaceWith);
                 this.open = false;
                 this.search = { type: null, items: [] };
+            },
+            toggle(e) {
+                const { selectionEnd, value } = e.target;
+                const sterm = value.slice(0, selectionEnd).split(/\s+/g).pop();
+                const prefix = sterm.slice(0, 1);
+                return this.controller.toggle(prefix, sterm);
             }
         }
     }

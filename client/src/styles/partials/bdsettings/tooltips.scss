@@ -3,7 +3,7 @@ bd-tooltips {
     position: absolute;
     right: 0;
     top: 0;
-    z-index: 9001;
+    z-index: 1004;
 }
 
 .bd-tooltip,
@@ -19,7 +19,7 @@ bd-tooltips {
     padding: 8px 12px;
     position: absolute;
     word-wrap: break-word;
-    z-index: 9001;
+    z-index: 1002;
 
     &::after {
         content: none;

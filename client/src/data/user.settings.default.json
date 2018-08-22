@@ -177,6 +177,13 @@
                         "text": "Emote Autocomplete",
                         "hint": "Autocomplete emotes when typing with ; prefix",
                         "value": true
+                    },
+                    {
+                        "id": "emoteactype",
+                        "type": "bool",
+                        "text": "Show most used instead of favourites",
+                        "hint": "Toggle with arrow keys in autocomplete menu",
+                        "value": true
                     }
                 ]
             }

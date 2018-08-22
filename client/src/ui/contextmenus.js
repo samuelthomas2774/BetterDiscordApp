@@ -73,6 +73,7 @@ export class DiscordContextMenu {
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
         for (const menu of this.menus.filter(menu => { if (!menu.filter) return true; return menu.filter(target)})) {
             retVal.props.children.push(VueInjector.createReactElement(CMGroup, {
+                target,
                 top,
                 left,
                 closeMenu: () => WebpackModules.getModuleByProps(['closeContextMenu']).closeContextMenu(),

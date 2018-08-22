@@ -61,7 +61,7 @@ export default new class EmoteModule extends BuiltinModule {
                 text: 'Favourite',
                 type: 'toggle',
                 checked: false,
-                onChange: e => e
+                onChange: (checked, target) => { console.log(target); return checked; }
             }
         ], filter => filter.closest('.bd-emote'));
 

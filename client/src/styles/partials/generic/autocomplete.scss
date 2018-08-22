@@ -1,4 +1,4 @@
-.bd-autocomplete {
+.bd-ac {
     border-radius: 5px 5px 0 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -10,16 +10,16 @@
     right: 0;
     background-color: #2f3136;
 
-    .bd-autocompleteInner {
+    .bd-acInner {
         padding-bottom: 8px;
         white-space: nowrap;
 
-        .bd-autocompleteRow {
+        .bd-acRow {
             padding: 0 8px;
             font-size: 14px;
             line-height: 16px;
 
-            .bd-autocompleteSelector {
+            .bd-acSelector {
                 border-radius: 3px;
                 padding: 8px;
 
@@ -35,7 +35,7 @@
                     }
                 }
 
-                .bd-autocompleteTitle {
+                .bd-acTitle {
                     color: #72767d;
                     padding: 4px 0;
                     text-transform: uppercase;
@@ -50,7 +50,7 @@
                     }
                 }
 
-                .bd-autocompleteField {
+                .bd-acField {
                     display: flex;
                     flex: 1 1 auto;
                     color: #f6f6f7;

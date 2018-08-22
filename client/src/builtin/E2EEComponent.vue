@@ -37,11 +37,9 @@
 </template>
 
 <script>
-    import fs from 'fs';
-    import { Utils } from 'common';
-    import { remote } from 'electron';
+    import { Utils, FileUtils, ClientIPC } from 'common';
     import { E2EE } from 'builtin';
-    import { DiscordApi, Security, WebpackModules } from 'modules';
+    import { DiscordApi, WebpackModules } from 'modules';
     import { Toasts } from 'ui';
     import { MiLock, MiImagePlus, MiIcVpnKey } from '../ui/components/common/MaterialIcon';
 
@@ -59,12 +57,12 @@
         },
         methods: {
             async showUploadDialog() {
-                const dialogResult = remote.dialog.showOpenDialog({ properties: ['openFile'] });
-                if (!dialogResult) return;
+                const dialogResult = await ClientIPC.send('bd-native-open', {properties: ['openFile']});
+                if (!dialogResult || !dialogResult.length) return;
 
-                const readFile = fs.readFileSync(dialogResult[0]);
-                const FileActions = WebpackModules.getModuleByProps(["makeFile"]);
-                const Uploader = WebpackModules.getModuleByProps(["instantBatchUpload"]);
+                const readFile = await FileUtils.readFileBuffer(dialogResult[0]);
+                const FileActions = WebpackModules.getModuleByProps(['makeFile']);
+                const Uploader = WebpackModules.getModuleByProps(['instantBatchUpload']);
 
                 const img = await Utils.getImageFromBuffer(readFile);
 

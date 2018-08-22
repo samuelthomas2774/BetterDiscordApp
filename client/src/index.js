@@ -108,6 +108,13 @@ class BetterDiscord {
                 ]);
             }
             showDummyNotif();
+
+            DiscordContextMenu.add([
+                {
+                    text: 'Hello',
+                    onClick: () => { Toasts.info('Hello!'); }
+                }
+            ]);
         } catch (err) {
             Logger.err('main', ['FAILED TO LOAD!', err]);
         }

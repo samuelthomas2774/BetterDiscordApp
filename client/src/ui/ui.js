@@ -4,6 +4,7 @@ export { default as BdMenu, BdMenuItems } from './bdmenu';
 export { default as Modals } from './modals';
 export { default as Toasts } from './toasts';
 export { default as Notifications } from './notifications';
+export * from './contextmenus';
 
 export { default as VueInjector } from './vueinjector';
 export { default as Reflection } from './reflection';

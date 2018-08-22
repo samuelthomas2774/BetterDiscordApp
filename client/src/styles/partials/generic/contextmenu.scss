@@ -1,0 +1,190 @@
+.bd-cm,
+.da-contextMenu { // sass-lint:disable-line class-name-format
+    background: #18191c;
+    box-shadow: 0 0 1px rgba(0, 0, 0, .82), 0 1px 4px rgba(0, 0, 0, .1);
+    border-radius: 5px;
+    position: fixed;
+    width: 170px;
+    z-index: 1005;
+    user-select: none;
+
+    &.bd-cmRenderLeft,
+    &.da-invertChildX { // sass-lint:disable-line class-name-format
+        .bd-cm {
+            margin-left: -170px;
+        }
+    }
+
+    .bd-cm {
+        left: 170px;
+        max-height: 270px;
+        overflow-y: auto;
+        contain: layout;
+        flex: 1;
+        min-height: 1px;
+        margin-left: 170px;
+
+        &::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-clip: padding-box;
+            background-color: rgba(32, 34, 37, .6);
+            border: 2px solid transparent;
+            border-radius: 4px;
+            cursor: move;
+        }
+
+        &::-webkit-scrollbar-track {
+            background-clip: padding-box;
+            border-radius: 7px;
+            border: 2px solid transparent;
+        }
+    }
+
+    .bd-cmGroup {
+        &:not(:first-child) {
+            &:not(:empty) {
+                border-top: 1px solid hsla(0, 0%, 96.1%, .08);
+            }
+        }
+    }
+
+    .bd-cmSub {
+        .bd-materialDesignIcon {
+            position: relative;
+            bottom: 2px;
+            fill: hsla(0, 0%, 100%, .6);
+            display: flex;
+            justify-content: flex-end;
+
+            svg {
+                height: 20px;
+                transform: rotate(-90deg);
+            }
+        }
+
+        &:hover {
+            svg {
+                fill: #fff;
+            }
+        }
+    }
+
+    .bd-cmItem {
+        cursor: default;
+        color: hsla(0, 0%, 100%, .6);
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 16px;
+        margin: 2px 0;
+        overflow: hidden;
+        padding: 6px 9px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
+        display: flex;
+
+        &.bd-cmSub {
+            padding: 6px 0 6px 9px;
+        }
+
+        .bd-cmHint {
+            opacity: .8;
+            color: hsla(0, 0%, 100%, .6);
+        }
+
+        span {
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-grow: 1;
+        }
+
+        img {
+            height: 16px;
+        }
+
+        &:hover {
+            background: #040405;
+            color: #fff;
+        }
+    }
+
+    .bd-cmToggle {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 9px;
+
+        .bd-cmLabel {
+            overflow: hidden;
+            padding-right: 4px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bd-cmCheckbox {
+            margin-left: 3px;
+            pointer-events: none;
+            align-items: center;
+            cursor: pointer;
+            display: flex;
+
+            .bd-cmCheckboxInner {
+                flex-shrink: 0;
+                height: 18px;
+                position: relative;
+                vertical-align: top;
+                width: 18px;
+
+                &::before,
+                &::after {
+                    content: '';
+                }
+
+                input {
+                    display: none;
+
+                    &:checked {
+                        + span {
+                            background-color: #7289da;
+                            border-color: #7289da;
+
+                            &::after {
+                                border-color: #fff;
+                                border-style: solid;
+                                border-width: 0 2px 2px 0;
+                                content: '';
+                                display: table;
+                                height: 10px;
+                                left: 4px;
+                                position: absolute;
+                                top: 0;
+                                transform: rotate(45deg);
+                                width: 4px;
+                            }
+                        }
+                    }
+                }
+
+                span {
+                    border: 2px solid hsla(0, 0%, 100%, .2);
+                    border-radius: 2px;
+                    bottom: 0;
+                    box-sizing: border-box;
+                    left: 0;
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    transition: .24s;
+                }
+            }
+        }
+    }
+}

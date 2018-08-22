@@ -186,6 +186,7 @@ export default class DOM {
     static get bdModals() { return this.getElement('bd-modals') || this.createElement('bd-modals').appendTo(this.bdBody) }
     static get bdToasts() { return this.getElement('bd-toasts') || this.createElement('bd-toasts').appendTo(this.bdBody) }
     static get bdNotifications() { return this.getElement('bd-notifications') || this.createElement('bd-notifications').appendTo(this.bdBody) }
+    static get bdContextMenu() { return this.getElement('bd-contextmenu') || this.createElement('bd-contextmenu').appendTo(this.bdBody) }
 
     static getElement(e) {
         if (e instanceof BdNode) return e.element;

@@ -17,7 +17,7 @@ export class BdContextMenu {
     /**
      * Show a context menu
      * @param {MouseEvent|Object} e MouseEvent or Object { x: 0, y: 0 }
-     * @param {Object[]} grops Groups of items to show in context menu
+     * @param {Object[]} groups Groups of items to show in context menu
      */
     static show(e, groups) {
         const x = e.x || e.clientX;

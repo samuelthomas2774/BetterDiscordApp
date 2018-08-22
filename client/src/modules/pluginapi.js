@@ -10,7 +10,7 @@
 
 import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenu, Modals, DOM, DOMObserver, Reflection, VueInjector, Toasts } from 'ui';
+import { BdMenu, Modals, DOM, DOMObserver, Reflection, VueInjector, Toasts, BdContextMenu, DiscordContextMenu } from 'ui';
 import * as CommonComponents from 'commoncomponents';
 import { Utils, Filters, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
@@ -194,6 +194,25 @@ export default class PluginApi {
             removeAll: this.removeAllMenuItems.bind(this)
         }, 'items', {
             get: () => this.menuItems
+        });
+    }
+
+    /**
+     * BdContextMenu
+     */
+
+    showContextMenu(event, groups) {
+        BdContextMenu.show(event, groups);
+        this.activeMenu.menu = BdContextMenu.activeMenu.menu;
+    }
+    get activeMenu() {
+        return this._activeMenu || (this._activeMenu = { menu: null });
+    }
+    get BdContextMenu() {
+        return Object.defineProperty({
+            show: this.showContextMenu.bind(this)
+        }, 'activeMenu', {
+            get: () => this.activeMenu
         });
     }
 

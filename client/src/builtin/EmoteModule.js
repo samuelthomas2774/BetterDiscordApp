@@ -52,8 +52,6 @@ export default new class EmoteModule extends BuiltinModule {
     get settingPath() { return ['emotes', 'default', 'enable'] }
 
     async enabled() {
-        // Add ; prefix for autocomplete
-        GlobalAc.add(';', this);
 
         // Add favourite button to context menu
         this.removeFavCm = DiscordContextMenu.add('BD:EmoteModule:FavCM', target => [
@@ -110,8 +108,6 @@ export default new class EmoteModule extends BuiltinModule {
     async disabled() {
         // Unpatch all patches
         for (const patch of Patcher.getPatchesByCaller('BD:EMOTEMODULE')) patch.unpatch();
-        // Remove ; prefix from autocomplete
-        GlobalAc.remove(';');
         if (this.removeFavCm) this.removeFavCm();
     }
 
@@ -328,39 +324,6 @@ export default new class EmoteModule extends BuiltinModule {
         const { type, id } = emote;
         if (type < 0 || type > 2) return null;
         return simple ? { type, id, name } : new Emote(type, id, name);
-    }
-
-    /**
-     * Search for autocomplete
-     * @param {any} regex
-     */
-    acsearch(regex) {
-        if (regex.length <= 0) {
-            return {
-                type: 'imagetext',
-                title: ['Your most used emotes'],
-                items: this.mostUsed.sort((a,b) => b.useCount - a.useCount).slice(0, 10).map(mu => {
-                    return {
-                        key: `${mu.key} | ${mu.useCount}`,
-                        value: {
-                            src: EMOTE_SOURCES[mu.type].replace(':id', mu.id),
-                            replaceWith: `;${mu.key};`
-                        }
-                    }
-                })
-            }
-        }
-
-        const results = this.search(regex);
-        return {
-            type: 'imagetext',
-            title: ['Matching', regex.length],
-            items: results.map(result => {
-                result.value.src = EMOTE_SOURCES[result.value.type].replace(':id', result.value.id);
-                result.value.replaceWith = `;${result.key};`;
-                return result;
-            })
-        }
     }
 
     /**

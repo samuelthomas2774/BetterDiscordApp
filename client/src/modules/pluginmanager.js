@@ -128,6 +128,10 @@ export default class extends ContentManager {
     static get unloadPlugin() { return this.unloadContent }
     static get reloadPlugin() { return this.reloadContent }
 
+    static unloadContentHook(content, reload) {
+        delete Globals.require.cache[Globals.require.resolve(content.paths.mainPath)];
+    }
+
     /**
      * Stops a plugin.
      * @param {Plugin|String} plugin

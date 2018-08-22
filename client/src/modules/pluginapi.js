@@ -279,11 +279,7 @@ export default class PluginApi {
     }
     addModal(_modal, component) {
         const modal = Modals.add(_modal, component);
-        modal.on('close', () => {
-            let index;
-            while ((index = this.modalStack.findIndex(m => m === modal)) > -1)
-                this.modalStack.splice(index, 1);
-        });
+        modal.on('close', () => Utils.removeFromArray(this.modalStack, modal));
         this.modalStack.push(modal);
         return modal;
     }

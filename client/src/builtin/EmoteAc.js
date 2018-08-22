@@ -8,6 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Settings } from 'modules';
+
 import BuiltinModule from './BuiltinModule';
 import EmoteModule from './EmoteModule';
 import GlobalAc from '../ui/autocomplete';
@@ -35,16 +37,17 @@ export default new class EmoteAc extends BuiltinModule {
      * @param {any} regex
      */
     acsearch(regex) {
+        const acType = Settings.getSetting('emotes', 'default', 'emoteactype').value;
         if (regex.length <= 0) {
             return {
                 type: 'imagetext',
-                title: ['Your most used emotes'],
-                items: EmoteModule.mostUsed.sort((a, b) => b.useCount - a.useCount).slice(0, 10).map(mu => {
+                title: [`Your ${acType ? 'most used' : 'favourite'} emotes`, '<= TOGGLE =>'],
+                items: EmoteModule[acType ? 'mostUsed' : 'favourites'].sort((a, b) => b.useCount - a.useCount).slice(0, 10).map(mu => {
                     return {
-                        key: `${mu.key} | ${mu.useCount}`,
+                        key: acType ? `${mu.key} | ${mu.useCount}` : mu.name,
                         value: {
                             src: EMOTE_SOURCES[mu.type].replace(':id', mu.id),
-                            replaceWith: `;${mu.key};`
+                            replaceWith: `;${acType ? mu.key : mu.name};`
                         }
                     }
                 })
@@ -65,7 +68,7 @@ export default new class EmoteAc extends BuiltinModule {
 
     toggle(sterm) {
         if (sterm.length > 1) return false;
-
+        Settings.getSetting('emotes', 'default', 'emoteactype').value = !Settings.getSetting('emotes', 'default', 'emoteactype').value;
         return true;
     }
 

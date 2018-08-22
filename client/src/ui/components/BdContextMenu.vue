@@ -39,11 +39,11 @@
                 this.top = window.innerHeight - this.mouseY - height < 0 ? this.mouseY - height : this.mouseY;
                 this.left = window.innerWidth - this.mouseX - 170 < 0 ? this.mouseX - 170 : this.mouseX;
                 this.renderLeft = (this.left + 170 * 2) > window.innerWidth;
-                window.addEventListener('mouseup', this.clickHide);
+                window.addEventListener('mousedown', this.clickHide);
                 return { top: `${this.top}px`, left: `${this.left}px` };
             },
             hide() {
-                window.removeEventListener('mouseup', this.clickHide);
+                window.removeEventListener('mousedown', this.clickHide);
                 this.activeMenu.menu = null;
             },
             clickHide(e) {

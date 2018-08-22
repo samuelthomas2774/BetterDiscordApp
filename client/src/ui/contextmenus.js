@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Utils } from 'common';
+import { Utils, ClientLogger as Logger } from 'common';
 import { ReactComponents, WebpackModules, MonkeyPatch } from 'modules';
 import { VueInjector, Toasts } from 'ui';
 import CMGroup from './components/contextmenu/Group.vue';
@@ -28,6 +28,17 @@ export class BdContextMenu {
 
     static get activeMenu() {
         return this._activeMenu || (this._activeMenu = { menu: null });
+    }
+
+    static install(Vue) {
+        Vue.directive('contextmenu', {
+            bind(el, binding) {
+                el.addEventListener('contextmenu', event => {
+                    Logger.log('BdContextMenu', ['Showing context menu', event, el, binding]);
+                    BdContextMenu.show(event, binding.value);
+                });
+            }
+        });
     }
 
 }

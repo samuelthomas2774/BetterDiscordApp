@@ -12,6 +12,7 @@ import Vue from 'vue';
 import VTooltip from 'v-tooltip';
 import DOM from './dom';
 import VueInjector from './vueinjector';
+import { BdContextMenu } from './contextmenus';
 
 Vue.use(VTooltip, {
     defaultContainer: 'bd-tooltips',
@@ -46,5 +47,6 @@ Vue.use(VTooltip, {
 });
 
 Vue.use(VueInjector);
+Vue.use(BdContextMenu);
 
 export default Vue;

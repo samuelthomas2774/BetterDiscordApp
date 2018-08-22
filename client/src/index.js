@@ -73,11 +73,20 @@ class BetterDiscord {
         Globals.initg();
     }
 
+    globalReady() {
+        BdUI.initUiEvents();
+        this.vueInstance = BdUI.injectUi();
+        this.init();
+    }
+
     async init() {
         try {
             await Database.init();
             await Settings.loadSettings();
             await ModuleManager.initModules();
+            BuiltinManager.initAll();
+
+            if (tests) this.initTests();
 
             if (!ignoreExternal) {
                 await ExtModuleManager.loadAllModules(true);
@@ -85,45 +94,40 @@ class BetterDiscord {
                 await ThemeManager.loadAllThemes(true);
             }
 
-            if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
-                Modals.showContentManagerErrors();
-
             Events.emit('ready');
             Events.emit('discord-ready');
-            BuiltinManager.initAll();
 
-            function showDummyNotif() { // eslint-disable-line no-inner-declarations
-                Notifications.add('Dummy Notification', [
-                    {
-                        text: 'Show Again', onClick: function () {
-                            setTimeout(showDummyNotif, 5000);
-                            return true;
-                        }
-                    },
-                    {
-                        text: 'Ignore', onClick: function () {
-                            return true;
-                        }
-                    }
-                ]);
-            }
-            showDummyNotif();
-
-            DiscordContextMenu.add([
-                {
-                    text: 'Hello',
-                    onClick: () => { Toasts.info('Hello!'); }
-                }
-            ]);
+            if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
+                Modals.showContentManagerErrors();
         } catch (err) {
             Logger.err('main', ['FAILED TO LOAD!', err]);
         }
     }
 
-    globalReady() {
-        BdUI.initUiEvents();
-        this.vueInstance = BdUI.injectUi();
-        this.init();
+    initTests() {
+        function showDummyNotif() { // eslint-disable-line no-inner-declarations
+            Notifications.add('Dummy Notification', [
+                {
+                    text: 'Show Again', onClick: function () {
+                        setTimeout(showDummyNotif, 5000);
+                        return true;
+                    }
+                },
+                {
+                    text: 'Ignore', onClick: function () {
+                        return true;
+                    }
+                }
+            ]);
+        }
+        showDummyNotif();
+
+        DiscordContextMenu.add([
+            {
+                text: 'Hello',
+                onClick: () => { Toasts.info('Hello!'); }
+            }
+        ]);
     }
 
 }

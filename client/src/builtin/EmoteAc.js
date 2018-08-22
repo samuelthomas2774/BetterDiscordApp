@@ -42,7 +42,7 @@ export default new class EmoteAc extends BuiltinModule {
             return {
                 type: 'imagetext',
                 title: [`Your ${acType ? 'most used' : 'favourite'} emotes`, '', `⬅ ${acType ? 'Favourites' : 'Most Used'} ⮕`],
-                items: EmoteModule[acType ? 'mostUsed' : 'favourites'].sort((a, b) => b.useCount - a.useCount).slice(0, 10).map(mu => {
+                items: EmoteModule[acType ? 'mostUsed' : 'favourites'].sort((a, b) => b.useCount - a.useCount).map(mu => {
                     return {
                         key: acType ? mu.key : mu.name,
                         value: {

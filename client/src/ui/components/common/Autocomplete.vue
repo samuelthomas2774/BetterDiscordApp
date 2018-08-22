@@ -20,12 +20,14 @@
                     </div>
                 </div>
             </div>
-            <div v-for="(item, index) in search.items" class="bd-acRow" @mouseover="selectedIndex = index" @click="inject">
-                <div class="bd-acSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}">
-                    <div class="bd-acField">
-                        <img v-if="search.type === 'imagetext'" :src="item.src || item.value.src" :alt="item.key || item.text || item.alt" />
-                        <div class="bd-flexGrow">{{item.key || item.text}}</div>
-                        <div class="bd-acHint" v-if="item.hint || (item.value && item.value.hint)">{{item.hint || item.value.hint}}</div>
+            <div class="bd-acScroller" ref="scroller">
+                <div v-for="(item, index) in search.items" class="bd-acRow" @mouseover="selectedIndex = index" @click="inject">
+                    <div class="bd-acSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}">
+                        <div class="bd-acField">
+                            <img v-if="search.type === 'imagetext'" :src="item.src || item.value.src" :alt="item.key || item.text || item.alt" />
+                            <div class="bd-flexGrow">{{item.key || item.text}}</div>
+                            <div class="bd-acHint" v-if="item.hint || (item.value && item.value.hint)">{{item.hint || item.value.hint}}</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -106,11 +108,13 @@
             traverse(key) {
                 if (!this.open) return;
                 if (key === 'ArrowUp') {
-                    this.selectedIndex = (this.selectedIndex - 1) < 0 ? Math.min(this.search.items.length, 10) - 1 : this.selectedIndex - 1;
+                    this.selectedIndex = (this.selectedIndex - 1) < 0 ? this.search.items.length - 1 : this.selectedIndex - 1;
+                    this.$refs.scroller.scrollTop = (this.selectedIndex + 1) * 32 - 320;
                     return;
                 }
                 if (key === 'ArrowDown') {
-                    this.selectedIndex = (this.selectedIndex + 1) >= Math.min(this.search.items.length, 10) ? 0 : this.selectedIndex + 1;
+                    this.selectedIndex = (this.selectedIndex + 1) >= this.search.items.length ? 0 : this.selectedIndex + 1;
+                    this.$refs.scroller.scrollTop = (this.selectedIndex + 1) * 32 - 320;
                     return;
                 }
             },

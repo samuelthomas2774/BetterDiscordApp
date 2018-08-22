@@ -109,7 +109,7 @@ class BetterDiscord {
             }
             showDummyNotif();
 
-            DiscordContextMenu.add([
+            DiscordContextMenu.add('DummyThing', [
                 {
                     text: 'Hello',
                     onClick: () => { Toasts.info('Hello!'); }

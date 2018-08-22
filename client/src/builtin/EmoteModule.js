@@ -68,6 +68,8 @@ export default new class EmoteModule extends BuiltinModule {
 
         this.patchMessageContent();
         this.patchSendAndEdit();
+        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: WebpackModules.getSelector('imageWrapper') });
+        MonkeyPatch('BD:EMOTEMODULE', ImageWrapper.component.prototype).after('render', this.beforeRenderImageWrapper.bind(this));
     }
 
     async disabled() {
@@ -95,7 +97,7 @@ export default new class EmoteModule extends BuiltinModule {
      */
     async patchMessageContent() {
         const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: WebpackModules.getSelector('container', 'containerCozy', 'containerCompact', 'edited') });
-        MonkeyPatch('BD:EMOTEMODULE', MessageContent.component.prototype).after('render', this.afterRenderMessageContent.bind(this));
+        MonkeyPatch('BD:EMOTEMODULE', MessageContent.component.prototype).before('render', this.afterRenderMessageContent.bind(this));
         MessageContent.forceUpdateAll();
     }
 
@@ -108,7 +110,6 @@ export default new class EmoteModule extends BuiltinModule {
             filter.className &&
             filter.className.includes('markup') &&
             filter.children.length >= 2);
-
         if (!markup) return;
         markup.children[1] = this.processMarkup(markup.children[1]);
     }
@@ -179,6 +180,20 @@ export default new class EmoteModule extends BuiltinModule {
     }
 
     /**
+     * Handle imagewrapper render
+     */
+    beforeRenderImageWrapper(component, args, retVal) {
+        if (!component.props || !component.props.src) return;
+
+        const src = component.props.original || component.props.src.split('?')[0];
+        if (!src || !src.includes('.bdemote.')) return;
+        const emoteName = src.split('/').pop().split('.')[0];
+        const emote = this.findByName(emoteName);
+        if (!emote) return;
+        retVal.props.children = emote.render();
+    }
+
+    /**
      * Add/update emote to most used
      * @param {Object} emote emote to add/update
      */
@@ -205,6 +220,7 @@ export default new class EmoteModule extends BuiltinModule {
     processMarkup(markup) {
         const newMarkup = [];
         if (!(markup instanceof Array)) return markup;
+
         const jumboable = !markup.some(child => {
             if (typeof child !== 'string') return false;
             return / \w+/g.test(child);

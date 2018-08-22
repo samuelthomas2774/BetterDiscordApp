@@ -33,9 +33,9 @@ export class BdContextMenu {
 
 export class DiscordContextMenu {
 
-    static add(target, groups) {
+    static add(items, filter) {
         if (!this.patched) this.patch();
-        this.menus.push({ target, groups });
+        this.menus.push({ items, filter });
     }
 
     static get menus() {
@@ -66,12 +66,12 @@ export class DiscordContextMenu {
         if (!target || !top || !left) return;
         if (!retVal.props.children) return;
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
-        for (const menu of this.menus.filter(menu => menu.target(target))) {
+        for (const menu of this.menus.filter(menu => { if (!menu.filter) return true; return menu.filter(target)})) {
             retVal.props.children.push(VueInjector.createReactElement(CMGroup, {
                 top,
                 left,
                 closeMenu: () => WebpackModules.getModuleByProps(['closeContextMenu']).closeContextMenu(),
-                items: menu.groups
+                items: menu.items
             }));
         }
     }

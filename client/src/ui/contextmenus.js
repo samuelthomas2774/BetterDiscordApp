@@ -35,12 +35,18 @@ export class DiscordContextMenu {
 
     /**
      * add items to Discord context menu
+     * @param {any} id unique id for group
      * @param {any} items items to add
      * @param {Function} [filter] filter function for target filtering
      */
-    static add(items, filter) {
+    static add(id, items, filter) {
         if (!this.patched) this.patch();
-        this.menus.push({ items, filter });
+        this.menus.push({ id, items, filter });
+        return () => this.remove(id);
+    }
+
+    static remove(id) {
+        this._menus = this._menus.filter(menu => menu.id !== id);
     }
 
     static get menus() {
@@ -66,17 +72,19 @@ export class DiscordContextMenu {
 
     static renderCm(component, args, retVal, res) {
         if (!retVal.props || !res.props) return;
-        const { target } = res.props;
+        const { target } = component.props;
         const { top, left } = retVal.props.style;
         if (!target || !top || !left) return;
         if (!retVal.props.children) return;
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
+
         for (const menu of this.menus.filter(menu => { if (!menu.filter) return true; return menu.filter(target)})) {
             retVal.props.children.push(VueInjector.createReactElement(CMGroup, {
+                target,
                 top,
                 left,
                 closeMenu: () => WebpackModules.getModuleByProps(['closeContextMenu']).closeContextMenu(),
-                items: menu.items
+                items: typeof menu.items === 'function' ? menu.items(target) : menu.items
             }));
         }
     }

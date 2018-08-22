@@ -9,21 +9,23 @@
 */
 
 <template>
-    <div class="bd-autocomplete">
-        <div v-if="search.items.length" class="bd-autocompleteInner">
-            <div class="bd-autocompleteRow">
-                <div class="bd-autocompleteSelector">
-                    <div class="bd-autocompleteTitle">
+    <div class="bd-ac">
+        <div v-if="search.items.length" class="bd-acInner">
+            <div class="bd-acRow">
+                <div class="bd-acSelector">
+                    <div class="bd-acTitle">
                         {{search.title[0] || search.title}}
-                        <strong>{{search.title[1] || sterm}}</strong>
+                        <strong v-if="search.title.length >= 2">{{search.title[1] || sterm}}</strong>
+                        <strong v-if="search.title.length === 3" :style="{float: 'right'}">{{search.title[2]}}</strong>
                     </div>
                 </div>
             </div>
-            <div v-for="(item, index) in search.items" class="bd-autocompleteRow" @mouseover="selectedIndex = index" @click="inject">
-                <div class="bd-autocompleteSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}">
-                    <div class="bd-autocompleteField">
-                        <img v-if="search.type === 'imagetext'" :src="item.value.src" :alt="item.key" />
-                        <div class="bd-flexGrow">{{item.key}}</div>
+            <div v-for="(item, index) in search.items" class="bd-acRow" @mouseover="selectedIndex = index" @click="inject">
+                <div class="bd-acSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}">
+                    <div class="bd-acField">
+                        <img v-if="search.type === 'imagetext'" :src="item.src || item.value.src" :alt="item.key || item.text || item.alt" />
+                        <div class="bd-flexGrow">{{item.key || item.text}}</div>
+                        <div class="bd-acHint" v-if="item.hint || (item.value && item.value.hint)">{{item.hint || item.value.hint}}</div>
                     </div>
                 </div>
             </div>
@@ -66,7 +68,9 @@
                 const { which, key } = e;
 
                 if (key === 'ArrowDown' || key === 'ArrowUp') this.traverse(key);
-                else if (key !== 'Tab' && key !== 'Enter') return;
+                else if (key === 'ArrowLeft' || key === 'ArrowRight') {
+                    if (!this.toggle(e)) return;
+                } else if (key !== 'Tab' && key !== 'Enter') return;
 
                 e.stopPropagation();
                 e.preventDefault();
@@ -119,6 +123,12 @@
                 this.insertText(this.ta.selectionStart - this.fsterm.length, this.search.items[this.selectedIndex].value.replaceWith);
                 this.open = false;
                 this.search = { type: null, items: [] };
+            },
+            toggle(e) {
+                const { selectionEnd, value } = e.target;
+                const sterm = value.slice(0, selectionEnd).split(/\s+/g).pop();
+                const prefix = sterm.slice(0, 1);
+                return this.controller.toggle(prefix, sterm);
             }
         }
     }

@@ -44,6 +44,11 @@ export default new class AutoComplete {
         return this.sets.hasOwnProperty(prefix);
     }
 
+    toggle(prefix, sterm) {
+        if (!this.sets[prefix].toggle) return false;
+        return this.sets[prefix].toggle(sterm);
+    }
+
     items(prefix, sterm) {
         if (!this.validPrefix(prefix)) return [];
         return this.sets[prefix].acsearch(sterm);

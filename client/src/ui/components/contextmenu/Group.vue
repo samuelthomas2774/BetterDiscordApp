@@ -12,14 +12,14 @@
     <div class="bd-cmGroup" ref="test">
         <template v-for="(item, index) in items">
             <CMButton v-if="!item.type || item.type === 'button'" :item="item" :onClick="() => { item.onClick(); closeMenu(); }" />
-            <CMToggle v-else-if="item.type === 'toggle'" :item="item" :onClick="() => { item.checked = item.onChange(!item.checked) }" />
+            <CMToggle v-else-if="item.type === 'toggle'" :item="item" :checked="item.checked" :onClick="() => { item.checked = item.onChange(!item.checked, target) }" />
             <div v-else-if="item.type === 'sub'" class="bd-cmItem bd-cmSub" @mouseenter="e => subMenuMouseEnter(e, index, item)" @mouseleave="e => subMenuMouseLeave(e, index, item)">
                 {{item.text}}
                 <MiChevronDown />
-                <div ref="test2" class="bd-cm" v-if="index === visibleSub" :style="subStyle">
+                <div class="bd-cm" v-if="index === visibleSub" :style="subStyle">
                     <template v-for="(item, index) in item.items">
                         <CMButton v-if="!item.type || item.type === 'button'" :item="item" :onClick="() => { item.onClick(); closeMenu(); }" />
-                        <CMToggle v-else-if="item.type === 'toggle'" :item="item" :onClick="() => { item.checked = item.onChange(!item.checked) }" />
+                        <CMToggle v-else-if="item.type === 'toggle'" :item="item" :checked="item.checked" :onClick="() => { item.checked = item.onChange(!item.checked, target) }" />
                     </template>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 subStyle: {}
             }
         },
-        props: ['items', 'closeMenu', 'left', 'top'],
+        props: ['items', 'closeMenu', 'left', 'top', 'target'],
         components: { CMButton, CMToggle, MiChevronDown },
         methods: {
             subMenuMouseEnter(e, index, sub) {
@@ -57,3 +57,5 @@
         }
     }
 </script>
+
+// return typeof this.item.checked === 'function' ? this.item.checked(target) : this.item.checked;

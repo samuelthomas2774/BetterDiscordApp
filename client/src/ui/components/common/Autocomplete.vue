@@ -15,15 +15,17 @@
                 <div class="bd-autocompleteSelector">
                     <div class="bd-autocompleteTitle">
                         {{search.title[0] || search.title}}
-                        <strong>{{search.title[1] || sterm}}</strong>
+                        <strong v-if="search.title.length >= 2">{{search.title[1] || sterm}}</strong>
+                        <strong v-if="search.title.length === 3" :style="{float: 'right'}">{{search.title[2]}}</strong>
                     </div>
                 </div>
             </div>
             <div v-for="(item, index) in search.items" class="bd-autocompleteRow" @mouseover="selectedIndex = index" @click="inject">
                 <div class="bd-autocompleteSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}">
                     <div class="bd-autocompleteField">
-                        <img v-if="search.type === 'imagetext'" :src="item.value.src" :alt="item.key" />
-                        <div class="bd-flexGrow">{{item.key}}</div>
+                        <img v-if="search.type === 'imagetext'" :src="item.src || item.value.src" :alt="item.key || item.text || item.alt" />
+                        <div class="bd-flexGrow">{{item.key || item.text}}</div>
+                        <div class="bd-acHint" v-if="item.hint || (item.value && item.value.hint)">{{item.hint || item.value.hint}}</div>
                     </div>
                 </div>
             </div>

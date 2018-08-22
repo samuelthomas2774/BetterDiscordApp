@@ -1,4 +1,4 @@
-/**
+﻿/**
  * BetterDiscord Emote Autocomplete Module
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
@@ -41,13 +41,14 @@ export default new class EmoteAc extends BuiltinModule {
         if (regex.length <= 0) {
             return {
                 type: 'imagetext',
-                title: [`Your ${acType ? 'most used' : 'favourite'} emotes`, '<= TOGGLE =>'],
+                title: [`Your ${acType ? 'most used' : 'favourite'} emotes`, '', `⬅ ${acType ? 'Favourites' : 'Most Used'} ⮕`],
                 items: EmoteModule[acType ? 'mostUsed' : 'favourites'].sort((a, b) => b.useCount - a.useCount).slice(0, 10).map(mu => {
                     return {
-                        key: acType ? `${mu.key} | ${mu.useCount}` : mu.name,
+                        key: acType ? mu.key : mu.name,
                         value: {
                             src: EMOTE_SOURCES[mu.type].replace(':id', mu.id),
-                            replaceWith: `;${acType ? mu.key : mu.name};`
+                            replaceWith: `;${acType ? mu.key : mu.name};`,
+                            hint: mu.useCount ? `Used ${mu.useCount} times` : null
                         }
                     }
                 })

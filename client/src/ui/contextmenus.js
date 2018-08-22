@@ -66,11 +66,12 @@ export class DiscordContextMenu {
 
     static renderCm(component, args, retVal, res) {
         if (!retVal.props || !res.props) return;
-        const { target } = res.props;
+        const { target } = component.props;
         const { top, left } = retVal.props.style;
         if (!target || !top || !left) return;
         if (!retVal.props.children) return;
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
+
         for (const menu of this.menus.filter(menu => { if (!menu.filter) return true; return menu.filter(target)})) {
             retVal.props.children.push(VueInjector.createReactElement(CMGroup, {
                 target,

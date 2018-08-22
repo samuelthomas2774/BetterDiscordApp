@@ -14,7 +14,7 @@ import { request } from 'vendor';
 
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { DiscordApi, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache, Patcher, Database } from 'modules';
-import { VueInjector } from 'ui';
+import { VueInjector, DiscordContextMenu } from 'ui';
 
 import Emote from './EmoteComponent.js';
 import Autocomplete from '../ui/components/common/Autocomplete.vue';
@@ -52,8 +52,26 @@ export default new class EmoteModule extends BuiltinModule {
     get settingPath() { return ['emotes', 'default', 'enable'] }
 
     async enabled() {
-        // Add ; prefix for autocomplete
-        GlobalAc.add(';', this);
+        // Add favourite button to context menu
+        this.favCm = DiscordContextMenu.add(target => [
+            {
+                text: 'Favourite',
+                type: 'toggle',
+                checked: target && target.alt ? this.favourites.find(e => e.name === target.alt.replace(/;/g, '')) : false,
+                onChange: (checked, target) => {
+                    const { alt } = target;
+                    if (!alt) return false;
+
+                    const name = alt.replace(/;/g, '');
+
+                    if (!checked) return this.removeFavourite(name);
+
+                    const emote = this.findByName(name, true);
+                    if (!emote) return false;
+                    return this.addFavourite(emote);
+                }
+            }
+        ], filter => filter.closest('.bd-emote'));
 
         if (!this.database.size) {
             await this.loadLocalDb();
@@ -68,13 +86,28 @@ export default new class EmoteModule extends BuiltinModule {
 
         this.patchMessageContent();
         this.patchSendAndEdit();
+        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: WebpackModules.getSelector('imageWrapper') });
+        MonkeyPatch('BD:EMOTEMODULE', ImageWrapper.component.prototype).after('render', this.beforeRenderImageWrapper.bind(this));
+    }
+
+    addFavourite(emote) {
+        if (this.favourites.find(e => e.name === emote.name)) return true;
+        this.favourites.push(emote);
+        Database.insertOrUpdate({ 'id': 'EmoteModule' }, { 'id': 'EmoteModule', favourites: this.favourites, mostused: this.mostUsed })
+        return true;
+    }
+
+    removeFavourite(name) {
+        if (!this.favourites.find(e => e.name === name)) return false;
+        this._favourites = this._favourites.filter(e => e.name !== name);
+        Database.insertOrUpdate({ 'id': 'EmoteModule' }, { 'id': 'EmoteModule', favourites: this.favourites, mostused: this.mostUsed })
+        return false;
     }
 
     async disabled() {
         // Unpatch all patches
         for (const patch of Patcher.getPatchesByCaller('BD:EMOTEMODULE')) patch.unpatch();
-        // Remove ; prefix from autocomplete
-        GlobalAc.remove(';');
+        DiscordContextMenu.remove(this.favCm);
     }
 
     /**
@@ -108,7 +141,6 @@ export default new class EmoteModule extends BuiltinModule {
             filter.className &&
             filter.className.includes('markup') &&
             filter.children.length >= 2);
-
         if (!markup) return;
         markup.children[1] = this.processMarkup(markup.children[1]);
     }
@@ -160,7 +192,7 @@ export default new class EmoteModule extends BuiltinModule {
             const arr = new Uint8Array(new ArrayBuffer(res.length));
             for (let i = 0; i < res.length; i++) arr[i] = res.charCodeAt(i);
             const suffix = arr[0] === 71 && arr[1] === 73 && arr[2] === 70 ? '.gif' : '.png';
-            Uploader.upload(args[0], FileActions.makeFile(arr, `${emote.name}${suffix}`));
+            Uploader.upload(args[0], FileActions.makeFile(arr, `${emote.name}.bdemote${suffix}`));
         });
     }
 
@@ -176,6 +208,20 @@ export default new class EmoteModule extends BuiltinModule {
             return isEmote ? `:${isEmote[1]}:` : word;
         }).join(' ');
         return orig(...args);
+    }
+
+    /**
+     * Handle imagewrapper render
+     */
+    beforeRenderImageWrapper(component, args, retVal) {
+        if (!component.props || !component.props.src) return;
+
+        const src = component.props.original || component.props.src.split('?')[0];
+        if (!src || !src.includes('.bdemote.')) return;
+        const emoteName = src.split('/').pop().split('.')[0];
+        const emote = this.findByName(emoteName);
+        if (!emote) return;
+        retVal.props.children = emote.render();
     }
 
     /**
@@ -205,6 +251,7 @@ export default new class EmoteModule extends BuiltinModule {
     processMarkup(markup) {
         const newMarkup = [];
         if (!(markup instanceof Array)) return markup;
+
         const jumboable = !markup.some(child => {
             if (typeof child !== 'string') return false;
             return / \w+/g.test(child);
@@ -276,39 +323,6 @@ export default new class EmoteModule extends BuiltinModule {
         const { type, id } = emote;
         if (type < 0 || type > 2) return null;
         return simple ? { type, id, name } : new Emote(type, id, name);
-    }
-
-    /**
-     * Search for autocomplete
-     * @param {any} regex
-     */
-    acsearch(regex) {
-        if (regex.length <= 0) {
-            return {
-                type: 'imagetext',
-                title: ['Your most used emotes'],
-                items: this.mostUsed.sort((a,b) => b.useCount - a.useCount).slice(0, 10).map(mu => {
-                    return {
-                        key: `${mu.key} | ${mu.useCount}`,
-                        value: {
-                            src: EMOTE_SOURCES[mu.type].replace(':id', mu.id),
-                            replaceWith: `;${mu.key};`
-                        }
-                    }
-                })
-            }
-        }
-
-        const results = this.search(regex);
-        return {
-            type: 'imagetext',
-            title: ['Matching', regex.length],
-            items: results.map(result => {
-                result.value.src = EMOTE_SOURCES[result.value.type].replace(':id', result.value.id);
-                result.value.replaceWith = `;${result.key};`;
-                return result;
-            })
-        }
     }
 
     /**

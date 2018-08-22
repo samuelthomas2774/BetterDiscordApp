@@ -1,5 +1,5 @@
 <template>
-    <img class="emoji" :class="{jumboable}" :src="src" :alt="`;${name};`" v-tooltip="{ content: `;${name};`, delay: { show: 750, hide: 0 } }" />
+    <img class="bd-emote emoji" :class="{jumboable}" :src="src" :alt="`;${name};`" v-tooltip="{ content: `;${name};`, delay: { show: 750, hide: 0 } }" />
 </template>
 
 <script>

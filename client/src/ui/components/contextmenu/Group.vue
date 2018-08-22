@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <CMToggle v-else-if="item.type === 'toggle'" :item="item" @click="item.checked = item.onChange(!item.checked)" />
+            <CMToggle v-else-if="item.type === 'toggle'" :item="item" :checked="item.checked" @click="item.checked = item.onChange(!item.checked, target)" />
             <CMButton v-else :item="item" @click="item.onClick ? item.onClick($event) : undefined; item.type === 'button' ? $emit('close') : undefined" />
         </template>
     </div>
@@ -36,7 +36,7 @@
         components: {
             CMButton, CMToggle, MiChevronDown
         },
-        props: ['items', 'left', 'top'],
+        props: ['items', 'left', 'top', 'target'],
         data() {
             return {
                 visibleSub: -1,
@@ -63,3 +63,5 @@
         }
     }
 </script>
+
+// return typeof this.item.checked === 'function' ? this.item.checked(target) : this.item.checked;

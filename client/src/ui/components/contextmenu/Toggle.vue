@@ -11,9 +11,9 @@
 <template>
     <div class="bd-cmItem bd-cmToggle" @click="$emit('click', $event)">
         <div class="bd-cmLabel">{{item.text}}</div>
-        <div class="bd-cmCheckbox">
+        <div class="bd-cmCheckbox" :checked="checked">
             <div class="bd-cmCheckboxInner">
-                <input type="checkbox" :checked="item.checked || item.enabled"/>
+                <input type="checkbox" :checked="checked"/>
                 <span></span>
             </div>
         </div>
@@ -22,6 +22,6 @@
 
 <script>
     export default {
-        props: ['item', 'onClick']
+        props: ['item', 'onClick', 'checked']
     }
 </script>

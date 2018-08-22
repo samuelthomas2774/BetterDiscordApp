@@ -8,6 +8,7 @@ import { default as TwentyFourHour } from './24Hour';
 import { default as KillClyde } from './KillClyde';
 import { default as BlockedMessages } from './BlockedMessages';
 import { default as VoiceDisconnect } from './VoiceDisconnect';
+import { default as EmoteAc } from './EmoteAc';
 
 export default class {
     static initAll() {
@@ -21,5 +22,6 @@ export default class {
         KillClyde.init();
         BlockedMessages.init();
         VoiceDisconnect.init();
+        EmoteAc.init();
     }
 }

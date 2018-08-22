@@ -9,7 +9,7 @@
 */
 
 <template>
-    <Modal :class="['bd-modalBasic', {'bd-modal-out': modal.closing}]" :headerText="modal.title" @close="modal.close">
+    <Modal class="bd-modalBasic" :headertext="modal.title" :closing="modal.closing" @close="modal.close">
         <div slot="body" class="bd-modalBasicBody">{{ modal.text }}</div>
         <div slot="footer" class="bd-modalControls">
             <div class="bd-flexGrow"></div>

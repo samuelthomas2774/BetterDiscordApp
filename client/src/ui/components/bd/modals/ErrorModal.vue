@@ -1,14 +1,14 @@
 <template>
-    <Modal :headerText="modal.event.header" @close="modal.close"
-           :class="{'bd-err': modal.event.type && modal.event.type === 'err', 'bd-modalOut': modal.closing}">
+    <Modal :headertext="modal.event.header" :closing="modal.closing" @close="modal.close"
+           :class="{'bd-err': modal.event.type && modal.event.type === 'err'}">
         <MiError v-if="modal.event.type === 'err'" slot="icon" size="20"/>
         <div slot="body">
             <div v-for="(content, index) in modal.event.content">
                 <div class="bd-modalError" :class="{'bd-open': content.showStack}">
                     <div class="bd-modalErrorTitle bd-flex">
                         <span class="bd-modalTitleText bd-flexGrow">{{content.message}}</span>
-                        <span class="bd-modalTitlelink" v-if="content.showStack" @click="() => { content.showStack = false; $forceUpdate(); }">Hide Stacktrace</span>
-                        <span class="bd-modalTitlelink" v-else @click="() => { content.showStack = true; $forceUpdate(); }">Show Stacktrace</span>
+                        <span class="bd-modalTitlelink" v-if="content.showStack" @click="content.showStack = false; $forceUpdate();">Hide Stacktrace</span>
+                        <span class="bd-modalTitlelink" v-else @click="content.showStack = true; $forceUpdate();">Show Stacktrace</span>
                     </div>
                     <div class="bd-scrollerWrap">
                         <div class="bd-scroller">

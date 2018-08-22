@@ -10,8 +10,9 @@
 
 <template>
     <div class="bd-settingsModal" :class="{'bd-edited': changed}">
-        <Modal :class="{'bd-modalOut': modal.closing}" :headerText="modal.headertext" @close="modal.close">
+        <Modal :headertext="modal.headertext" :closing="modal.closing" @close="modal.close">
             <SettingsPanel :settings="settings" :schemes="modal.schemes" slot="body" class="bd-settingsModalBody" />
+
             <div slot="footer" class="bd-footerAlert" :class="{'bd-active': changed || saving, 'bd-warn': warnclose}" :style="{pointerEvents: changed ? 'all' : 'none'}">
                 <div class="bd-footerAlertText">Unsaved changes</div>
                 <div class="bd-button bd-resetButton bd-tp" :class="{'bd-disabled': saving}" @click="resetSettings">Reset</div>

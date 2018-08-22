@@ -4,15 +4,15 @@ import { VueInjector } from 'ui';
 import AutocompleteComponent from './components/common/Autocomplete.vue';
 import { Utils } from 'common';
 
-export default new class AutoComplete {
+export default new class Autocomplete {
 
     get sets() {
-        return this._sets || (this._sets = {});
+        return this._sets || (this._sets = new Map());
     }
 
     async init() {
         this.cta = await ReactComponents.getComponent('ChannelTextArea', { selector: WebpackModules.getSelector('channelTextArea', 'emojiButton') });
-        MonkeyPatch('BD:EMOTEMODULE', this.cta.component.prototype).after('render', this.channelTextAreaAfterRender.bind(this));
+        MonkeyPatch('BD:Autocomplete', this.cta.component.prototype).after('render', this.channelTextAreaAfterRender.bind(this));
         this.initialized = true;
     }
 
@@ -32,21 +32,21 @@ export default new class AutoComplete {
 
     add(prefix, controller) {
         if (!this.initialized) this.init();
-        if (this.sets.hasOwnProperty(prefix)) return;
-        this.sets[prefix] = controller;
+        if (this.validPrefix(prefix)) return;
+        this.sets.set(prefix, controller);
     }
 
     remove(prefix) {
-        if (this.sets.hasOwnProperty(prefix)) delete this.sets[prefix];
+        this.sets.delete(prefix);
     }
 
     validPrefix(prefix) {
-        return this.sets.hasOwnProperty(prefix);
+        return this.sets.has(prefix);
     }
 
     items(prefix, sterm) {
         if (!this.validPrefix(prefix)) return [];
-        return this.sets[prefix].acsearch(sterm);
+        return this.sets.get(prefix).acsearch(sterm);
     }
 
 }

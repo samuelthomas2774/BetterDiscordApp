@@ -23,6 +23,7 @@ import { WebpackModules } from './webpackmodules';
 import DiscordApi from './discordapi';
 import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
+import GlobalAc from '../ui/autocomplete';
 
 export default class PluginApi {
 
@@ -347,6 +348,43 @@ export default class PluginApi {
             warning: this.showWarningToast.bind(this),
             get enabled() { return Toasts.enabled }
         };
+    }
+
+    /**
+     * Autocomplete
+     */
+
+    get autocompleteSets() {
+        return this._autocompleteSets || (this._autocompleteSets = new Map());
+    }
+    addAutocompleteController(prefix, controller) {
+        if (!controller) controller = this.plugin;
+        if (GlobalAc.validPrefix(prefix)) return;
+        GlobalAc.add(prefix, controller);
+        this.autocompleteSets.set(prefix, controller);
+    }
+    removeAutocompleteController(prefix) {
+        if (this.autocompleteSets.get(prefix) !== GlobalAc.sets.get(prefix)) return;
+        GlobalAc.remove(prefix);
+        this.autocompleteSets.delete(prefix);
+    }
+    removeAllAutocompleteControllers() {
+        for (let [prefix] of this.autocompleteSets) {
+            this.removeAutocompleteController(prefix);
+        }
+    }
+    validAutocompletePrefix(prefix) {
+        return GlobalAc.validPrefix(prefix);
+    }
+    get Autocomplete() {
+        return Object.defineProperty({
+            add: this.addAutocompleteController.bind(this),
+            remove: this.removeAutocompleteController.bind(this),
+            removeAll: this.removeAllAutocompleteControllers.bind(this),
+            validPrefix: this.validAutocompletePrefix.bind(this)
+        }, 'sets', {
+            get: () => this.autocompleteSets
+        });
     }
 
     /**

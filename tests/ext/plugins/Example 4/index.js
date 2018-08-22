@@ -1,4 +1,4 @@
-exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, CommonComponents, DiscordContextMenu, Api }) => class extends Plugin {
+exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, CommonComponents, DiscordContextMenu, Autocomplete, Api }) => class extends Plugin {
     async onstart() {
         this.keybindEvent = this.keybindEvent.bind(this);
 
@@ -89,6 +89,13 @@ exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Com
                 onClick: () => Modals.basic('Test', 'Hello from Plugin 4')
             }
         ]);
+
+        /**
+         * Autocomplete.
+         * This calls `acsearch` on the controller (the plugin object). You can add multiple autocomplete sets by passing another controller.
+         */
+
+        Autocomplete.add('|');
     }
 
     onstop() {
@@ -97,10 +104,33 @@ exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Com
 
         BdMenuItems.removeAll();
         DiscordContextMenu.removeAll();
+        Autocomplete.removeAll();
     }
 
     keybindEvent(event) {
         Logger.log('Keybind pressed', event);
         Modals.basic('Example Plugin 4', 'Test keybind activated.');
+    }
+
+    acsearch(sterm) {
+        // sterm is the text after the prefix
+        Logger.log('Searching for', sterm);
+
+        return {
+            title: ['Plugin 4 autocomplete'],
+            items: [
+                {key: 'Item 1', value: {replaceWith: 'Something to insert when selected'}},
+                {key: 'Item 2', value: {replaceWith: 'Something to insert when selected'}},
+                {key: 'Item 3', value: {replaceWith: 'Something to insert when selected'}},
+                {key: 'Item 4', value: {replaceWith: 'Something to insert when selected'}}
+            ]
+
+            // `title` can also be an array - the second item will be white
+            // You can also add `type: 'imagetext'` here and add an `src` property to each item's value to show an image
+        };
+    }
+
+    get api() {
+        return Api;
     }
 };

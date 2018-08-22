@@ -33,6 +33,11 @@ export class BdContextMenu {
 
 export class DiscordContextMenu {
 
+    /**
+     * add items to Discord context menu
+     * @param {any} items items to add
+     * @param {Function} [filter] filter function for target filtering
+     */
     static add(items, filter) {
         if (!this.patched) this.patch();
         this.menus.push({ items, filter });

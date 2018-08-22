@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-cmItem" :style="{color: item.color || ''}" @click="onClick">
+    <div class="bd-cmItem" :style="{color: item.color || ''}" @click="$emit('click', $event)">
         <span>{{item.text}}</span>
         <div class="bd-cmHint" v-if="item.hint">{{item.hint}}</div>
         <img :src="item.icon" v-else-if="item.icon"/>
@@ -18,6 +18,6 @@
 
 <script>
     export default {
-        props: ['item', 'onClick']
+        props: ['item']
     }
 </script>

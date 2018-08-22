@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div class="bd-cmItem bd-cmToggle" @click="onClick">
+    <div class="bd-cmItem bd-cmToggle" @click="$emit('click', $event)">
         <div class="bd-cmLabel">{{item.text}}</div>
         <div class="bd-cmCheckbox">
             <div class="bd-cmCheckboxInner">

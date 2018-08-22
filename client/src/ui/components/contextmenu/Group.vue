@@ -11,15 +11,15 @@
 <template>
     <div class="bd-cmGroup" ref="test">
         <template v-for="(item, index) in items">
-            <CMButton v-if="!item.type || item.type === 'button'" :item="item" :onClick="() => { item.onClick(); closeMenu(); }" />
-            <CMToggle v-else-if="item.type === 'toggle'" :item="item" :onClick="() => { item.checked = item.onChange(!item.checked) }" />
+            <CMButton v-if="!item.type || item.type === 'button'" :item="item" @click="item.onClick ? item.onClick($event) : undefined; item.type === 'button' ? $emit('close') : undefined" />
+            <CMToggle v-else-if="item.type === 'toggle'" :item="item" @click="item.checked = item.onChange(!item.checked)" />
             <div v-else-if="item.type === 'sub'" class="bd-cmItem bd-cmSub" @mouseenter="e => subMenuMouseEnter(e, index, item)" @mouseleave="e => subMenuMouseLeave(e, index, item)">
                 {{item.text}}
                 <MiChevronDown />
                 <div ref="test2" class="bd-cm" v-if="index === visibleSub" :style="subStyle">
                     <template v-for="(item, index) in item.items">
-                        <CMButton v-if="!item.type || item.type === 'button'" :item="item" :onClick="() => { item.onClick(); closeMenu(); }" />
-                        <CMToggle v-else-if="item.type === 'toggle'" :item="item" :onClick="() => { item.checked = item.onChange(!item.checked) }" />
+                        <CMButton v-if="!item.type || item.type === 'button'" :item="item" @click="item.onClick ? item.onClick($event) : undefined; item.type === 'button' ? $emit('close') : undefined" />
+                        <CMToggle v-else-if="item.type === 'toggle'" :item="item" @click="item.checked = item.onChange(!item.checked)" />
                     </template>
                 </div>
             </div>
@@ -40,8 +40,10 @@
                 subStyle: {}
             }
         },
-        props: ['items', 'closeMenu', 'left', 'top'],
-        components: { CMButton, CMToggle, MiChevronDown },
+        props: ['items', 'left', 'top'],
+        components: {
+            CMButton, CMToggle, MiChevronDown
+        },
         methods: {
             subMenuMouseEnter(e, index, sub) {
                 const subHeight = sub.items.length > 9 ? 270 : sub.items.length * e.target.offsetHeight;

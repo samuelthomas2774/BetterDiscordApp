@@ -10,10 +10,10 @@
 
 <template>
     <div class="bd-settingsWrapper" :class="[{'bd-active': active}, 'platform-' + this.platform]">
-        <div class="bd-settingsButton" :class="{'bd-active': active, 'bd-animating': animating, 'bd-hideButton': hideButton}" @click="active = true">
+        <div class="bd-settingsButton" :class="{'bd-active': active, 'bd-animating': animating, 'bd-hideButton': hideButton}" @click="active = true" v-contextmenu="buttonContextMenu">
             <div v-if="updating === 0" v-tooltip.right="'Checking for updates'" class="bd-settingsButtonBtn bd-loading"></div>
             <div v-else-if="updating === 2" v-tooltip.right="'Updates available!'" class="bd-settingsButtonBtn bd-updates"></div>
-            <div v-else class="bd-settingsButtonBtn" :class="[{'bd-loading': !loaded}]"></div>
+            <div v-else class="bd-settingsButtonBtn" :class="{'bd-loading': !loaded}"></div>
         </div>
         <BdSettings ref="settings" :active="active" @close="active = false" />
     </div>
@@ -21,7 +21,7 @@
 
 <script>
     // Imports
-    import { Events, Settings } from 'modules';
+    import { Events, Settings, Updater } from 'modules';
     import { Modals } from 'ui';
     import process from 'process';
     import BdSettings from './BdSettings.vue';
@@ -38,7 +38,21 @@
                 eventHandlers: {},
                 keybindHandler: null,
                 hideButton: false,
-                hideButtonToggleHandler: null
+                hideButtonToggleHandler: null,
+                buttonContextMenu: [
+                    {
+                        items: [
+                            {
+                                text: 'Check for updates',
+                                updating: false,
+                                onClick(event) {
+                                    if (this.updating === 2) Updater.update();
+                                    else if (this.updating !== 0) Updater.checkForUpdates();
+                                }
+                            }
+                        ]
+                    }
+                ]
             };
         },
         components: {
@@ -67,6 +81,12 @@
                     this.animating = false;
                     this.timeout = null;
                 }, 400);
+            },
+            updating(updating) {
+                const updateItem = this.buttonContextMenu[0].items[0];
+
+                updateItem.updating = updating;
+                updateItem.text = updating === 0 ? 'Checking for updates...' : updating === 2 ? 'Install updates' : 'Check for updates';
             }
         },
         created() {

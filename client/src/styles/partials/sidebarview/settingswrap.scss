@@ -23,8 +23,8 @@
             > .bd-scroller {
                 overflow-y: scroll;
 
-                .platform-darwin { // sass-lint:disable-line class-name-format
-                    .bd-settings & {
+                .bd-settings & {
+                    .platform-darwin & { // sass-lint:disable-line class-name-format
                         padding-top: 22px;
                     }
                 }

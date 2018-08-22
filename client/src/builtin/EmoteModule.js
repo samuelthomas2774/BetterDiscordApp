@@ -60,8 +60,18 @@ export default new class EmoteModule extends BuiltinModule {
             {
                 text: 'Favourite',
                 type: 'toggle',
-                checked: (target) => { console.log(target); if (target.alt && target.alt === ';cirThree;') { console.log('yes'); return true; } else return false; },
-                onChange: (checked, target) => { if (target.alt && target.alt === ';cirThree;') { console.log('yes'); return true; } else return false; }
+                checked: (target) => {
+                    const { alt } = target;
+                    if (!alt) return false;
+                    return this.favourites.find(e => e.alt === alt);
+                },
+                onChange: (checked, target) => {
+                    const { alt } = target;
+                    if (!alt) return false;
+                    const fav = this.favourites.find(e => e.alt === alt);
+                    if (fav) return this._favourites = this._favourites.filter(e => e.alt !== target.alt);
+                    this.favourites.push({ alt: target.alt });
+                }
             }
         ], filter => filter.closest('.bd-emote'));
 

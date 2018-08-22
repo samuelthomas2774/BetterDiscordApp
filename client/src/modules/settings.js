@@ -9,7 +9,6 @@
 */
 
 import { Toasts } from 'ui';
-import { EmoteModule } from 'builtin';
 import { SettingsSet } from 'structs';
 import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
@@ -63,7 +62,6 @@ export default new class Settings {
 
             CssEditor.setState(scss, css, css_editor_files, scss_error);
             CssEditor.editor_bounds = css_editor_bounds || {};
-            EmoteModule.favourite_emotes = favourite_emotes || [];
         } catch (err) {
             // There was an error loading settings
             // This probably means that the user doesn't have any settings yet
@@ -87,8 +85,7 @@ export default new class Settings {
                 css: CssEditor.css,
                 css_editor_files: CssEditor.files,
                 scss_error: CssEditor.error,
-                css_editor_bounds: CssEditor.editor_bounds,
-                favourite_emotes: EmoteModule.favourite_emotes
+                css_editor_bounds: CssEditor.editor_bounds
             });
 
             for (const set of this.settings) {

@@ -9,20 +9,17 @@
 */
 
 <template>
-    <div class="bd-cmGroup" ref="test">
+    <div class="bd-cmGroup">
         <template v-for="(item, index) in items">
-            <CMButton v-if="!item.type || item.type === 'button'" :item="item" @click="item.onClick ? item.onClick($event) : undefined; item.type === 'button' ? $emit('close') : undefined" />
-            <CMToggle v-else-if="item.type === 'toggle'" :item="item" @click="item.checked = item.onChange(!item.checked)" />
-            <div v-else-if="item.type === 'sub'" class="bd-cmItem bd-cmSub" @mouseenter="e => subMenuMouseEnter(e, index, item)" @mouseleave="e => subMenuMouseLeave(e, index, item)">
+            <CMToggle v-if="item.type === 'toggle'" :item="item" @click="item.checked = item.onChange(!item.checked)" />
+            <div v-else-if="item.type === 'sub'" class="bd-cmItem bd-cmSub" @mouseenter="subMenuMouseEnter($event, index, item)" @mouseleave="subMenuMouseLeave($event, index, item)">
                 {{item.text}}
                 <MiChevronDown />
-                <div ref="test2" class="bd-cm" v-if="index === visibleSub" :style="subStyle">
-                    <template v-for="(item, index) in item.items">
-                        <CMButton v-if="!item.type || item.type === 'button'" :item="item" @click="item.onClick ? item.onClick($event) : undefined; item.type === 'button' ? $emit('close') : undefined" />
-                        <CMToggle v-else-if="item.type === 'toggle'" :item="item" @click="item.checked = item.onChange(!item.checked)" />
-                    </template>
+                <div class="bd-cm" v-if="index === visibleSub" :style="subStyle">
+                    <CMGroup :items="item.items" :top="subTop" :left="left" @close="$emit('close')" />
                 </div>
             </div>
+            <CMButton v-else :item="item" @click="item.onClick ? item.onClick($event) : undefined; item.type === 'button' ? $emit('close') : undefined" />
         </template>
     </div>
 </template>
@@ -34,23 +31,26 @@
     import { MiChevronDown } from '../common';
 
     export default {
+        name: 'CMGroup',
+        components: {
+            CMButton, CMToggle, MiChevronDown
+        },
+        props: ['items', 'left', 'top'],
         data() {
             return {
                 visibleSub: -1,
-                subStyle: {}
-            }
-        },
-        props: ['items', 'left', 'top'],
-        components: {
-            CMButton, CMToggle, MiChevronDown
+                subStyle: {},
+                subTop: 0,
+                subLeft: 0
+            };
         },
         methods: {
             subMenuMouseEnter(e, index, sub) {
                 const subHeight = sub.items.length > 9 ? 270 : sub.items.length * e.target.offsetHeight;
-                const top = this.top + subHeight + e.target.offsetTop > window.innerHeight ?
+                this.subTop = this.top + subHeight + e.target.offsetTop > window.innerHeight ?
                     this.top - subHeight + e.target.offsetTop + e.target.offsetHeight :
                     this.top + e.target.offsetTop;
-                this.subStyle = { top: `${top}px`, left: `${this.left}px` };
+                this.subStyle = { top: `${this.subTop}px`, left: `${this.left}px` };
                 this.visibleSub = index;
             },
             subMenuMouseLeave(e, index, sub) {

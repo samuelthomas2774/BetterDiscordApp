@@ -9,7 +9,7 @@
 */
 
 <template>
-    <div ref="root" class="bd-cm" :class="{'bd-cmRenderLeft': renderLeft}" v-if="activeMenu && activeMenu.menu" :style="calculatePosition()">
+    <div class="bd-cm" :class="{'bd-cmRenderLeft': renderLeft}" v-if="activeMenu && activeMenu.menu" :style="calculatePosition()">
         <CMGroup v-for="(group, index) in activeMenu.menu.groups" :items="group.items" :key="index" :left="left" :top="top" @close="hide" />
     </div>
 </template>
@@ -47,9 +47,7 @@
                 this.activeMenu.menu = null;
             },
             clickHide(e) {
-                if (!this.$refs.root) return;
-                if (this.$refs.root.contains(e.target)) return;
-                this.hide();
+                if (!this.$el.contains(e.target)) this.hide();
             }
         }
     }

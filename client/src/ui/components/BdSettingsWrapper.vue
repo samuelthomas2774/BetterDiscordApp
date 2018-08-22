@@ -28,6 +28,13 @@
 
     export default {
         data() {
+            const subMenu = {
+                type: 'sub',
+                text: 'Sub menu',
+                items: []
+            };
+            subMenu.items.push(subMenu);
+
             return {
                 loaded: false,
                 updating: false,
@@ -49,7 +56,8 @@
                                     if (this.updating === 2) Updater.update();
                                     else if (this.updating !== 0) Updater.checkForUpdates();
                                 }
-                            }
+                            },
+                            subMenu
                         ]
                     }
                 ]

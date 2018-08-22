@@ -9,7 +9,7 @@
 */
 
 import { WebpackModules } from 'modules';
-import Vue from './vue';
+import Vue from 'vue';
 
 export default class {
 
@@ -93,4 +93,24 @@ export default class {
         }
     }
 
+    static install(Vue) {
+        Vue.component('ReactComponent', ReactComponent);
+    }
+
 }
+
+export const ReactComponent = {
+    props: ['component', 'component-props', 'component-children', 'react-element'],
+    render(createElement) {
+        return createElement('div');
+    },
+    mounted() {
+        const { React, ReactDOM } = WebpackModules;
+
+        ReactDOM.unmountComponentAtNode(this.$el);
+        ReactDOM.render(this.reactElement || React.createElement(this.component, this.componentProps, ...(this.componentChildren || [])), this.$el);
+    },
+    beforeDestroy() {
+        WebpackModules.ReactDOM.unmountComponentAtNode(this.$el);
+    }
+};

@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Utils } from 'common';
 import { ReactComponents, WebpackModules, MonkeyPatch } from 'modules';
 import { VueInjector, Toasts } from 'ui';
 import CMGroup from './components/contextmenu/Group.vue';
@@ -40,7 +41,13 @@ export class DiscordContextMenu {
      */
     static add(items, filter) {
         if (!this.patched) this.patch();
-        this.menus.push({ items, filter });
+        const menu = { items, filter };
+        this.menus.push(menu);
+        return menu;
+    }
+
+    static remove(menu) {
+        Utils.removeFromArray(this.menus, menu);
     }
 
     static get menus() {

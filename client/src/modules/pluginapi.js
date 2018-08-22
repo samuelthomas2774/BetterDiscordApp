@@ -571,6 +571,37 @@ export default class PluginApi {
         return m => MonkeyPatch(this.plugin.id, m);
     }
 
+    /**
+     * DiscordContextMenu
+     */
+
+    get discordContextMenus() {
+        return this._discordContextMenus || (this._discordContextMenus = []);
+    }
+    addDiscordContextMenu(items, filter) {
+        const menu = DiscordContextMenu.add(items, filter);
+        this.discordContextMenus.push(menu);
+        return menu;
+    }
+    removeDiscordContextMenu(menu) {
+        DiscordContextMenu.remove(menu);
+        Utils.removeFromArray(this.discordContextMenus, menu);
+    }
+    removeAllDiscordContextMenus() {
+        for (let menu of this.discordContextMenus) {
+            this.removeDiscordContextMenu(menu);
+        }
+    }
+    get DiscordContextMenu() {
+        return Object.defineProperty({
+            add: this.addDiscordContextMenu.bind(this),
+            remove: this.removeDiscordContextMenu.bind(this),
+            removeAll: this.removeAllDiscordContextMenus.bind(this)
+        }, 'menus', {
+            get: () => this.discordContextMenus
+        });
+    }
+
 }
 
 // Stop plugins from modifying the plugin API for all plugins

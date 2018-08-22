@@ -1,4 +1,5 @@
-.bd-cm {
+.bd-cm,
+.da-contextMenu {
     background: #18191c;
     box-shadow: 0 0 1px rgba(0, 0, 0, .82), 0 1px 4px rgba(0, 0, 0, .1);
     border-radius: 5px;
@@ -7,7 +8,8 @@
     z-index: 1005;
     user-select: none;
 
-    &.bd-cmRenderLeft {
+    &.bd-cmRenderLeft,
+    &.da-invertChildX {
         .bd-cm {
             margin-left: -170px;
         }

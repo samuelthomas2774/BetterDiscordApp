@@ -1,4 +1,4 @@
-exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, CommonComponents, DiscordContextMenu, Autocomplete, Api }) => class extends Plugin {
+exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, CommonComponents, DiscordContextMenu, Autocomplete, Notifications, Api }) => class extends Plugin {
     async onstart() {
         this.keybindEvent = this.keybindEvent.bind(this);
 
@@ -96,6 +96,14 @@ exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Com
          */
 
         Autocomplete.add('|');
+
+        /**
+         * Notifications.
+         */
+
+        Notifications.add('Notification from Plugin 4', [
+            {text: 'Dismiss', onClick: () => true}
+        ]);
     }
 
     onstop() {

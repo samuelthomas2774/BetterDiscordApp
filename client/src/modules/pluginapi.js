@@ -10,7 +10,7 @@
 
 import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenu, Modals, DOM, DOMObserver, Reflection, VueInjector, Toasts, BdContextMenu, DiscordContextMenu } from 'ui';
+import { BdMenu, Modals, DOM, DOMObserver, Reflection, VueInjector, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
 import * as CommonComponents from 'commoncomponents';
 import { Utils, Filters, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
@@ -275,9 +275,6 @@ export default class PluginApi {
     get modalStack() {
         return this._modalStack || (this._modalStack = []);
     }
-    get baseModalComponent() {
-        return Modals.baseComponent;
-    }
     addModal(_modal, component) {
         const modal = Modals.add(_modal, component);
         modal.on('close', () => Utils.removeFromArray(this.modalStack, modal));
@@ -316,7 +313,7 @@ export default class PluginApi {
                 get: () => this.modalStack
             },
             baseComponent: {
-                get: () => this.baseModalComponent
+                get: () => Modals.baseComponent
             }
         });
     }
@@ -324,6 +321,7 @@ export default class PluginApi {
     /**
      * Toasts
      */
+
     showToast(message, options = {}) {
         return Toasts.push(message, options);
     }
@@ -348,6 +346,36 @@ export default class PluginApi {
             warning: this.showWarningToast.bind(this),
             get enabled() { return Toasts.enabled }
         };
+    }
+
+    /**
+     * Notifications
+     */
+
+    get notificationStack() {
+        return this._notificationStack || (this._notificationStack = []);
+    }
+    addNotification(text, buttons = []) {
+        const notification = Notifications.add(text, buttons, () => Utils.removeFromArray(this.notificationStack, notification));
+        this.notificationStack.push(notification);
+        return notification;
+    }
+    dismissNotification(index) {
+        index = Notifications.stack.indexOf(this.notificationStack[index]);
+        if (index) Notifications.dismiss(index);
+    }
+    dismissAll() {
+        for (let index in this.notificationStack) {
+            this.dismissNotification(index);
+        }
+    }
+    get Notifications() {
+        return Object.defineProperty({
+            add: this.addNotification.bind(this),
+            dismiss: this.dismissNotification.bind(this)
+        }, 'stack', {
+            get: () => this.notificationStack
+        });
     }
 
     /**

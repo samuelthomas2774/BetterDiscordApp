@@ -69,13 +69,13 @@ export default class BuiltinModule {
     /**
      * Patch a function in a module
      * @param {any} module Module to patch
-     * @param {String} fndName Name of the function patch
+     * @param {String} fnName Name of the function to patch
      * @param {Function} cb Callback
      * @param {String} [when=after] before|after|instead
      */
-    patch(module, fndName, cb, when = 'after') {
+    patch(module, fnName, cb, when = 'after') {
         if (!['before', 'after', 'instead'].includes(when)) when = 'after';
-        Patch(`BD:${this.moduleName}`, module)[when](fndName, cb.bind(this));
+        Patch(`BD:${this.moduleName}`, module)[when](fnName, cb.bind(this));
     }
 
     /**

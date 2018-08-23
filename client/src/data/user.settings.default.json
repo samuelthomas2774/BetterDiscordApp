@@ -235,6 +235,13 @@
                         "text": "E2EE",
                         "hint": "End-to-end encryption",
                         "value": false
+                    },
+                    {
+                        "id": "use-keytar",
+                        "type": "bool",
+                        "text": "Use system keychain",
+                        "hint": "Store the master password in the system keychain",
+                        "value": true
                     }
                 ]
             },

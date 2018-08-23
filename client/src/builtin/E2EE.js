@@ -12,7 +12,7 @@ import { Settings, Cache, Events } from 'modules';
 import BuiltinModule from './BuiltinModule';
 import { WebpackModules, ReactComponents, MonkeyPatch, Patcher, DiscordApi, Security } from 'modules';
 import { VueInjector, Reflection, Modals, Toasts } from 'ui';
-import { ClientLogger as Logger } from 'common';
+import { ClientLogger as Logger, ClientIPC } from 'common';
 import { request } from 'vendor';
 import { Utils } from 'common';
 import E2EEComponent from './E2EEComponent.vue';
@@ -35,31 +35,57 @@ export default new class E2EE extends BuiltinModule {
         this.encryptNewMessages = true;
         this.ecdhDate = START_DATE;
         this.handlePublicKey = this.handlePublicKey.bind(this);
+        this.fetchMasterKey = this.fetchMasterKey.bind(this);
     }
 
     async enabled(e) {
-        try {
-            const newMaster = await Modals.input('Open Database', 'Master Password', true).promise;
-            this.setMaster(newMaster);
-            Events.on('discord:MESSAGE_CREATE', this.handlePublicKey);
-            this.patchDispatcher();
-            this.patchMessageContent();
-            const selector = `.${WebpackModules.getClassName('channelTextArea', 'emojiButton')}`;
-            const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
-            this.patchChannelTextArea(cta);
-            this.patchChannelTextAreaSubmit(cta);
-            cta.forceUpdateAll();
-        } catch (err) {
-            Settings.getSetting(...this.settingPath).value = false;
-            Toasts.error('Invalid master password! E2EE Disabled');
-        }
+        await this.fetchMasterKey();
+        Settings.getSetting('security', 'default', 'use-keytar').on('setting-updated', this.fetchMasterKey);
+
+        Events.on('discord:MESSAGE_CREATE', this.handlePublicKey);
+        this.patchDispatcher();
+        this.patchMessageContent();
+        const selector = `.${WebpackModules.getClassName('channelTextArea', 'emojiButton')}`;
+        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
+        this.patchChannelTextArea(cta);
+        this.patchChannelTextAreaSubmit(cta);
+        cta.forceUpdateAll();
     }
 
     async disabled(e) {
+        Settings.getSetting('security', 'default', 'use-keytar').off('setting-updated', this.fetchMasterKey);
         Events.off('discord:MESSAGE_CREATE', this.handlePublicKey);
         for (const patch of Patcher.getPatchesByCaller('BD:E2EE')) patch.unpatch();
         const ctaComponent = await ReactComponents.getComponent('ChannelTextArea');
         ctaComponent.forceUpdateAll();
+    }
+
+    async fetchMasterKey() {
+        try {
+            if (Settings.get('security', 'default', 'use-keytar')) {
+                const master = await ClientIPC.getPassword('betterdiscord', 'master');
+                if (master) return this.setMaster(master);
+
+                if (Settings.getSetting('security', 'e2eedb', 'e2ekvps').items.length) {
+                    // Ask the user for their current password to save to the system keychain
+                    const currentMaster = await Modals.input('Save to System Keychain', 'Master Password', true).promise;
+                    await ClientIPC.setPassword('betterdiscord', 'master', currentMaster);
+                    return this.setMaster(currentMaster);
+                }
+
+                // Generate a new master password and save it to the system keychain
+                const newMaster = Security.randomBytes();
+                await ClientIPC.setPassword('betterdiscord', 'master', newMaster);
+                return this.setMaster(newMaster);
+            }
+
+            const newMaster = await Modals.input('Open Database', 'Master Password', true).promise;
+            return this.setMaster(newMaster);
+        } catch (err) {
+            Settings.getSetting(...this.settingPath).value = false;
+            Toasts.error('Invalid master password! E2EE Disabled');
+            Logger.err('E2EE', ['Error fetching master password', err]);
+        }
     }
 
     setMaster(key) {
@@ -300,8 +326,11 @@ export default new class E2EE extends BuiltinModule {
 
         component.props.readyState = 'LOADING';
         Logger.info('E2EE', `Decrypting image: ${src}`);
-        request.get(src, { encoding: 'binary' }).then(res => {
-            (async () => {
+
+        (async () => {
+            try {
+                const res = await request.get(src, { encoding: 'binary' });
+
                 const arr = new Uint8Array(new ArrayBuffer(res.length));
                 for (let i = 0; i < res.length; i++) arr[i] = res.charCodeAt(i);
 
@@ -330,10 +359,10 @@ export default new class E2EE extends BuiltinModule {
 
                 component.props.decrypting = false;
                 component.forceUpdate();
-            })();
-        }).catch(err => {
-            console.log('request error', err);
-        });
+            } catch (err) {
+                console.log('request error', err);
+            }
+        })();
     }
 
     patchChannelTextArea(cta) {
@@ -355,4 +384,5 @@ export default new class E2EE extends BuiltinModule {
         if (!this.encryptNewMessages || !key) return;
         component.props.value = Security.encrypt(Security.decrypt(seed, [this.master, key]), component.props.value, '$:');
     }
+
 }

@@ -13,6 +13,7 @@ import sass from 'node-sass';
 import { BrowserWindow, dialog, session } from 'electron';
 import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
+import keytar from 'keytar';
 
 import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } from './modules';
 
@@ -57,9 +58,10 @@ const globals = {
 const CSP = {
     'img-src': ['https://cdn.betterttv.net', 'https://cdn.frankerfacez.com'],
     'script-src': [
-        '\'sha256-fSHKdpQGCHaIqWP3SpJOuUHrLp49jy4dWHzZ/RBJ/p4=\'', // React Devtools
-        '\'sha256-VFJcfKY5B3EBkFDgQnv3CozPwBlZcxwssfLVWlPFfZU=\'', // Vue Devtools
-        '\'sha256-VzDmLZ4PxPkOS/KY7ITzLQsSWhfCnvUrNculcj8UNgE=\' \'sha256-l6K+77Z1cmldR9gIvaVWlboF/zr5MXCQHcsEHfnr5TU=\''] // Vue Detector
+        `'sha256-fSHKdpQGCHaIqWP3SpJOuUHrLp49jy4dWHzZ/RBJ/p4='`, // React Devtools
+        `'sha256-VFJcfKY5B3EBkFDgQnv3CozPwBlZcxwssfLVWlPFfZU='`, // Vue Devtools
+        `'sha256-VzDmLZ4PxPkOS/KY7ITzLQsSWhfCnvUrNculcj8UNgE=' 'sha256-l6K+77Z1cmldR9gIvaVWlboF/zr5MXCQHcsEHfnr5TU='` // Vue Detector
+    ]
 };
 
 class PatchedBrowserWindow extends BrowserWindow {
@@ -136,6 +138,11 @@ class Comms {
         });
 
         BDIpc.on('bd-dba', (event, options) => this.bd.dbInstance.exec(options), true);
+
+        BDIpc.on('bd-keytar-get', (event, {service, account}) => keytar.getPassword(service, account), true);
+        BDIpc.on('bd-keytar-set', (event, {service, account, password}) => keytar.setPassword(service, account, password), true);
+        BDIpc.on('bd-keytar-delete', (event, {service, account}) => keytar.deletePassword(service, account), true);
+        BDIpc.on('bd-keytar-find-credentials', (event, {service}) => keytar.findCredentials(service), true);
     }
 
     async send(channel, message) {

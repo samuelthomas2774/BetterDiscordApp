@@ -112,6 +112,22 @@ const ClientIPC = new class ClientIPC {
         return this.send('dba', command);
     }
 
+    getPassword(service, account) {
+        return this.send('keytar-get', {service, account});
+    }
+
+    setPassword(service, account, password) {
+        return this.send('keytar-set', {service, account, password});
+    }
+
+    deletePassword(service, account) {
+        return this.send('keytar-delete', {service, account});
+    }
+
+    findCredentials(service) {
+        return this.send('keytar-find-credentials', {service});
+    }
+
 }
 
 export default ClientIPC;

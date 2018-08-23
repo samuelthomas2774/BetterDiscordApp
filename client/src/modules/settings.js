@@ -12,6 +12,7 @@ import { Toasts } from 'ui';
 import { SettingsSet } from 'structs';
 import { FileUtils, ClientLogger as Logger } from 'common';
 import path from 'path';
+import process from 'process';
 import Globals from './globals';
 import CssEditor from './csseditor';
 import Events from './events';
@@ -38,6 +39,12 @@ export default new class Settings {
 
             return set;
         });
+
+        // Set a hint for each platform for the use-keytar setting
+        const useKeytarSetting = this.getSetting('security', 'default', 'use-keytar');
+        if (process.platform === 'win32') useKeytarSetting.hint = 'Store the master password in Credential Manager';
+        if (process.platform === 'darwin') useKeytarSetting.hint = 'Store the master password in the default keychain';
+        if (process.platform === 'linux') useKeytarSetting.hint = 'Store the master password in libsecret';
     }
 
     /**

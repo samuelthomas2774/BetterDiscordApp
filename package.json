@@ -18,6 +18,8 @@
   "dependencies": {
     "csp-parse": "github:macropodhq/csp-parse",
     "deepmerge": "^2.1.1",
+    "fs-extra": "^7.0.0",
+    "keytar": "4.2.1",
     "nedb": "^1.8.0",
     "node-sass": "^4.9.2"
   },
@@ -69,6 +71,7 @@
     "webpack": "^3.12.0"
   },
   "scripts": {
+    "install": "node scripts/install.js",
     "build": "npm run build --prefix client && npm run build --prefix core && npm run build --prefix csseditor && npm run build --prefix installer",
     "build_client": "npm run build --prefix client",
     "watch_client": "npm run watch --prefix client",

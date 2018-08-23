@@ -132,16 +132,21 @@ export class Utils {
      * @param {Function} exclude A function to filter objects that shouldn't be cloned
      * @return {Any} The cloned value
      */
-    static deepclone(value, exclude) {
+    static deepclone(value, exclude, cloned) {
         if (exclude && exclude(value)) return value;
 
-        if (typeof value === 'object') {
-            if (value instanceof Array) return value.map(i => this.deepclone(i, exclude));
+        if (!cloned) cloned = new WeakMap();
+
+        if (typeof value === 'object' && value !== null) {
+            if (value instanceof Array) return value.map(i => this.deepclone(i, exclude, cloned));
+
+            if (cloned.has(value)) return cloned.get(value);
 
             const clone = Object.assign({}, value);
+            cloned.set(value, clone);
 
             for (const key in clone) {
-                clone[key] = this.deepclone(clone[key], exclude);
+                clone[key] = this.deepclone(clone[key], exclude, cloned);
             }
 
             return clone;
@@ -159,6 +164,8 @@ export class Utils {
         if (exclude && exclude(object)) return;
 
         if (typeof object === 'object' && object !== null) {
+            if (Object.isFrozen(object)) return object;
+
             const properties = Object.getOwnPropertyNames(object);
 
             for (const property of properties) {

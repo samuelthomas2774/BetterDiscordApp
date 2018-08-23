@@ -59,8 +59,7 @@
             filePath() {
                 try {
                     return Globals.require.resolve(path.join(Globals.getPath('data'), 'window'));
-                }
-                catch (err) {
+                } catch (err) {
                     FileUtils.writeJsonToFile(this.defaultFilePath, {});
                     return this.defaultFilePath;
                 }
@@ -79,11 +78,13 @@
 
                 if (event.category.id === 'default' && event.setting.id === 'transparent') {
                     newPreferences.transparent = event.value;
-                    if (event.value) delete newPreferences.backgroundColor;
+                    if (event.value) newPreferences.backgroundColor = null;
+                    else if (newPreferences.backgroundColor === null) delete newPreferences.backgroundColor;
                 }
 
                 if (event.category.id === 'default' && event.setting.id === 'background-colour') {
                     newPreferences.backgroundColor = event.value;
+                    if (event.value) newPreferences.transparent = false;
                 }
 
                 if (event.category.id === 'default' && event.setting.id === 'frame') {

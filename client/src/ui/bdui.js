@@ -25,13 +25,19 @@ export default class {
         });
         if (hideButtonSetting.value) document.body.classList.add('bd-hideButton');
 
+        const currentWindow = remote.getCurrentWindow();
+        const windowOptions = currentWindow.__bd_options;
+
+        if (!windowOptions.hasOwnProperty('frame') || windowOptions.frame) document.body.classList.add('bd-windowHasFrame');
+        if (windowOptions.transparent) document.body.classList.add('bd-windowIsTransparent');
+
         this.pathCache = {
             isDm: null,
             server: DiscordApi.currentGuild,
             channel: DiscordApi.currentChannel
         };
 
-        remote.getCurrentWindow().webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
+        currentWindow.webContents.on('did-navigate-in-page', (e, url, isMainFrame) => {
             const { currentGuild, currentChannel } = DiscordApi;
 
             if (!this.pathCache.server)

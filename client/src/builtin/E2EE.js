@@ -77,10 +77,10 @@ export default new class E2EE extends BuiltinModule {
                 const newMaster = Security.randomBytes();
                 await ClientIPC.setPassword('betterdiscord', 'master', newMaster);
                 return this.setMaster(newMaster);
-            } else {
-                const newMaster = await Modals.input('Open Database', 'Master Password', true).promise;
-                return this.setMaster(newMaster);
             }
+
+            const newMaster = await Modals.input('Open Database', 'Master Password', true).promise;
+            return this.setMaster(newMaster);
         } catch (err) {
             Settings.getSetting(...this.settingPath).value = false;
             Toasts.error('Invalid master password! E2EE Disabled');

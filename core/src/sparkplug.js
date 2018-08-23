@@ -17,6 +17,8 @@ import electron, { ipcRenderer } from 'electron';
 
     console.log('[BetterDiscord|Sparkplug]');
 
+    electron.webFrame.registerURLSchemeAsPrivileged('chrome-extension');
+
     const currentWindow = electron.remote.getCurrentWindow();
 
     if (currentWindow.__bd_preload) {

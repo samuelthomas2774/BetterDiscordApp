@@ -28,17 +28,18 @@ export default new class ReactDevtoolsModule extends BuiltinModule {
     }
 
     enabled(e) {
-        electron.remote.BrowserWindow.getAllWindows()[0].webContents.on('devtools-opened', this.devToolsOpened);
+        electron.remote.getCurrentWindow().webContents.on('devtools-opened', this.devToolsOpened);
+        if (electron.remote.getCurrentWindow().isDevToolsOpened) this.devToolsOpened();
     }
 
     disabled(e) {
         electron.remote.BrowserWindow.removeDevToolsExtension('React Developer Tools');
-        electron.remote.BrowserWindow.getAllWindows()[0].webContents.removeListener('devtools-opened', this.devToolsOpened);
+        electron.remote.getCurrentWindow().webContents.removeListener('devtools-opened', this.devToolsOpened);
     }
 
     devToolsOpened() {
         electron.remote.BrowserWindow.removeDevToolsExtension('React Developer Tools');
-        electron.webFrame.registerURLSchemeAsPrivileged('chrome-extension');
+
         try {
             const res = electron.remote.BrowserWindow.addDevToolsExtension(path.join(Globals.getPath('ext'), 'extensions', 'rdt'));
             if (res !== undefined) {

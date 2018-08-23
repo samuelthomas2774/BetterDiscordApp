@@ -108,8 +108,7 @@
 
 .bd-e2eePopover {
     background: #484b51;
-    margin: 0;
-    margin-top: 15px;
+    transform: translate(-2px, 52px);
 
     .bd-ok {
         svg {
@@ -123,9 +122,7 @@
         }
     }
 
-    .bd-popoverWrapper,
     .bd-popoverWrapper {
-        .bd-popoverInner,
         .bd-popoverInner {
             display: flex;
 
@@ -141,7 +138,6 @@
                 }
             }
 
-            .bd-materialDesignIcon,
             .bd-materialDesignIcon {
                 display: flex;
                 fill: #7e8084;
@@ -154,7 +150,6 @@
         }
     }
 
-    .bd-popoverArrow,
     .bd-popoverArrow {
         display: none;
     }

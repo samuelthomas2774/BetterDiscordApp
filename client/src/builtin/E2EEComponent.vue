@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-e2eeTaContainer">
-        <v-popover popoverClass="bd-popover bd-e2eePopover" placement="top">
+        <v-popover popoverClass="bd-popover bd-e2eePopover" placement="top-start">
             <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
                 <MiLock v-tooltip="error" />
             </div>
@@ -27,9 +27,9 @@
             </div>
 
             <template slot="popover">
-                <div @click="toggleEncrypt" :class="{'bd-warn': !E2EE.encryptNewMessages, 'bd-ok': E2EE.encryptNewMessages}"><MiLock size="16" v-tooltip="'Toggle Encryption'" /></div>
-                <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus size="16" v-tooltip="'Upload Encrypted Image'" /></div>
-                <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiIcVpnKey size="16" v-tooltip="'Begin Key Exchange'" /></div>
+                <div @click="toggleEncrypt" :class="{'bd-warn': !E2EE.encryptNewMessages, 'bd-ok': E2EE.encryptNewMessages}"><MiLock v-tooltip="'Toggle Encryption'" /></div>
+                <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus v-tooltip="'Upload Encrypted Image'" /></div>
+                <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiIcVpnKey v-tooltip="'Begin Key Exchange'" /></div>
             </template>
         </v-popover>
         <div class="bd-taDivider"></div>

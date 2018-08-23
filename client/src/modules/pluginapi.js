@@ -355,8 +355,11 @@ export default class PluginApi {
     get notificationStack() {
         return this._notificationStack || (this._notificationStack = []);
     }
-    addNotification(text, buttons = []) {
-        const notification = Notifications.add(text, buttons, () => Utils.removeFromArray(this.notificationStack, notification));
+    addNotification(title, text, buttons = []) {
+        if (arguments.length <= 1) text = title, title = undefined;
+        if (arguments[1] instanceof Array) [text, buttons] = arguments, title = undefined;
+
+        const notification = Notifications.add(title, text, buttons, () => Utils.removeFromArray(this.notificationStack, notification));
         this.notificationStack.push(notification);
         return notification;
     }
@@ -364,7 +367,7 @@ export default class PluginApi {
         index = Notifications.stack.indexOf(this.notificationStack[index]);
         if (index) Notifications.dismiss(index);
     }
-    dismissAll() {
+    dismissAllNotifications() {
         for (let index in this.notificationStack) {
             this.dismissNotification(index);
         }
@@ -372,7 +375,8 @@ export default class PluginApi {
     get Notifications() {
         return Object.defineProperty({
             add: this.addNotification.bind(this),
-            dismiss: this.dismissNotification.bind(this)
+            dismiss: this.dismissNotification.bind(this),
+            dismissAll: this.dismissAllNotifications.bind(this)
         }, 'stack', {
             get: () => this.notificationStack
         });

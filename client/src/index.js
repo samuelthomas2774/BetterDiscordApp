@@ -105,8 +105,9 @@ class BetterDiscord {
     }
 
     initTests() {
+        let notifications = 0;
         function showDummyNotif() { // eslint-disable-line no-inner-declarations
-            Notifications.add('Dummy Notification', [
+            Notifications.add(notifications++ ? `Notification ${notifications}` : undefined, 'Dummy Notification', [
                 {
                     text: 'Show Again', onClick: function () {
                         setTimeout(showDummyNotif, 5000);

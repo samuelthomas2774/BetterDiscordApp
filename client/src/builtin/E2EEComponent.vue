@@ -10,7 +10,11 @@
 
 <template>
     <div class="bd-e2eeTaContainer">
-        <v-popover popoverClass="bd-popover bd-e2eePopover" trigger="hover" placement="top-start" :disabled="error && DiscordApi.currentChannel.type !== 'DM'">
+        <v-popover :popoverClass="['bd-popover', 'bd-e2eePopover', {'bd-e2eePopoverOver': popoutPositionSetting.value === 'over'}]"
+            :trigger="popoutPositionSetting.value === 'over' && popoutTriggerSetting.value === 'hover' ? 'hover' : 'click'"
+            :placement="popoutPositionSetting.value === 'over' ? 'top-start' : 'top'"
+            :disabled="error && DiscordApi.currentChannel.type !== 'DM'">
+
             <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
                 <MiLock v-tooltip="error" />
             </div>
@@ -39,7 +43,7 @@
 <script>
     import { Utils, FileUtils, ClientIPC } from 'common';
     import { E2EE } from 'builtin';
-    import { DiscordApi, WebpackModules } from 'modules';
+    import { Settings, DiscordApi, WebpackModules } from 'modules';
     import { Toasts } from 'ui';
     import { MiLock, MiImagePlus, MiIcVpnKey } from '../ui/components/common/MaterialIcon';
 
@@ -50,9 +54,11 @@
         data() {
             return {
                 E2EE,
+                DiscordApi,
                 state: 'loading',
                 error: null,
-                DiscordApi
+                popoutPositionSetting: Settings.getSetting('security', 'e2ee-popout', 'position'),
+                popoutTriggerSetting: Settings.getSetting('security', 'e2ee-popout', 'trigger')
             };
         },
         methods: {

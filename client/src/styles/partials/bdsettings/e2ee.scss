@@ -108,7 +108,10 @@
 
 .bd-e2eePopover {
     background: #484b51;
-    transform: translate(-2px, 52px);
+
+    &.bd-e2eePopoverOver {
+        transform: translate(-2px, 52px);
+    }
 
     .bd-ok {
         svg {

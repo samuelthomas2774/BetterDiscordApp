@@ -70,18 +70,31 @@ gulp.task('css-editor', function () {
     ]);
 });
 
-gulp.task('dependencies', function () {
+gulp.task('node-modules', function () {
     return copydeps('.', 'release');
 });
 
-gulp.task('node-sass-bindings', function () {
+gulp.task('node-sass-bindings', gulp.series(function () {
+    return del(['release/node_modules/node-sass/vendor']);
+}, function () {
     return pump([
         gulp.src('other/node_sass_bindings/**/*'),
         copy('release/node_modules/node-sass/vendor', { prefix: 2 })
     ]);
 });
 
-gulp.task('build-release', gulp.parallel('release-package', 'client', 'core', 'sparkplug', 'core-modules', 'index', 'css-editor', gulp.series('dependencies', 'node-sass-bindings')));
+gulp.task('keytar-bindings', gulp.series(function () {
+    return del(['release/node_modules/keytar/build']);
+}, function () {
+    return pump([
+        gulp.src('other/keytar/**/*'),
+        copy('release/node_modules/keytar/build/Release', {prefix: 2})
+    ]);
+}));
+
+gulp.task('dependencies', gulp.series('node-modules', gulp.parallel('node-sass-bindings', 'keytar-bindings')));
+
+gulp.task('build-release', gulp.parallel('release-package', 'client', 'core', 'sparkplug', 'core-modules', 'index', 'css-editor', 'dependencies'));
 
 gulp.task('release', gulp.series(function () {
     return del(['release/**/*']);

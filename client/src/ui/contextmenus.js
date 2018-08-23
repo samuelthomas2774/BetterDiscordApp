@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Utils, ClientLogger as Logger } from 'common';
 import { ReactComponents, WebpackModules, MonkeyPatch } from 'modules';
 import { VueInjector, Toasts } from 'ui';
 import CMGroup from './components/contextmenu/Group.vue';
@@ -17,7 +18,7 @@ export class BdContextMenu {
     /**
      * Show a context menu
      * @param {MouseEvent|Object} e MouseEvent or Object { x: 0, y: 0 }
-     * @param {Object[]} grops Groups of items to show in context menu
+     * @param {Object[]} groups Groups of items to show in context menu
      */
     static show(e, groups) {
         const x = e.x || e.clientX;
@@ -27,6 +28,17 @@ export class BdContextMenu {
 
     static get activeMenu() {
         return this._activeMenu || (this._activeMenu = { menu: null });
+    }
+
+    static install(Vue) {
+        Vue.directive('contextmenu', {
+            bind(el, binding) {
+                el.addEventListener('contextmenu', event => {
+                    Logger.log('BdContextMenu', ['Showing context menu', event, el, binding]);
+                    BdContextMenu.show(event, binding.value);
+                });
+            }
+        });
     }
 
 }
@@ -39,14 +51,15 @@ export class DiscordContextMenu {
      * @param {any} items items to add
      * @param {Function} [filter] filter function for target filtering
      */
-    static add(id, items, filter) {
+    static add(items, filter) {
         if (!this.patched) this.patch();
-        this.menus.push({ id, items, filter });
-        return () => this.remove(id);
+        const menu = { items, filter };
+        this.menus.push(menu);
+        return menu;
     }
 
-    static remove(id) {
-        this._menus = this._menus.filter(menu => menu.id !== id);
+    static remove(menu) {
+        Utils.removeFromArray(this.menus, menu);
     }
 
     static get menus() {
@@ -58,8 +71,8 @@ export class DiscordContextMenu {
         this.patched = true;
         const self = this;
         MonkeyPatch('BD:DiscordCMOCM', WebpackModules.getModuleByProps(['openContextMenu'])).instead('openContextMenu', (_, [e, fn], originalFn) => {
-            const overrideFn = function (...args) {
-                const res = fn(...args);
+            const overrideFn = function () {
+                const res = fn.apply(this, arguments);
                 if (!res.hasOwnProperty('type')) return res;
                 if (!res.type.prototype || !res.type.prototype.render || res.type.prototype.render.__patched) return res;
                 MonkeyPatch('BD:DiscordCMRender', res.type.prototype).after('render', (c, a, r) => self.renderCm(c, a, r, res));
@@ -78,7 +91,7 @@ export class DiscordContextMenu {
         if (!retVal.props.children) return;
         if (!(retVal.props.children instanceof Array)) retVal.props.children = [retVal.props.children];
 
-        for (const menu of this.menus.filter(menu => { if (!menu.filter) return true; return menu.filter(target)})) {
+        for (const menu of this.menus.filter(menu => !menu.filter || menu.filter(target))) {
             retVal.props.children.push(VueInjector.createReactElement(CMGroup, {
                 target,
                 top,

@@ -74,7 +74,7 @@ class PatchedBrowserWindow extends BrowserWindow {
 
         super(options);
 
-        this.__bd_preload = [];
+        Object.defineProperty(this, '__bd_preload', {value: []});
 
         if (originalOptions.webPreferences && originalOptions.webPreferences.preload) {
             this.__bd_preload.push(originalOptions.webPreferences.preload);
@@ -82,6 +82,11 @@ class PatchedBrowserWindow extends BrowserWindow {
         if (userOptions.webPreferences && userOptions.webPreferences.preload) {
             this.__bd_preload.push(path.resolve(_dataPath, userOptions.webPreferences.preload));
         }
+
+        Object.defineProperty(this, '__bd_options', {value: options});
+        Object.freeze(options);
+        Object.freeze(options.webPreferences);
+        Object.freeze(this.__bd_preload);
     }
 
     static get userWindowPreferences() {

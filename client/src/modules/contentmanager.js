@@ -266,7 +266,7 @@ export default class {
         if (!content) throw {message: `Could not find a ${this.contentType} from ${content}.`};
 
         try {
-            await Modals.confirm(`Delete ${this.contentType} ?`, `Are you sure you want to delete ${content.info.name} ?`, 'Delete').promise;
+            await Modals.confirm(`Delete ${this.contentType}?`, `Are you sure you want to delete ${content.info.name} ?`, 'Delete').promise;
         } catch (err) {
             return false;
         }
@@ -277,8 +277,7 @@ export default class {
             if (!force)
                 await unload;
 
-            await FileUtils.directoryExists(content.paths.contentPath);
-            FileUtils.deleteDirectory(content.paths.contentPath);
+            await FileUtils.recursiveDeleteDirectory(content.paths.contentPath);
             return true;
         } catch (err) {
             Logger.err(this.moduleName, err);
@@ -308,7 +307,7 @@ export default class {
 
             const index = this.getContentIndex(content);
 
-            delete Globals.require.cache[Globals.require.resolve(content.paths.mainPath)];
+            if (this.unloadContentHook) this.unloadContentHook(content);
 
             if (reload) {
                 const newcontent = await this.preloadContent(content.dirName, true, index);

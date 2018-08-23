@@ -1,20 +1,29 @@
-exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, CommonComponents, Api }) => class extends Plugin {
+exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, CommonComponents, DiscordContextMenu, Autocomplete, Notifications, Api }) => class extends Plugin {
     async onstart() {
         this.keybindEvent = this.keybindEvent.bind(this);
 
-        // Some array event examples
+        /**
+         * Array setting events.
+         */
+
         const arraySetting = this.settings.getSetting('default', 'array-1');
         Logger.log('Array setting', arraySetting);
         arraySetting.on('item-added', event => Logger.log('Item', event.item, 'was added to the array setting'));
         arraySetting.on('item-updated', event => Logger.log('Item', event.item, 'of the array setting was updated', event));
         arraySetting.on('item-removed', event => Logger.log('Item', event.item, 'removed from the array setting'));
 
-        // Keybind setting examples
+        /**
+         * Keybind setting events.
+         */
+
         const keybindSetting = this.settings.getSetting('default', 'keybind-1');
         Logger.log('Keybind setting', keybindSetting);
         keybindSetting.on('keybind-activated', this.keybindEvent);
 
-        // Create a new settings set and add it to the menu
+        /**
+         * Settings.
+         */
+
         const set = Settings.createSet({
             text: this.name
         });
@@ -41,7 +50,7 @@ exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Com
             Logger.log('Updated settings', updatedSettings);
             await new Promise(resolve => setTimeout(resolve, 500));
             set.setSaved();
-        })
+        });
 
         const setting2 = await category.addSetting({
             id: 'setting-2',
@@ -51,6 +60,10 @@ exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Com
         });
 
         setting2.on('setting-updated', event => Logger.log('Setting 2 was changed to', event.value));
+
+        /**
+         * Menu items.
+         */
 
         this.menuItem = BdMenuItems.addSettingsSet('Plugins', set, 'Plugin 4');
 
@@ -65,6 +78,32 @@ exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Com
                 Api, plugin: Api.plugin
             }; }
         });
+
+        /**
+         * Discord context menus.
+         */
+
+        this.contextMenu = DiscordContextMenu.add([
+            {
+                text: 'Test',
+                onClick: () => Modals.basic('Test', 'Hello from Plugin 4')
+            }
+        ]);
+
+        /**
+         * Autocomplete.
+         * This calls `acsearch` on the controller (the plugin object). You can add multiple autocomplete sets by passing another controller.
+         */
+
+        Autocomplete.add('|');
+
+        /**
+         * Notifications.
+         */
+
+        Notifications.add('Notification from Plugin 4', [
+            {text: 'Dismiss', onClick: () => true}
+        ]);
     }
 
     onstop() {
@@ -72,10 +111,34 @@ exports.main = (Plugin, { Logger, Settings, Modals, BdMenu: { BdMenuItems }, Com
         keybindSetting.off('keybind-activated', this.keybindEvent);
 
         BdMenuItems.removeAll();
+        DiscordContextMenu.removeAll();
+        Autocomplete.removeAll();
     }
 
     keybindEvent(event) {
         Logger.log('Keybind pressed', event);
         Modals.basic('Example Plugin 4', 'Test keybind activated.');
+    }
+
+    acsearch(sterm) {
+        // sterm is the text after the prefix
+        Logger.log('Searching for', sterm);
+
+        return {
+            title: ['Plugin 4 autocomplete'],
+            items: [
+                {key: 'Item 1', value: {replaceWith: 'Something to insert when selected'}},
+                {key: 'Item 2', value: {replaceWith: 'Something to insert when selected'}},
+                {key: 'Item 3', value: {replaceWith: 'Something to insert when selected'}},
+                {key: 'Item 4', value: {replaceWith: 'Something to insert when selected'}}
+            ]
+
+            // `title` can also be an array - the second item will be white
+            // You can also add `type: 'imagetext'` here and add an `src` property to each item's value to show an image
+        };
+    }
+
+    get api() {
+        return Api;
     }
 };

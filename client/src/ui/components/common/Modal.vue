@@ -9,25 +9,27 @@
 */
 
 <template>
-    <div :class="['bd-modal', {'bd-modalScrolled': scrolled}]">
+    <div :class="['bd-modal', {'bd-modalOut': closing, 'bd-modalScrolled': scrolled}]">
         <div class="bd-modalInner">
             <div class="bd-modalHeader">
-                <div class="bd-modalIcon">
-                    <slot name="icon" />
-                </div>
-                <span class="bd-modalHeadertext">{{ headerText }}</span>
+                <slot name="header">
+                    <div v-if="$slots.icon" class="bd-modalIcon">
+                        <slot name="icon" />
+                    </div>
+                    <span class="bd-modalHeadertext">{{ headertext }}</span>
+                </slot>
                 <div class="bd-modalX" @click="$emit('close', $event.shiftKey, $event)">
                     <MiClose size="18" />
                 </div>
             </div>
             <div class="bd-modalBody">
                 <div class="bd-scrollerWrap">
-                    <div class="bd-scroller" @scroll="e => scrolled = e.target.scrollTop !== 0">
+                    <div class="bd-scroller" @scroll="e => scrolled = e.target.scrollTop > 0">
                         <slot name="body"></slot>
                      </div>
                 </div>
             </div>
-            <div class="bd-modalFooter">
+            <div v-if="$slots.footer" class="bd-modalFooter">
                 <slot name="footer"></slot>
             </div>
         </div>
@@ -39,7 +41,7 @@
     import { MiClose } from './MaterialIcon';
 
     export default {
-        props: ['headerText'],
+        props: ['headertext', 'closing'],
         components: {
             MiClose
         },

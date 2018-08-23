@@ -25,7 +25,7 @@ const EMOTE_SOURCES = [
     'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0',
     'https://cdn.frankerfacez.com/emoticon/:id/1',
     'https://cdn.betterttv.net/emote/:id/1x'
-]
+];
 
 export default new class EmoteModule extends BuiltinModule {
 
@@ -52,38 +52,30 @@ export default new class EmoteModule extends BuiltinModule {
     get settingPath() { return ['emotes', 'default', 'enable'] }
 
     async enabled() {
-
         // Add favourite button to context menu
-        this.removeFavCm = DiscordContextMenu.add('BD:EmoteModule:FavCM', target => [
+        this.favCm = DiscordContextMenu.add(target => [
             {
                 text: 'Favourite',
                 type: 'toggle',
-                checked: target && target.alt ? this.favourites.find(e => e.name === target.alt.replace(/;/g, '')) : false,
+                checked: target && target.alt && this.isFavourite(target.alt.replace(/;/g, '')),
                 onChange: (checked, target) => {
                     const { alt } = target;
                     if (!alt) return false;
 
-                    const name = alt.replace(/;/g, '');
+                    const emote = alt.replace(/;/g, '');
 
-                    if (!checked) return this.removeFavourite(name);
-
-                    const emote = this.findByName(name, true);
-                    if (!emote) return false;
-                    return this.addFavourite(emote);
+                    if (!checked) return this.removeFavourite(emote), false;
+                    return this.addFavourite(emote), true;
                 }
             }
-        ], filter => filter.closest('.bd-emote'));
+        ], target => target.closest('.bd-emote'));
 
         if (!this.database.size) {
             await this.loadLocalDb();
         }
 
         // Read favourites and most used from database
-        const userData = await Database.findOne({ 'id': 'EmoteModule' });
-        if (userData) {
-            if (userData.hasOwnProperty('favourites')) this._favourites = userData.favourites;
-            if (userData.hasOwnProperty('mostused')) this._mostUsed = userData.mostused;
-        }
+        await this.loadUserData();
 
         this.patchMessageContent();
         this.patchSendAndEdit();
@@ -91,24 +83,42 @@ export default new class EmoteModule extends BuiltinModule {
         MonkeyPatch('BD:EMOTEMODULE', ImageWrapper.component.prototype).after('render', this.beforeRenderImageWrapper.bind(this));
     }
 
+    /**
+     * Adds an emote to favourites.
+     * @param {Object|String} emote
+     * @return {Promise}
+     */
     addFavourite(emote) {
-        if (this.favourites.find(e => e.name === emote.name)) return true;
+        if (this.isFavourite(emote)) return;
+        if (typeof emote === 'string') emote = this.findByName(emote, true);
         this.favourites.push(emote);
-        Database.insertOrUpdate({ 'id': 'EmoteModule' }, { 'id': 'EmoteModule', favourites: this.favourites, mostused: this.mostUsed })
-        return true;
+        return this.saveUserData();
     }
 
-    removeFavourite(name) {
-        if (!this.favourites.find(e => e.name === name)) return false;
-        this._favourites = this._favourites.filter(e => e.name !== name);
-        Database.insertOrUpdate({ 'id': 'EmoteModule' }, { 'id': 'EmoteModule', favourites: this.favourites, mostused: this.mostUsed })
-        return false;
+    /**
+     * Removes an emote from favourites.
+     * @param {Object|String} emote
+     * @return {Promise}
+     */
+    removeFavourite(emote) {
+        if (!this.isFavourite(emote)) return;
+        Utils.removeFromArray(this.favourites, e => e.name === emote || e.name === emote.name, true);
+        return this.saveUserData();
+    }
+
+    /**
+     * Checks if an emote is in favourites.
+     * @param {Object|String} emote
+     * @return {Boolean}
+     */
+    isFavourite(emote) {
+        return !!this.favourites.find(e => e.name === emote || e.name === emote.name);
     }
 
     async disabled() {
         // Unpatch all patches
         for (const patch of Patcher.getPatchesByCaller('BD:EMOTEMODULE')) patch.unpatch();
-        if (this.removeFavCm) this.removeFavCm();
+        DiscordContextMenu.remove(this.favCm);
     }
 
     /**
@@ -122,6 +132,23 @@ export default new class EmoteModule extends BuiltinModule {
 
             this.database.set(id, { id: emote.value.id || value, type });
         }
+    }
+
+    async loadUserData() {
+        const userData = await Database.findOne({ type: 'builtin', id: 'EmoteModule' });
+        if (!userData) return;
+
+        if (userData.hasOwnProperty('favourites')) this._favourites = userData.favourites;
+        if (userData.hasOwnProperty('mostused')) this._mostUsed = userData.mostused;
+    }
+
+    async saveUserData() {
+        await Database.insertOrUpdate({ type: 'builtin', id: 'EmoteModule' }, {
+            type: 'builtin',
+            id: 'EmoteModule',
+            favourites: this.favourites,
+            mostused: this.mostUsed
+        });
     }
 
     /**
@@ -228,6 +255,7 @@ export default new class EmoteModule extends BuiltinModule {
     /**
      * Add/update emote to most used
      * @param {Object} emote emote to add/update
+     * @return {Promise}
      */
     addToMostUsed(emote) {
         const isMostUsed = this.mostUsed.find(mu => mu.key === emote.name);
@@ -243,7 +271,7 @@ export default new class EmoteModule extends BuiltinModule {
         }
         // Save most used to database
         // TODO only save first n
-        Database.insertOrUpdate({ 'id': 'EmoteModule' }, { 'id': 'EmoteModule', favourites: this.favourites, mostused: this.mostUsed })
+        return this.saveUserData();
     }
 
     /**

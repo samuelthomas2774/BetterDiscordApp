@@ -132,16 +132,21 @@ export class Utils {
      * @param {Function} exclude A function to filter objects that shouldn't be cloned
      * @return {Any} The cloned value
      */
-    static deepclone(value, exclude) {
+    static deepclone(value, exclude, cloned) {
         if (exclude && exclude(value)) return value;
 
-        if (typeof value === 'object') {
-            if (value instanceof Array) return value.map(i => this.deepclone(i, exclude));
+        if (!cloned) cloned = new WeakMap();
+
+        if (typeof value === 'object' && value !== null) {
+            if (value instanceof Array) return value.map(i => this.deepclone(i, exclude, cloned));
+
+            if (cloned.has(value)) return cloned.get(value);
 
             const clone = Object.assign({}, value);
+            cloned.set(value, clone);
 
             for (const key in clone) {
-                clone[key] = this.deepclone(clone[key], exclude);
+                clone[key] = this.deepclone(clone[key], exclude, cloned);
             }
 
             return clone;
@@ -159,6 +164,8 @@ export class Utils {
         if (exclude && exclude(object)) return;
 
         if (typeof object === 'object' && object !== null) {
+            if (Object.isFrozen(object)) return object;
+
             const properties = Object.getOwnPropertyNames(object);
 
             for (const property of properties) {
@@ -177,9 +184,9 @@ export class Utils {
      * @param {Any} item The item to remove from the array
      * @return {Array}
      */
-    static removeFromArray(array, item) {
+    static removeFromArray(array, item, filter) {
         let index;
-        while ((index = array.indexOf(item)) > -1)
+        while ((index = filter ? array.findIndex(item) : array.indexOf(item)) > -1)
             array.splice(index, 1);
         return array;
     }
@@ -496,30 +503,52 @@ export class FileUtils {
     }
 
     /**
-     * Delete a directory
+     * Deletes a file.
+     * @param {String} path The file's path
+     * @return {Promise}
+     */
+    static async deleteFile(path) {
+        await this.fileExists(path);
+
+        return new Promise((resolve, reject) => {
+            fs.unlink(path, (err, files) => {
+                if (err) reject(err);
+                else resolve(files);
+            });
+        });
+    }
+
+    /**
+     * Deletes a directory.
      * @param {String} path The directory's path
      * @return {Promise}
      */
-    static async deleteDirectory(pathToDir) {
-        try {
-            await this.directoryExists(pathToDir);
-            const files = await this.listDirectory(pathToDir);
+    static async deleteDirectory(path) {
+        await this.directoryExists(path);
 
-            for (const file of files) {
-                const pathToFile = path.join(pathToDir, file);
-                try {
-                    await this.directoryExists(pathToFile);
-                    await this.deleteDirectory(pathToFile);
-                } catch (err) {
-                    fs.unlinkSync(pathToFile);
-                }
+        return new Promise((resolve, reject) => {
+            fs.rmdir(path, (err, files) => {
+                if (err) reject(err);
+                else resolve(files);
+            });
+        });
+    }
+
+    /**
+     * Deletes a directory and it's contents.
+     * @param {String} path The directory's path
+     * @return {Promise}
+     */
+    static async recursiveDeleteDirectory(pathToDir) {
+        for (const file of await this.listDirectory(pathToDir)) {
+            const pathToFile = path.join(pathToDir, file);
+            try {
+                await this.recursiveDeleteDirectory(pathToFile);
+            } catch (err) {
+                await this.deleteFile(pathToFile);
             }
-
-            fs.rmdirSync(pathToDir);
-
-            return true;
-        } catch (err) {
-            throw err;
         }
+
+        await this.deleteDirectory(pathToDir);
     }
 }

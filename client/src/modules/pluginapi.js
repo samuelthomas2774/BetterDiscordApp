@@ -10,7 +10,7 @@
 
 import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenu, Modals, DOM, DOMObserver, Reflection, VueInjector, Toasts } from 'ui';
+import { BdMenu, Modals, DOM, DOMObserver, Reflection, VueInjector, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
 import * as CommonComponents from 'commoncomponents';
 import { Utils, Filters, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
@@ -23,6 +23,7 @@ import { WebpackModules } from './webpackmodules';
 import DiscordApi from './discordapi';
 import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
+import GlobalAc from '../ui/autocomplete';
 
 export default class PluginApi {
 
@@ -198,6 +199,25 @@ export default class PluginApi {
     }
 
     /**
+     * BdContextMenu
+     */
+
+    showContextMenu(event, groups) {
+        BdContextMenu.show(event, groups);
+        this.activeMenu.menu = BdContextMenu.activeMenu.menu;
+    }
+    get activeMenu() {
+        return this._activeMenu || (this._activeMenu = { menu: null });
+    }
+    get BdContextMenu() {
+        return Object.defineProperty({
+            show: this.showContextMenu.bind(this)
+        }, 'activeMenu', {
+            get: () => this.activeMenu
+        });
+    }
+
+    /**
      * CssUtils
      */
 
@@ -255,16 +275,9 @@ export default class PluginApi {
     get modalStack() {
         return this._modalStack || (this._modalStack = []);
     }
-    get baseModalComponent() {
-        return Modals.baseComponent;
-    }
     addModal(_modal, component) {
         const modal = Modals.add(_modal, component);
-        modal.on('close', () => {
-            let index;
-            while ((index = this.modalStack.findIndex(m => m === modal)) > -1)
-                this.modalStack.splice(index, 1);
-        });
+        modal.on('close', () => Utils.removeFromArray(this.modalStack, modal));
         this.modalStack.push(modal);
         return modal;
     }
@@ -300,7 +313,7 @@ export default class PluginApi {
                 get: () => this.modalStack
             },
             baseComponent: {
-                get: () => this.baseModalComponent
+                get: () => Modals.baseComponent
             }
         });
     }
@@ -308,6 +321,7 @@ export default class PluginApi {
     /**
      * Toasts
      */
+
     showToast(message, options = {}) {
         return Toasts.push(message, options);
     }
@@ -335,32 +349,121 @@ export default class PluginApi {
     }
 
     /**
+     * Notifications
+     */
+
+    get notificationStack() {
+        return this._notificationStack || (this._notificationStack = []);
+    }
+    addNotification(title, text, buttons = []) {
+        if (arguments.length <= 1) text = title, title = undefined;
+        if (arguments[1] instanceof Array) [text, buttons] = arguments, title = undefined;
+
+        const notification = Notifications.add(title, text, buttons, () => Utils.removeFromArray(this.notificationStack, notification));
+        this.notificationStack.push(notification);
+        return notification;
+    }
+    dismissNotification(index) {
+        index = Notifications.stack.indexOf(this.notificationStack[index]);
+        if (index) Notifications.dismiss(index);
+    }
+    dismissAllNotifications() {
+        for (const index in this.notificationStack) {
+            this.dismissNotification(index);
+        }
+    }
+    get Notifications() {
+        return Object.defineProperty({
+            add: this.addNotification.bind(this),
+            dismiss: this.dismissNotification.bind(this),
+            dismissAll: this.dismissAllNotifications.bind(this)
+        }, 'stack', {
+            get: () => this.notificationStack
+        });
+    }
+
+    /**
+     * Autocomplete
+     */
+
+    get autocompleteSets() {
+        return this._autocompleteSets || (this._autocompleteSets = new Map());
+    }
+    addAutocompleteController(prefix, controller) {
+        if (!controller) controller = this.plugin;
+        if (GlobalAc.validPrefix(prefix)) return;
+        GlobalAc.add(prefix, controller);
+        this.autocompleteSets.set(prefix, controller);
+    }
+    removeAutocompleteController(prefix) {
+        if (this.autocompleteSets.get(prefix) !== GlobalAc.sets.get(prefix)) return;
+        GlobalAc.remove(prefix);
+        this.autocompleteSets.delete(prefix);
+    }
+    removeAllAutocompleteControllers() {
+        for (const [prefix] of this.autocompleteSets) {
+            this.removeAutocompleteController(prefix);
+        }
+    }
+    validAutocompletePrefix(prefix) {
+        return GlobalAc.validPrefix(prefix);
+    }
+    toggleAutocompleteMode(prefix, sterm) {
+        return GlobalAc.toggle(prefix, sterm);
+    }
+    searchAutocomplete(prefix, sterm) {
+        return GlobalAc.items(prefix, sterm);
+    }
+    get Autocomplete() {
+        return Object.defineProperty({
+            add: this.addAutocompleteController.bind(this),
+            remove: this.removeAutocompleteController.bind(this),
+            removeAll: this.removeAllAutocompleteControllers.bind(this),
+            validPrefix: this.validAutocompletePrefix.bind(this),
+            toggle: this.toggleAutocompleteMode.bind(this),
+            search: this.searchAutocomplete.bind(this)
+        }, 'sets', {
+            get: () => this.autocompleteSets
+        });
+    }
+
+    /**
      * Emotes
      */
 
     get emotes() {
-        return EmoteModule.emotes;
+        return EmoteModule.database;
     }
-    get favourite_emotes() {
-        return EmoteModule.favourite_emotes;
+    get favouriteEmotes() {
+        return EmoteModule.favourites;
+    }
+    get mostUsedEmotes() {
+        return EmoteModule.mostUsed;
     }
     setFavouriteEmote(emote, favourite) {
-        return EmoteModule.setFavourite(emote, favourite);
+        return EmoteModule[favourite ? 'removeFavourite' : 'addFavourite'](emote);
     }
     addFavouriteEmote(emote) {
         return EmoteModule.addFavourite(emote);
     }
     removeFavouriteEmote(emote) {
-        return EmoteModule.addFavourite(emote);
+        return EmoteModule.removeFavourite(emote);
     }
     isFavouriteEmote(emote) {
         return EmoteModule.isFavourite(emote);
     }
     getEmote(emote) {
-        return EmoteModule.getEmote(emote);
+        return EmoteModule.findByName(emote, true);
     }
-    filterEmotes(regex, limit, start = 0) {
-        return EmoteModule.filterEmotes(regex, limit, start);
+    getEmoteUseCount(emote) {
+        const mostUsed = EmoteModule.mostUsed.find(mu => mu.key === emote.name);
+        return mostUsed ? mostUsed.useCount : 0;
+    }
+    incrementEmoteUseCount(emote) {
+        return EmoteModule.addToMostUsed(emote);
+    }
+    searchEmotes(regex, limit) {
+        return EmoteModule.search(regex, limit);
     }
     get Emotes() {
         return Object.defineProperties({
@@ -369,13 +472,18 @@ export default class PluginApi {
             removeFavourite: this.removeFavouriteEmote.bind(this),
             isFavourite: this.isFavouriteEmote.bind(this),
             getEmote: this.getEmote.bind(this),
-            filter: this.filterEmotes.bind(this)
+            getUseCount: this.getEmoteUseCount.bind(this),
+            incrementUseCount: this.incrementEmoteUseCount.bind(this),
+            search: this.searchEmotes.bind(this)
         }, {
             emotes: {
                 get: () => this.emotes
             },
-            favourite_emotes: {
-                get: () => this.favourite_emotes
+            favourites: {
+                get: () => this.favouriteEmotes
+            },
+            mostused: {
+                get: () => this.mostUsedEmotes
             }
         });
     }
@@ -550,6 +658,37 @@ export default class PluginApi {
     }
     get monkeyPatch() {
         return m => MonkeyPatch(this.plugin.id, m);
+    }
+
+    /**
+     * DiscordContextMenu
+     */
+
+    get discordContextMenus() {
+        return this._discordContextMenus || (this._discordContextMenus = []);
+    }
+    addDiscordContextMenu(items, filter) {
+        const menu = DiscordContextMenu.add(items, filter);
+        this.discordContextMenus.push(menu);
+        return menu;
+    }
+    removeDiscordContextMenu(menu) {
+        DiscordContextMenu.remove(menu);
+        Utils.removeFromArray(this.discordContextMenus, menu);
+    }
+    removeAllDiscordContextMenus() {
+        for (const menu of this.discordContextMenus) {
+            this.removeDiscordContextMenu(menu);
+        }
+    }
+    get DiscordContextMenu() {
+        return Object.defineProperty({
+            add: this.addDiscordContextMenu.bind(this),
+            remove: this.removeDiscordContextMenu.bind(this),
+            removeAll: this.removeAllDiscordContextMenus.bind(this)
+        }, 'menus', {
+            get: () => this.discordContextMenus
+        });
     }
 
 }

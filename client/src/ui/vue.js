@@ -8,10 +8,11 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { WebpackModules } from 'modules';
 import Vue from 'vue';
 import VTooltip from 'v-tooltip';
 import DOM from './dom';
+import VueInjector from './vueinjector';
+import { BdContextMenu } from './contextmenus';
 
 Vue.use(VTooltip, {
     defaultContainer: 'bd-tooltips',
@@ -45,22 +46,7 @@ Vue.use(VTooltip, {
     }
 });
 
-export const ReactComponent = {
-    props: ['component', 'component-props', 'component-children', 'react-element'],
-    render(createElement) {
-        return createElement('div');
-    },
-    mounted() {
-        const { React, ReactDOM } = WebpackModules;
-
-        ReactDOM.unmountComponentAtNode(this.$el);
-        ReactDOM.render(this.reactElement || React.createElement(this.component, this.componentProps, ...(this.componentChildren || [])), this.$el);
-    },
-    beforeDestroy() {
-        WebpackModules.ReactDOM.unmountComponentAtNode(this.$el);
-    }
-};
-
-Vue.component('ReactComponent', ReactComponent);
+Vue.use(VueInjector);
+Vue.use(BdContextMenu);
 
 export default Vue;

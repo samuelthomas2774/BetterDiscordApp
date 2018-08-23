@@ -9,15 +9,14 @@
 */
 
 <template>
-    <Modal :class="['bd-modalBasic', {'bd-modalOut': modal.closing}]" :headerText="modal.title" @close="modal.close">
+    <Modal class="bd-modalBasic" :headertext="modal.title" :closing="modal.closing" @close="modal.close">
         <div slot="body" class="bd-modalBasicBody bd-inputModalBody bd-formTextinput">
             {{ modal.text }}
-            <input v-if="modal.password" ref="input" type="password" @keyup.stop="keyup" />
-            <input v-else ref="input" type="text" @keyup.stop="keyup"/>
+            <input ref="input" :type="modal.password ? 'password' : 'text'" @keyup.stop="keyup"/>
         </div>
         <div slot="footer" class="bd-modalControls">
             <div class="bd-flexGrow"></div>
-            <div class="bd-button bd-ok" @click="() => { modal.confirm(value); modal.close(); }">OK</div>
+            <div class="bd-button bd-ok" @click="modal.confirm(value); modal.close();">OK</div>
         </div>
     </Modal>
 </template>

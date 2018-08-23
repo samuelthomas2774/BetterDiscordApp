@@ -367,7 +367,7 @@ export class ChannelCategory extends GuildChannel {
      * A list of channels in this category.
      */
     get channels() {
-        return List.from(this.guild.channels, c => c.parentId === this.id);
+        return List.from(this.guild.channels.filter(c => c.parentId === this.id));
     }
 
     /**

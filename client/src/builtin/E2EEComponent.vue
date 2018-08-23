@@ -25,30 +25,28 @@
             <div v-else class="bd-e2eeTaBtn bd-e2eeLock bd-ok">
                 <MiLock v-tooltip="'Ready!'" />
             </div>
+
             <template slot="popover">
                 <div @click="toggleEncrypt" :class="{'bd-warn': !E2EE.encryptNewMessages, 'bd-ok': E2EE.encryptNewMessages}"><MiLock size="16" v-tooltip="'Toggle Encryption'" /></div>
                 <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus size="16" v-tooltip="'Upload Encrypted Image'" /></div>
-                <!-- Using these icons for now -->
-                <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiPencil size="16" v-tooltip="'Begin Key Exchange'" /></div>
+                <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiIcVpnKey size="16" v-tooltip="'Begin Key Exchange'" /></div>
             </template>
         </v-popover>
         <div class="bd-taDivider"></div>
     </div>
 </template>
 
-
-
 <script>
-    import fs from 'fs';
-    import { Utils } from 'common';
-    import { remote } from 'electron';
+    import { Utils, FileUtils, ClientIPC } from 'common';
     import { E2EE } from 'builtin';
-    import { DiscordApi, Security, WebpackModules } from 'modules';
-    import { MiLock, MiPlus, MiImagePlus, MiPencil, MiRefresh } from '../ui/components/common/MaterialIcon';
+    import { DiscordApi, WebpackModules } from 'modules';
     import { Toasts } from 'ui';
+    import { MiLock, MiImagePlus, MiIcVpnKey } from '../ui/components/common/MaterialIcon';
 
     export default {
-        components: { MiLock, MiPlus, MiImagePlus, MiPencil, MiRefresh },
+        components: {
+            MiLock, MiImagePlus, MiIcVpnKey
+        },
         data() {
             return {
                 E2EE,
@@ -59,12 +57,12 @@
         },
         methods: {
             async showUploadDialog() {
-                const dialogResult = remote.dialog.showOpenDialog({ properties: ['openFile'] });
-                if (!dialogResult) return;
+                const dialogResult = await ClientIPC.send('bd-native-open', {properties: ['openFile']});
+                if (!dialogResult || !dialogResult.length) return;
 
-                const readFile = fs.readFileSync(dialogResult[0]);
-                const FileActions = WebpackModules.getModuleByProps(["makeFile"]);
-                const Uploader = WebpackModules.getModuleByProps(["instantBatchUpload"]);
+                const readFile = await FileUtils.readFileBuffer(dialogResult[0]);
+                const FileActions = WebpackModules.getModuleByProps(['makeFile']);
+                const Uploader = WebpackModules.getModuleByProps(['instantBatchUpload']);
 
                 const img = await Utils.getImageFromBuffer(readFile);
 

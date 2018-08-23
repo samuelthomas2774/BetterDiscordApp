@@ -28,21 +28,22 @@ export default new class VueDevtoolsModule extends BuiltinModule {
     }
 
     enabled(e) {
-        electron.remote.BrowserWindow.getAllWindows()[0].webContents.on('devtools-opened', this.devToolsOpened);
+        electron.remote.getCurrentWindow().webContents.on('devtools-opened', this.devToolsOpened);
+        if (electron.remote.getCurrentWindow().isDevToolsOpened) this.devToolsOpened();
     }
 
     disabled(e) {
         electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
-        electron.remote.BrowserWindow.getAllWindows()[0].webContents.removeListener('devtools-opened', this.devToolsOpened);
+        electron.remote.getCurrentWindow().webContents.removeListener('devtools-opened', this.devToolsOpened);
     }
 
     devToolsOpened() {
         electron.remote.BrowserWindow.removeDevToolsExtension('Vue.js devtools');
-        electron.webFrame.registerURLSchemeAsPrivileged('chrome-extension');
+
         try {
             const res = electron.remote.BrowserWindow.addDevToolsExtension(path.join(Globals.getPath('ext'), 'extensions', 'vdt'));
             if (res !== undefined) {
-                Toasts.success(`${res  } Installed`);
+                Toasts.success(`${res} Installed`);
                 return;
             }
             Toasts.error('Vue.js devtools install failed');

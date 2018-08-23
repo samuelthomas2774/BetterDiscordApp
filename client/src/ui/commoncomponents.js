@@ -1,4 +1,4 @@
-export { ReactComponent } from './vue';
+export { ReactComponent } from './vueinjector';
 
 export * from './components/common';
 

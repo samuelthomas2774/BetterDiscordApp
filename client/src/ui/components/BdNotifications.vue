@@ -15,6 +15,7 @@
                 <div @click="this.dismissFirst" class="bd-notificationDismissBtn"><MiArrowLeft size="20"/></div>
             </div>
             <div class="bd-notificationBody bd-flex">
+                <div v-if="notifications[0].title" class="bd-notificationTitle">{{notifications[0].title}}</div>
                 <div class="bd-notificationText">{{notifications[0].text}}</div>
             </div>
             <div class="bd-notificationFooter bd-flex">

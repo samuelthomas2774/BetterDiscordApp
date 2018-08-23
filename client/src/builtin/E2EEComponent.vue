@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-e2eeTaContainer">
-        <v-popover popoverClass="bd-popover bd-e2eePopover" placement="top-start">
+        <v-popover popoverClass="bd-popover bd-e2eePopover" placement="top-start" :disabled="error && DiscordApi.currentChannel.type !== 'DM'">
             <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
                 <MiLock v-tooltip="error" />
             </div>

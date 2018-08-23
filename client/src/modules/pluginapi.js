@@ -368,7 +368,7 @@ export default class PluginApi {
         if (index) Notifications.dismiss(index);
     }
     dismissAllNotifications() {
-        for (let index in this.notificationStack) {
+        for (const index in this.notificationStack) {
             this.dismissNotification(index);
         }
     }
@@ -401,7 +401,7 @@ export default class PluginApi {
         this.autocompleteSets.delete(prefix);
     }
     removeAllAutocompleteControllers() {
-        for (let [prefix] of this.autocompleteSets) {
+        for (const [prefix] of this.autocompleteSets) {
             this.removeAutocompleteController(prefix);
         }
     }
@@ -669,7 +669,7 @@ export default class PluginApi {
         Utils.removeFromArray(this.discordContextMenus, menu);
     }
     removeAllDiscordContextMenus() {
-        for (let menu of this.discordContextMenus) {
+        for (const menu of this.discordContextMenus) {
             this.removeDiscordContextMenu(menu);
         }
     }

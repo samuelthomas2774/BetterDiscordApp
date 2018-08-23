@@ -44,9 +44,9 @@ export default new class Autocomplete {
         return this.sets.has(prefix);
     }
 
-    toggle(prefix, sterm) {
-        if (!this.sets[prefix].toggle) return false;
-        return this.sets[prefix].toggle(sterm);
+    toggle(prefix, sterm, event) {
+        const controller = this.sets.get(prefix);
+        return controller && controller.toggle && controller.toggle(sterm, event);
     }
 
     items(prefix, sterm) {

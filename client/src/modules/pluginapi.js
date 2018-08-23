@@ -408,12 +408,20 @@ export default class PluginApi {
     validAutocompletePrefix(prefix) {
         return GlobalAc.validPrefix(prefix);
     }
+    toggleAutocompleteMode(prefix, sterm) {
+        return GlobalAc.toggle(prefix, sterm);
+    }
+    searchAutocomplete(prefix, sterm) {
+        return GlobalAc.items(prefix, sterm);
+    }
     get Autocomplete() {
         return Object.defineProperty({
             add: this.addAutocompleteController.bind(this),
             remove: this.removeAutocompleteController.bind(this),
             removeAll: this.removeAllAutocompleteControllers.bind(this),
-            validPrefix: this.validAutocompletePrefix.bind(this)
+            validPrefix: this.validAutocompletePrefix.bind(this),
+            toggle: this.toggleAutocompleteMode.bind(this),
+            search: this.searchAutocomplete.bind(this)
         }, 'sets', {
             get: () => this.autocompleteSets
         });

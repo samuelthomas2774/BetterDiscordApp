@@ -132,7 +132,7 @@
                 const { selectionEnd, value } = e.target;
                 const sterm = value.slice(0, selectionEnd).split(/\s+/g).pop();
                 const prefix = sterm.slice(0, 1);
-                return this.controller.toggle(prefix, sterm);
+                return this.controller.toggle(prefix, sterm, e);
             }
         }
     }

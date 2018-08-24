@@ -184,7 +184,7 @@ const KnownModules = {
     ExternalLink: Filters.byCode(/\.trusted\b/)
 };
 
-class Modules {
+class Module {
 
     /**
      * Finds a module using a filter function.
@@ -218,7 +218,7 @@ class Modules {
      * @param {Function} fallback A function to use to filter modules if not finding a known module
      * @return {Any}
      */
-    static getModuleByName(name, fallback) {
+    static byName(name, fallback) {
         if (Cache.hasOwnProperty(name)) return Cache[name];
         if (KnownModules.hasOwnProperty(name)) fallback = KnownModules[name];
         if (!fallback) return undefined;
@@ -231,7 +231,7 @@ class Modules {
      * @param {String} name The display name of the module
      * @return {Any}
      */
-    static getModuleByDisplayName(name) {
+    static byDisplayName(name) {
         return this.getModule(Filters.byDisplayName(name), true);
     }
 
@@ -241,7 +241,7 @@ class Modules {
      * @param {Boolean} first Whether to return the only the first matching module
      * @return {Any}
      */
-    static getModuleByRegex(regex, first = true) {
+    static byRegex(regex, first = true) {
         return this.getModule(Filters.byCode(regex), first);
     }
 
@@ -251,7 +251,7 @@ class Modules {
      * @param {Boolean} first Whether to return only the first matching module
      * @return {Any}
      */
-    static getModuleByPrototypes(prototypes, first = true) {
+    static byPrototypes(prototypes, first = true) {
         return this.getModule(Filters.byPrototypeFields(prototypes), first);
     }
 
@@ -261,7 +261,7 @@ class Modules {
      * @param {Boolean} first Whether to return only the first matching module
      * @return {Any}
      */
-    static getModuleByProps(props, first = true) {
+    static byProps(props, first = true) {
         return this.getModule(Filters.byProperties(props), first);
     }
 
@@ -408,10 +408,10 @@ class Modules {
 
 }
 
-const ModuleProxy = new Proxy(Modules, {
-    get(Modules, property) {
-        return Modules[property] || Modules.getModuleByName(property);
+const Modules = new Proxy(Module, {
+    get(Module, name) {
+        return Module.byName(name);
     }
 });
 
-export { ModuleProxy as Modules };
+export { Module, Modules }

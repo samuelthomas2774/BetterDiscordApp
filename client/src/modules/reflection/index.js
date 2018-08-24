@@ -8,11 +8,15 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Modules } from './modules';
+import { Module, Modules } from './modules';
 import { Reflection as DOM } from 'ui';
 import Resolver from './resolver';
 
 export default class Reflection {
+
+    static get module() {
+        return Module;
+    }
 
     static get modules() {
         return Modules;

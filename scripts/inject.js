@@ -2,7 +2,8 @@ const args = process.argv;
 const fs = require('fs');
 const path = require('path');
 
-const releaseInput = args[2] ? args[2].toLowerCase() : '';
+const useBdRelase = args[2] && args[2].toLowerCase() === 'release';
+const releaseInput = useBdRelease ? args[3] ? args[3].toLowerCase() : args[2] ? args[2].toLowerCase() : '';
 const release = releaseInput === 'canary' ? 'DiscordCanary' : releaseInput === 'ptb' ? 'DiscordPTB' : 'Discord';
 console.log(`Injecting into version ${release}`);
 
@@ -15,7 +16,8 @@ const discordPath = (function() {
     } else if (process.platform === 'darwin') {
         const appPath = releaseInput === 'canary' ? path.join('/Applications', 'Discord Canary.app')
             : releaseInput === 'ptb' ? path.join('/Applications', 'Discord PTB.app')
-            : args[2] ? args[2] : path.join('/Applications', 'Discord.app');
+            : useBdRelease && args[3] ? args[3] : ? args[2] ? args[2]
+            : path.join('/Applications', 'Discord.app');
 
         return path.join(appPath, 'Contents', 'Resources');
     } else if (process.platform === 'linux') {
@@ -34,6 +36,8 @@ if (!fs.existsSync(appPath)) fs.mkdirSync(appPath);
 if (fs.existsSync(packageJson)) fs.unlinkSync(packageJson);
 if (fs.existsSync(indexJs)) fs.unlinkSync(indexJs);
 
+const bdPath = useBdRelease ? path.resolve(__dirname, '..', 'release') : path.resolve(__dirname, '..');
+
 console.log(`Writing package.json`);
 fs.writeFileSync(packageJson, JSON.stringify({
     name: 'betterdiscord',
@@ -50,7 +54,7 @@ const electron = require('electron');
 const basePath = path.join(__dirname, '..', 'app.asar');
 electron.app.getAppPath = () => basePath;
 Module._load(basePath, null, true);
-electron.app.on('ready', () => new (require('${path.join(__dirname, '..', 'core').replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}').BetterDiscord)());
+electron.app.on('ready', () => new (require('${bdPath.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}').BetterDiscord)());
 `);
 
 console.log(`Injection successful, please restart ${release}.`);

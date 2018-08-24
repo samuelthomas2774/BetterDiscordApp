@@ -81,7 +81,7 @@ gulp.task('node-sass-bindings', gulp.series(function () {
         gulp.src('other/node_sass_bindings/**/*'),
         copy('release/node_modules/node-sass/vendor', { prefix: 2 })
     ]);
-});
+}));
 
 gulp.task('keytar-bindings', gulp.series(function () {
     return del(['release/node_modules/keytar/build']);

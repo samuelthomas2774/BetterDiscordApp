@@ -9,5 +9,12 @@
 */
 
 import { Modules } from './modules';
+import Resolver from './resolver';
 
-export class Reflection { }
+export class Reflection {
+
+    static get resolver() {
+        return Resolver;
+    }
+
+}

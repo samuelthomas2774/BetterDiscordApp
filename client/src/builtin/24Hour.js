@@ -9,7 +9,7 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import { Patcher, MonkeyPatch, WebpackModules, ReactComponents } from 'modules';
+import { Patcher, MonkeyPatch, Reflection, ReactComponents } from 'modules';
 
 const twelveHour = new RegExp(`([0-9]{1,2}):([0-9]{1,2})\\s(AM|PM)`);
 
@@ -21,7 +21,7 @@ export default new class TwentyFourHour extends BuiltinModule {
 
     async enabled(e) {
         if (Patcher.getPatchesByCaller('BD:TwentyFourHour').length) return;
-        const TimeFormatter = WebpackModules.getModuleByName('TimeFormatter');
+        const { TimeFormatter } = Reflection.modules;
         MonkeyPatch('BD:TwentyFourHour', TimeFormatter).after('calendarFormat', (thisObject, args, returnValue) => {
             const matched = returnValue.match(twelveHour);
             if (!matched || matched.length != 4) return;

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { WebpackModules } from './webpackmodules';
+import Reflection from './reflection/index';
 import { ClientLogger as Logger } from 'common';
 
 /**
@@ -64,7 +64,7 @@ export class Patcher {
 
     static resolveModule(module) {
         if (module instanceof Function || (module instanceof Object)) return module;
-        if (typeof module === 'string') return WebpackModules.getModuleByName(module);
+        if (typeof module === 'string') return Reflection.module.byName(module);
         return null;
     }
 

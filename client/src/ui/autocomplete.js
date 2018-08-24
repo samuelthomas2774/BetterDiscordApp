@@ -1,4 +1,4 @@
-import { Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache } from 'modules';
+import { Settings, Globals, Reflection, ReactComponents, MonkeyPatch, Cache } from 'modules';
 import { VueInjector } from 'ui';
 
 import AutocompleteComponent from './components/common/Autocomplete.vue';
@@ -11,7 +11,7 @@ export default new class Autocomplete {
     }
 
     async init() {
-        this.cta = await ReactComponents.getComponent('ChannelTextArea', { selector: WebpackModules.getSelector('channelTextArea', 'emojiButton') });
+        this.cta = await ReactComponents.getComponent('ChannelTextArea', { selector: Reflection.resolve('channelTextArea', 'emojiButton').selector });
         MonkeyPatch('BD:Autocomplete', this.cta.component.prototype).after('render', this.channelTextAreaAfterRender.bind(this));
         this.initialized = true;
     }

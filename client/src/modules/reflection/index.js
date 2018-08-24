@@ -37,4 +37,8 @@ export default class Reflection {
     static get DOM() {
         return DOM;
     }
+
+    static get require() {
+        return Module.require;
+    }
 }

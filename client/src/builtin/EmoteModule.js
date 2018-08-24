@@ -13,7 +13,7 @@ import path from 'path';
 import { request } from 'vendor';
 
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { DiscordApi, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache, Patcher, Database } from 'modules';
+import { DiscordApi, Settings, Globals, Reflection, ReactComponents, MonkeyPatch, Cache, Patcher, Database } from 'modules';
 import { VueInjector, DiscordContextMenu } from 'ui';
 
 import Emote from './EmoteComponent.js';
@@ -79,7 +79,7 @@ export default new class EmoteModule extends BuiltinModule {
 
         this.patchMessageContent();
         this.patchSendAndEdit();
-        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: WebpackModules.getSelector('imageWrapper') });
+        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: Reflection.resolve('imageWrapper').selector });
         MonkeyPatch('BD:EMOTEMODULE', ImageWrapper.component.prototype).after('render', this.beforeRenderImageWrapper.bind(this));
     }
 
@@ -155,7 +155,7 @@ export default new class EmoteModule extends BuiltinModule {
      * Patches MessageContent render method
      */
     async patchMessageContent() {
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: WebpackModules.getSelector('container', 'containerCozy', 'containerCompact', 'edited') });
+        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
         MonkeyPatch('BD:EMOTEMODULE', MessageContent.component.prototype).after('render', this.afterRenderMessageContent.bind(this));
         MessageContent.forceUpdateAll();
     }
@@ -177,8 +177,9 @@ export default new class EmoteModule extends BuiltinModule {
      * Patches MessageActions send and edit
      */
     patchSendAndEdit() {
-        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('sendMessage', this.handleSendMessage.bind(this));
-        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('editMessage', this.handleEditMessage.bind(this));
+        const { MessageActions } = Reflection.modules;
+        MonkeyPatch('BD:EMOTEMODULE', MessageActions).instead('sendMessage', this.handleSendMessage.bind(this));
+        MonkeyPatch('BD:EMOTEMODULE', MessageActions).instead('editMessage', this.handleEditMessage.bind(this));
     }
 
     /**
@@ -213,8 +214,8 @@ export default new class EmoteModule extends BuiltinModule {
         if (!emote) return orig(...args);
         this.addToMostUsed(emote);
 
-        const FileActions = WebpackModules.getModuleByProps(['makeFile']);
-        const Uploader = WebpackModules.getModuleByProps(['instantBatchUpload']);
+        const FileActions = Reflection.module.byProps('makeFile');
+        const Uploader = Reflection.module.byProps('instantBatchUpload');
 
         request.get(emote.props.src, { encoding: 'binary' }).then(res => {
             const arr = new Uint8Array(new ArrayBuffer(res.length));

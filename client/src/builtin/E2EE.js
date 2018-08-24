@@ -10,8 +10,8 @@
 
 import { Settings, Cache, Events } from 'modules';
 import BuiltinModule from './BuiltinModule';
-import { WebpackModules, ReactComponents, MonkeyPatch, Patcher, DiscordApi, Security } from 'modules';
-import { VueInjector, Reflection, Modals, Toasts } from 'ui';
+import { Reflection, ReactComponents, MonkeyPatch, Patcher, DiscordApi, Security } from 'modules';
+import { VueInjector, Modals, Toasts } from 'ui';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 import { request } from 'vendor';
 import { Utils } from 'common';
@@ -45,8 +45,7 @@ export default new class E2EE extends BuiltinModule {
         Events.on('discord:MESSAGE_CREATE', this.handlePublicKey);
         this.patchDispatcher();
         this.patchMessageContent();
-        const selector = `.${WebpackModules.getClassName('channelTextArea', 'emojiButton')}`;
-        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector });
+        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector: Reflection.resolve('channelTextArea', 'emojiButton').selector });
         this.patchChannelTextArea(cta);
         this.patchChannelTextAreaSubmit(cta);
         cta.forceUpdateAll();
@@ -188,7 +187,7 @@ export default new class E2EE extends BuiltinModule {
             if (!ECDH_STORAGE.hasOwnProperty(channelId)) {
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${this.createKeyExchange(channelId)}\n-----END PUBLIC KEY-----\n\`\`\``;
                 if (this.encryptNewMessages) this.encryptNewMessages = false;
-                WebpackModules.getModuleByName('DraftActions').saveDraft(channelId, publicKeyMessage);
+                Reflection.modules.DraftActions.saveDraft(channelId, publicKeyMessage);
             }
             const secret = this.computeSecret(channelId, key);
             this.setKey(channelId, secret);
@@ -202,7 +201,7 @@ export default new class E2EE extends BuiltinModule {
     }
 
     patchDispatcher() {
-        const Dispatcher = WebpackModules.getModuleByName('Dispatcher');
+        const { Dispatcher } = Reflection.modules;
         MonkeyPatch('BD:E2EE', Dispatcher).before('dispatch', (_, [event]) => {
             if (event.type !== 'MESSAGE_CREATE') return;
 
@@ -216,9 +215,8 @@ export default new class E2EE extends BuiltinModule {
                 decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), event.message.content);
             } catch (err) { return } // Ignore errors such as non empty
 
-            const MessageParser = WebpackModules.getModuleByName('MessageParser');
-            const Permissions = WebpackModules.getModuleByName('GuildPermissions');
-            const DiscordConstants = WebpackModules.getModuleByName('DiscordConstants');
+            const { MessageParser, Permissions, DiscordConstants } = Reflection.modules;
+
             const currentChannel = DiscordApi.Channel.fromId(event.message.channel_id).discordObject;
 
             // Create a generic message object to parse mentions with
@@ -234,11 +232,10 @@ export default new class E2EE extends BuiltinModule {
     }
 
     async patchMessageContent() {
-        const selector = `.${WebpackModules.getClassName('container', 'containerCozy', 'containerCompact', 'edited')}`;
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector });
+        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
         MonkeyPatch('BD:E2EE', MessageContent.component.prototype).before('render', this.beforeRenderMessageContent.bind(this));
         MonkeyPatch('BD:E2EE', MessageContent.component.prototype).after('render', this.renderMessageContent.bind(this));
-        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: `.${WebpackModules.getClassName('imageWrapper')}` });
+        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: Reflection.resolve('imageWrapper').selector });
         MonkeyPatch('BD:E2EE', ImageWrapper.component.prototype).before('render', this.beforeRenderImageWrapper.bind(this));
     }
 
@@ -248,10 +245,7 @@ export default new class E2EE extends BuiltinModule {
         const key = this.getKey(component.props.message.channel_id);
         if (!key) return; // We don't have a key for this channel
 
-        const Message = WebpackModules.getModuleByPrototypes(['isMentioned']);
-        const MessageParser = WebpackModules.getModuleByName('MessageParser');
-        const Permissions = WebpackModules.getModuleByName('GuildPermissions');
-        const DiscordConstants = WebpackModules.getModuleByName('DiscordConstants');
+        const { Message, MessageParser, Permissions, DiscordConstants } = Reflection.modules;
         const currentChannel = DiscordApi.Channel.fromId(component.props.message.channel_id).discordObject;
 
         if (typeof component.props.message.content !== 'string') return; // Ignore any non string content

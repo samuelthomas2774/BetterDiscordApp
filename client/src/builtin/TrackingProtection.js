@@ -10,7 +10,7 @@
 
 import BuiltinModule from './BuiltinModule';
 
-import { Patcher, MonkeyPatch, WebpackModules } from 'modules';
+import { Patcher, MonkeyPatch, Reflection } from 'modules';
 
 export default new class E2EE extends BuiltinModule {
 
@@ -24,7 +24,7 @@ export default new class E2EE extends BuiltinModule {
 
     enabled(e) {
         if (Patcher.getPatchesByCaller('BD:TrackingProtection').length) return;
-        const trackingModule = WebpackModules.getModuleByProps(['track']);
+        const trackingModule = Reflection.module.byProps('track');
         if (!trackingModule) return; // TODO Log it
         MonkeyPatch('BD:TrackingProtection', trackingModule).instead('track', this.track);
     }

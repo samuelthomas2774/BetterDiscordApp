@@ -9,7 +9,7 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import { Patcher, MonkeyPatch, WebpackModules } from 'modules';
+import { Patcher, MonkeyPatch, Reflection } from 'modules';
 
 export default new class KillClyde extends BuiltinModule {
 
@@ -19,7 +19,7 @@ export default new class KillClyde extends BuiltinModule {
 
     async enabled(e) {
         if (Patcher.getPatchesByCaller('BD:KillClyde').length) return;
-        const MessageActions = WebpackModules.getModuleByName('MessageActions');
+        const { MessageActions } = Reflection.modules;
         MonkeyPatch('BD:KillClyde', MessageActions).instead('sendBotMessage', void 0);
     }
 

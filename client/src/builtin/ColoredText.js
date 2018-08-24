@@ -11,7 +11,7 @@
 import BuiltinModule from './BuiltinModule';
 
 import { Utils } from 'common';
-import { Settings, Patcher, MonkeyPatch, WebpackModules, ReactComponents, DiscordApi } from 'modules';
+import { Settings, Patcher, MonkeyPatch, Reflection, ReactComponents, DiscordApi } from 'modules';
 
 export default new class ColoredText extends BuiltinModule {
 
@@ -44,13 +44,13 @@ export default new class ColoredText extends BuiltinModule {
     async enabled(e) {
         if (Patcher.getPatchesByCaller('BD:ColoredText').length) return;
         this.intensitySetting.on('setting-updated', this._intensityUpdated);
-        this.MessageContent = await ReactComponents.getComponent('MessageContent', { selector: WebpackModules.getSelector('container', 'containerCozy', 'containerCompact', 'edited') });
+        this.MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
         MonkeyPatch('BD:ColoredText', this.MessageContent.component.prototype).after('render', this.injectColoredText);
         this.MessageContent.forceUpdateAll();
     }
 
     injectColoredText(thisObject, args, returnValue) {
-        const TinyColor = WebpackModules.getModuleByName('TinyColor');
+        const { TinyColor } = Reflection.modules;
         const markup = Utils.findInReactTree(returnValue, m => m && m.props && m.props.className && m.props.className.includes('da-markup'));
         const roleColor = thisObject.props.message.colorString;
         if (markup && roleColor) markup.props.style = {color: TinyColor.mix(roleColor, this.defaultColor, this.intensity)};

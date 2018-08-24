@@ -10,7 +10,7 @@
 
 import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
-import { BdMenu, Modals, DOM, DOMObserver, Reflection, VueInjector, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
+import { BdMenu, Modals, DOM, DOMObserver, VueInjector, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
 import * as CommonComponents from 'commoncomponents';
 import { Utils, Filters, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
@@ -19,7 +19,7 @@ import PluginManager from './pluginmanager';
 import ThemeManager from './thememanager';
 import Events from './events';
 import EventsWrapper from './eventswrapper';
-import { WebpackModules } from './webpackmodules';
+import Reflection from './reflection/index';
 import DiscordApi from './discordapi';
 import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
@@ -540,92 +540,6 @@ export default class PluginApi {
             getModule: this.getModule.bind(this),
             listModules: this.listModules.bind(this)
         };
-    }
-
-    /**
-     * WebpackModules
-     */
-
-    get webpackRequire() {
-        return WebpackModules.require;
-    }
-    getWebpackModule(filter, first = true) {
-        return WebpackModules.getModule(filter, first);
-    }
-    getWebpackModuleByName(name, fallback) {
-        return WebpackModules.getModuleByName(name, fallback);
-    }
-    getWebpackModuleByDisplayName(name) {
-        return WebpackModules.getModuleByDisplayName(name);
-    }
-    getWebpackModuleByRegex(regex) {
-        return WebpackModules.getModuleByRegex(regex, true);
-    }
-    getWebpackModulesByRegex(regex) {
-        return WebpackModules.getModuleByRegex(regex, false);
-    }
-    getWebpackModuleByProperties(...props) {
-        return WebpackModules.getModuleByProps(props, true);
-    }
-    getWebpackModuleByPrototypeFields(...props) {
-        return WebpackModules.getModuleByPrototypes(props, true);
-    }
-    getWebpackModulesByProperties(...props) {
-        return WebpackModules.getModuleByProps(props, false);
-    }
-    getWebpackModulesByPrototypeFields(...props) {
-        return WebpackModules.getModuleByPrototypes(props, false);
-    }
-    waitForWebpackModule(filter) {
-        return WebpackModules.waitForModule(filter);
-    }
-    waitForWebpackModuleByName(name, fallback) {
-        return WebpackModules.waitForModuleByName(name, fallback);
-    }
-    waitForWebpackModuleByDisplayName(name) {
-        return WebpackModules.waitForModuleByDisplayName(name);
-    }
-    waitForWebpackModuleByRegex(regex) {
-        return WebpackModules.waitForModuleByRegex(regex);
-    }
-    waitForWebpackModuleByProperties(...props) {
-        return WebpackModules.waitForModuleByProps(props);
-    }
-    waitForWebpackModuleByPrototypeFields(...props) {
-        return WebpackModules.waitForModuleByPrototypes(props);
-    }
-    getWebpackClassName(...classes) {
-        return WebpackModules.getClassName(...classes);
-    }
-    waitForWebpackClassName(...classes) {
-        return WebpackModules.waitForClassName(...classes);
-    }
-    get WebpackModules() {
-        return new Proxy({
-            getModule: this.getWebpackModule.bind(this),
-            getModuleByName: this.getWebpackModuleByName.bind(this),
-            getModuleByDisplayName: this.getWebpackModuleByDisplayName.bind(this),
-            getModuleByRegex: this.getWebpackModuleByRegex.bind(this),
-            getModulesByRegex: this.getWebpackModulesByRegex.bind(this),
-            getModuleByProperties: this.getWebpackModuleByProperties.bind(this),
-            getModuleByPrototypeFields: this.getWebpackModuleByPrototypeFields.bind(this),
-            getModulesByProperties: this.getWebpackModulesByProperties.bind(this),
-            getModulesByPrototypeFields: this.getWebpackModulesByPrototypeFields.bind(this),
-            waitForModule: this.waitForWebpackModule.bind(this),
-            waitForModuleByName: this.waitForWebpackModuleByName.bind(this),
-            waitForModuleByDisplayName: this.waitForWebpackModuleByDisplayName.bind(this),
-            waitForModuleByRegex: this.waitForWebpackModuleByRegex.bind(this),
-            waitForModuleByProperties: this.waitForWebpackModuleByProperties.bind(this),
-            waitForModuleByPrototypeFields: this.waitForWebpackModuleByPrototypeFields.bind(this),
-            getClassName: this.getWebpackClassName.bind(this),
-            waitForClassName: this.waitForWebpackClassName.bind(this),
-            get KnownModules() { return WebpackModules.KnownModules },
-            get require() { return WebpackModules.require }
-        }, {
-            get(WebpackModules, property) {
-                return WebpackModules[property] || WebpackModules.getModuleByName(property);
-            }
-        });
     }
 
     /**

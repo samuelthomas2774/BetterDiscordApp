@@ -36,8 +36,8 @@
 </template>
 
 <script>
-    import { WebpackModules, DiscordApi, Events } from 'modules';
-    let wtf = null;
+    import { Reflection, DiscordApi, Events } from 'modules';
+
     export default {
         data() {
             return {

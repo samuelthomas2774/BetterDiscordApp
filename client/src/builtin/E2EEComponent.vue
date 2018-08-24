@@ -39,7 +39,7 @@
 <script>
     import { Utils, FileUtils, ClientIPC } from 'common';
     import { E2EE } from 'builtin';
-    import { DiscordApi, WebpackModules } from 'modules';
+    import { DiscordApi, Reflection } from 'modules';
     import { Toasts } from 'ui';
     import { MiLock, MiImagePlus, MiIcVpnKey } from '../ui/components/common/MaterialIcon';
 
@@ -61,8 +61,8 @@
                 if (!dialogResult || !dialogResult.length) return;
 
                 const readFile = await FileUtils.readFileBuffer(dialogResult[0]);
-                const FileActions = WebpackModules.getModuleByProps(['makeFile']);
-                const Uploader = WebpackModules.getModuleByProps(['instantBatchUpload']);
+                const FileActions = Reflection.module.byProps('makeFile');
+                const Uploader = Reflection.module.byProps('instantBatchUpload');
 
                 const img = await Utils.getImageFromBuffer(readFile);
 
@@ -93,7 +93,7 @@
                 E2EE.preExchangeState = E2EE.encryptNewMessages;
                 E2EE.encryptNewMessages = false; // Disable encrypting new messages so we won't encrypt public keys
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${keyExchange}\n-----END PUBLIC KEY-----\n\`\`\``;
-                WebpackModules.getModuleByName('DraftActions').saveDraft(DiscordApi.currentChannel.id, publicKeyMessage);
+                Reflection.modules.DraftActions.saveDraft(DiscordApi.currentChannel.id, publicKeyMessage);
                 Toasts.info('Key exchange started. Expires in 30 seconds');
             }
         },

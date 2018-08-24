@@ -259,7 +259,7 @@ class Module {
      * @param {any} props Properties to use to filter modules
      * @return {Any}
      */
-    static allbyPrototypes(...prototypes) {
+    static allByPrototypes(...prototypes) {
         return this.getModule(Filters.byPrototypeFields(prototypes), false);
     }
 

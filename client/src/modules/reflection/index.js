@@ -22,6 +22,14 @@ export default class Reflection {
         return Modules;
     }
 
+    static get resolve() {
+        return Resolver.resolve;
+    }
+
+    static get resolveAsync() {
+        return Resolver.resolveAsync;
+    }
+
     static get resolver() {
         return Resolver;
     }
@@ -29,5 +37,4 @@ export default class Reflection {
     static get DOM() {
         return DOM;
     }
-
 }

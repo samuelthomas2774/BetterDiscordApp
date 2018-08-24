@@ -9,7 +9,7 @@
 */
 
 import { Utils, Filters } from 'common';
-import Events from './events';
+import Events from '../events';
 
 const KnownModules = {
     React: Filters.byProperties(['createElement', 'cloneElement']),

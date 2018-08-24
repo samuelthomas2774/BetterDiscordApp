@@ -1,5 +1,5 @@
 /**
- * BetterDiscord Reflection Modules
+ * BetterDiscord WebpackModules Module
  * Copyright (c) 2015-present Jiiks/JsSucks - https://github.com/Jiiks / https://github.com/JsSucks
  * All rights reserved.
  * https://betterdiscord.net
@@ -184,7 +184,7 @@ const KnownModules = {
     ExternalLink: Filters.byCode(/\.trusted\b/)
 };
 
-class Modules {
+class WebpackModules {
 
     /**
      * Finds a module using a filter function.
@@ -389,6 +389,25 @@ class Modules {
     }
 
     /**
+     * Searches for a class module and returns a class from it.
+     * @param {String} base The first part of the class to find
+     * @param {String} ...additional_classes Additional classes to look for to filter duplicate class modules
+     * @return {String}
+     */
+    static getClassName(base, ...additional_classes) {
+        const class_module = this.getModuleByProps([base, ...additional_classes]);
+        if (class_module && class_module[base]) return class_module[base].split(' ')[0];
+    }
+    static async waitForClassName(base, ...additional_classes) {
+        const class_module = await this.waitForModuleByProps([base, ...additional_classes]);
+        if (class_module && class_module[base]) return class_module[base].split(' ')[0];
+    }
+    static getSelector(base, ...additional_classes) {
+        const gcn = this.getClassName(base, ...additional_classes);
+        if (gcn) return `.${gcn}`;
+    }
+
+    /**
      * Returns all loaded modules.
      * @return {Array}
      */
@@ -408,10 +427,4 @@ class Modules {
 
 }
 
-const ModuleProxy = new Proxy(Modules, {
-    get(Modules, property) {
-        return Modules[property] || Modules.getModuleByName(property);
-    }
-});
-
-export { ModuleProxy as Modules };
+export { WebpackModules }

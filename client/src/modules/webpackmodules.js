@@ -1,11 +1,11 @@
 /* Deprecation Notice */
-import { Modules } from './reflection/modules';
+import { WebpackModules } from './reflection/wpm.depr.js';
 import { ClientLogger as Logger } from 'common';
 
-const DeprecationWarning = new Proxy(Modules, {
-    get(Modules, property) {
+const DeprecationWarning = new Proxy(WebpackModules, {
+    get(WebpackModules, property) {
         Logger.warn('DEPR', 'WebpackModules is deprecated. Use Reflection.Modules instead.');
-        return Modules[property] || Modules.getModuleByName(property);
+        return WebpackModules[property] || WebpackModules.getModuleByName(property);
     }
 });
 

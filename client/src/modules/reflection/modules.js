@@ -246,23 +246,39 @@ class Module {
     }
 
     /**
-     * Finds a module using properties on it's prototype.
-     * @param {Array} props Properties to use to filter modules
-     * @param {Boolean} first Whether to return only the first matching module
+     * Finds the first module using properties on it's prototype.
+     * @param {any} props Properties to use to filter modules
      * @return {Any}
      */
-    static byPrototypes(prototypes, first = true) {
-        return this.getModule(Filters.byPrototypeFields(prototypes), first);
+    static byPrototypes(...prototypes) {
+        return this.getModule(Filters.byPrototypeFields(prototypes), true);
     }
 
     /**
-     * Finds a module using it's own properties.
-     * @param {Array} props Properties to use to filter modules
-     * @param {Boolean} first Whether to return only the first matching module
+     * Finds all modules using properties on it's prototype.
+     * @param {any} props Properties to use to filter modules
      * @return {Any}
      */
-    static byProps(props, first = true) {
-        return this.getModule(Filters.byProperties(props), first);
+    static allbyPrototypes(...prototypes) {
+        return this.getModule(Filters.byPrototypeFields(prototypes), false);
+    }
+
+    /**
+     * Finds the first module using it's own properties.
+     * @param {any} props Properties to use to filter modules
+     * @return {Any}
+     */
+    static byProps(...props) {
+        return this.getModule(Filters.byProperties(props), true);
+    }
+
+    /**
+     * Finds all modules using it's own properties.
+     * @param {any} props Properties to use to filter modules
+     * @return {Any}
+     */
+    static allByProps(...props) {
+        return this.getModule(Filters.byProperties(props), false);
     }
 
     /**

@@ -9,12 +9,17 @@
 */
 
 import { Modules } from './modules';
+import { Reflection as DOM } from 'ui';
 import Resolver from './resolver';
 
 export class Reflection {
 
     static get resolver() {
         return Resolver;
+    }
+
+    static get DOM() {
+        return DOM;
     }
 
 }

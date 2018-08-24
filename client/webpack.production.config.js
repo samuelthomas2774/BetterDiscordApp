@@ -23,7 +23,7 @@ const scssLoader = {
 };
 
 module.exports = {
-    entry: './src/index.js',
+    entry: path.resolve(__dirname, 'src', 'index.js'),
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'betterdiscord.client-release.js'
@@ -38,22 +38,22 @@ module.exports = {
         util: 'require("util")',
         process: 'require("process")',
         net: 'require("net")',
+        'node-crypto': 'require("crypto")',
         request: 'require(require("path").join(require("electron").remote.app.getAppPath(), "node_modules", "request"))',
-        sparkplug: 'require("./sparkplug")',
-        'node-crypto': 'require("crypto")'
+        sparkplug: 'require("./sparkplug")'
     },
     resolve: {
         alias: {
-            vue$: path.resolve('..', 'node_modules', 'vue', 'dist', 'vue.esm.js')
+            vue$: path.resolve(__dirname, '..', 'node_modules', 'vue', 'dist', 'vue.esm.js')
         },
         modules: [
-            path.resolve('..', 'node_modules'),
-            path.resolve('..', 'common', 'modules'),
-            path.resolve('src', 'modules'),
-            path.resolve('src', 'ui'),
-            path.resolve('src', 'plugins'),
-            path.resolve('src', 'structs'),
-            path.resolve('src', 'builtin')
+            path.resolve(__dirname, '..', 'node_modules'),
+            path.resolve(__dirname, '..', 'common', 'modules'),
+            path.resolve(__dirname, 'src', 'modules'),
+            path.resolve(__dirname, 'src', 'ui'),
+            path.resolve(__dirname, 'src', 'plugins'),
+            path.resolve(__dirname, 'src', 'structs'),
+            path.resolve(__dirname, 'src', 'builtin')
         ]
     },
     node: {

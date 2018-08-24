@@ -14,9 +14,5 @@
     "type": "git",
     "url": "https://github.com/JsSucks/BetterDiscordApp.git"
   },
-  "private": false,
-  "scripts": {
-    "build": "webpack --progress --colors",
-    "watch": "webpack --progress --colors --watch"
-  }
+  "private": false
 }

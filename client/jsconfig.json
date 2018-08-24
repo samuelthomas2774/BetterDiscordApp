@@ -1,16 +1,16 @@
 {
     "compilerOptions": {
-      "target": "es2017",
-      "allowSyntheticDefaultImports": false,
-      "baseUrl": "./",
-      "paths": {
-        "modules": ["./src/modules/modules.js"],
-        "structs": ["./src/structs/structs.js"],
-        "common": ["../common/modules/common.js"],
-        "ui": ["./src/ui/ui.js"],
-        "builtin": ["./src/builtin/builtin.js"],
-        "vue$": ["../node_modules/vue/dist/vue.esm.js"]
-      }
+        "target": "es2017",
+        "allowSyntheticDefaultImports": false,
+        "baseUrl": "./",
+        "paths": {
+            "modules": ["./src/modules/modules.js"],
+            "structs": ["./src/structs/structs.js"],
+            "common": ["../common/modules/common.js"],
+            "ui": ["./src/ui/ui.js"],
+            "builtin": ["./src/builtin/builtin.js"],
+            "vue$": ["../node_modules/vue/dist/vue.esm.js"]
+        }
     },
     "exclude": ["node_modules", "dist"]
 }

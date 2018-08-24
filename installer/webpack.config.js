@@ -15,7 +15,7 @@ const scssLoader = {
 };
 
 module.exports = {
-    entry: './src/index.js',
+    entry: path.resolve(__dirname, 'src', 'index.js'),
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'installer.js'
@@ -25,12 +25,12 @@ module.exports = {
     },
     resolve: {
         alias: {
-            vue$: path.resolve('..', 'node_modules', 'vue', 'dist', 'vue.esm.js')
+            vue$: path.resolve(__dirname, '..', 'node_modules', 'vue', 'dist', 'vue.esm.js')
         }
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: './src/index.html'
+            template: path.resolve(__dirname, 'src', 'index.html')
         })
     ]
 };

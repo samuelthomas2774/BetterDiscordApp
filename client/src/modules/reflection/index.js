@@ -12,7 +12,11 @@ import { Modules } from './modules';
 import { Reflection as DOM } from 'ui';
 import Resolver from './resolver';
 
-export class Reflection {
+export default class Reflection {
+
+    static get modules() {
+        return Modules;
+    }
 
     static get resolver() {
         return Resolver;

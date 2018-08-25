@@ -15,23 +15,20 @@ const twelveHour = new RegExp(`([0-9]{1,2}):([0-9]{1,2})\\s(AM|PM)`);
 
 export default new class TwentyFourHour extends BuiltinModule {
 
-    get settingPath() {
-        return ['ui', 'default', '24-hour'];
-    }
+    get settingPath() { return ['ui', 'default', '24-hour'] }
+    get moduleName() { return 'TwentyFourHour' }
 
-    async enabled(e) {
-        if (Patcher.getPatchesByCaller('BD:TwentyFourHour').length) return;
+    applyPatches() {
+        if (this.patches.length) return;
         const { TimeFormatter } = Reflection.modules;
-        MonkeyPatch('BD:TwentyFourHour', TimeFormatter).after('calendarFormat', (thisObject, args, returnValue) => {
-            const matched = returnValue.match(twelveHour);
-            if (!matched || matched.length != 4) return;
-            if (matched[3] == 'AM') return returnValue.replace(matched[0], `${matched[1] == '12' ? '00' : matched[1].padStart(2, '0')}:${matched[2]}`)
-            return returnValue.replace(matched[0], `${parseInt(matched[1]) + 12}:${matched[2]}`)
-        });
+        this.patch(TimeFormatter, 'calendarFormat', this.convertTimeStamps);
     }
 
-    disabled(e) {
-        Patcher.unpatchAll('BD:TwentyFourHour');
+    convertTimeStamps(that, args, returnValue) {
+        const matched = returnValue.match(twelveHour);
+        if (!matched || matched.length !== 4) return;
+        if (matched[3] === 'AM') return returnValue.replace(matched[0], `${matched[1] === '12' ? '00' : matched[1].padStart(2, '0')}:${matched[2]}`)
+        return returnValue.replace(matched[0], `${parseInt(matched[1]) + 12}:${matched[2]}`)
     }
-
+    
 }

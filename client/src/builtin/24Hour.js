@@ -15,15 +15,21 @@ const twelveHour = new RegExp(`([0-9]{1,2}):([0-9]{1,2})\\s(AM|PM)`);
 
 export default new class TwentyFourHour extends BuiltinModule {
 
-    get settingPath() { return ['ui', 'default', '24-hour'] }
+    /* Getters */
     get moduleName() { return 'TwentyFourHour' }
 
+    get settingPath() { return ['ui', 'default', '24-hour'] }
+
+    /* Patches */
     applyPatches() {
         if (this.patches.length) return;
         const { TimeFormatter } = Reflection.modules;
         this.patch(TimeFormatter, 'calendarFormat', this.convertTimeStamps);
     }
 
+    /**
+     * Convert 12 hours timestamps to 24 hour timestamps
+     */
     convertTimeStamps(that, args, returnValue) {
         const matched = returnValue.match(twelveHour);
         if (!matched || matched.length !== 4) return;

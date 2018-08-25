@@ -15,6 +15,7 @@ import { Settings, Patcher, MonkeyPatch, Reflection, ReactComponents, DiscordApi
 
 export default new class ColoredText extends BuiltinModule {
 
+    /* Getters */
     get moduleName() { return 'ColoredText' }
 
     get settingPath() { return ['ui', 'default', 'colored-text'] }
@@ -41,10 +42,12 @@ export default new class ColoredText extends BuiltinModule {
         this.intensitySetting.off('setting-updated', this._intensityUpdated);
     }
 
+    /* Methods */
     _intensityUpdated() {
         this.MessageContent.forceUpdateAll();
     }
 
+    /* Patches */
     async applyPatches() {
         if (this.patches.length) return;
         this.MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
@@ -52,6 +55,9 @@ export default new class ColoredText extends BuiltinModule {
         this.MessageContent.forceUpdateAll();
     }
 
+    /**
+     * Set markup text colour to match role colour
+     */
     injectColoredText(thisObject, args, returnValue) {
         const { TinyColor } = Reflection.modules;
         const markup = Utils.findInReactTree(returnValue, m => m && m.props && m.props.className && m.props.className.includes('da-markup'));

@@ -13,8 +13,10 @@ import { Reflection } from 'modules';
 
 export default new class BlockedMessages extends BuiltinModule {
 
-    get settingPath() { return ['ui', 'default', 'blocked-messages'] }
+    /* Getters */
     get moduleName() { return 'BlockedMessages' }
+
+    get settingPath() { return ['ui', 'default', 'blocked-messages'] }
 
     async enabled(e) {
         const MessageListComponents = Reflection.module.byProps('BlockedMessageGroup');
@@ -30,17 +32,22 @@ export default new class BlockedMessages extends BuiltinModule {
         if (this.cancelBlockedMessages) this.cancelBlockedMessages();
     }
 
+    /* Methods */
     static isBlocked(id) {
         const { RelationshipStore } = Reflection.modules;
         return RelationshipStore.isBlocked(id);
     }
 
+    /* Patches */
     applyPatches() {
         if (this.patches.length) return;
         const { MessageActions } = Reflection.modules;
         this.patch(MessageActions, 'receiveMessage', this.processMessage, 'instead');
     }
 
+    /**
+     * Ignore blocked messages completely
+     */
     processMessage(that, args, originalFunction) {
         if (args[1] && args[1].author && args[1].author.id && BlockedMessages.isBlocked(args[1].author.id)) return;
         return originalFunction(...args);

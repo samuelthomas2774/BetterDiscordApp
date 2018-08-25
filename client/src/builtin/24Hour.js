@@ -9,7 +9,7 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import { Patcher, MonkeyPatch, Reflection, ReactComponents } from 'modules';
+import { Reflection } from 'modules';
 
 const twelveHour = new RegExp(`([0-9]{1,2}):([0-9]{1,2})\\s(AM|PM)`);
 

@@ -1,0 +1,17 @@
+{
+    "info": {
+        "id": "custom-elements",
+        "name": "Custom Elements Example",
+        "authors": [
+            {
+                "name": "Jiiks",
+                "discord_id": "81388395867156480",
+                "github_username": "Jiiks",
+                "twitter_username": "Jiiksi"
+            }
+        ],
+        "version": 1.0,
+        "description": "Custom Elements Description"
+    },
+    "main": "index.js"
+}

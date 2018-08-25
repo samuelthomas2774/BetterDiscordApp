@@ -105,7 +105,9 @@ export default class PluginApi {
             removeFromArray: (...args) => Utils.removeFromArray.apply(Utils, args),
             defineSoftGetter: (...args) => Utils.defineSoftGetter.apply(Utils, args),
             wait: (...args) => Utils.wait.apply(Utils, args),
-            until: (...args) => Utils.until.apply(Utils, args)
+            until: (...args) => Utils.until.apply(Utils, args),
+            findInTree: (...args) => Utils.findInTree.apply(Utils, args),
+            findInReactTree: (...args) => Utils.findInReactTree.apply(Utils, args)
         };
     }
 

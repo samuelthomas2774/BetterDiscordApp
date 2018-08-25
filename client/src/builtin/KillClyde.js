@@ -9,7 +9,7 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import { Patcher, MonkeyPatch, Reflection } from 'modules';
+import { Reflection } from 'modules';
 
 export default new class KillClyde extends BuiltinModule {
 

@@ -11,7 +11,7 @@
 import BuiltinModule from './BuiltinModule';
 
 import { Utils } from 'common';
-import { Settings, Patcher, MonkeyPatch, Reflection, ReactComponents, DiscordApi } from 'modules';
+import { Settings, Reflection, ReactComponents, DiscordApi } from 'modules';
 
 export default new class ColoredText extends BuiltinModule {
 

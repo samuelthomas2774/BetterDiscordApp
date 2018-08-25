@@ -18,13 +18,14 @@ import { Toasts } from 'ui';
 
 export default new class VueDevtoolsModule extends BuiltinModule {
 
+    /* Getters */
+    get moduleName() { return 'VueDevTools' }
+
+    get settingPath() { return ['core', 'advanced', 'vue-devtools'] }
+
     constructor() {
         super();
         this.devToolsOpened = this.devToolsOpened.bind(this);
-    }
-
-    get settingPath() {
-        return ['core', 'advanced', 'vue-devtools'];
     }
 
     enabled(e) {

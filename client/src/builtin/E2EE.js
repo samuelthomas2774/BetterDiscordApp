@@ -137,7 +137,7 @@ export default new class E2EE extends BuiltinModule {
         const items = Settings.getSetting('security', 'e2eedb', 'e2ekvps').items;
         const index = items.findIndex(kvp => kvp.value.key === channelId);
         if (index > -1) {
-            items[index].value = {key: channelId, value: key};
+            items[index].value = { key: channelId, value: key };
             return;
         }
         Settings.getSetting('security', 'e2eedb', 'e2ekvps').addItem({ value: { key: channelId, value: key } });
@@ -223,7 +223,7 @@ export default new class E2EE extends BuiltinModule {
             const parsed = MessageParser.parse(currentChannel, decrypt).content;
 
             if (userMentionPattern.test(parsed))
-                event.message.mentions = parsed.match(userMentionPattern).map(m => {return {id: m.replace(/[^0-9]/g, '')}});
+                event.message.mentions = parsed.match(userMentionPattern).map(m => { return { id: m.replace(/[^0-9]/g, '') } });
             if (roleMentionPattern.test(parsed))
                 event.message.mention_roles = parsed.match(roleMentionPattern).map(m => m.replace(/[^0-9]/g, ''));
             if (everyoneMentionPattern.test(parsed))
@@ -245,7 +245,8 @@ export default new class E2EE extends BuiltinModule {
         const key = this.getKey(component.props.message.channel_id);
         if (!key) return; // We don't have a key for this channel
 
-        const { Message, MessageParser, Permissions, DiscordConstants } = Reflection.modules;
+        const Message = Reflection.module.byPrototypes('isMentioned');
+        const { MessageParser, Permissions, DiscordConstants } = Reflection.modules;
         const currentChannel = DiscordApi.Channel.fromId(component.props.message.channel_id).discordObject;
 
         if (typeof component.props.message.content !== 'string') return; // Ignore any non string content
@@ -261,7 +262,7 @@ export default new class E2EE extends BuiltinModule {
         const message = MessageParser.createMessage(currentChannel.id, MessageParser.parse(currentChannel, decrypt).content);
 
         if (userMentionPattern.test(message.content))
-            message.mentions = message.content.match(userMentionPattern).map(m => {return {id: m.replace(/[^0-9]/g, '')}});
+            message.mentions = message.content.match(userMentionPattern).map(m => { return { id: m.replace(/[^0-9]/g, '') } });
         if (roleMentionPattern.test(message.content))
             message.mention_roles = message.content.match(roleMentionPattern).map(m => m.replace(/[^0-9]/g, ''));
         if (everyoneMentionPattern.test(message.content))

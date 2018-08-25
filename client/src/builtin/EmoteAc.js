@@ -13,6 +13,7 @@ import { Settings } from 'modules';
 import BuiltinModule from './BuiltinModule';
 import EmoteModule from './EmoteModule';
 import GlobalAc from '../ui/autocomplete';
+import { BdContextMenu } from 'ui';
 
 const EMOTE_SOURCES = [
     'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0',
@@ -22,14 +23,46 @@ const EMOTE_SOURCES = [
 
 export default new class EmoteAc extends BuiltinModule {
 
+    /* Getters */
+    get moduleName() { return 'EmoteAC' }
     get settingPath() { return ['emotes', 'default', 'emoteac'] }
 
     async enabled(e) {
         GlobalAc.add(';', this);
+        window.removeEventListener('contextmenu', this.acCm);
+        window.addEventListener('contextmenu', this.acCm);
     }
 
     disabled(e) {
         GlobalAc.remove(';');
+        window.removeEventListener('contextmenu', this.acCm);
+    }
+
+    /* Methods */
+    acCm(e) {
+        const row = e.target.closest('.bd-emotAc');
+        if (!row) return;
+        const img = row.querySelector('img');
+        if (!img || !img.alt) return;
+
+        BdContextMenu.show(e, [
+            {
+                text: 'Test',
+                items: [
+                    {
+                        text: 'Favourite',
+                        type: 'toggle',
+                        checked: EmoteModule.isFavourite(img.alt.replace(/;/g, '')),
+                        onChange: checked => {
+                            if (!img || !img.alt) return;
+                            const emote = img.alt.replace(/;/g, '');
+                            if (!checked) return EmoteModule.removeFavourite(emote), false;
+                            return EmoteModule.addFavourite(emote), true;
+                        }
+                    }
+                ]
+            }
+        ]);
     }
 
     /**
@@ -51,7 +84,8 @@ export default new class EmoteAc extends BuiltinModule {
                             hint: mu.useCount ? `Used ${mu.useCount} times` : null
                         }
                     }
-                })
+                }),
+                extraClasses: ['bd-emotAc']
             }
         }
 
@@ -63,7 +97,8 @@ export default new class EmoteAc extends BuiltinModule {
                 result.value.src = EMOTE_SOURCES[result.value.type].replace(':id', result.value.id);
                 result.value.replaceWith = `;${result.key};`;
                 return result;
-            })
+            }),
+            extraClasses: ['bd-emotAc']
         }
     }
 

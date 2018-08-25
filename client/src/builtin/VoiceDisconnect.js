@@ -13,21 +13,23 @@ import { Reflection } from 'modules';
 
 export default new class VoiceDisconnect extends BuiltinModule {
 
-    get settingPath() {
-        return ['core', 'default', 'voice-disconnect'];
-    }
+    /* Getters */
+    get moduleName() { return 'VoiceDisconnect' }
+
+    get settingPath() { return ['core', 'default', 'voice-disconnect'] }
 
     async enabled(e) {
         window.addEventListener('beforeunload', this.listener);
     }
 
+    disabled(e) {
+        window.removeEventListener('beforeunload', this.listener);
+    }
+
+    /* Methods */
     listener() {
         const { VoiceChannelActions } = Reflection.modules;
         VoiceChannelActions.selectVoiceChannel(null, null);
-    }
-
-    disabled(e) {
-        window.removeEventListener('beforeunload', this.listener);
     }
 
 }

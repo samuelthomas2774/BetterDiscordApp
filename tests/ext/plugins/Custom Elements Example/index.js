@@ -50,21 +50,18 @@ module.exports = (Plugin, Api, Vendor) => {
         async patchGuildTextChannel() {
             // Get the GuildTextChannel component and patch it's render function
             const GuildTextChannel = await ReactComponents.getComponent('GuildTextChannel');
-            monkeyPatch(GuildTextChannel.component.prototype).after('render', this.injectReact.bind(this));
+            monkeyPatch(GuildTextChannel.component.prototype).after('render', this.injectCustomElements.bind(this));
             // Force update to see our changes immediatly
             GuildTextChannel.forceUpdateAll();
-        }
-
-        /* Injecting a custom Vue element */
-        injectVue() {
-            // TODO
         }
 
         /*
          * Injecting a custom React element using React.createElement
          * https://reactjs.org/docs/react-api.html#createelement
+         * Injecting a custom Vue element using Vue.component
+         * https://vuejs.org/v2/guide/render-function.html
          **/
-        injectReact(that, args, returnValue) {
+        injectCustomElements(that, args, returnValue) {
             // Get the child we want using a treewalker since we know the child we want has a channel property and children.
             const child = Utils.findInReactTree(returnValue, filter => filter.hasOwnProperty('channel') && filter.children);
             if (!child) return;

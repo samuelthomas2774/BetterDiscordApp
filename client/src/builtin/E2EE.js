@@ -30,6 +30,14 @@ let seed;
 
 export default new class E2EE extends BuiltinModule {
 
+    /* Getters */
+
+    get moduleName() { return 'E2EE' }
+
+    get settingPath() { return ['security', 'default', 'e2ee'] }
+
+    get database() { return Settings.getSetting('security', 'e2eedb', 'e2ekvps').value }
+
     constructor() {
         super();
         this.encryptNewMessages = true;
@@ -40,25 +48,18 @@ export default new class E2EE extends BuiltinModule {
 
     async enabled(e) {
         await this.fetchMasterKey();
-        Settings.getSetting('security', 'default', 'use-keytar').on('setting-updated', this.fetchMasterKey);
-
         Events.on('discord:MESSAGE_CREATE', this.handlePublicKey);
-        this.patchDispatcher();
-        this.patchMessageContent();
-        const cta = await ReactComponents.getComponent('ChannelTextArea', { selector: Reflection.resolve('channelTextArea', 'emojiButton').selector });
-        this.patchChannelTextArea(cta);
-        this.patchChannelTextAreaSubmit(cta);
-        cta.forceUpdateAll();
+        Settings.getSetting('security', 'default', 'use-keytar').on('setting-updated', this.fetchMasterKey);
     }
 
     async disabled(e) {
         Settings.getSetting('security', 'default', 'use-keytar').off('setting-updated', this.fetchMasterKey);
         Events.off('discord:MESSAGE_CREATE', this.handlePublicKey);
-        for (const patch of Patcher.getPatchesByCaller('BD:E2EE')) patch.unpatch();
         const ctaComponent = await ReactComponents.getComponent('ChannelTextArea');
         ctaComponent.forceUpdateAll();
     }
 
+    /* Methods */
     async fetchMasterKey() {
         try {
             if (Settings.get('security', 'default', 'use-keytar')) {
@@ -92,14 +93,6 @@ export default new class E2EE extends BuiltinModule {
         const newMaster = Security.encrypt(seed, key);
         // TODO re-encrypt everything with new master
         return (this.master = newMaster);
-    }
-
-    get settingPath() {
-        return ['security', 'default', 'e2ee'];
-    }
-
-    get database() {
-        return Settings.getSetting('security', 'e2eedb', 'e2ekvps').value;
     }
 
     encrypt(key, content, prefix = '') {
@@ -171,6 +164,48 @@ export default new class E2EE extends BuiltinModule {
         }
     }
 
+    /* Patches */
+    async applyPatches() {
+        if (this.patches.length) return;
+
+        const { Dispatcher } = Reflection.modules;
+        this.patch(Dispatcher, 'dispatch', this.dispatcherPatch, 'before');
+        this.patchMessageContent();
+
+        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', { selector: Reflection.resolve('channelTextArea', 'emojiButton').selector });
+        this.patchChannelTextArea(ChannelTextArea);
+        this.patchChannelTextAreaSubmit(ChannelTextArea);
+        ChannelTextArea.forceUpdateAll();
+    }
+
+    dispatcherPatch(_, [event]) {
+        if (!event || event.type !== 'MESSAGE_CREATE') return;
+
+        const key = this.getKey(event.message.channel_id);
+        if (!key) return; // We don't have a key for this channel
+
+        if (typeof event.message.content !== 'string') return; // Ignore any non string content
+        if (!event.message.content.startsWith('$:')) return; // Not an encrypted string
+        let decrypt;
+        try {
+            decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), event.message.content);
+        } catch (err) { return } // Ignore errors such as non empty
+
+        const { MessageParser, Permissions, DiscordConstants } = Reflection.modules;
+
+        const currentChannel = DiscordApi.Channel.fromId(event.message.channel_id).discordObject;
+
+        // Create a generic message object to parse mentions with
+        const parsed = MessageParser.parse(currentChannel, decrypt).content;
+
+        if (userMentionPattern.test(parsed))
+            event.message.mentions = parsed.match(userMentionPattern).map(m => { return { id: m.replace(/[^0-9]/g, '') } });
+        if (roleMentionPattern.test(parsed))
+            event.message.mention_roles = parsed.match(roleMentionPattern).map(m => m.replace(/[^0-9]/g, ''));
+        if (everyoneMentionPattern.test(parsed))
+            event.message.mention_everyone = Permissions.can(DiscordConstants.Permissions.MENTION_EVERYONE, currentChannel);
+    }
+
     // TODO Received exchange should also expire if not accepted in time
     async handlePublicKey(e) {
         if (!DiscordApi.currentChannel) return;
@@ -200,43 +235,13 @@ export default new class E2EE extends BuiltinModule {
         }
     }
 
-    patchDispatcher() {
-        const { Dispatcher } = Reflection.modules;
-        MonkeyPatch('BD:E2EE', Dispatcher).before('dispatch', (_, [event]) => {
-            if (event.type !== 'MESSAGE_CREATE') return;
-
-            const key = this.getKey(event.message.channel_id);
-            if (!key) return; // We don't have a key for this channel
-
-            if (typeof event.message.content !== 'string') return; // Ignore any non string content
-            if (!event.message.content.startsWith('$:')) return; // Not an encrypted string
-            let decrypt;
-            try {
-                decrypt = this.decrypt(this.decrypt(this.decrypt(seed, this.master), key), event.message.content);
-            } catch (err) { return } // Ignore errors such as non empty
-
-            const { MessageParser, Permissions, DiscordConstants } = Reflection.modules;
-
-            const currentChannel = DiscordApi.Channel.fromId(event.message.channel_id).discordObject;
-
-            // Create a generic message object to parse mentions with
-            const parsed = MessageParser.parse(currentChannel, decrypt).content;
-
-            if (userMentionPattern.test(parsed))
-                event.message.mentions = parsed.match(userMentionPattern).map(m => { return { id: m.replace(/[^0-9]/g, '') } });
-            if (roleMentionPattern.test(parsed))
-                event.message.mention_roles = parsed.match(roleMentionPattern).map(m => m.replace(/[^0-9]/g, ''));
-            if (everyoneMentionPattern.test(parsed))
-                event.message.mention_everyone = Permissions.can(DiscordConstants.Permissions.MENTION_EVERYONE, currentChannel);
-        });
-    }
-
     async patchMessageContent() {
         const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
-        MonkeyPatch('BD:E2EE', MessageContent.component.prototype).before('render', this.beforeRenderMessageContent.bind(this));
-        MonkeyPatch('BD:E2EE', MessageContent.component.prototype).after('render', this.renderMessageContent.bind(this));
+        this.patch(MessageContent.component.prototype, 'render', this.beforeRenderMessageContent, 'before');
+        this.patch(MessageContent.component.prototype, 'render', this.afterRenderMessageContent);
+
         const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: Reflection.resolve('imageWrapper').selector });
-        MonkeyPatch('BD:E2EE', ImageWrapper.component.prototype).before('render', this.beforeRenderImageWrapper.bind(this));
+        this.patch(ImageWrapper.component.prototype, 'render', this.beforeRenderImageWrapper, 'before');
     }
 
     beforeRenderMessageContent(component) {
@@ -280,7 +285,7 @@ export default new class E2EE extends BuiltinModule {
         component.props.message.contentParsed = create.contentParsed;
     }
 
-    renderMessageContent(component, args, retVal) {
+    afterRenderMessageContent(component, args, retVal) {
         if (!component.props.message.bd_encrypted) return;
         const buttons = Utils.findInReactTree(retVal, m => Array.isArray(m) && m[1].props && m[1].props.currentUserId);
         if (!buttons) return;
@@ -361,7 +366,7 @@ export default new class E2EE extends BuiltinModule {
     }
 
     patchChannelTextArea(cta) {
-        MonkeyPatch('BD:E2EE', cta.component.prototype).after('render', this.renderChannelTextArea);
+        this.patch(cta.component.prototype, 'render', this.renderChannelTextArea);
     }
 
     renderChannelTextArea(component, args, retVal) {
@@ -371,7 +376,7 @@ export default new class E2EE extends BuiltinModule {
     }
 
     patchChannelTextAreaSubmit(cta) {
-        MonkeyPatch('BD:E2EE', cta.component.prototype).before('handleSubmit', this.handleChannelTextAreaSubmit.bind(this));
+        this.patch(cta.component.prototype, 'handleSubmit', this.handleChannelTextAreaSubmit, 'before');
     }
 
     handleChannelTextAreaSubmit(component, args, retVal) {

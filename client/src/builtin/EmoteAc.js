@@ -22,6 +22,8 @@ const EMOTE_SOURCES = [
 
 export default new class EmoteAc extends BuiltinModule {
 
+    /* Getters */
+    get moduleName() { return 'EmoteAC' }
     get settingPath() { return ['emotes', 'default', 'emoteac'] }
 
     async enabled(e) {

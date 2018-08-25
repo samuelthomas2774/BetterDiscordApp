@@ -12,9 +12,9 @@ import BuiltinModule from './BuiltinModule';
 import path from 'path';
 import { request } from 'vendor';
 
-import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { DiscordApi, Settings, Globals, Reflection, ReactComponents, MonkeyPatch, Cache, Patcher, Database } from 'modules';
-import { VueInjector, DiscordContextMenu } from 'ui';
+import { Utils, FileUtils } from 'common';
+import { DiscordApi, Settings, Globals, Reflection, ReactComponents, Database } from 'modules';
+import { DiscordContextMenu } from 'ui';
 
 import Emote from './EmoteComponent.js';
 import Autocomplete from '../ui/components/common/Autocomplete.vue';
@@ -219,7 +219,7 @@ export default new class EmoteModule extends BuiltinModule {
         this.patchMessageContent();
         this.patchSendAndEdit();
         const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: Reflection.resolve('imageWrapper').selector });
-        MonkeyPatch('BD:EMOTEMODULE', ImageWrapper.component.prototype).after('render', this.beforeRenderImageWrapper.bind(this));
+        this.patch(ImageWrapper.component.prototype, 'render', this.beforeRenderImageWrapper, 'before');
     }
 
     /**

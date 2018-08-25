@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { WebpackModules } from './webpackmodules';
+import Reflection from './reflection/index';
 import { MonkeyPatch } from './patcher';
 import Events from './events';
 import EventListener from './eventlistener';
@@ -37,7 +37,7 @@ export default class extends EventListener {
     }
 
     hook() {
-        const Events = WebpackModules.getModuleByName('Events');
+        const { Events } = Reflection.modules;
         MonkeyPatch('BD:EVENTS', Events.prototype).after('emit', (obj, args, retVal) => {
             const eventId = args.length >= 3 ? args[2].id || -1 : -1;
             if (eventId === this.ignoreMultiple) return;

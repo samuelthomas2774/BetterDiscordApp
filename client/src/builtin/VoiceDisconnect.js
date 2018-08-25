@@ -9,7 +9,7 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import { WebpackModules } from 'modules';
+import { Reflection } from 'modules';
 
 export default new class VoiceDisconnect extends BuiltinModule {
 
@@ -22,7 +22,7 @@ export default new class VoiceDisconnect extends BuiltinModule {
     }
 
     listener() {
-        const VoiceChannelActions = WebpackModules.getModuleByName('VoiceChannelActions');
+        const { VoiceChannelActions } = Reflection.modules;
         VoiceChannelActions.selectVoiceChannel(null, null);
     }
 

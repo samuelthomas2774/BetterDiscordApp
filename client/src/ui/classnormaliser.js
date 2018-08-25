@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Module, WebpackModules } from 'modules';
+import { Module, Reflection } from 'modules';
 
 const normalizedPrefix = 'da';
 const randClass = new RegExp(`^(?!${normalizedPrefix}-)((?:[A-Za-z]|[0-9]|-)+)-(?:[A-Za-z]|[0-9]|-|_){6}$`);
@@ -16,7 +16,7 @@ const randClass = new RegExp(`^(?!${normalizedPrefix}-)((?:[A-Za-z]|[0-9]|-)+)-(
 export default class ClassNormaliser extends Module {
 
     init() {
-        this.patchClassModules(WebpackModules.getModule(this.moduleFilter.bind(this), false));
+        this.patchClassModules(Reflection.module.getModule(this.moduleFilter.bind(this), false));
         this.normalizeElement(document.querySelector('#app-mount'));
     }
 

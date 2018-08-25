@@ -26,3 +26,4 @@ export { default as BdWebApi } from './bdwebapi';
 export { default as Connectivity } from './connectivity';
 export { default as Security } from './security';
 export { default as Cache } from './cache';
+export { default as Reflection } from './reflection/index';

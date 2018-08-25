@@ -9,7 +9,7 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import { Patcher, MonkeyPatch, WebpackModules, ReactComponents } from 'modules';
+import { Patcher, MonkeyPatch, Reflection, ReactComponents } from 'modules';
 
 export default new class BlockedMessages extends BuiltinModule {
 
@@ -18,16 +18,16 @@ export default new class BlockedMessages extends BuiltinModule {
     }
 
     static isBlocked(id) {
-        const RelationshipStore = WebpackModules.getModuleByName('RelationshipStore');
+        const { RelationshipStore } = Reflection.modules;
         return RelationshipStore.isBlocked(id);
     }
 
     async enabled(e) {
         if (Patcher.getPatchesByCaller('BD:BlockedMessages').length) return;
-        const MessageActions = WebpackModules.getModuleByName('MessageActions');
+        const { MessageActions } = Reflection.modules;
         MonkeyPatch('BD:BlockedMessages', MessageActions).instead('receiveMessage', this.processMessage);
 
-        const MessageListComponents = WebpackModules.getModuleByProps(['BlockedMessageGroup']);
+        const MessageListComponents = Reflection.module.byProps('BlockedMessageGroup');
         MessageListComponents.OriginalBlockedMessageGroup = MessageListComponents.BlockedMessageGroup;
         MessageListComponents.BlockedMessageGroup = () => {return null;};
         this.cancelBlockedMessages = () => {

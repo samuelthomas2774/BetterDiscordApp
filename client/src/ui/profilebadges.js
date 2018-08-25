@@ -8,8 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { Module, ReactComponents, ReactHelpers, MonkeyPatch, WebpackModules } from 'modules';
-import { Reflection } from 'ui';
+import { Module, ReactComponents, ReactHelpers, MonkeyPatch, Reflection } from 'modules';
 import { ClientLogger as Logger } from 'common';
 import { BdBadge } from './components/bd';
 import VueInjector from './vueinjector';
@@ -88,7 +87,7 @@ export default class extends Module {
     async patchNameTag() {
         if (this.PatchedNameTag) return this.PatchedNameTag;
 
-        const selector = `.${WebpackModules.getClassName('nameTag', 'username', 'discriminator', 'ownerIcon')}`;
+        const selector = Reflection.resolve('nameTag', 'username', 'discriminator', 'ownerIcon').selector;
         const NameTag = await ReactComponents.getComponent('NameTag', {selector});
 
         this.PatchedNameTag = class extends NameTag.component {

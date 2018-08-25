@@ -36,7 +36,6 @@
 </template>
 
 <script>
-    import { WebpackModules } from 'modules';
     export default {
         props: ['item'],
         data() {
@@ -44,7 +43,6 @@
         },
         methods: {
             resolveThumb() {
-                window.momentTest = WebpackModules;
                 return `${this.item.repository.rawUri}/${this.item.files.previews[0].thumb}`;
             }
         }

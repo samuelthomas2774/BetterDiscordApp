@@ -10,11 +10,11 @@
 
 import { List } from 'structs';
 import { User, Channel, Guild, Message } from 'discordstructs';
-import { WebpackModules } from './webpackmodules';
+import Reflection from './reflection/index';
 
 export const Modules = {
     _getModule(name) {
-        const foundModule = WebpackModules.getModuleByName(name);
+        const foundModule = Reflection.module.byName(name);
         if (!foundModule) return null;
         delete this[name];
         return this[name] = foundModule;

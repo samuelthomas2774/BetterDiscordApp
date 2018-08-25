@@ -13,18 +13,16 @@ import { Patcher, MonkeyPatch, Reflection } from 'modules';
 
 export default new class KillClyde extends BuiltinModule {
 
-    get settingPath() {
-        return ['ui', 'default', 'kill-clyde'];
-    }
+    /* Getters */
+    get moduleName() { return 'KillClyde' }
 
-    async enabled(e) {
-        if (Patcher.getPatchesByCaller('BD:KillClyde').length) return;
+    get settingPath() { return ['ui', 'default', 'kill-clyde'] }
+
+    /* Patches */
+    applyPatches() {
+        if (this.patches.length) return;
         const { MessageActions } = Reflection.modules;
-        MonkeyPatch('BD:KillClyde', MessageActions).instead('sendBotMessage', void 0);
-    }
-
-    disabled(e) {
-        Patcher.unpatchAll('BD:KillClyde');
+        this.patch(MessageActions, 'sendBotMessage', () => void 0, 'instead');
     }
 
 }

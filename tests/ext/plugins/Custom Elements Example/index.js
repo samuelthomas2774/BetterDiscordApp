@@ -5,7 +5,8 @@
 module.exports = (Plugin, Api, Vendor) => {
 
     // Destructure some apis
-    const { Logger, ReactComponents, Patcher, monkeyPatch, Reflection, Utils, CssUtils } = Api;
+    const { Logger, ReactComponents, Patcher, monkeyPatch, Reflection, Utils, CssUtils, VueInjector } = Api;
+    const { Vue } = Vendor;
     const { React } = Reflection.modules; // This should be in vendor
 
     return class extends Plugin {
@@ -70,18 +71,34 @@ module.exports = (Plugin, Api, Vendor) => {
             // If children is not an array make it into one
             if (!child.children instanceof Array) child.children = [child.children];
 
-            // add our custom component to children
-            child.children.push(React.createElement(
+            // Create custom components
+            const reactComponent = React.createElement(
                 'button',
-                { className: 'exampleCustomElement', onClick: e => this.handleReactClick(e, child.channel) },
-                'i'
-            ));
+                { className: 'exampleCustomElement', onClick: e => this.handleClick(e, child.channel) },
+                'r'
+            );
+
+            // Using Vue might be preferred to some
+            const vueComponent = Vue.component('somecomponent', {
+                render: createElement => {
+                    return createElement('button', {
+                        class: 'exampleCustomElement',
+                        on: {
+                            click: e => this.handleClick(e, child.channel)
+                        }
+                    }, 'v')
+                }
+            });
+
+            // Add our custom components to children
+            child.children.push(reactComponent);
+            child.children.push(VueInjector.createReactElement(vueComponent)); // We need to wrap our vue component inside react
         }
 
         /**
          * Will log the channel object
          */
-        handleReactClick(e, channel) {
+        handleClick(e, channel) {
             Logger.log('Clicked!', channel);
         }
     }

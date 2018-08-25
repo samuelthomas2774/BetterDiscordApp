@@ -24,6 +24,7 @@ import DiscordApi from './discordapi';
 import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
 import GlobalAc from '../ui/autocomplete';
+import Vue from 'vue';
 
 export default class PluginApi {
 
@@ -605,6 +606,10 @@ export default class PluginApi {
         }, 'menus', {
             get: () => this.discordContextMenus
         });
+    }
+
+    Vuewrap(id, args) {
+        return VueInjector.createReactElement(Vue.component(id, args));
     }
 
 }

@@ -5,7 +5,7 @@
 module.exports = (Plugin, Api, Vendor) => {
 
     // Destructure some apis
-    const { Logger, ReactComponents, Patcher, monkeyPatch, Reflection, Utils, CssUtils, VueInjector } = Api;
+    const { Logger, ReactComponents, Patcher, monkeyPatch, Reflection, Utils, CssUtils, VueInjector, Vuewrap } = Api;
     const { Vue } = Vendor;
     const { React } = Reflection.modules; // This should be in vendor
 
@@ -87,9 +87,22 @@ module.exports = (Plugin, Api, Vendor) => {
                 }
             });
 
+            // You can also use Vuewrap which does the wrapping for us
+            const vueWrapComponent = Vuewrap('somecomponent', {
+                render: createElement => {
+                    return createElement('button', {
+                        class: 'exampleCustomElement',
+                        on: {
+                            click: e => this.handleClick(e, child.channel)
+                        }
+                    }, 'vw')
+                }
+            });
+
             // Add our custom components to children
             child.children.push(reactComponent);
             child.children.push(VueInjector.createReactElement(vueComponent)); // We need to wrap our vue component inside react
+            child.children.push(vueWrapComponent);
         }
 
         /**

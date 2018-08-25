@@ -9,22 +9,20 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import { Patcher, MonkeyPatch, WebpackModules } from 'modules';
+import { Reflection } from 'modules';
 
 export default new class KillClyde extends BuiltinModule {
 
-    get settingPath() {
-        return ['ui', 'default', 'kill-clyde'];
-    }
+    /* Getters */
+    get moduleName() { return 'KillClyde' }
 
-    async enabled(e) {
-        if (Patcher.getPatchesByCaller('BD:KillClyde').length) return;
-        const MessageActions = WebpackModules.getModuleByName('MessageActions');
-        MonkeyPatch('BD:KillClyde', MessageActions).instead('sendBotMessage', void 0);
-    }
+    get settingPath() { return ['ui', 'default', 'kill-clyde'] }
 
-    disabled(e) {
-        Patcher.unpatchAll('BD:KillClyde');
+    /* Patches */
+    applyPatches() {
+        if (this.patches.length) return;
+        const { MessageActions } = Reflection.modules;
+        this.patch(MessageActions, 'sendBotMessage', () => void 0, 'instead');
     }
 
 }

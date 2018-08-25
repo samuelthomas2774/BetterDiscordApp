@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { WebpackModules } from 'modules';
+import { Reflection } from 'modules';
 import Vue from 'vue';
 
 export default class {
@@ -37,15 +37,14 @@ export default class {
      * @return {React.Element}
      */
     static createReactElement(component, props, mountAtTop) {
-        const React = WebpackModules.getModuleByName('React');
+        const { React } = Reflection.modules;
         return React.createElement(this.ReactCompatibility, {component, mountAtTop, props});
     }
 
     static get ReactCompatibility() {
         if (this._ReactCompatibility) return this._ReactCompatibility;
 
-        const React = WebpackModules.getModuleByName('React');
-        const ReactDOM = WebpackModules.getModuleByName('ReactDOM');
+        const { React, ReactDOM} = Reflection.modules;
 
         return this._ReactCompatibility = class VueComponent extends React.Component {
             render() {
@@ -105,12 +104,12 @@ export const ReactComponent = {
         return createElement('div');
     },
     mounted() {
-        const { React, ReactDOM } = WebpackModules;
+        const { React, ReactDOM } = Reflection.modules;
 
         ReactDOM.unmountComponentAtNode(this.$el);
         ReactDOM.render(this.reactElement || React.createElement(this.component, this.componentProps, ...(this.componentChildren || [])), this.$el);
     },
     beforeDestroy() {
-        WebpackModules.ReactDOM.unmountComponentAtNode(this.$el);
+        Reflection.modules.ReactDOM.unmountComponentAtNode(this.$el);
     }
 };

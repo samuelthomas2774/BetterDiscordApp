@@ -10,7 +10,11 @@
 
 <template>
     <div class="bd-e2eeTaContainer">
-        <v-popover popoverClass="bd-popover bd-e2eePopover" placement="top">
+        <v-popover :popoverClass="['bd-popover', 'bd-e2eePopover', {'bd-e2eePopoverOver': popoutPositionSetting.value === 'over'}]"
+            :trigger="popoutPositionSetting.value === 'over' && popoutTriggerSetting.value === 'hover' ? 'hover' : 'click'"
+            :placement="popoutPositionSetting.value === 'over' ? 'top-start' : 'top'"
+            :disabled="error && DiscordApi.currentChannel.type !== 'DM'">
+
             <div v-if="error" class="bd-e2eeTaBtn bd-e2eeLock bd-error">
                 <MiLock v-tooltip="error" />
             </div>
@@ -27,9 +31,9 @@
             </div>
 
             <template slot="popover">
-                <div @click="toggleEncrypt" :class="{'bd-warn': !E2EE.encryptNewMessages, 'bd-ok': E2EE.encryptNewMessages}"><MiLock size="16" v-tooltip="'Toggle Encryption'" /></div>
-                <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus size="16" v-tooltip="'Upload Encrypted Image'" /></div>
-                <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiIcVpnKey size="16" v-tooltip="'Begin Key Exchange'" /></div>
+                <div @click="toggleEncrypt" :class="{'bd-warn': !E2EE.encryptNewMessages, 'bd-ok': E2EE.encryptNewMessages}"><MiLock v-tooltip="'Toggle Encryption'" /></div>
+                <div v-close-popover @click="showUploadDialog" v-if="!error"><MiImagePlus v-tooltip="'Upload Encrypted Image'" /></div>
+                <div v-close-popover @click="generatePublicKey" v-if="DiscordApi.currentChannel.type === 'DM'"><MiIcVpnKey v-tooltip="'Begin Key Exchange'" /></div>
             </template>
         </v-popover>
         <div class="bd-taDivider"></div>
@@ -39,7 +43,7 @@
 <script>
     import { Utils, FileUtils, ClientIPC } from 'common';
     import { E2EE } from 'builtin';
-    import { DiscordApi, WebpackModules } from 'modules';
+    import { Settings, DiscordApi, Reflection } from 'modules';
     import { Toasts } from 'ui';
     import { MiLock, MiImagePlus, MiIcVpnKey } from '../ui/components/common/MaterialIcon';
 
@@ -50,9 +54,11 @@
         data() {
             return {
                 E2EE,
+                DiscordApi,
                 state: 'loading',
                 error: null,
-                DiscordApi
+                popoutPositionSetting: Settings.getSetting('security', 'e2ee-popout', 'position'),
+                popoutTriggerSetting: Settings.getSetting('security', 'e2ee-popout', 'trigger')
             };
         },
         methods: {
@@ -61,8 +67,8 @@
                 if (!dialogResult || !dialogResult.length) return;
 
                 const readFile = await FileUtils.readFileBuffer(dialogResult[0]);
-                const FileActions = WebpackModules.getModuleByProps(['makeFile']);
-                const Uploader = WebpackModules.getModuleByProps(['instantBatchUpload']);
+                const FileActions = Reflection.module.byProps('makeFile');
+                const Uploader = Reflection.module.byProps('instantBatchUpload');
 
                 const img = await Utils.getImageFromBuffer(readFile);
 
@@ -93,7 +99,7 @@
                 E2EE.preExchangeState = E2EE.encryptNewMessages;
                 E2EE.encryptNewMessages = false; // Disable encrypting new messages so we won't encrypt public keys
                 const publicKeyMessage = `\`\`\`\n-----BEGIN PUBLIC KEY-----\n${keyExchange}\n-----END PUBLIC KEY-----\n\`\`\``;
-                WebpackModules.getModuleByName('DraftActions').saveDraft(DiscordApi.currentChannel.id, publicKeyMessage);
+                Reflection.modules.DraftActions.saveDraft(DiscordApi.currentChannel.id, publicKeyMessage);
                 Toasts.info('Key exchange started. Expires in 30 seconds');
             }
         },

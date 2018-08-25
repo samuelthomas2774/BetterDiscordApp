@@ -23,7 +23,7 @@
 
 <script>
     // Imports
-    import { WebpackModules } from 'modules';
+    import { Reflection } from 'modules';
     import { BdMenu } from 'ui';
     import { shell } from 'electron';
     import { MiGithubCircle, MiWeb, MiTwitterCircle, MiDiscord } from '../common';
@@ -44,7 +44,7 @@
                 e.preventDefault();
             },
             openUserProfileModal(discord_id) {
-                WebpackModules.getModuleByName('UserProfileModal').open(discord_id);
+                Reflection.modules.UserProfileModal.open(discord_id);
                 BdMenu.close();
             },
             openGitHub() {

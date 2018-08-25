@@ -252,8 +252,50 @@
                 "settings": [
                     {
                         "id": "e2ekvps",
-                        "type": [ "securekvp" ],
+                        "type": ["securekvp"],
                         "value": []
+                    }
+                ]
+            },
+            {
+                "id": "e2ee-popout",
+                "name": "E2EE Popout",
+                "type": "drawer",
+                "settings": [
+                    {
+                        "id": "position",
+                        "type": "radio",
+                        "text": "Position",
+                        "value": "above",
+                        "fullwidth": true,
+                        "options": [
+                            {
+                                "text": "Above the lock icon",
+                                "value": "above"
+                            },
+                            {
+                                "text": "Over the lock icon",
+                                "value": "over"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "trigger",
+                        "type": "radio",
+                        "text": "Trigger",
+                        "hint": "Only applies when the popout is over the lock icon",
+                        "value": "click",
+                        "fullwidth": true,
+                        "options": [
+                            {
+                                "text": "After clicking the lock icon",
+                                "value": "click"
+                            },
+                            {
+                                "text": "When hovering over the lock icon",
+                                "value": "hover"
+                            }
+                        ]
                     }
                 ]
             }

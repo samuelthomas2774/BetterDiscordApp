@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="bd-acScroller" ref="scroller">
-                <div v-for="(item, index) in search.items" class="bd-acRow" @mouseover="selectedIndex = index" @click="inject">
+                <div v-for="(item, index) in search.items" class="bd-acRow" :class="search.extraClasses" @mouseover="selectedIndex = index" @click="inject">
                     <div class="bd-acSelector bd-selectable" :class="{'bd-selected': index === selectedIndex}">
                         <div class="bd-acField">
                             <img v-if="search.type === 'imagetext'" :src="item.src || item.value.src" :alt="item.key || item.text || item.alt" />
@@ -36,8 +36,8 @@
 </template>
 
 <script>
-    import { WebpackModules, DiscordApi, Events } from 'modules';
-    let wtf = null;
+    import { Reflection, DiscordApi, Events } from 'modules';
+
     export default {
         data() {
             return {

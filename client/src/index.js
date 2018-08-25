@@ -8,9 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI, BdMenu, Modals, Reflection, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
+import { DOM, BdUI, BdMenu, Modals, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
 import BdCss from './styles/index.scss';
-import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi, BdWebApi, Connectivity, Cache } from 'modules';
+import { Events, CssEditor, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi, BdWebApi, Connectivity, Cache, Reflection } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
 import { BuiltinManager, EmoteModule, ReactDevtoolsModule, VueDevtoolsModule, TrackingProtection, E2EE } from 'builtin';
 import electron from 'electron';
@@ -34,7 +34,7 @@ class BetterDiscord {
             ModuleManager, PluginManager, ThemeManager, ExtModuleManager,
             Vendor,
 
-            WebpackModules, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi,
+            Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi,
             EmoteModule,
             BdWebApi,
             Connectivity,
@@ -49,7 +49,7 @@ class BetterDiscord {
             module: Globals.require.cache[__filename],
             require: Globals.require,
             webpack_require: __webpack_require__, // eslint-disable-line no-undef
-            get discord_require() { return WebpackModules.require }
+            get discord_require() { return Reflection.require }
         };
 
         const developermode = Settings.getSetting('core', 'advanced', 'developer-mode');

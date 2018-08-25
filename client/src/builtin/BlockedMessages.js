@@ -9,41 +9,48 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import { Patcher, MonkeyPatch, WebpackModules, ReactComponents } from 'modules';
+import { Reflection } from 'modules';
 
 export default new class BlockedMessages extends BuiltinModule {
 
-    get settingPath() {
-        return ['ui', 'default', 'blocked-messages'];
-    }
+    /* Getters */
+    get moduleName() { return 'BlockedMessages' }
 
-    static isBlocked(id) {
-        const RelationshipStore = WebpackModules.getModuleByName('RelationshipStore');
-        return RelationshipStore.isBlocked(id);
-    }
+    get settingPath() { return ['ui', 'default', 'blocked-messages'] }
 
     async enabled(e) {
-        if (Patcher.getPatchesByCaller('BD:BlockedMessages').length) return;
-        const MessageActions = WebpackModules.getModuleByName('MessageActions');
-        MonkeyPatch('BD:BlockedMessages', MessageActions).instead('receiveMessage', this.processMessage);
-
-        const MessageListComponents = WebpackModules.getModuleByProps(['BlockedMessageGroup']);
+        const MessageListComponents = Reflection.module.byProps('BlockedMessageGroup');
         MessageListComponents.OriginalBlockedMessageGroup = MessageListComponents.BlockedMessageGroup;
-        MessageListComponents.BlockedMessageGroup = () => {return null;};
+        MessageListComponents.BlockedMessageGroup = () => { return null; };
         this.cancelBlockedMessages = () => {
             MessageListComponents.BlockedMessageGroup = MessageListComponents.OriginalBlockedMessageGroup;
             delete MessageListComponents.OriginalBlockedMessageGroup;
         }
     }
 
-    processMessage(thisObject, args, originalFunction) {
-        if (args[1] && args[1].author && args[1].author.id && BlockedMessages.isBlocked(args[1].author.id)) return;
-        return originalFunction(...args);
+    disabled(e) {
+        if (this.cancelBlockedMessages) this.cancelBlockedMessages();
     }
 
-    disabled(e) {
-        Patcher.unpatchAll('BD:BlockedMessages');
-        if (this.cancelBlockedMessages) this.cancelBlockedMessages();
+    /* Methods */
+    static isBlocked(id) {
+        const { RelationshipStore } = Reflection.modules;
+        return RelationshipStore.isBlocked(id);
+    }
+
+    /* Patches */
+    applyPatches() {
+        if (this.patches.length) return;
+        const { MessageActions } = Reflection.modules;
+        this.patch(MessageActions, 'receiveMessage', this.processMessage, 'instead');
+    }
+
+    /**
+     * Ignore blocked messages completely
+     */
+    processMessage(that, args, originalFunction) {
+        if (args[1] && args[1].author && args[1].author.id && BlockedMessages.isBlocked(args[1].author.id)) return;
+        return originalFunction(...args);
     }
 
 }

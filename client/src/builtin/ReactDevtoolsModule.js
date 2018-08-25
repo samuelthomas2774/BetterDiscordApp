@@ -18,13 +18,14 @@ import { Toasts } from 'ui';
 
 export default new class ReactDevtoolsModule extends BuiltinModule {
 
+    /* Getters */
+    get moduleName() { return 'ReactDevTools' }
+
+    get settingPath() { return ['core', 'advanced', 'react-devtools'] }
+
     constructor() {
         super();
         this.devToolsOpened = this.devToolsOpened.bind(this);
-    }
-
-    get settingPath() {
-        return ['core', 'advanced', 'react-devtools'];
     }
 
     enabled(e) {

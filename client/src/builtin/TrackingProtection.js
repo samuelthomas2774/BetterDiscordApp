@@ -10,27 +10,27 @@
 
 import BuiltinModule from './BuiltinModule';
 
-import { Patcher, MonkeyPatch, WebpackModules } from 'modules';
+import { Reflection } from 'modules';
 
 export default new class E2EE extends BuiltinModule {
 
-    get settingPath() {
-        return ['security', 'default', 'tracking-protection'];
+    /* Getters */
+    get moduleName() { return 'TrackingProtection' }
+
+    get settingPath() { return ['security', 'default', 'tracking-protection'] }
+
+    /* Patches */
+    applyPatches() {
+        if (this.patches.length) return;
+        const TrackingModule = Reflection.module.byProps('track');
+        if (!TrackingModule) {
+            this.warn('Tracking module not found!');
+            return;
+        }
+        this.patch(TrackingModule, 'track', this.track, 'instead');
     }
 
     track(e) {
-        // console.log('Blocked Tracking');
+        this.debug('Tracking blocked');
     }
-
-    enabled(e) {
-        if (Patcher.getPatchesByCaller('BD:TrackingProtection').length) return;
-        const trackingModule = WebpackModules.getModuleByProps(['track']);
-        if (!trackingModule) return; // TODO Log it
-        MonkeyPatch('BD:TrackingProtection', trackingModule).instead('track', this.track);
-    }
-
-    disabled(e) {
-        for (const patch of Patcher.getPatchesByCaller('BD:TrackingProtection')) patch.unpatch();
-    }
-
 }

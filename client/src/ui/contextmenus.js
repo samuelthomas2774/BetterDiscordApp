@@ -9,7 +9,7 @@
 */
 
 import { Utils, ClientLogger as Logger } from 'common';
-import { ReactComponents, WebpackModules, MonkeyPatch } from 'modules';
+import { ReactComponents, Reflection, MonkeyPatch } from 'modules';
 import { VueInjector, Toasts } from 'ui';
 import CMGroup from './components/contextmenu/Group.vue';
 
@@ -70,7 +70,7 @@ export class DiscordContextMenu {
         if (this.patched) return;
         this.patched = true;
         const self = this;
-        MonkeyPatch('BD:DiscordCMOCM', WebpackModules.getModuleByProps(['openContextMenu'])).instead('openContextMenu', (_, [e, fn], originalFn) => {
+        MonkeyPatch('BD:DiscordCMOCM', Reflection.module.byProps('openContextMenu')).instead('openContextMenu', (_, [e, fn], originalFn) => {
             const overrideFn = function () {
                 const res = fn.apply(this, arguments);
                 if (!res.hasOwnProperty('type')) return res;
@@ -96,7 +96,7 @@ export class DiscordContextMenu {
                 target,
                 top,
                 left,
-                closeMenu: () => WebpackModules.getModuleByProps(['closeContextMenu']).closeContextMenu(),
+                closeMenu: () => Reflection.module.byProps('closeContextMenu').closeContextMenu(),
                 items: typeof menu.items === 'function' ? menu.items(target) : menu.items
             }));
         }

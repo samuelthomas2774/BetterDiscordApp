@@ -11,58 +11,57 @@
 import BuiltinModule from './BuiltinModule';
 
 import { Utils } from 'common';
-import { Settings, Patcher, MonkeyPatch, WebpackModules, ReactComponents, DiscordApi } from 'modules';
+import { Settings, Reflection, ReactComponents, DiscordApi } from 'modules';
 
 export default new class ColoredText extends BuiltinModule {
+
+    /* Getters */
+    get moduleName() { return 'ColoredText' }
+
+    get settingPath() { return ['ui', 'default', 'colored-text'] }
+
+    get intensityPath() { return ['ui', 'advanced', 'colored-text-intensity'] }
+
+    get intensitySetting() { return Settings.getSetting(...this.intensityPath) }
+
+    get intensity() { return 100 - this.intensitySetting.value }
+
+    get defaultColor() { return DiscordApi.UserSettings.theme == 'light' ? '#747f8d' : '#dcddde' }
 
     constructor() {
         super();
         this._intensityUpdated = this._intensityUpdated.bind(this);
-        this.injectColoredText = this.injectColoredText.bind(this);
     }
 
-    get settingPath() {
-        return ['ui', 'default', 'colored-text'];
+    async enabled(e) {
+        this.intensitySetting.off('setting-updated', this._intensityUpdated);
+        this.intensitySetting.on('setting-updated', this._intensityUpdated);
     }
 
-    get intensityPath() {
-        return ['ui', 'advanced', 'colored-text-intensity'];
+    disabled(e) {
+        this.intensitySetting.off('setting-updated', this._intensityUpdated);
     }
 
-    get intensitySetting() {
-        return Settings.getSetting(...this.intensityPath);
-    }
-
-    get intensity() {
-        return 100 - this.intensitySetting.value;
-    }
-
+    /* Methods */
     _intensityUpdated() {
         this.MessageContent.forceUpdateAll();
     }
 
-    async enabled(e) {
-        if (Patcher.getPatchesByCaller('BD:ColoredText').length) return;
-        this.intensitySetting.on('setting-updated', this._intensityUpdated);
-        this.MessageContent = await ReactComponents.getComponent('MessageContent', { selector: WebpackModules.getSelector('container', 'containerCozy', 'containerCompact', 'edited') });
-        MonkeyPatch('BD:ColoredText', this.MessageContent.component.prototype).after('render', this.injectColoredText);
+    /* Patches */
+    async applyPatches() {
+        if (this.patches.length) return;
+        this.MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
+        this.patch(this.MessageContent.component.prototype, 'render', this.injectColoredText);
         this.MessageContent.forceUpdateAll();
     }
 
+    /**
+     * Set markup text colour to match role colour
+     */
     injectColoredText(thisObject, args, returnValue) {
-        const TinyColor = WebpackModules.getModuleByName('TinyColor');
+        const { TinyColor } = Reflection.modules;
         const markup = Utils.findInReactTree(returnValue, m => m && m.props && m.props.className && m.props.className.includes('da-markup'));
         const roleColor = thisObject.props.message.colorString;
         if (markup && roleColor) markup.props.style = {color: TinyColor.mix(roleColor, this.defaultColor, this.intensity)};
     }
-
-    get defaultColor() {
-        return DiscordApi.UserSettings.theme == 'light' ? '#747f8d' : '#dcddde';
-    }
-
-    disabled(e) {
-        Patcher.unpatchAll('BD:ColoredText');
-        this.intensitySetting.off('setting-updated', this._intensityUpdated);
-    }
-
 }

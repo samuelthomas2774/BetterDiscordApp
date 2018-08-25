@@ -10,10 +10,10 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, Reflection, Modals } from 'ui';
+import { DOM, Modals } from 'ui';
 import { Utils, Filters, ClientLogger as Logger } from 'common';
 import { MonkeyPatch } from './patcher';
-import { WebpackModules } from './webpackmodules';
+import Reflection from './reflection/index';
 import DiscordApi from './discordapi';
 
 class Helpers {
@@ -153,11 +153,11 @@ class Helpers {
     }
 
     static get React() {
-        return WebpackModules.getModuleByName('React');
+        return Reflection.modules.React;
     }
 
     static get ReactDOM() {
-        return WebpackModules.getModuleByName('ReactDOM');
+        return Reflection.modules.ReactDOM;
     }
 }
 
@@ -174,7 +174,7 @@ class ReactComponent {
     forceUpdateAll() {
         if (!this.important || !this.important.selector) return;
         for (const e of document.querySelectorAll(this.important.selector)) {
-            Reflection(e).forceUpdate(this);
+            Reflection.DOM(e).forceUpdate(this);
         }
     }
 }
@@ -236,7 +236,7 @@ export class ReactComponents {
 
                 let component, reflect;
                 for (const element of elements) {
-                    reflect = Reflection(element);
+                    reflect = Reflection.DOM(element);
                     component = filter ? reflect.components.find(filter) : reflect.component;
                     if (component) break;
                 }
@@ -310,7 +310,7 @@ export class ReactAutoPatcher {
      * Also patches some known components.
      */
     static async autoPatch() {
-        const React = await WebpackModules.waitForModuleByName('React');
+        const React = await Reflection.module.waitForModuleByName('React');
 
         this.unpatchCreateElement = MonkeyPatch('BD:ReactComponents:createElement', React).before('createElement', (component, args) => ReactComponents.push(args[0]));
 
@@ -326,7 +326,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchMessage() {
-        const selector = `.${WebpackModules.getClassName('message', 'messageCozy', 'messageCompact')}`;
+        const { selector } = Reflection.resolve('message', 'messageCozy', 'messageCompact');
         this.Message = await ReactComponents.getComponent('Message', {selector}, m => m.prototype && m.prototype.renderCozy);
 
         this.unpatchMessageRender = MonkeyPatch('BD:ReactComponents', this.Message.component.prototype).after('render', (component, args, retVal) => {
@@ -350,7 +350,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchMessageGroup() {
-        const selector = `.${WebpackModules.getClassName('container', 'message', 'messageCozy')}`;
+        const { selector } = Reflection.resolve('container', 'message', 'messageCozy');
         this.MessageGroup = await ReactComponents.getComponent('MessageGroup', {selector});
 
         this.unpatchMessageGroupRender = MonkeyPatch('BD:ReactComponents', this.MessageGroup.component.prototype).after('render', (component, args, retVal) => {
@@ -368,7 +368,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannelMember() {
-        const selector = `.${WebpackModules.getClassName('member', 'memberInner', 'activity')}`;
+        const { selector } = Reflection.resolve('member', 'memberInner', 'activity');
         this.ChannelMember = await ReactComponents.getComponent('ChannelMember', {selector}, m => m.prototype.renderActivity);
 
         this.unpatchChannelMemberRender = MonkeyPatch('BD:ReactComponents', this.ChannelMember.component.prototype).after('render', (component, args, retVal) => {
@@ -384,7 +384,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchGuild() {
-        const selector = `div.${WebpackModules.getClassName('guild', 'guildsWrapper')}:not(:first-child)`;
+        const selector = `div.${Reflection.resolve('guild', 'guildsWrapper').className}:not(:first-child)`;
         this.Guild = await ReactComponents.getComponent('Guild', {selector}, m => m.prototype.renderBadge);
 
         this.unpatchGuild = MonkeyPatch('BD:ReactComponents', this.Guild.component.prototype).after('render', (component, args, retVal) => {
@@ -421,7 +421,7 @@ export class ReactAutoPatcher {
      * The GuildTextChannel component represents a text channel in the guild channel list.
      */
     static async patchGuildTextChannel() {
-        const selector = `.${WebpackModules.getClassName('containerDefault', 'actionIcon')}`;
+        const { selector } = Reflection.resolve('containerDefault', 'actionIcon');
         this.GuildTextChannel = await ReactComponents.getComponent('GuildTextChannel', {selector}, c => c.prototype.renderMentionBadge);
 
         this.unpatchGuildTextChannel = MonkeyPatch('BD:ReactComponents', this.GuildTextChannel.component.prototype).after('render', this._afterChannelRender);
@@ -433,7 +433,7 @@ export class ReactAutoPatcher {
      * The GuildVoiceChannel component represents a voice channel in the guild channel list.
      */
     static async patchGuildVoiceChannel() {
-        const selector = `.${WebpackModules.getClassName('containerDefault', 'actionIcon')}`;
+        const { selector } = Reflection.resolve('containerDefault', 'actionIcon');
         this.GuildVoiceChannel = await ReactComponents.getComponent('GuildVoiceChannel', {selector}, c => c.prototype.handleVoiceConnect);
 
         this.unpatchGuildVoiceChannel = MonkeyPatch('BD:ReactComponents', this.GuildVoiceChannel.component.prototype).after('render', this._afterChannelRender);
@@ -467,7 +467,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchUserProfileModal() {
-        const selector = `.${WebpackModules.getClassName('root', 'topSectionNormal')}`;
+        const { selector } = Reflection.resolve('root', 'topSectionNormal');
         this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', {selector}, Filters.byPrototypeFields(['renderHeader', 'renderBadges']));
 
         this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
@@ -482,7 +482,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchUserPopout() {
-        const selector = `.${WebpackModules.getClassName('userPopout', 'headerNormal')}`;
+        const { selector } = Reflection.resolve('userPopout', 'headerNormal');
         this.UserPopout = await ReactComponents.getComponent('UserPopout', {selector});
 
         this.unpatchUserPopout = MonkeyPatch('BD:ReactComponents', this.UserPopout.component.prototype).after('render', (component, args, retVal) => {
@@ -501,10 +501,10 @@ export class ReactAutoPatcher {
     }
 
     static async patchUploadArea() {
-        const selector = `.${WebpackModules.getClassName('uploadArea')}`;
+        const { selector } = Reflection.resolve('uploadArea');
         this.UploadArea = await ReactComponents.getComponent('UploadArea', {selector});
 
-        const reflect = Reflection(selector);
+        const reflect = Reflection.DOM(selector);
         const stateNode = reflect.getComponentStateNode(this.UploadArea);
         const callback = function(e) {
             if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return;

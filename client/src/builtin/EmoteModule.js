@@ -12,9 +12,9 @@ import BuiltinModule from './BuiltinModule';
 import path from 'path';
 import { request } from 'vendor';
 
-import { Utils, FileUtils, ClientLogger as Logger } from 'common';
-import { DiscordApi, Settings, Globals, WebpackModules, ReactComponents, MonkeyPatch, Cache, Patcher, Database } from 'modules';
-import { VueInjector, DiscordContextMenu } from 'ui';
+import { Utils, FileUtils } from 'common';
+import { DiscordApi, Settings, Globals, Reflection, ReactComponents, Database } from 'modules';
+import { DiscordContextMenu } from 'ui';
 
 import Emote from './EmoteComponent.js';
 import Autocomplete from '../ui/components/common/Autocomplete.vue';
@@ -28,6 +28,10 @@ const EMOTE_SOURCES = [
 ];
 
 export default new class EmoteModule extends BuiltinModule {
+
+    /* Getters */
+
+    get moduleName() { return 'EmoteModule' }
 
     /**
      * @returns {String} Path to local emote database
@@ -76,12 +80,13 @@ export default new class EmoteModule extends BuiltinModule {
 
         // Read favourites and most used from database
         await this.loadUserData();
-
-        this.patchMessageContent();
-        this.patchSendAndEdit();
-        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: WebpackModules.getSelector('imageWrapper') });
-        MonkeyPatch('BD:EMOTEMODULE', ImageWrapper.component.prototype).after('render', this.beforeRenderImageWrapper.bind(this));
     }
+
+    async disabled() {
+        DiscordContextMenu.remove(this.favCm);
+    }
+
+    /* Methods */
 
     /**
      * Adds an emote to favourites.
@@ -115,12 +120,6 @@ export default new class EmoteModule extends BuiltinModule {
         return !!this.favourites.find(e => e.name === emote || e.name === emote.name);
     }
 
-    async disabled() {
-        // Unpatch all patches
-        for (const patch of Patcher.getPatchesByCaller('BD:EMOTEMODULE')) patch.unpatch();
-        DiscordContextMenu.remove(this.favCm);
-    }
-
     /**
      * Load emotes from local database
      */
@@ -152,12 +151,93 @@ export default new class EmoteModule extends BuiltinModule {
     }
 
     /**
+     * Add/update emote to most used
+     * @param {Object} emote emote to add/update
+     * @return {Promise}
+     */
+    addToMostUsed(emote) {
+        const isMostUsed = this.mostUsed.find(mu => mu.key === emote.name);
+        if (isMostUsed) {
+            isMostUsed.useCount += 1;
+        } else {
+            this.mostUsed.push({
+                key: emote.name,
+                id: emote.id,
+                type: emote.type,
+                useCount: 1
+            });
+        }
+        // Save most used to database
+        // TODO only save first n
+        return this.saveUserData();
+    }
+
+    /**
+     * Find an emote by name
+     * @param {String} name Emote name
+     * @param {Boolean} simple Simple object or Emote instance
+     * @returns {Object|Emote}
+     */
+    findByName(name, simple = false) {
+        const emote = this.database.get(name);
+        if (!emote) return null;
+        return this.parseEmote(name, emote, simple);
+    }
+
+    /**
+     * Parse emote object
+     * @param {String} name Emote name
+     * @param {Object} emote Emote object
+     * @param {Boolean} simple Simple object or Emote instance
+     * @returns {Object|Emote}
+     */
+    parseEmote(name, emote, simple = false) {
+        const { type, id } = emote;
+        if (type < 0 || type > 2) return null;
+        return simple ? { type, id, name } : new Emote(type, id, name);
+    }
+
+    /**
+     * Search for anything else
+     * @param {any} regex
+     * @param {any} limit
+     */
+    search(regex, limit = 10) {
+        if (typeof regex === 'string') regex = new RegExp(regex, 'i');
+        const matching = [];
+
+        for (const [key, value] of this.database.entries()) {
+            if (matching.length >= limit) break;
+            if (regex.test(key)) matching.push({ key, value })
+        }
+
+        return matching;
+    }
+
+    /* Patches */
+    async applyPatches() {
+        this.patchMessageContent();
+        this.patchSendAndEdit();
+        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: Reflection.resolve('imageWrapper').selector });
+        this.patch(ImageWrapper.component.prototype, 'render', this.beforeRenderImageWrapper, 'before');
+    }
+
+    /**
      * Patches MessageContent render method
      */
     async patchMessageContent() {
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: WebpackModules.getSelector('container', 'containerCozy', 'containerCompact', 'edited') });
-        MonkeyPatch('BD:EMOTEMODULE', MessageContent.component.prototype).after('render', this.afterRenderMessageContent.bind(this));
+        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
+        this.patch(MessageContent.component.prototype, 'render', this.afterRenderMessageContent);
         MessageContent.forceUpdateAll();
+    }
+
+    /**
+     * Patches MessageActions send and edit
+     */
+    patchSendAndEdit() {
+        const { MessageActions } = Reflection.modules;
+        this.patch(MessageActions, 'sendMessage', this.handleSendMessage, 'instead');
+        this.patch(MessageActions, 'editMessage', this.handleEditMessage, 'instead');
     }
 
     /**
@@ -171,14 +251,6 @@ export default new class EmoteModule extends BuiltinModule {
             filter.children.length >= 2);
         if (!markup) return;
         markup.children[1] = this.processMarkup(markup.children[1]);
-    }
-
-    /**
-     * Patches MessageActions send and edit
-     */
-    patchSendAndEdit() {
-        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('sendMessage', this.handleSendMessage.bind(this));
-        MonkeyPatch('BD:EMOTEMODULE', WebpackModules.getModuleByName('MessageActions')).instead('editMessage', this.handleEditMessage.bind(this));
     }
 
     /**
@@ -213,8 +285,8 @@ export default new class EmoteModule extends BuiltinModule {
         if (!emote) return orig(...args);
         this.addToMostUsed(emote);
 
-        const FileActions = WebpackModules.getModuleByProps(['makeFile']);
-        const Uploader = WebpackModules.getModuleByProps(['instantBatchUpload']);
+        const FileActions = Reflection.module.byProps('makeFile');
+        const Uploader = Reflection.module.byProps('instantBatchUpload');
 
         request.get(emote.props.src, { encoding: 'binary' }).then(res => {
             const arr = new Uint8Array(new ArrayBuffer(res.length));
@@ -250,28 +322,6 @@ export default new class EmoteModule extends BuiltinModule {
         const emote = this.findByName(emoteName);
         if (!emote) return;
         retVal.props.children = emote.render();
-    }
-
-    /**
-     * Add/update emote to most used
-     * @param {Object} emote emote to add/update
-     * @return {Promise}
-     */
-    addToMostUsed(emote) {
-        const isMostUsed = this.mostUsed.find(mu => mu.key === emote.name);
-        if (isMostUsed) {
-            isMostUsed.useCount += 1;
-        } else {
-            this.mostUsed.push({
-                key: emote.name,
-                id: emote.id,
-                type: emote.type,
-                useCount: 1
-            });
-        }
-        // Save most used to database
-        // TODO only save first n
-        return this.saveUserData();
     }
 
     /**
@@ -327,48 +377,6 @@ export default new class EmoteModule extends BuiltinModule {
         }
         if (newMarkup.length === 1) return newMarkup[0];
         return newMarkup;
-    }
-
-    /**
-     * Find an emote by name
-     * @param {String} name Emote name
-     * @param {Boolean} simple Simple object or Emote instance
-     * @returns {Object|Emote}
-     */
-    findByName(name, simple = false) {
-        const emote = this.database.get(name);
-        if (!emote) return null;
-        return this.parseEmote(name, emote, simple);
-    }
-
-    /**
-     * Parse emote object
-     * @param {String} name Emote name
-     * @param {Object} emote Emote object
-     * @param {Boolean} simple Simple object or Emote instance
-     * @returns {Object|Emote}
-     */
-    parseEmote(name, emote, simple = false) {
-        const { type, id } = emote;
-        if (type < 0 || type > 2) return null;
-        return simple ? { type, id, name } : new Emote(type, id, name);
-    }
-
-    /**
-     * Search for anything else
-     * @param {any} regex
-     * @param {any} limit
-     */
-    search(regex, limit = 10) {
-        if (typeof regex === 'string') regex = new RegExp(regex, 'i');
-        const matching = [];
-
-        for (const [key, value] of this.database.entries()) {
-            if (matching.length >= limit) break;
-            if (regex.test(key)) matching.push({ key, value })
-        }
-
-        return matching;
     }
 
 }

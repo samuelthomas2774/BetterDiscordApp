@@ -9,12 +9,25 @@
 */
 
 import BuiltinModule from './BuiltinModule';
-import { Patcher, MonkeyPatch, Reflection, ReactComponents } from 'modules';
+import { Reflection } from 'modules';
 
 export default new class BlockedMessages extends BuiltinModule {
 
-    get settingPath() {
-        return ['ui', 'default', 'blocked-messages'];
+    get settingPath() { return ['ui', 'default', 'blocked-messages'] }
+    get moduleName() { return 'BlockedMessages' }
+
+    async enabled(e) {
+        const MessageListComponents = Reflection.module.byProps('BlockedMessageGroup');
+        MessageListComponents.OriginalBlockedMessageGroup = MessageListComponents.BlockedMessageGroup;
+        MessageListComponents.BlockedMessageGroup = () => { return null; };
+        this.cancelBlockedMessages = () => {
+            MessageListComponents.BlockedMessageGroup = MessageListComponents.OriginalBlockedMessageGroup;
+            delete MessageListComponents.OriginalBlockedMessageGroup;
+        }
+    }
+
+    disabled(e) {
+        if (this.cancelBlockedMessages) this.cancelBlockedMessages();
     }
 
     static isBlocked(id) {
@@ -22,28 +35,15 @@ export default new class BlockedMessages extends BuiltinModule {
         return RelationshipStore.isBlocked(id);
     }
 
-    async enabled(e) {
-        if (Patcher.getPatchesByCaller('BD:BlockedMessages').length) return;
+    applyPatches() {
+        if (this.patches.length) return;
         const { MessageActions } = Reflection.modules;
-        MonkeyPatch('BD:BlockedMessages', MessageActions).instead('receiveMessage', this.processMessage);
-
-        const MessageListComponents = Reflection.module.byProps('BlockedMessageGroup');
-        MessageListComponents.OriginalBlockedMessageGroup = MessageListComponents.BlockedMessageGroup;
-        MessageListComponents.BlockedMessageGroup = () => {return null;};
-        this.cancelBlockedMessages = () => {
-            MessageListComponents.BlockedMessageGroup = MessageListComponents.OriginalBlockedMessageGroup;
-            delete MessageListComponents.OriginalBlockedMessageGroup;
-        }
+        this.patch(MessageActions, 'receiveMessage', this.processMessage, 'instead');
     }
 
-    processMessage(thisObject, args, originalFunction) {
+    processMessage(that, args, originalFunction) {
         if (args[1] && args[1].author && args[1].author.id && BlockedMessages.isBlocked(args[1].author.id)) return;
         return originalFunction(...args);
-    }
-
-    disabled(e) {
-        Patcher.unpatchAll('BD:BlockedMessages');
-        if (this.cancelBlockedMessages) this.cancelBlockedMessages();
     }
 
 }

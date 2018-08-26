@@ -25,6 +25,8 @@ import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
 import GlobalAc from '../ui/autocomplete';
 import Vue from 'vue';
+import path from 'path';
+import Globals from './globals';
 
 export default class PluginApi {
 
@@ -54,6 +56,15 @@ export default class PluginApi {
         const module = ExtModuleManager.findModule(m);
         if (module && module.__require) return module.__require;
         return null;
+    }
+
+    relativeRequire(file) {
+        const absolutePath = path.join(this.pluginPath, file);
+        delete Globals.require.cache[Globals.require.resolve(absolutePath)];
+        return Globals.require(absolutePath);
+    }
+    get relative() {
+        return this.relativeRequire.bind(this);
     }
 
     get Api() { return this }
@@ -608,8 +619,8 @@ export default class PluginApi {
         });
     }
 
-    Vuewrap(id, args) {
-        return VueInjector.createReactElement(Vue.component(id, args));
+    Vuewrap(id, component, props) {
+        return VueInjector.createReactElement(Vue.component(id, component), props);
     }
 
 }

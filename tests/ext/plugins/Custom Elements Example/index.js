@@ -5,9 +5,13 @@
 module.exports = (Plugin, Api, Vendor) => {
 
     // Destructure some apis
-    const { Logger, ReactComponents, Patcher, monkeyPatch, Reflection, Utils, CssUtils, VueInjector, Vuewrap } = Api;
+    const { Logger, ReactComponents, Patcher, monkeyPatch, Reflection, Utils, CssUtils, VueInjector, Vuewrap, relative } = Api;
     const { Vue } = Vendor;
     const { React } = Reflection.modules; // This should be in vendor
+
+    // Import custom components from relative paths
+    const customVueComponent = relative('./components/vuecomponent');
+    const customReactComponent = relative('./components/reactcomponent');
 
     return class extends Plugin {
 
@@ -68,41 +72,9 @@ module.exports = (Plugin, Api, Vendor) => {
             // If children is not an array make it into one
             if (!child.children instanceof Array) child.children = [child.children];
 
-            // Create custom components
-            const reactComponent = React.createElement(
-                'button',
-                { className: 'exampleCustomElement', onClick: e => this.handleClick(e, child.channel) },
-                'r'
-            );
-
-            // Using Vue might be preferred to some
-            const vueComponent = Vue.component('somecomponent', {
-                render: createElement => {
-                    return createElement('button', {
-                        class: 'exampleCustomElement',
-                        on: {
-                            click: e => this.handleClick(e, child.channel)
-                        }
-                    }, 'v')
-                }
-            });
-
-            // You can also use Vuewrap which does the wrapping for us
-            const vueWrapComponent = Vuewrap('somecomponent', {
-                render: createElement => {
-                    return createElement('button', {
-                        class: 'exampleCustomElement',
-                        on: {
-                            click: e => this.handleClick(e, child.channel)
-                        }
-                    }, 'vw')
-                }
-            });
-
             // Add our custom components to children
-            child.children.push(reactComponent);
-            child.children.push(VueInjector.createReactElement(vueComponent)); // We need to wrap our vue component inside react
-            child.children.push(vueWrapComponent);
+            child.children.push(customReactComponent(React, { onClick: e => this.handleClick(e, child.channel) }));
+            child.children.push(customVueComponent(Vuewrap, { onClick: e => this.handleClick(e, child.channel) }));
         }
 
         /**

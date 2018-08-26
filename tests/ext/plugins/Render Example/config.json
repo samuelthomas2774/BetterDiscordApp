@@ -1,7 +1,7 @@
 {
     "info": {
-        "id": "custom-elements",
-        "name": "Custom Elements Example",
+        "id": "render-example",
+        "name": "Render Example",
         "authors": [
             {
                 "name": "Jiiks",
@@ -11,7 +11,7 @@
             }
         ],
         "version": 1.0,
-        "description": "Custom Elements Description"
+        "description": "Example for rendering stuff"
     },
     "main": "index.js"
 }

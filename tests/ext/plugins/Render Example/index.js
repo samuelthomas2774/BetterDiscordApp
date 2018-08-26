@@ -16,7 +16,6 @@ module.exports = (Plugin, Api, Vendor) => {
     return class extends Plugin {
 
         async onStart() {
-            Logger.log('Custom Elements Example Started');
             this.injectStyle();
             this.patchGuildTextChannel();
             this.patchMessages();
@@ -24,7 +23,6 @@ module.exports = (Plugin, Api, Vendor) => {
         }
 
         async onStop() {
-            Logger.log('Custom Elements Example Stopped');
             // The automatic unpatcher is not there yet
             Patcher.unpatchAll();
             CssUtils.deleteAllStyles();

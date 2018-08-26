@@ -141,8 +141,10 @@ export default class ArraySetting extends Setting {
         if (item instanceof SettingsSet)
             return item;
 
+        const id = item ? item.args ? item.args.id : item.id : Math.random();
+
         const set = new SettingsSet({
-            id: item ? item.args ? item.args.id : item.id : Math.random(),
+            id: id || Math.random(),
             categories: this.categories.map(c => c.clone()),
             schemes: this.schemes
         }, item ? item.args || item : undefined);

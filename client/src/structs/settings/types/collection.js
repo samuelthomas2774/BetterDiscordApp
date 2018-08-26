@@ -11,6 +11,7 @@
 import { Utils } from 'common';
 import ArraySetting from './array';
 import Setting from '../setting';
+import BaseSetting from './basesetting';
 
 export default class CollectionSetting extends ArraySetting {
 
@@ -28,15 +29,16 @@ export default class CollectionSetting extends ArraySetting {
     /**
      * Creates a new setting for this collection setting.
      * @param {Setting} item Values to merge into the new setting (optional)
-     * @return {Setting} The new set
+     * @return {Setting} The new setting
      */
     createItem(item) {
-        if (item instanceof Setting)
+        if (item instanceof BaseSetting)
             return item;
 
         const merge = [...arguments].filter(a => a);
         const setting = this.setting.clone(...merge);
         setting.args.id = item ? item.args ? item.args.id : item.id : Math.random();
+        if (!setting.args.id) setting.args.id = Math.random();
 
         setting.setSaved();
         setting.on('settings-updated', async event => {

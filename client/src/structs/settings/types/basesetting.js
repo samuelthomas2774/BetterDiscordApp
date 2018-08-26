@@ -166,6 +166,10 @@ export default class Setting extends AsyncEventEmitter {
         this.args.value = value;
         this.changed = !Utils.compare(this.args.value, this.args.saved_value);
 
+        if (value !== null && typeof value === 'object' || typeof value === 'function') {
+            Object.freeze(value);
+        }
+
         const updatedSetting = new SettingUpdatedEvent({
             setting: this, setting_id: this.id,
             value, old_value

@@ -36,7 +36,10 @@ export default new class E2EE extends BuiltinModule {
 
     get settingPath() { return ['security', 'default', 'e2ee'] }
 
-    get database() { return Settings.getSetting('security', 'e2eedb', 'e2ekvps').value }
+    get e2ekvpsSetting() { return Settings.getSetting('security', 'e2eedb', 'e2ekvps') }
+    get database() { return this.e2ekvpsSetting.items }
+
+    get useKeytarSetting() { return Settings.getSetting('security', 'default', 'use-keytar') }
 
     constructor() {
         super();
@@ -49,11 +52,11 @@ export default new class E2EE extends BuiltinModule {
     async enabled(e) {
         await this.fetchMasterKey();
         Events.on('discord:MESSAGE_CREATE', this.handlePublicKey);
-        Settings.getSetting('security', 'default', 'use-keytar').on('setting-updated', this.fetchMasterKey);
+        this.useKeytarSetting.on('setting-updated', this.fetchMasterKey);
     }
 
     async disabled(e) {
-        Settings.getSetting('security', 'default', 'use-keytar').off('setting-updated', this.fetchMasterKey);
+        this.useKeytarSetting.off('setting-updated', this.fetchMasterKey);
         Events.off('discord:MESSAGE_CREATE', this.handlePublicKey);
         const ctaComponent = await ReactComponents.getComponent('ChannelTextArea');
         ctaComponent.forceUpdateAll();
@@ -62,11 +65,11 @@ export default new class E2EE extends BuiltinModule {
     /* Methods */
     async fetchMasterKey() {
         try {
-            if (Settings.get('security', 'default', 'use-keytar')) {
+            if (this.useKeytarSetting.value) {
                 const master = await ClientIPC.getPassword('betterdiscord', 'master');
                 if (master) return this.setMaster(master);
 
-                if (Settings.getSetting('security', 'e2eedb', 'e2ekvps').items.length) {
+                if (this.database.length) {
                     // Ask the user for their current password to save to the system keychain
                     const currentMaster = await Modals.input('Save to System Keychain', 'Master Password', true).promise;
                     await ClientIPC.setPassword('betterdiscord', 'master', currentMaster);
@@ -82,7 +85,7 @@ export default new class E2EE extends BuiltinModule {
             const newMaster = await Modals.input('Open Database', 'Master Password', true).promise;
             return this.setMaster(newMaster);
         } catch (err) {
-            Settings.getSetting(...this.settingPath).value = false;
+            this.setting.value = false;
             Toasts.error('Invalid master password! E2EE Disabled');
             Logger.err('E2EE', ['Error fetching master password', err]);
         }
@@ -127,13 +130,9 @@ export default new class E2EE extends BuiltinModule {
     }
 
     setKey(channelId, key) {
-        const items = Settings.getSetting('security', 'e2eedb', 'e2ekvps').items;
-        const index = items.findIndex(kvp => kvp.value.key === channelId);
-        if (index > -1) {
-            items[index].value = { key: channelId, value: key };
-            return;
-        }
-        Settings.getSetting('security', 'e2eedb', 'e2ekvps').addItem({ value: { key: channelId, value: key } });
+        const item = this.database.find(kvp => kvp.value.key === channelId);
+        if (item) item.value = { key: channelId, value: key };
+        else this.e2ekvpsSetting.addItem({ value: { key: channelId, value: key } });
     }
 
     createKeyExchange(dmChannelID) {
@@ -155,13 +154,9 @@ export default new class E2EE extends BuiltinModule {
     }
 
     computeSecret(dmChannelID, otherKey) {
-        try {
-            const secret = Security.computeECDHSecret(ECDH_STORAGE[dmChannelID], otherKey);
-            delete ECDH_STORAGE[dmChannelID];
-            return Security.hash('sha384', secret, 'hex');
-        } catch (e) {
-            throw e;
-        }
+        const secret = Security.computeECDHSecret(ECDH_STORAGE[dmChannelID], otherKey);
+        delete ECDH_STORAGE[dmChannelID];
+        return Security.hash('sha384', secret, 'hex');
     }
 
     /* Patches */

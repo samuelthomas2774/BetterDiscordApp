@@ -130,6 +130,12 @@ export default class extends ContentManager {
 
     static unloadContentHook(content, reload) {
         delete Globals.require.cache[Globals.require.resolve(content.paths.mainPath)];
+        const uncache = [];
+        for (const required in Globals.require.cache) {
+            if (!required.includes(content.paths.contentPath)) continue;
+            uncache.push(Globals.require.resolve(required));
+        }
+        for (const u of uncache) delete Globals.require.cache[u];
     }
 
     /**

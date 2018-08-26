@@ -19,6 +19,7 @@ module.exports = (Plugin, Api, Vendor) => {
             Logger.log('Custom Elements Example Started');
             this.injectStyle();
             this.patchGuildTextChannel();
+            this.patchMessages();
             return true;
         }
 
@@ -31,6 +32,8 @@ module.exports = (Plugin, Api, Vendor) => {
             // Force update elements to remove our changes
             const GuildTextChannel = await ReactComponents.getComponent('GuildTextChannel');
             GuildTextChannel.forceUpdateAll();
+            const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
+            MessageContent.forceUpdateAll();
             return true;
         }
 
@@ -47,7 +50,14 @@ module.exports = (Plugin, Api, Vendor) => {
                     &:hover {
                         opacity: 1;
                     }
-                }`;
+                }
+                .exampleBtnGroup {
+                    .bd-button {
+                        font-size: 14px;
+                        padding: 5px;
+                    }
+                }
+                `;
             await CssUtils.injectSass(css);
         }
 
@@ -57,6 +67,14 @@ module.exports = (Plugin, Api, Vendor) => {
             monkeyPatch(GuildTextChannel.component.prototype).after('render', this.injectCustomElements.bind(this));
             // Force update to see our changes immediatly
             GuildTextChannel.forceUpdateAll();
+        }
+
+        async patchMessages() {
+            // Get Message component and patch it's render function
+            const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
+            monkeyPatch(MessageContent.component.prototype).after('render', this.injectGenericComponents.bind(this));
+            // Force update to see our changes immediatly
+            MessageContent.forceUpdateAll();
         }
 
         /*
@@ -75,6 +93,30 @@ module.exports = (Plugin, Api, Vendor) => {
             // Add our custom components to children
             child.children.push(customReactComponent(React, { onClick: e => this.handleClick(e, child.channel) }));
             child.children.push(customVueComponent(Vuewrap, { onClick: e => this.handleClick(e, child.channel) }));
+        }
+
+        /**
+         * Inject generic components provided by BD
+         */
+        injectGenericComponents(that, args, returnValue) {
+            // If children is not an array make it into one
+            if (!returnValue.props.children instanceof Array) returnValue.props.children = [returnValue.props.children];
+            // Add a generic Button component provided by BD
+            returnValue.props.children.push(Api.Components.ButtonGroup({
+                classes: [ 'exampleBtnGroup' ], // Additional classes for button group
+                buttons: [
+                    {
+                        classes: ['exampleBtn'], // Additional classes for button
+                        text: 'Hello World!', // Text for button
+                        onClick: e => Logger.log('Hello World!') // Button click handler
+                    },
+                    {
+                        classes: ['exampleBtn'],
+                        text: 'Button',
+                        onClick: e => Logger.log('Button!')
+                    }
+                ]
+            }).render()); // Render will return the wrapped component that can then be displayed
         }
 
         /**

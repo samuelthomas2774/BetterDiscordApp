@@ -12,6 +12,7 @@ import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { BdMenu, Modals, DOM, DOMObserver, VueInjector, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
 import * as CommonComponents from 'commoncomponents';
+import { default as Components } from '../ui/components/generic';
 import { Utils, Filters, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
@@ -64,6 +65,7 @@ export default class PluginApi {
     get EventsWrapper() { return EventsWrapper }
 
     get CommonComponents() { return CommonComponents }
+    get Components() { return Components }
     get Filters() { return Filters }
     get Discord() { return DiscordApi }
     get DiscordApi() { return DiscordApi }

@@ -2,16 +2,16 @@
  * This is an example of how you should add custom elements instead of manipulating the DOM directly
  */
 
+// Import custom components
+const customVueComponent = require('./components/vuecomponent');
+const customReactComponent = require('./components/reactcomponent');
+
 module.exports = (Plugin, Api, Vendor) => {
 
     // Destructure some apis
-    const { Logger, ReactComponents, Patcher, monkeyPatch, Reflection, Utils, CssUtils, VueInjector, Vuewrap, relative } = Api;
+    const { Logger, ReactComponents, Patcher, monkeyPatch, Reflection, Utils, CssUtils, VueInjector, Vuewrap, requireUncached } = Api;
     const { Vue } = Vendor;
     const { React } = Reflection.modules; // This should be in vendor
-
-    // Import custom components from relative paths
-    const customVueComponent = relative('./components/vuecomponent');
-    const customReactComponent = relative('./components/reactcomponent');
 
     return class extends Plugin {
 

@@ -58,15 +58,6 @@ export default class PluginApi {
         return null;
     }
 
-    relativeRequire(file) {
-        const absolutePath = path.join(this.pluginPath, file);
-        delete Globals.require.cache[Globals.require.resolve(absolutePath)];
-        return Globals.require(absolutePath);
-    }
-    get relative() {
-        return this.relativeRequire.bind(this);
-    }
-
     get Api() { return this }
 
     get AsyncEventEmitter() { return AsyncEventEmitter }

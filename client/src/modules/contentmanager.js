@@ -19,6 +19,7 @@ import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { SettingsSet, ErrorEvent } from 'structs';
 import { Modals } from 'ui';
 import Combokeys from 'combokeys';
+import Settings from './settings';
 
 /**
  * Base class for managing external content
@@ -131,6 +132,8 @@ export default class {
             const directories = await FileUtils.listDirectory(this.contentPath);
 
             for (const dir of directories) {
+                const packed = dir.endsWith('.bd');
+
                 // If content is already loaded this should resolve
                 if (this.getContentByDirName(dir)) continue;
 
@@ -219,7 +222,14 @@ export default class {
      */
     static async preloadContent(dirName, reload = false, index) {
         try {
+            const unsafeAllowed = Settings.getSetting('core', 'advanced', 'unsafe-content').value;
             const packed = typeof dirName === 'object' && dirName.packed;
+
+            // Block any unpacked content as they can't be verified
+            if (!packed && !unsafeAllowed) {
+                throw 'Blocked unsafe content';
+            }
+
             const contentPath = packed ? dirName.contentPath : path.join(this.contentPath, dirName);
 
             await FileUtils.directoryExists(contentPath);

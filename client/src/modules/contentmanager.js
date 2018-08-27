@@ -365,8 +365,6 @@ export default class {
                 } else {
                     newcontent = await this.preloadContent(content.dirName, true, index);
                 }
-                console.debug('enwcontent', newcontent);
-                //const newcontent = await (content.packed ? this.preloadPackedContent(content.packed.pkg, true, index) : this.preloadContent(content.dirName, true, index));
 
                 if (newcontent.enabled) {
                     newcontent.userConfig.enabled = false;

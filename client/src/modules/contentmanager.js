@@ -222,7 +222,7 @@ export default class {
      */
     static async preloadContent(dirName, reload = false, index) {
         try {
-            const unsafeAllowed = Settings.getSetting('core', 'advanced', 'unsafe-content').value;
+            const unsafeAllowed = Settings.getSetting('security', 'default', 'unsafe-content').value;
             const packed = typeof dirName === 'object' && dirName.packed;
 
             // Block any unpacked content as they can't be verified

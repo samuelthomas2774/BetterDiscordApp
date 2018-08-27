@@ -35,6 +35,13 @@
                         "value": false
                     },
                     {
+                        "id": "unsafe-content",
+                        "type": "bool",
+                        "text": "Allow unverified content",
+                        "hint": "Allow loading unverified plugins/themes",
+                        "value": "false"
+                    },
+                    {
                         "id": "debugger-keybind",
                         "type": "keybind",
                         "text": "Debugger keybind",

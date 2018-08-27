@@ -40,7 +40,6 @@ module.exports = {
         net: 'require("net")',
         request: 'require(require("path").join(require("electron").remote.app.getAppPath(), "node_modules", "request"))',
         sparkplug: 'require("../../core/dist/sparkplug")',
-        asar: 'require("asar")',
         'node-crypto': 'require("crypto")'
     },
     resolve: {

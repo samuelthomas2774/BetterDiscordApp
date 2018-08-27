@@ -8,13 +8,16 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import asar from 'asar';
+import path, { dirname } from 'path';
+import rimraf from 'rimraf';
+
 import Content from './content';
 import Globals from './globals';
 import Database from './database';
 import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { SettingsSet, ErrorEvent } from 'structs';
 import { Modals } from 'ui';
-import path from 'path';
 import Combokeys from 'combokeys';
 
 /**
@@ -77,12 +80,20 @@ export default class {
             const directories = await FileUtils.listDirectory(this.contentPath);
 
             for (const dir of directories) {
-                try {
-                    await FileUtils.directoryExists(path.join(this.contentPath, dir));
-                } catch (err) { continue; }
+                const packed = dir.endsWith('.bd');
+
+                if (!packed) {
+                    try {
+                        await FileUtils.directoryExists(path.join(this.contentPath, dir));
+                    } catch (err) { continue; }
+                }
 
                 try {
-                    await this.preloadContent(dir);
+                    if (packed) {
+                        await this.preloadPackedContent(dir);
+                    } else {
+                        await this.preloadContent(dir);
+                    }
                 } catch (err) {
                     this.errors.push(new ErrorEvent({
                         module: this.moduleName,
@@ -173,6 +184,33 @@ export default class {
         }
     }
 
+    static async preloadPackedContent(pkg, reload = false, index) {
+        try {
+            const packagePath = path.join(this.contentPath, pkg);
+            await FileUtils.fileExists(packagePath);
+
+            const config = JSON.parse(asar.extractFile(packagePath, 'config.json').toString());
+            const unpackedPath = path.join(Globals.getPath('tmp'), config.info.name);
+
+            asar.extractAll(packagePath, unpackedPath);
+            const content = await this.preloadContent({
+                config,
+                contentPath: unpackedPath,
+                packagePath: packagePath,
+                pkg,
+                packed: true
+            }, reload, index);
+
+            rimraf(unpackedPath, err => {
+                if (err) throw err;
+            });
+
+            return content;
+        } catch (err) {
+            throw err;
+        }
+    }
+
     /**
      * Common loading procedure for loading content before passing it to the actual loader
      * @param {any} dirName Base directory for content
@@ -181,7 +219,8 @@ export default class {
      */
     static async preloadContent(dirName, reload = false, index) {
         try {
-            const contentPath = path.join(this.contentPath, dirName);
+            const packed = typeof dirName === 'object' && dirName.packed;
+            const contentPath = packed ? dirName.contentPath : path.join(this.contentPath, dirName);
 
             await FileUtils.directoryExists(contentPath);
 
@@ -189,7 +228,7 @@ export default class {
                 throw { 'message': `Attempted to load already loaded user content: ${path}` };
 
             const configPath = path.resolve(contentPath, 'config.json');
-            const readConfig = await FileUtils.readJsonFromFile(configPath);
+            const readConfig = packed ? dirName.config : await FileUtils.readJsonFromFile(configPath);
             const mainPath = path.join(contentPath, readConfig.main || 'index.js');
 
             const defaultConfig = new SettingsSet({
@@ -213,7 +252,7 @@ export default class {
                 }
             } catch (err) {
                 // We don't care if this fails it either means that user config doesn't exist or there's something wrong with it so we revert to default config
-                Logger.warn(this.moduleName, [`Failed reading config for ${this.contentType} ${readConfig.info.name} in ${dirName}`, err]);
+                Logger.warn(this.moduleName, [`Failed reading config for ${this.contentType} ${readConfig.info.name} in ${packed ? dirName.pkg : dirName}`, err]);
             }
 
             userConfig.config = defaultConfig.clone({ settings: userConfig.config });
@@ -243,7 +282,7 @@ export default class {
                 mainPath
             };
 
-            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies, readConfig.permissions, readConfig.mainExport);
+            const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies, readConfig.permissions, readConfig.mainExport, packed ? dirName : false);
             if (!content) return undefined;
             if (!reload && this.getContentById(content.id))
                 throw {message: `A ${this.contentType} with the ID ${content.id} already exists.`};
@@ -310,7 +349,15 @@ export default class {
             if (this.unloadContentHook) this.unloadContentHook(content);
 
             if (reload) {
-                const newcontent = await this.preloadContent(content.dirName, true, index);
+                let newcontent;
+                if (content.packed) {
+                    newcontent = await this.preloadPackedContent(content.packed.pkg, true, index);
+                } else {
+                    newcontent = await this.preloadContent(content.dirName, true, index);
+                }
+                console.debug('enwcontent', newcontent);
+                //const newcontent = await (content.packed ? this.preloadPackedContent(content.packed.pkg, true, index) : this.preloadContent(content.dirName, true, index));
+
                 if (newcontent.enabled) {
                     newcontent.userConfig.enabled = false;
                     newcontent.start(false);

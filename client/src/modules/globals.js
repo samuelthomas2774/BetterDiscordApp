@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import path from 'path';
 import sparkplug from 'sparkplug';
 import { ClientIPC } from 'common';
 import Module from './module';
@@ -35,6 +36,10 @@ export default new class extends Module {
 
     async first() {
         const config = await ClientIPC.send('getConfig');
+        config.paths.push({
+            id: 'tmp',
+            path: path.join(config.paths.find(p => p.id === 'base').path, 'tmp')
+        });
         this.setState({ config });
 
         // This is for Discord to stop error reporting :3

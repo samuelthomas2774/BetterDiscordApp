@@ -74,7 +74,7 @@ export default class extends ContentManager {
     static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
-    static async loadPlugin(paths, configs, info, main, dependencies, permissions, mainExport) {
+    static async loadPlugin(paths, configs, info, main, dependencies, permissions, mainExport, packed = false) {
         if (permissions && permissions.length > 0) {
             for (const perm of permissions) {
                 Logger.log(this.moduleName, `Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
@@ -116,6 +116,11 @@ export default class extends ContentManager {
                 mainPath: paths.mainPath
             }
         });
+
+        if (packed) instance.packed = {
+            packagePath: packed.packagePath,
+            pkg: packed.pkg
+        };
 
         if (instance.enabled && this.loaded) {
             instance.userConfig.enabled = false;

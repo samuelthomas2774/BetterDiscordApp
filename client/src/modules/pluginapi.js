@@ -12,6 +12,7 @@ import { EmoteModule } from 'builtin';
 import { SettingsSet, SettingsCategory, Setting, SettingsScheme } from 'structs';
 import { BdMenu, Modals, DOM, DOMObserver, VueInjector, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
 import * as CommonComponents from 'commoncomponents';
+import { default as Components } from '../ui/components/generic';
 import { Utils, Filters, ClientLogger as Logger, ClientIPC, AsyncEventEmitter } from 'common';
 import Settings from './settings';
 import ExtModuleManager from './extmodulemanager';
@@ -24,6 +25,9 @@ import DiscordApi from './discordapi';
 import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
 import GlobalAc from '../ui/autocomplete';
+import Vue from 'vue';
+import path from 'path';
+import Globals from './globals';
 
 export default class PluginApi {
 
@@ -61,6 +65,7 @@ export default class PluginApi {
     get EventsWrapper() { return EventsWrapper }
 
     get CommonComponents() { return CommonComponents }
+    get Components() { return Components }
     get Filters() { return Filters }
     get Discord() { return DiscordApi }
     get DiscordApi() { return DiscordApi }
@@ -105,7 +110,9 @@ export default class PluginApi {
             removeFromArray: (...args) => Utils.removeFromArray.apply(Utils, args),
             defineSoftGetter: (...args) => Utils.defineSoftGetter.apply(Utils, args),
             wait: (...args) => Utils.wait.apply(Utils, args),
-            until: (...args) => Utils.until.apply(Utils, args)
+            until: (...args) => Utils.until.apply(Utils, args),
+            findInTree: (...args) => Utils.findInTree.apply(Utils, args),
+            findInReactTree: (...args) => Utils.findInReactTree.apply(Utils, args)
         };
     }
 
@@ -603,6 +610,10 @@ export default class PluginApi {
         }, 'menus', {
             get: () => this.discordContextMenus
         });
+    }
+
+    Vuewrap(id, component, props) {
+        return VueInjector.createReactElement(Vue.component(id, component), props);
     }
 
 }

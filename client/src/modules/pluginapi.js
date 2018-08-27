@@ -25,7 +25,6 @@ import DiscordApi from './discordapi';
 import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
 import GlobalAc from '../ui/autocomplete';
-import Vue from 'vue';
 import path from 'path';
 import Globals from './globals';
 
@@ -612,8 +611,8 @@ export default class PluginApi {
         });
     }
 
-    Vuewrap(id, component, props) {
-        return VueInjector.createReactElement(Vue.component(id, component), props);
+    Vuewrap(component, props) {
+        return VueInjector.createReactElement(component, props);
     }
 
 }

@@ -1,5 +1,5 @@
-module.exports = (VueWrap, props) => {
-    return VueWrap('somecomponent', {
+module.exports = (Vuewrap, props) => {
+    return Vuewrap({
         render: function (createElement) {
             return createElement('button', {
                 class: 'exampleCustomElement',
@@ -10,4 +10,4 @@ module.exports = (VueWrap, props) => {
         },
         props: ['onClick']
     }, props);
-}
+};

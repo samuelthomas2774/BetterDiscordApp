@@ -12,7 +12,7 @@
     <Card :item="plugin">
         <SettingSwitch v-if="plugin.type === 'plugin'" slot="toggle" :value="plugin.enabled" @input="$emit('toggle-plugin')" />
         <ButtonGroup slot="controls">
-            <Button v-if="devmode" v-tooltip="'Package Plugin'" @click="package"><MiBoxDownload size="18"/></Button>
+            <Button v-if="devmode && !plugin.packed" v-tooltip="'Package Plugin'" @click="package"><MiBoxDownload size="18"/></Button>
             <Button v-tooltip="'Settings (shift + click to open settings without cloning the set)'" v-if="plugin.hasSettings" @click="$emit('show-settings', $event.shiftKey)"><MiSettings size="18" /></Button>
             <Button v-tooltip="'Reload'" @click="$emit('reload-plugin')"><MiRefresh size="18" /></Button>
             <Button v-tooltip="'Edit'" @click="editPlugin"><MiPencil size="18" /></Button>

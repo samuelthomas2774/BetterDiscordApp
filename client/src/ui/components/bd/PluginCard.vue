@@ -23,9 +23,10 @@
 
 <script>
     // Imports
-    import archiver from 'archiver';
+    import asar from 'asar';
     import electron from 'electron';
     import fs from 'fs';
+    import { Toasts } from 'ui';
     import { Settings } from 'modules';
     import { ClientLogger as Logger } from 'common';
     import { shell } from 'electron';
@@ -57,18 +58,10 @@
                 }, filepath => {
                     if (!filepath) return;
 
-                    const archive = archiver('zip', {
-                        zlib: { level: 0 }
+                    asar.uncache(filepath);
+                    asar.createPackage(this.plugin.contentPath, filepath, () => {
+                        Toasts.success('Plugin Packaged!');
                     });
-
-                    const out = fs.createWriteStream(filepath);
-
-                    archive.pipe(out);
-                    archive.glob('**/*', {
-                        cwd: this.plugin.contentPath,
-                        root: this.plugin.contentPath
-                    });
-                    archive.finalize();
                 });
             },
             editPlugin() {

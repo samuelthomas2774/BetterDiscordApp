@@ -21,11 +21,11 @@
     "fs-extra": "^7.0.0",
     "keytar": "4.2.1",
     "nedb": "^1.8.0",
-    "node-sass": "^4.9.2"
+    "node-sass": "^4.9.2",
+    "asar": "^0.14.3"
   },
   "devDependencies": {
     "aes256": "^1.0.4",
-    "archiver": "^2.1.1",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",

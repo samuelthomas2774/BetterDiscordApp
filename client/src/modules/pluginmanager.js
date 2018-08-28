@@ -112,15 +112,17 @@ export default class extends ContentManager {
             configs, info, main,
             paths: {
                 contentPath: paths.contentPath,
-                dirName: paths.dirName,
+                dirName: packed ? packed.packageName : paths.dirName,
                 mainPath: paths.mainPath
             }
         });
 
         if (packed) instance.packed = {
+            pkg: packed.pkg,
+            packageName: packed.packageName,
             packagePath: packed.packagePath,
-            pkg: packed.pkg
-        };
+            packed: true
+        }; else instance.packed = false;
 
         if (instance.enabled && this.loaded) {
             instance.userConfig.enabled = false;

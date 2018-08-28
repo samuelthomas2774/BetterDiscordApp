@@ -190,25 +190,22 @@ export default class {
     static async preloadPackedContent(pkg, reload = false, index) {
         try {
             const packagePath = path.join(this.contentPath, pkg);
+            const packageName = pkg.replace('.bd', '');
             await FileUtils.fileExists(packagePath);
 
             const config = JSON.parse(asar.extractFile(packagePath, 'config.json').toString());
-            const unpackedPath = path.join(Globals.getPath('tmp'), config.info.name);
+            const unpackedPath = path.join(Globals.getPath('tmp'), packageName);
 
             asar.extractAll(packagePath, unpackedPath);
-            const content = await this.preloadContent({
+            return this.preloadContent({
                 config,
                 contentPath: unpackedPath,
                 packagePath: packagePath,
                 pkg,
+                packageName,
                 packed: true
             }, reload, index);
 
-            rimraf(unpackedPath, err => {
-                if (err) throw err;
-            });
-
-            return content;
         } catch (err) {
             throw err;
         }
@@ -295,13 +292,19 @@ export default class {
             const content = await this.loadContent(paths, configs, readConfig.info, readConfig.main, readConfig.dependencies, readConfig.permissions, readConfig.mainExport, packed ? dirName : false);
             if (!content) return undefined;
             if (!reload && this.getContentById(content.id))
-                throw {message: `A ${this.contentType} with the ID ${content.id} already exists.`};
+                throw { message: `A ${this.contentType} with the ID ${content.id} already exists.` };
 
             if (reload) this.localContent.splice(index, 1, content);
             else this.localContent.push(content);
             return content;
         } catch (err) {
             throw err;
+        } finally {
+            if (typeof dirName === 'object' && dirName.packed) {
+                rimraf(dirName.contentPath, err => {
+                    if (err) Logger.err(err);
+                });
+            }
         }
     }
 
@@ -358,20 +361,7 @@ export default class {
 
             if (this.unloadContentHook) this.unloadContentHook(content);
 
-            if (reload) {
-                let newcontent;
-                if (content.packed) {
-                    newcontent = await this.preloadPackedContent(content.packed.pkg, true, index);
-                } else {
-                    newcontent = await this.preloadContent(content.dirName, true, index);
-                }
-
-                if (newcontent.enabled) {
-                    newcontent.userConfig.enabled = false;
-                    newcontent.start(false);
-                }
-                return newcontent;
-            }
+            if (reload) return content.packed ? this.preloadPackedContent(content.packed.pkg, true, index) : this.preloadContent(content.dirName, true, index);
 
             this.localContent.splice(index, 1);
         } catch (err) {

@@ -2,7 +2,7 @@
     "info": {
         "name": "Example Theme 1",
         "authors": [ "Jiiks" ],
-        "version": 1.0,
+        "version": "1.0",
         "description": "Example Theme 1 Description",
         "icon": "icon.svg",
         "icon_type": "image/svg+xml",

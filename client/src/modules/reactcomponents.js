@@ -15,6 +15,7 @@ import { Utils, Filters, ClientLogger as Logger } from 'common';
 import { MonkeyPatch } from './patcher';
 import Reflection from './reflection/index';
 import DiscordApi from './discordapi';
+import Events from './events';
 
 class Helpers {
     static get plannedActions() {
@@ -506,17 +507,17 @@ export class ReactAutoPatcher {
 
         const reflect = Reflection.DOM(selector);
         const stateNode = reflect.getComponentStateNode(this.UploadArea);
-        const callback = function(e) {
+        const callback = function (e) {
             if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return;
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
             stateNode.clearDragging();
-            Modals.confirm('Function not ready', `You tried to install "${e.dataTransfer.files[0].path}", but installing .bd files isn't ready yet.`)
-            // Possibly something like Events.emit('install-file', e.dataTransfer.files[0]);
+
+            Events.emit('install-pkg', e.dataTransfer.files[0], DiscordApi.currentChannel.id);
         };
 
-        // Remove their handler, add ours, then readd theirs to give ours priority to stop theirs when we get a .bd file.
+        // Remove their handler, add ours, then read theirs to give ours priority to stop theirs when we get a .bd file.
         reflect.element.removeEventListener('drop', stateNode.handleDrop);
         reflect.element.addEventListener('drop', callback);
         reflect.element.addEventListener('drop', stateNode.handleDrop);

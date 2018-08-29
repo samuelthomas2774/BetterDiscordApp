@@ -63,8 +63,8 @@
 
             if (alreadyInstalled) {
                 this.alreadyInstalled = true;
-                if (config.version > alreadyInstalled.version) {
-                    this.upDoDate = false;
+                if (config.info.version > alreadyInstalled.version) {
+                    this.upToDate = false;
                 }
             }
 

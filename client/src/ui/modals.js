@@ -191,12 +191,12 @@ export default class Modals {
         return new Modal(modal, InputModal);
     }
 
-    static installModal(title, config) {
-        return this.add(this.createInstallModal(title, config));
+    static installModal(contentType, config) {
+        return this.add(this.createInstallModal(contentType, config));
     }
 
-    static createInstallModal(title, config) {
-        const modal = { title, config };
+    static createInstallModal(contentType, config) {
+        const modal = { contentType, config };
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = value => resolve(value);
             modal.beforeClose = () => reject();

@@ -27,25 +27,52 @@
                 </div>
             </div>
         </div>
-        <div slot="footer" class="bd-installModalFooter">
+        <div v-if="verifying" slot="footer" class="bd-installModalFooter">
+            <span class="bd-installModalStatus">Verifying {{this.modal.contentType}}</span>
+        </div>
+        <div v-else-if="alreadyInstalled && upToDate" slot="footer" class="bd-installModalFooter">
+            <span class="bd-installModalStatus">Up to date version already installed!</span>
+        </div>
+        <div v-else slot="footer" class="bd-installModalFooter">
             <div class="bd-button bd-ok" @click="modal.confirm(0); modal.close();">Upload</div>
-            <div class="bd-button bd-ok" @click="modal.confirm(); modal.close();">Install</div>
+            <div class="bd-button bd-ok" @click="modal.confirm(); modal.close();">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
         </div>
     </Modal>
 </template>
 <script>
     // Imports
     import { Modal, MiExtension } from '../../common';
+    import { PluginManager, ThemeManager } from 'modules';
 
     export default {
         data() {
             return {
-                installing: false
+                installing: false,
+                verifying: true,
+                alreadyInstalled: false,
+                upToDate: true
             }
         },
         props: ['modal'],
         components: {
             Modal, MiExtension
+        },
+        mounted() {
+            const { contentType, config } = this.modal;
+            const alreadyInstalled = contentType === 'plugin' ? PluginManager.getPluginById(config.info.id) : ThemeManager.getContentById(config.info.id);
+
+            if (alreadyInstalled) {
+                this.alreadyInstalled = true;
+                if (config.version > alreadyInstalled.version) {
+                    this.upDoDate = false;
+                }
+            }
+
+            // TODO Verify
+            setTimeout(() => {
+                this.verifying = false;
+            }, 2000);
+
         }
     }
 </script>

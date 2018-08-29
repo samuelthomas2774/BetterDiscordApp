@@ -36,5 +36,5 @@ export default new class TwentyFourHour extends BuiltinModule {
         if (matched[3] === 'AM') return returnValue.replace(matched[0], `${matched[1] === '12' ? '00' : matched[1].padStart(2, '0')}:${matched[2]}`)
         return returnValue.replace(matched[0], `${parseInt(matched[1]) + 12}:${matched[2]}`)
     }
-    
+
 }

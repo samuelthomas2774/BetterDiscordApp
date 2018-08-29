@@ -3,6 +3,7 @@ import asar from 'asar';
 
 import { Modals } from 'ui';
 import { Utils } from 'common';
+import PluginManager from './pluginmanager';
 
 export default class extends EventListener {
 
@@ -46,7 +47,7 @@ export default class extends EventListener {
             ];
             */
             // Show install modal
-            const modalResult = await Modals.installModal(`Install BetterDiscord ${isPlugin ? 'Plugin' : 'Theme'}`, config).promise;
+            const modalResult = await Modals.installModal(isPlugin ? 'plugin' : 'theme', config).promise;
 
             if (modalResult === 0) {
                 // Upload it instead

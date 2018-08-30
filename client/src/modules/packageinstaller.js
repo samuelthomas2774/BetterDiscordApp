@@ -66,17 +66,26 @@ export default class PackageInstaller {
      * @param {Boolean} update Does an older version already exist
      */
     static async installPackage(bytesOrPath, id, update = false) {
-        const bytes = typeof bytesOrPath === 'string' ? fs.readFileSync(bytesOrPath) : bytesOrPath;
+        try {
+            const bytes = typeof bytesOrPath === 'string' ? fs.readFileSync(bytesOrPath) : bytesOrPath;
 
-        const outputName = `${id}.bd`;
-        const outputPath = path.join(Globals.getPath('plugins'), outputName);
-        fs.writeFileSync(outputPath, bytes);
+            const outputName = `${id}.bd`;
+            const outputPath = path.join(Globals.getPath('plugins'), outputName);
+            fs.writeFileSync(outputPath, bytes);
 
-        if (!update) {
-            return PluginManager.preloadPackedContent(outputName);
+            let newContent = null;
+
+            if (!update) {
+                newContent = await PluginManager.preloadPackedContent(outputName);
+            } else {
+                newContent = await PluginManager.reloadContent(PluginManager.getPluginById(id));
+            }
+
+            return newContent;
+
+        } catch (err) {
+            throw err;
         }
-
-        return PluginManager.reloadContent(PluginManager.getPluginById(id));
     }
 
     /**

@@ -1,54 +1,69 @@
 <template>
-    <Modal class="bd-installModal" :headertext="modal.title" :closing="modal.closing" @close="modal.close" :noheader="true" :class="{'bd-err': !verifying && !verified}">
-        <div slot="body" class="bd-installModalBody">
-            <div class="bd-installModalTop">
-                <div class="bd-installModalIcon">
-                    <div v-if="modal.icon" class="bd-installModalCi" :style="{backgroundImage: `url(${modal.icon})`}"/>
-                    <MiExtension v-else/>
-                </div>
-                <div class="bd-installModalInfo">
-                    <span>{{modal.config.info.name}} v{{modal.config.info.version}} by {{modal.config.info.authors.map(a => a.name).join(', ')}}</span>
-                    <div class="bd-installModalDesc">
-                        {{modal.config.info.description}}
+    <Modal class="bd-installModal" :headertext="modal.title" :closing="modal.closing" @close="modal.close" :noheader="true" :class="{'bd-err': !verifying && !verified, 'bd-installModalDone': installed}">
+        <template v-if="!installed && !err">
+            <div slot="body" class="bd-installModalBody">
+                <div class="bd-installModalTop">
+                    <div class="bd-installModalIcon">
+                        <div v-if="modal.icon" class="bd-installModalCi" :style="{backgroundImage: `url(${modal.icon})`}" />
+                        <MiExtension v-else />
                     </div>
-                </div>
-            </div>
-            <div class="bd-installModalBottom">
-                <div v-for="(perm, i) in modal.config.permissions" :key="`perm-${i}`" class="bd-permScope">
-                    <div class="bd-permAllow">
-                        <div class="bd-permCheck">
-                            <div class="bd-permCheckInner"></div>
-                        </div>
-                        <div class="bd-permInner">
-                            <div class="bd-permName">{{perm.HEADER}}</div>
-                            <div class="bd-permDesc">{{perm.BODY}}</div>
+                    <div class="bd-installModalInfo">
+                        <span>{{modal.config.info.name}} v{{modal.config.info.version}} by {{modal.config.info.authors.map(a => a.name).join(', ')}}</span>
+                        <div class="bd-installModalDesc">
+                            {{modal.config.info.description}}
                         </div>
                     </div>
                 </div>
+                <div class="bd-installModalBottom">
+                    <div v-for="(perm, i) in modal.config.permissions" :key="`perm-${i}`" class="bd-permScope">
+                        <div class="bd-permAllow">
+                            <div class="bd-permCheck">
+                                <div class="bd-permCheckInner"></div>
+                            </div>
+                            <div class="bd-permInner">
+                                <div class="bd-permName">{{perm.HEADER}}</div>
+                                <div class="bd-permDesc">{{perm.BODY}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div v-if="verifying" slot="footer" class="bd-installModalFooter">
-            <span class="bd-installModalStatus">Verifying {{modal.contentType}}</span>
-        </div>
-        <div v-else-if="!verified" slot="footer" class="bd-installModalFooter">
-            <span class="bd-installModalStatus bd-err">Not verified!</span>
-            <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
-            <div class="bd-button bd-err" @click="install" v-if="allowUnsafe">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
-        </div>
-        <div v-else-if="alreadyInstalled && upToDate" slot="footer" class="bd-installModalFooter">
-            <span class="bd-installModalStatus">Up to date version already installed!</span>
-            <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
-        </div>
-        <div v-else slot="footer" class="bd-installModalFooter">
-            <span class="bd-installModalStatus bd-ok">Verified!</span>
-            <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
-            <div class="bd-button bd-ok" @click="install">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
-        </div>
+            <div v-if="verifying" slot="footer" class="bd-installModalFooter">
+                <span class="bd-installModalStatus">Verifying {{modal.contentType}}</span>
+            </div>
+            <div v-else-if="!verified" slot="footer" class="bd-installModalFooter">
+                <span class="bd-installModalStatus bd-err">Not verified!</span>
+                <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
+                <div class="bd-button bd-err" @click="install" v-if="allowUnsafe">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
+            </div>
+            <div v-else-if="alreadyInstalled && upToDate" slot="footer" class="bd-installModalFooter">
+                <span class="bd-installModalStatus">Up to date version already installed!</span>
+                <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
+            </div>
+            <div v-else slot="footer" class="bd-installModalFooter">
+                <span class="bd-installModalStatus bd-ok">Verified!</span>
+                <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
+                <div class="bd-button bd-ok" @click="install">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
+            </div>
+        </template>
+        <template v-else-if="err">
+            <div slot="body" class="bd-installModalBody">{{err.message}}</div>
+        </template>
+        <template v-else>
+            <div slot="body" class="bd-installModalBody">
+                <span>{{alreadyInstalled ? 'Succesfully Updated!' : 'Successfully Installed!'}}</span>
+                <MiSuccess/>
+            </div>
+            <div slot="footer" class="bd-installModalFooter">
+                <div class="bd-button bd-ok" v-if="installed.hasSettings" @click="showSettingsModal">Settings</div>
+                <div class="bd-button bd-ok" @click="modal.confirm(); modal.close();">OK</div>
+            </div>
+        </template>
     </Modal>
 </template>
 <script>
     // Imports
-    import { Modal, MiExtension } from '../../common';
+    import { Modal, MiExtension, MiSuccess } from '../../common';
     import { PluginManager, ThemeManager, PackageInstaller, Settings } from 'modules';
 
     export default {
@@ -58,12 +73,14 @@
                 verifying: true,
                 alreadyInstalled: false,
                 upToDate: true,
-                allowUnsafe: Settings.getSetting('security', 'default', 'unsafe-content').value
+                allowUnsafe: Settings.getSetting('security', 'default', 'unsafe-content').value,
+                installed: false,
+                err: null
             }
         },
         props: ['modal'],
         components: {
-            Modal, MiExtension
+            Modal, MiExtension, MiSuccess
         },
         mounted() {
             const { contentType, config } = this.modal;
@@ -84,10 +101,17 @@
                 this.verifying = false;
             },
             async install() {
-                const installed = await PackageInstaller.installPackage(this.modal.filePath, this.modal.config.info.id, this.alreadyInstalled);
-                console.log(installed);
-                this.modal.confirm();
-                this.modal.close();
+                try {
+                    const installed = await PackageInstaller.installPackage(this.modal.filePath, this.modal.config.info.id, this.alreadyInstalled);
+                    this.installed = installed;
+                    console.log(this.installed);
+                } catch (err) {
+                    console.log(err);
+                    this.err = err;
+                }
+            },
+            showSettingsModal() {
+                this.installed.showSettingsModal();
             }
         }
     }

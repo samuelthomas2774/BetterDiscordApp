@@ -140,4 +140,43 @@
             }
         }
     }
+
+    &.bd-installModalDone {
+        .bd-modalInner {
+            min-width: 400px;
+            max-width: 400px;
+            height: 250px;
+            border: 2px solid $colok;
+
+            .bd-installModalBody {
+                display: flex;
+                flex-grow: 1;
+                align-content: center;
+                justify-content: center;
+                align-items: center;
+
+                h3 {
+                    color: $colok;
+                    font-size: 1.2em;
+                    font-weight: 700;
+                    text-align: center;
+                    padding: 20px;
+                }
+            }
+
+            .bd-materialDesignIcon {
+                svg {
+                    fill: $colok;
+                    width: 100px;
+                    height: 100px;
+                }
+            }
+
+            .bd-installModalFooter {
+                .bd-button {
+                    margin-left: 5px;
+                }
+            }
+        }
+    }
 }

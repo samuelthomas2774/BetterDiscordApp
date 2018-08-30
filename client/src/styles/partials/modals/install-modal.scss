@@ -1,14 +1,12 @@
 .bd-installModal {
 
-    &.bd-err {
-        .bd-modalInner {
-            border: 2px solid $colerr;
-        }
-    }
-
     .bd-modalInner {
         min-width: 520px;
         min-height: 200px;
+
+        @at-root .bd-err#{&} {
+            border: 2px solid $colerr;
+        }
 
         .bd-modalBody {
             flex-grow: 1;
@@ -42,6 +40,10 @@
                         justify-content: center;
                         align-items: center;
                         justify-items: center;
+
+                        @at-root .bd-err#{&} {
+                            background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEzMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTAwIDEzMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+LnN0MHtmaWxsOiNGNEY2RkM7fS5zdDF7ZmlsbDpub25lO3N0cm9rZTojRDg0MDQwO3N0cm9rZS13aWR0aDoyO30uc3Qye29wYWNpdHk6MC42O2ZpbGw6bm9uZTtzdHJva2U6I0Q4NDA0MDtzdHJva2Utd2lkdGg6MjtlbmFibGUtYmFja2dyb3VuZDpuZXcgICAgO308L3N0eWxlPjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNSwxOWMwLTMuMywyLjctNiw2LTZoNDRjNC43LDAsMjAsMTUuMywyMCwyMHY3NGMwLDMuMy0yLjcsNi02LDZIMjFjLTMuMywwLTYtMi43LTYtNlYxOXoiLz48cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTUsMTljMC0zLjMsMi43LTYsNi02aDQ0YzQuNywwLDIwLDE1LjMsMjAsMjB2NzRjMCwzLjMtMi43LDYtNiw2SDIxYy0zLjMsMC02LTIuNy02LTZWMTl6Ii8+PHBhdGggY2xhc3M9InN0MCIgZD0iTTY2LDE2YzAtMy4zLDEuOS00LjEsNC4yLTEuOGwxMy41LDEzLjVjMi4zLDIuMywxLjYsNC4yLTEuOCw0LjJINjljLTEuNywwLTMtMS4zLTMtM1YxNkw2NiwxNnoiLz48cGF0aCBjbGFzcz0ic3QxIiBkPSJNNjYsMTZjMC0zLjMsMS45LTQuMSw0LjItMS44bDEzLjUsMTMuNWMyLjMsMi4zLDEuNiw0LjItMS44LDQuMkg2OWMtMS43LDAtMy0xLjMtMy0zVjE2TDY2LDE2eiIvPjxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik02MSwxN0gyM2MtMi44LDAtNSwyLjItNSw1djciLz48cGF0aCBjbGFzcz0ic3QyIiBkPSJNNjksMTl2Ny41YzAsMS40LDEuMSwyLjUsMi41LDIuNUg3NCIvPjwvc3ZnPg==');
+                        }
 
                         .bd-installModalCi {
                             width: 40px;
@@ -95,14 +97,11 @@
                 line-height: 36px;
                 flex-grow: 1;
                 padding: 0 25px;
-            }
+                font-weight: 600;
 
-            .bd-installModalStatus {
                 &:not(.bd-err) {
                     color: #fff;
                 }
-
-                font-weight: 600;
             }
 
             .bd-button {

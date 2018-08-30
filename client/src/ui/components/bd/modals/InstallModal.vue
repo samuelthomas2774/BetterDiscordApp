@@ -51,8 +51,8 @@
         </template>
         <template v-else>
             <div slot="body" class="bd-installModalBody">
-                <span>{{alreadyInstalled ? 'Succesfully Updated!' : 'Successfully Installed!'}}</span>
-                <MiSuccess/>
+                <h3>{{alreadyInstalled ? 'Succesfully Updated!' : 'Successfully Installed!'}}</h3>
+                <MiSuccessCircle/>
             </div>
             <div slot="footer" class="bd-installModalFooter">
                 <div class="bd-button bd-ok" v-if="installed.hasSettings" @click="showSettingsModal">Settings</div>
@@ -63,7 +63,7 @@
 </template>
 <script>
     // Imports
-    import { Modal, MiExtension, MiSuccess } from '../../common';
+    import { Modal, MiExtension, MiSuccessCircle } from '../../common';
     import { PluginManager, ThemeManager, PackageInstaller, Settings } from 'modules';
 
     export default {
@@ -80,7 +80,7 @@
         },
         props: ['modal'],
         components: {
-            Modal, MiExtension, MiSuccess
+            Modal, MiExtension, MiSuccessCircle
         },
         mounted() {
             const { contentType, config } = this.modal;

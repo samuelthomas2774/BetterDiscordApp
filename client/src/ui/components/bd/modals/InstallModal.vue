@@ -40,6 +40,7 @@
             <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
         </div>
         <div v-else slot="footer" class="bd-installModalFooter">
+            <span class="bd-installModalStatus bd-ok">Verified!</span>
             <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
             <div class="bd-button bd-ok" @click="install">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
         </div>

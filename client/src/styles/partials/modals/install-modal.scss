@@ -98,9 +98,14 @@
                 flex-grow: 1;
                 padding: 0 25px;
                 font-weight: 600;
+                color: #fff;
 
-                &:not(.bd-err) {
-                    color: #fff;
+                &.bd-ok {
+                    color: $colok;
+                }
+
+                &.bd-err {
+                    color: $colerr;
                 }
             }
 

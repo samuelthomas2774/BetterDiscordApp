@@ -1,5 +1,5 @@
 <template>
-    <Modal class="bd-installModal" :headertext="modal.title" :closing="modal.closing" @close="modal.close" :noheader="true" :class="{'bd-err': !verifying && !verified, 'bd-installModalDone': installed}">
+    <Modal class="bd-installModal" :headertext="modal.title" :closing="modal.closing" @close="modal.close" :noheader="true" :class="{'bd-err': !verifying && !verified, 'bd-installModalDone': installed, 'bd-installModalFail': err}">
         <template v-if="!installed && !err">
             <div slot="body" class="bd-installModalBody">
                 <div class="bd-installModalTop">
@@ -47,7 +47,14 @@
             </div>
         </template>
         <template v-else-if="err">
-            <div slot="body" class="bd-installModalBody">{{err.message}}</div>
+            <div slot="body" class="bd-installModalBody">
+                <h3>Something went wrong :(</h3>
+                <MiError />
+            </div>
+            <div slot="footer" class="bd-installModalFooter bd-installModalErrMsg">
+                {{err.message}}
+                <span>Ctrl+Shift+I</span>
+            </div>
         </template>
         <template v-else>
             <div slot="body" class="bd-installModalBody">
@@ -63,7 +70,7 @@
 </template>
 <script>
     // Imports
-    import { Modal, MiExtension, MiSuccessCircle } from '../../common';
+    import { Modal, MiExtension, MiSuccessCircle, MiError } from '../../common';
     import { PluginManager, ThemeManager, PackageInstaller, Settings } from 'modules';
 
     export default {
@@ -80,7 +87,7 @@
         },
         props: ['modal'],
         components: {
-            Modal, MiExtension, MiSuccessCircle
+            Modal, MiExtension, MiSuccessCircle, MiError
         },
         mounted() {
             const { contentType, config } = this.modal;

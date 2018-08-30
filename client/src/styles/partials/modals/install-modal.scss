@@ -179,4 +179,53 @@
             }
         }
     }
+
+    &.bd-installModalFail {
+        .bd-modalInner {
+            min-width: 400px;
+            max-width: 400px;
+            height: 250px;
+            border: 2px solid $colerr;
+
+            .bd-installModalBody {
+                display: flex;
+                flex-grow: 1;
+                align-content: center;
+                justify-content: center;
+                align-items: center;
+
+                h3 {
+                    color: $colerr;
+                    font-size: 1.2em;
+                    font-weight: 700;
+                    text-align: center;
+                    padding: 20px;
+                }
+            }
+
+            .bd-materialDesignIcon {
+                svg {
+                    fill: $colerr;
+                    width: 100px;
+                    height: 100px;
+                }
+            }
+
+            .bd-installModalFooter {
+
+                &.bd-installModalErrMsg {
+                    justify-content: flex-start;
+                    padding: 10px;
+                    background: rgba(0, 0, 0, .2);
+                    font-weight: 700;
+
+                    span {
+                        color: #fff;
+                        flex-grow: 1;
+                        text-align: right;
+                    }
+                }
+            }
+        }
+    }
 }

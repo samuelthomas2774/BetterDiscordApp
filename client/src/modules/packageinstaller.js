@@ -67,11 +67,12 @@ export default class PackageInstaller {
      * @param {Boolean} update Does an older version already exist
      */
     static async installPackage(bytesOrPath, id, update = false) {
+        let outputPath = null;
         try {
             const bytes = typeof bytesOrPath === 'string' ? fs.readFileSync(bytesOrPath) : bytesOrPath;
 
             const outputName = `${id}.bd`;
-            const outputPath = path.join(Globals.getPath('plugins'), outputName);
+            outputPath = path.join(Globals.getPath('plugins'), outputName);
             fs.writeFileSync(outputPath, bytes);
 
             let newContent = null;
@@ -96,6 +97,11 @@ export default class PackageInstaller {
 
             return PluginManager.reloadContent(oldContent);
         } catch (err) {
+            if (outputPath) {
+                rimraf(outputPath, err => {
+                    if (err) console.log(err);
+                });
+            }
             throw err;
         }
     }

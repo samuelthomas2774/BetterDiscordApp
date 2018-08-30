@@ -104,7 +104,6 @@
                 try {
                     const installed = await PackageInstaller.installPackage(this.modal.filePath, this.modal.config.info.id, this.alreadyInstalled);
                     this.installed = installed;
-                    console.log(this.installed);
                 } catch (err) {
                     console.log(err);
                     this.err = err;

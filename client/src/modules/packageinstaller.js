@@ -2,6 +2,7 @@ import EventListener from './eventlistener';
 import asar from 'asar';
 import fs from 'fs';
 import path from 'path';
+import rimraf from 'rimraf';
 
 import { Modals } from 'ui';
 import { Utils } from 'common';
@@ -75,14 +76,25 @@ export default class PackageInstaller {
 
             let newContent = null;
 
-            if (!update) {
-                newContent = await PluginManager.preloadPackedContent(outputName);
-            } else {
-                newContent = await PluginManager.reloadContent(PluginManager.getPluginById(id));
+            const oldContent = await PluginManager.reloadContent(PluginManager.getPluginById(id));
+
+            if (update && oldContent.packed && oldContent.packageName !== id) {
+                await oldContent.unload(true);
+                rimraf(oldContent.packed.packagePath, err => {
+                    if(err) console.log(err);
+                });
+                return PluginManager.preloadPackedContent(outputName);
             }
 
-            return newContent;
+            if (update && !oldContent.packed) {
+                await oldContent.unload(true);
+                rimraf(oldContent.contentPath, err => {
+                    if (err) console.log(err);
+                });
+                return PluginManager.preloadPackedContent(outputName);
+            }
 
+            return PluginManager.reloadContent(oldContent);
         } catch (err) {
             throw err;
         }

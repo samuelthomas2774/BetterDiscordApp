@@ -502,30 +502,6 @@ export class ReactAutoPatcher {
     }
 
     static async patchUploadArea() {
-        const { selector } = Reflection.resolve('uploadArea');
-        this.UploadArea = await ReactComponents.getComponent('UploadArea', {selector});
-
-        const reflect = Reflection.DOM(selector);
-        const stateNode = reflect.getComponentStateNode(this.UploadArea);
-        const callback = function (e) {
-            if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return;
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            stateNode.clearDragging();
-
-            PackageInstaller.installPackageDragAndDrop(e.dataTransfer.files[0], DiscordApi.currentChannel.id);
-
-            // Events.emit('install-pkg', e.dataTransfer.files[0], DiscordApi.currentChannel.id);
-        };
-
-        // Remove their handler, add ours, then read theirs to give ours priority to stop theirs when we get a .bd file.
-        reflect.element.removeEventListener('drop', stateNode.handleDrop);
-        reflect.element.addEventListener('drop', callback);
-        reflect.element.addEventListener('drop', stateNode.handleDrop);
-
-        this.unpatchUploadArea = function() {
-            reflect.element.removeEventListener('drop', callback);
-        };
+        PackageInstaller.uploadAreaPatch();
     }
 }

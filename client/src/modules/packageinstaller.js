@@ -8,30 +8,40 @@ import { Utils } from 'common';
 import PluginManager from './pluginmanager';
 import Globals from './globals';
 import Security from './security';
+import { ReactComponents } from './reactcomponents';
+import Reflection from './reflection';
+import DiscordApi from './discordapi';
 
-export default class {
+export default class PackageInstaller {
 
-    static async installPackageDragAndDrop(pkg, upload) {
+    /**
+     * Handler for drag and drop package install
+     * @param {String} filePath Path to local file
+     * @param {String} channelId Current channel id
+     */
+    static async dragAndDropHandler(filePath, channelId) {
         try {
-            const config = JSON.parse(asar.extractFile(pkg.path, 'config.json').toString());
+            const config = JSON.parse(asar.extractFile(filePath, 'config.json').toString());
             const { info, main } = config;
 
             let icon = null;
             if (info.icon && info.icon_type) {
-                const extractIcon = asar.extractFile(pkg.path, info.icon);
+                const extractIcon = asar.extractFile(filePath, info.icon);
                 icon = `data:${info.icon_type};base64,${Utils.arrayBufferToBase64(extractIcon)}`;
             }
 
             const isPlugin = info.type && info.type === 'plugin' || main.endsWith('.js');
 
             // Show install modal
-            const modalResult = await Modals.installModal(isPlugin ? 'plugin' : 'theme', config, pkg.path, icon).promise;
+            const modalResult = await Modals.installModal(isPlugin ? 'plugin' : 'theme', config, filePath, icon).promise;
 
             if (modalResult === 0) {
                 // Upload it instead
             }
 
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     /**
@@ -67,6 +77,35 @@ export default class {
         }
 
         return PluginManager.reloadContent(PluginManager.getPluginById(id));
+    }
+
+    /**
+     * Patches Discord upload area for .bd files
+     */
+    static async uploadAreaPatch() {
+        const { selector } = Reflection.resolve('uploadArea');
+        this.UploadArea = await ReactComponents.getComponent('UploadArea', { selector });
+
+        const reflect = Reflection.DOM(selector);
+        const stateNode = reflect.getComponentStateNode(this.UploadArea);
+        const callback = function (e) {
+            if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            stateNode.clearDragging();
+
+            PackageInstaller.dragAndDropHandler(e.dataTransfer.files[0].path, DiscordApi.currentChannel.id);
+        };
+
+        // Remove their handler, add ours, then read theirs to give ours priority to stop theirs when we get a .bd file.
+        reflect.element.removeEventListener('drop', stateNode.handleDrop);
+        reflect.element.addEventListener('drop', callback);
+        reflect.element.addEventListener('drop', stateNode.handleDrop);
+
+        this.unpatchUploadArea = function () {
+            reflect.element.removeEventListener('drop', callback);
+        };
     }
 
 }

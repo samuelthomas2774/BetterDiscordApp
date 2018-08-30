@@ -15,7 +15,7 @@ import { Utils, Filters, ClientLogger as Logger } from 'common';
 import { MonkeyPatch } from './patcher';
 import Reflection from './reflection/index';
 import DiscordApi from './discordapi';
-import Events from './events';
+import PackageInstaller from './packageinstaller';
 
 class Helpers {
     static get plannedActions() {
@@ -514,7 +514,9 @@ export class ReactAutoPatcher {
             e.stopImmediatePropagation();
             stateNode.clearDragging();
 
-            Events.emit('install-pkg', e.dataTransfer.files[0], DiscordApi.currentChannel.id);
+            PackageInstaller.installPackageEvent(e.dataTransfer.files[0], DiscordApi.currentChannel.id);
+
+            // Events.emit('install-pkg', e.dataTransfer.files[0], DiscordApi.currentChannel.id);
         };
 
         // Remove their handler, add ours, then read theirs to give ours priority to stop theirs when we get a .bd file.

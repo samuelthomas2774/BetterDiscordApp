@@ -12,7 +12,6 @@ import { ClientLogger as Logger } from 'common';
 import { SocketProxy, EventHook, CssEditor } from 'modules';
 import { ProfileBadges, ClassNormaliser } from 'ui';
 import Updater from './updater';
-import PackageInstaller from './packageinstaller';
 
 /**
  * Module Manager initializes all modules when everything is ready
@@ -29,8 +28,7 @@ export default class {
             new SocketProxy(),
             new EventHook(),
             CssEditor,
-            Updater,
-            new PackageInstaller()
+            Updater
         ]);
     }
 

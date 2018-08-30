@@ -35,14 +35,14 @@
         </div>
         <div v-else slot="footer" class="bd-installModalFooter">
             <div class="bd-button bd-ok" @click="modal.confirm(0); modal.close();">Upload</div>
-            <div class="bd-button bd-ok" @click="modal.confirm(); modal.close();">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
+            <div class="bd-button bd-ok" @click="install">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
         </div>
     </Modal>
 </template>
 <script>
     // Imports
     import { Modal, MiExtension } from '../../common';
-    import { PluginManager, ThemeManager } from 'modules';
+    import { PluginManager, ThemeManager, PackageInstaller } from 'modules';
 
     export default {
         data() {
@@ -73,6 +73,14 @@
                 this.verifying = false;
             }, 2000);
 
+        },
+        methods: {
+            async install() {
+                const installed = await PackageInstaller.installPackage(this.modal.config.path, this.modal.config.info.name, this.alreadyInstalled);
+                console.log(installed);
+                this.modal.confirm();
+                this.modal.close();
+            }
         }
     }
 </script>

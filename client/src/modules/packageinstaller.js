@@ -7,6 +7,7 @@ import { Modals } from 'ui';
 import { Utils } from 'common';
 import PluginManager from './pluginmanager';
 import Globals from './globals';
+import Security from './security';
 
 export default class {
 
@@ -57,6 +58,19 @@ export default class {
         } catch (err) {}
     }
 
+    /**
+     * Hash and verify a package
+     * @param {Byte[]|String} bytesOrPath byte array of binary or path to local file
+     */
+    static async verifyPackage(bytesOrPath) {
+        const bytes = typeof bytesOrPath === 'string' ? fs.readFileSync(bytesOrPath) : bytesOrPath;
+        // Temporary hash to simulate response from server
+        const tempVerified = '2e3532ee366816adc37b0f478bfef35e03f96e7aeee9b115f5918ef6a4e94de8';
+        const hashBytes = Security.hash('sha256', bytes, 'hex');
+
+        return hashBytes === tempVerified;
+    }
+
     // TODO lots of stuff
     /**
      * Installs or updates defined package
@@ -66,6 +80,7 @@ export default class {
      */
     static async installPackage(bytesOrPath, name, update = false) {
         const bytes = typeof bytesOrPath === 'string' ? fs.readFileSync(bytesOrPath) : bytesOrPath;
+
         const outputPath = path.join(Globals.getPath('plugins'), `${name}.bd`);
         fs.writeFileSync(outputPath, bytes);
 

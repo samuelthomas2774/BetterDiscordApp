@@ -30,6 +30,9 @@
         <div v-if="verifying" slot="footer" class="bd-installModalFooter">
             <span class="bd-installModalStatus">Verifying {{this.modal.contentType}}</span>
         </div>
+        <div v-else-if="!verified" slot="footer" class="bd-installModalFooter">
+            <span class="bd-installModalStatus">Not verified!</span>
+        </div>
         <div v-else-if="alreadyInstalled && upToDate" slot="footer" class="bd-installModalFooter">
             <span class="bd-installModalStatus">Up to date version already installed!</span>
         </div>
@@ -67,14 +70,14 @@
                     this.upToDate = false;
                 }
             }
-
-            // TODO Verify
-            setTimeout(() => {
-                this.verifying = false;
-            }, 2000);
-
+            this.verify();
         },
         methods: {
+            async verify() {
+                const verified = await PackageInstaller.verifyPackage(this.modal.config.path);
+                this.verified = verified;
+                this.verifying = false;
+            },
             async install() {
                 const installed = await PackageInstaller.installPackage(this.modal.config.path, this.modal.config.info.name, this.alreadyInstalled);
                 console.log(installed);

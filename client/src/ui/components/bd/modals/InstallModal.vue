@@ -1,13 +1,13 @@
 <template>
-    <Modal class="bd-installModal" :headertext="modal.title" :closing="modal.closing" @close="modal.close" :noheader="true">
+    <Modal class="bd-installModal" :headertext="modal.title" :closing="modal.closing" @close="modal.close" :noheader="true" :class="{'bd-err': !verifying && !verified}">
         <div slot="body" class="bd-installModalBody">
             <div class="bd-installModalTop">
                 <div class="bd-installModalIcon">
-                    <div v-if="modal.config.iconEncoded" class="bd-installModalCi" :style="{backgroundImage: `url(${modal.config.iconEncoded})`}"/>
+                    <div v-if="modal.icon" class="bd-installModalCi" :style="{backgroundImage: `url(${modal.icon})`}"/>
                     <MiExtension v-else/>
                 </div>
                 <div class="bd-installModalInfo">
-                    <span>{{modal.config.info.name}} v{{modal.config.info.version.toString()}} by {{modal.config.info.authors.map(a => a.name).join(', ')}}</span>
+                    <span>{{modal.config.info.name}} v{{modal.config.info.version}} by {{modal.config.info.authors.map(a => a.name).join(', ')}}</span>
                     <div class="bd-installModalDesc">
                         {{modal.config.info.description}}
                     </div>
@@ -28,16 +28,19 @@
             </div>
         </div>
         <div v-if="verifying" slot="footer" class="bd-installModalFooter">
-            <span class="bd-installModalStatus">Verifying {{this.modal.contentType}}</span>
+            <span class="bd-installModalStatus">Verifying {{modal.contentType}}</span>
         </div>
         <div v-else-if="!verified" slot="footer" class="bd-installModalFooter">
-            <span class="bd-installModalStatus">Not verified!</span>
+            <span class="bd-installModalStatus bd-err">Not verified!</span>
+            <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
+            <div class="bd-button bd-err" @click="install" v-if="allowUnsafe">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
         </div>
         <div v-else-if="alreadyInstalled && upToDate" slot="footer" class="bd-installModalFooter">
             <span class="bd-installModalStatus">Up to date version already installed!</span>
+            <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
         </div>
         <div v-else slot="footer" class="bd-installModalFooter">
-            <div class="bd-button bd-ok" @click="modal.confirm(0); modal.close();">Upload</div>
+            <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
             <div class="bd-button bd-ok" @click="install">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
         </div>
     </Modal>
@@ -45,7 +48,7 @@
 <script>
     // Imports
     import { Modal, MiExtension } from '../../common';
-    import { PluginManager, ThemeManager, PackageInstaller } from 'modules';
+    import { PluginManager, ThemeManager, PackageInstaller, Settings } from 'modules';
 
     export default {
         data() {
@@ -53,7 +56,8 @@
                 installing: false,
                 verifying: true,
                 alreadyInstalled: false,
-                upToDate: true
+                upToDate: true,
+                allowUnsafe: Settings.getSetting('security', 'default', 'unsafe-content').value
             }
         },
         props: ['modal'],
@@ -74,12 +78,12 @@
         },
         methods: {
             async verify() {
-                const verified = await PackageInstaller.verifyPackage(this.modal.config.path);
+                const verified = await PackageInstaller.verifyPackage(this.modal.filePath);
                 this.verified = verified;
                 this.verifying = false;
             },
             async install() {
-                const installed = await PackageInstaller.installPackage(this.modal.config.path, this.modal.config.info.name, this.alreadyInstalled);
+                const installed = await PackageInstaller.installPackage(this.modal.filePath, this.modal.config.info.id, this.alreadyInstalled);
                 console.log(installed);
                 this.modal.confirm();
                 this.modal.close();

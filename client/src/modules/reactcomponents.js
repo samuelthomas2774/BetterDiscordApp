@@ -514,7 +514,7 @@ export class ReactAutoPatcher {
             e.stopImmediatePropagation();
             stateNode.clearDragging();
 
-            PackageInstaller.installPackageEvent(e.dataTransfer.files[0], DiscordApi.currentChannel.id);
+            PackageInstaller.installPackageDragAndDrop(e.dataTransfer.files[0], DiscordApi.currentChannel.id);
 
             // Events.emit('install-pkg', e.dataTransfer.files[0], DiscordApi.currentChannel.id);
         };

@@ -1,5 +1,11 @@
 .bd-installModal {
 
+    &.bd-err {
+        .bd-modalInner {
+            border: 2px solid $colerr;
+        }
+    }
+
     .bd-modalInner {
         min-width: 520px;
         min-height: 200px;
@@ -85,7 +91,17 @@
             background: rgba(0, 0, 0, .1);
 
             .bd-installModalStatus {
-                color: #fff;
+                height: 36px;
+                line-height: 36px;
+                flex-grow: 1;
+                padding: 0 25px;
+            }
+
+            .bd-installModalStatus {
+                &:not(.bd-err) {
+                    color: #fff;
+                }
+
                 font-weight: 600;
             }
 
@@ -94,14 +110,21 @@
                 padding: 10px;
                 border-radius: 3px;
                 min-width: 100px;
-                background: #3ecc9c;
                 transition: opacity .2s ease-in-out;
+
+                &.bd-ok {
+                    background: #3ecc9c;
+                }
+
+                &.bd-err {
+                    color: #fff;
+                }
 
                 &:hover {
                     opacity: .8;
                 }
 
-                &:first-child {
+                &.bd-installModalUpload {
                     background: transparent;
                     transition: none;
 

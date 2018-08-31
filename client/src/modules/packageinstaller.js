@@ -77,7 +77,7 @@ export default class PackageInstaller {
             fs.writeFileSync(outputPath, bytes);
 
             if (!update) return PluginManager.preloadPackedContent(outputName);
-            
+
             const oldContent = PluginManager.getPluginById(id);
 
             if (update && oldContent.packed && oldContent.packed.packageName !== id) {

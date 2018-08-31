@@ -17,6 +17,7 @@ import ErrorModal from './components/bd/modals/ErrorModal.vue';
 import SettingsModal from './components/bd/modals/SettingsModal.vue';
 import PermissionModal from './components/bd/modals/PermissionModal.vue';
 import InputModal from './components/bd/modals/InputModal.vue';
+import InstallModal from './components/bd/modals/InstallModal.vue';
 
 let modals = 0;
 
@@ -188,6 +189,19 @@ export default class Modals {
             modal.beforeClose = () => reject();
         });
         return new Modal(modal, InputModal);
+    }
+
+    static installModal(contentType, config, filePath, icon) {
+        return this.add(this.createInstallModal(contentType, config, filePath, icon));
+    }
+
+    static createInstallModal(contentType, config, filePath, icon) {
+        const modal = { contentType, config, filePath, icon };
+        modal.promise = new Promise((resolve, reject) => {
+            modal.confirm = value => resolve(value);
+            modal.beforeClose = () => reject();
+        });
+        return new Modal(modal, InstallModal);
     }
 
     /**

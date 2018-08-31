@@ -10,7 +10,7 @@
                 "twitter_username": "Jiiksi"
             }
         ],
-        "version": 1.0,
+        "version": "1.0",
         "description": "Example for rendering stuff"
     },
     "main": "index.js"

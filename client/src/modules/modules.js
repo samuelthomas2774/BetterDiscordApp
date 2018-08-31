@@ -27,3 +27,4 @@ export { default as Connectivity } from './connectivity';
 export { default as Security } from './security';
 export { default as Cache } from './cache';
 export { default as Reflection } from './reflection/index';
+export { default as PackageInstaller } from './packageinstaller';

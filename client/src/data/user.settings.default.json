@@ -223,6 +223,13 @@
                 "id": "default",
                 "settings": [
                     {
+                        "id": "unsafe-content",
+                        "type": "bool",
+                        "text": "Allow unverified content",
+                        "hint": "Allow loading unverified plugins/themes",
+                        "value": "false"
+                    },
+                    {
                         "id": "tracking-protection",
                         "type": "bool",
                         "text": "Tracking Protection",

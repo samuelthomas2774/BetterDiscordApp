@@ -12,6 +12,7 @@
     <Card :item="plugin">
         <SettingSwitch v-if="plugin.type === 'plugin'" slot="toggle" :value="plugin.enabled" @input="$emit('toggle-plugin')" />
         <ButtonGroup slot="controls">
+            <Button v-if="devmode && !plugin.packed" v-tooltip="'Package Plugin'" @click="package"><MiBoxDownload size="18"/></Button>
             <Button v-tooltip="'Settings (shift + click to open settings without cloning the set)'" v-if="plugin.hasSettings" @click="$emit('show-settings', $event.shiftKey)"><MiSettings size="18" /></Button>
             <Button v-tooltip="'Reload'" @click="$emit('reload-plugin')"><MiRefresh size="18" /></Button>
             <Button v-tooltip="'Edit'" @click="editPlugin"><MiPencil size="18" /></Button>
@@ -22,18 +23,47 @@
 
 <script>
     // Imports
+    import asar from 'asar';
+    import electron from 'electron';
+    import fs from 'fs';
+    import { Toasts } from 'ui';
+    import { Settings } from 'modules';
     import { ClientLogger as Logger } from 'common';
     import { shell } from 'electron';
     import Card from './Card.vue';
-    import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension } from '../common';
+    import { Button, ButtonGroup, SettingSwitch, MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension, MiBoxDownload } from '../common';
 
     export default {
+        data() {
+            return {
+                devmode: Settings.getSetting('core', 'advanced', 'developer-mode').value
+            }
+        },
         props: ['plugin'],
         components: {
             Card, Button, ButtonGroup, SettingSwitch,
-            MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension
+            MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension, MiBoxDownload
         },
         methods: {
+            package() {
+                electron.remote.dialog.showSaveDialog({
+                    title: 'Save Plugin Package',
+                    defaultPath: this.plugin.name,
+                    filters: [
+                        {
+                            name: 'BetterDiscord Package',
+                            extensions: ['bd']
+                        }
+                    ]
+                }, filepath => {
+                    if (!filepath) return;
+
+                    asar.uncache(filepath);
+                    asar.createPackage(this.plugin.contentPath, filepath, () => {
+                        Toasts.success('Plugin Packaged!');
+                    });
+                });
+            },
             editPlugin() {
                 try {
                     shell.openItem(this.plugin.contentPath);

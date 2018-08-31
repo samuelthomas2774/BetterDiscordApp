@@ -22,3 +22,5 @@ export { default as MiLock } from './materialicons/Lock.vue';
 export { default as MiImagePlus } from './materialicons/ImagePlus.vue';
 export { default as MiIcVpnKey } from './materialicons/IcVpnKey.vue';
 export { default as MiArrowLeft } from './materialicons/ArrowLeft.vue';
+export { default as MiBoxDownload } from './materialicons/BoxDownload.vue';
+export { default as MiSuccessCircle } from './materialicons/SuccessCircle.vue';

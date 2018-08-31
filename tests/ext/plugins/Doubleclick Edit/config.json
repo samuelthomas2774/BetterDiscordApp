@@ -10,7 +10,7 @@
                 "twitter_username": "Jiiksi"
             }
         ],
-        "version": 1.0,
+        "version": "1.0,"
         "description": "Edit messages by double clicking them. This is a v1 fix"
     },
     "main": "index.js"

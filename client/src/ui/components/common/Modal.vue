@@ -11,7 +11,7 @@
 <template>
     <div :class="['bd-modal', {'bd-modalOut': closing, 'bd-modalScrolled': scrolled}]">
         <div class="bd-modalInner">
-            <div class="bd-modalHeader">
+            <div class="bd-modalHeader" v-if="!noheader">
                 <slot name="header">
                     <div v-if="$slots.icon" class="bd-modalIcon">
                         <slot name="icon" />
@@ -41,7 +41,7 @@
     import { MiClose } from './MaterialIcon';
 
     export default {
-        props: ['headertext', 'closing'],
+        props: ['headertext', 'closing', 'noheader'],
         components: {
             MiClose
         },

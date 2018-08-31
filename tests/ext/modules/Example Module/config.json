@@ -2,7 +2,7 @@
     "info": {
         "name": "Example Module",
         "authors": [ "Jiiks" ],
-        "version": 1.0,
+        "version": "1.0",
         "description": "Module Example"
     },
     "main": "index.js",

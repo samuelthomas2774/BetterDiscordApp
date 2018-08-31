@@ -11,7 +11,7 @@
                 "twitter_username": "_samuelelliott"
             }
         ],
-        "version": 1.0,
+        "version": "1.0",
         "description": "Plugin for testing array setting events as the first example plugin has a lot of stuff in it now."
     },
     "main": "index.js",

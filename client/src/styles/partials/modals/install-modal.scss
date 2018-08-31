@@ -1,0 +1,231 @@
+.bd-installModal {
+
+    .bd-modalInner {
+        min-width: 520px;
+        min-height: 200px;
+
+        @at-root .bd-err#{&} {
+            border: 2px solid $colerr;
+        }
+
+        .bd-modalBody {
+            flex-grow: 1;
+            padding: 0;
+
+            .bd-installModalBody {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+
+                .bd-installModalTop {
+                    padding: 0 15px;
+                    display: flex;
+                    height: 100px;
+
+                    span {
+                        font-weight: 700;
+                    }
+
+                    .bd-installModalIcon {
+                        background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEzMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTAwIDEzMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+LnN0MHtmaWxsOiNGNEY2RkM7fS5zdDF7ZmlsbDpub25lO3N0cm9rZTojMzYzOTNFO3N0cm9rZS13aWR0aDoyO30uc3Qye29wYWNpdHk6MC42O2ZpbGw6bm9uZTtzdHJva2U6IzM2MzkzRTtzdHJva2Utd2lkdGg6MjtlbmFibGUtYmFja2dyb3VuZDpuZXcgICAgO308L3N0eWxlPjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNSwxOWMwLTMuMywyLjctNiw2LTZoNDRjNC43LDAsMjAsMTUuMywyMCwyMHY3NGMwLDMuMy0yLjcsNi02LDZIMjFjLTMuMywwLTYtMi43LTYtNlYxOXoiLz48cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTUsMTljMC0zLjMsMi43LTYsNi02aDQ0YzQuNywwLDIwLDE1LjMsMjAsMjB2NzRjMCwzLjMtMi43LDYtNiw2SDIxYy0zLjMsMC02LTIuNy02LTZWMTl6Ii8+PHBhdGggY2xhc3M9InN0MCIgZD0iTTY2LDE2YzAtMy4zLDEuOS00LjEsNC4yLTEuOGwxMy41LDEzLjVjMi4zLDIuMywxLjYsNC4yLTEuOCw0LjJINjljLTEuNywwLTMtMS4zLTMtM1YxNkw2NiwxNnoiLz48cGF0aCBjbGFzcz0ic3QxIiBkPSJNNjYsMTZjMC0zLjMsMS45LTQuMSw0LjItMS44bDEzLjUsMTMuNWMyLjMsMi4zLDEuNiw0LjItMS44LDQuMkg2OWMtMS43LDAtMy0xLjMtMy0zVjE2TDY2LDE2eiIvPjxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik02MSwxN0gyM2MtMi44LDAtNSwyLjItNSw1djciLz48cGF0aCBjbGFzcz0ic3QyIiBkPSJNNjksMTl2Ny41YzAsMS40LDEuMSwyLjUsMi41LDIuNUg3NCIvPjwvc3ZnPg==');
+                        background-size: 100% 100%;
+                        flex-shrink: 0;
+                        width: 100px;
+                        height: 130px;
+                        position: fixed;
+                        border-radius: 3px;
+                        margin-top: -30px;
+                        display: flex;
+                        align-content: center;
+                        justify-content: center;
+                        align-items: center;
+                        justify-items: center;
+
+                        @at-root .bd-err#{&} {
+                            background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEzMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTAwIDEzMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+LnN0MHtmaWxsOiNGNEY2RkM7fS5zdDF7ZmlsbDpub25lO3N0cm9rZTojRDg0MDQwO3N0cm9rZS13aWR0aDoyO30uc3Qye29wYWNpdHk6MC42O2ZpbGw6bm9uZTtzdHJva2U6I0Q4NDA0MDtzdHJva2Utd2lkdGg6MjtlbmFibGUtYmFja2dyb3VuZDpuZXcgICAgO308L3N0eWxlPjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNSwxOWMwLTMuMywyLjctNiw2LTZoNDRjNC43LDAsMjAsMTUuMywyMCwyMHY3NGMwLDMuMy0yLjcsNi02LDZIMjFjLTMuMywwLTYtMi43LTYtNlYxOXoiLz48cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTUsMTljMC0zLjMsMi43LTYsNi02aDQ0YzQuNywwLDIwLDE1LjMsMjAsMjB2NzRjMCwzLjMtMi43LDYtNiw2SDIxYy0zLjMsMC02LTIuNy02LTZWMTl6Ii8+PHBhdGggY2xhc3M9InN0MCIgZD0iTTY2LDE2YzAtMy4zLDEuOS00LjEsNC4yLTEuOGwxMy41LDEzLjVjMi4zLDIuMywxLjYsNC4yLTEuOCw0LjJINjljLTEuNywwLTMtMS4zLTMtM1YxNkw2NiwxNnoiLz48cGF0aCBjbGFzcz0ic3QxIiBkPSJNNjYsMTZjMC0zLjMsMS45LTQuMSw0LjItMS44bDEzLjUsMTMuNWMyLjMsMi4zLDEuNiw0LjItMS44LDQuMkg2OWMtMS43LDAtMy0xLjMtMy0zVjE2TDY2LDE2eiIvPjxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik02MSwxN0gyM2MtMi44LDAtNSwyLjItNSw1djciLz48cGF0aCBjbGFzcz0ic3QyIiBkPSJNNjksMTl2Ny41YzAsMS40LDEuMSwyLjUsMi41LDIuNUg3NCIvPjwvc3ZnPg==');
+                        }
+
+                        .bd-installModalCi {
+                            width: 40px;
+                            height: 40px;
+                        }
+
+                        svg {
+                            fill: #36393e;
+                            width: 40px;
+                            height: 40px;
+                        }
+                    }
+
+                    .bd-installModalInfo {
+                        display: flex;
+                        flex-grow: 1;
+                        flex-direction: column;
+                        padding: 15px 10px;
+                        margin-left: 100px;
+                    }
+
+                    .bd-installModalDesc {
+                        margin-top: 5px;
+                    }
+                }
+
+
+                .bd-installModalBottom {
+                    padding: 0 15px;
+                    flex-grow: 1;
+
+                    .bd-permScope {
+                        &:last-child {
+                            .bd-permInner {
+                                border: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .bd-installModalFooter {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+            background: rgba(0, 0, 0, .1);
+
+            .bd-installModalStatus {
+                height: 36px;
+                line-height: 36px;
+                flex-grow: 1;
+                padding: 0 25px;
+                font-weight: 600;
+                color: #fff;
+
+                &.bd-ok {
+                    color: $colok;
+                }
+
+                &.bd-err {
+                    color: $colerr;
+                }
+            }
+
+            .bd-button {
+                font-size: 16px;
+                padding: 10px;
+                border-radius: 3px;
+                min-width: 100px;
+                transition: opacity .2s ease-in-out;
+
+                &.bd-ok {
+                    background: #3ecc9c;
+                }
+
+                &.bd-err {
+                    color: #fff;
+                }
+
+                &:hover {
+                    opacity: .8;
+                }
+
+                &.bd-installModalUpload {
+                    background: transparent;
+                    transition: none;
+
+                    &:hover {
+                        opacity: 1;
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+
+    &.bd-installModalDone {
+        .bd-modalInner {
+            min-width: 400px;
+            max-width: 400px;
+            height: 250px;
+            border: 2px solid $colok;
+
+            .bd-installModalBody {
+                display: flex;
+                flex-grow: 1;
+                align-content: center;
+                justify-content: center;
+                align-items: center;
+
+                h3 {
+                    color: $colok;
+                    font-size: 1.2em;
+                    font-weight: 700;
+                    text-align: center;
+                    padding: 20px;
+                }
+            }
+
+            .bd-materialDesignIcon {
+                svg {
+                    fill: $colok;
+                    width: 100px;
+                    height: 100px;
+                }
+            }
+
+            .bd-installModalFooter {
+                .bd-button {
+                    margin-left: 5px;
+                }
+            }
+        }
+    }
+
+    &.bd-installModalFail {
+        .bd-modalInner {
+            min-width: 400px;
+            max-width: 400px;
+            height: 250px;
+            border: 2px solid $colerr;
+
+            .bd-installModalBody {
+                display: flex;
+                flex-grow: 1;
+                align-content: center;
+                justify-content: center;
+                align-items: center;
+
+                h3 {
+                    color: $colerr;
+                    font-size: 1.2em;
+                    font-weight: 700;
+                    text-align: center;
+                    padding: 20px;
+                }
+            }
+
+            .bd-materialDesignIcon {
+                svg {
+                    fill: $colerr;
+                    width: 100px;
+                    height: 100px;
+                }
+            }
+
+            .bd-installModalFooter {
+
+                &.bd-installModalErrMsg {
+                    justify-content: flex-start;
+                    padding: 10px;
+                    background: rgba(0, 0, 0, .2);
+                    font-weight: 700;
+
+                    span {
+                        color: #fff;
+                        flex-grow: 1;
+                        text-align: right;
+                    }
+                }
+            }
+        }
+    }
+}

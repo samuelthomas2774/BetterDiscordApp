@@ -80,7 +80,7 @@ export default class PackageInstaller {
             
             const oldContent = PluginManager.getPluginById(id);
 
-            if (update && oldContent.packed && oldContent.packageName !== id) {
+            if (update && oldContent.packed && oldContent.packed.packageName !== id) {
                 await oldContent.unload(true);
                 rimraf(oldContent.packed.packagePath, err => {
                     if(err) console.log(err);

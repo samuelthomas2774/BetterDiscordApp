@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import rimraf from 'rimraf';
 
+import { request } from 'vendor';
 import { Modals } from 'ui';
 import { Utils } from 'common';
 import PluginManager from './pluginmanager';
@@ -75,15 +76,16 @@ export default class PackageInstaller {
             outputPath = path.join(Globals.getPath('plugins'), outputName);
             fs.writeFileSync(outputPath, bytes);
 
-            let newContent = null;
-
-            const oldContent = await PluginManager.reloadContent(PluginManager.getPluginById(id));
+            if (!update) return PluginManager.preloadPackedContent(outputName);
+            
+            const oldContent = PluginManager.getPluginById(id);
 
             if (update && oldContent.packed && oldContent.packageName !== id) {
                 await oldContent.unload(true);
                 rimraf(oldContent.packed.packagePath, err => {
                     if(err) console.log(err);
                 });
+
                 return PluginManager.preloadPackedContent(outputName);
             }
 
@@ -92,6 +94,7 @@ export default class PackageInstaller {
                 rimraf(oldContent.contentPath, err => {
                     if (err) console.log(err);
                 });
+
                 return PluginManager.preloadPackedContent(outputName);
             }
 
@@ -102,6 +105,37 @@ export default class PackageInstaller {
                     if (err) console.log(err);
                 });
             }
+            throw err;
+        }
+    }
+
+    /**
+     * Install package from remote location. Only github/bdapi is supoorted.
+     * @param {String} remoteLocation Remote resource location
+     */
+    static async installRemotePackage(remoteLocation) {
+        try {
+            const { hostname } = Object.assign(document.createElement('a'), { href: remoteLocation });
+            if (hostname !== 'api.github.com' && hostname !== 'secretbdapi') throw 'Invalid host!';
+
+            const options = {
+                uri: remoteLocation,
+                headers: {
+                    'User-Agent': 'BetterDiscordClient',
+                    'Accept': 'application/octet-stream'
+                }
+            };
+
+            const response = await request.get(options);
+            const outputPath = path.join(Globals.getPath('tmp'), Security.hash('sha256', response, 'hex'));
+            fs.writeFileSync(outputPath, response);
+
+            await this.dragAndDropHandler(outputPath);
+
+            rimraf(outputPath, err => {
+                if (err) console.log(err);
+            });
+        } catch (err) {
             throw err;
         }
     }

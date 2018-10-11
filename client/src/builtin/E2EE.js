@@ -236,7 +236,7 @@ export default new class E2EE extends BuiltinModule {
     }
 
     async patchMessageContent() {
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
+        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector }, m => m.defaultProps && m.defaultProps.hasOwnProperty('disableButtons'));
         this.patch(MessageContent.component.prototype, 'render', this.beforeRenderMessageContent, 'before');
         this.patch(MessageContent.component.prototype, 'render', this.afterRenderMessageContent);
 

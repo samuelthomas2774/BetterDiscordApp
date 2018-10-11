@@ -226,7 +226,7 @@ export default new class EmoteModule extends BuiltinModule {
      * Patches MessageContent render method
      */
     async patchMessageContent() {
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
+        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector }, m => m.defaultProps && m.defaultProps.hasOwnProperty('disableButtons'));
         this.patch(MessageContent.component.prototype, 'render', this.afterRenderMessageContent);
         MessageContent.forceUpdateAll();
     }

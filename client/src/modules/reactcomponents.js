@@ -131,7 +131,8 @@ class Helpers {
     static findByProp(obj, what, value) {
         if (obj.hasOwnProperty(what) && obj[what] === value) return obj;
         if (obj.props && !obj.children) return this.findByProp(obj.props, what, value);
-        if (!obj.children || !obj.children.length) return null;
+        if (!obj.children) return null;
+        if (!(obj.children instanceof Array)) return this.findByProp(obj.children, what, value);
         for (const child of obj.children) {
             if (!child) continue;
             const findInChild = this.findByProp(child, what, value);

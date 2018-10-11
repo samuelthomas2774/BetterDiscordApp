@@ -10,7 +10,7 @@
 
 import path from 'path';
 import sass from 'node-sass';
-import { BrowserWindow, dialog, session } from 'electron';
+import { BrowserWindow as OriginalBrowserWindow, dialog, session } from 'electron';
 import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
 import keytar from 'keytar';
@@ -64,9 +64,9 @@ const CSP = {
     ]
 };
 
-class PatchedBrowserWindow extends BrowserWindow {
+class BrowserWindow extends OriginalBrowserWindow {
     constructor(originalOptions) {
-        const userOptions = PatchedBrowserWindow.userWindowPreferences;
+        const userOptions = BrowserWindow.userWindowPreferences;
 
         const options = deepmerge(originalOptions, userOptions);
         options.webPreferences = Object.assign({}, options.webPreferences);
@@ -120,7 +120,7 @@ class Comms {
         BDIpc.on('bd-sendToCssEditor', (event, m) => this.sendToCssEditor(m.channel, m.message), true);
 
         BDIpc.on('bd-native-open', (event, options) => {
-            dialog.showOpenDialog(BrowserWindow.fromWebContents(event.ipcEvent.sender), options, filenames => {
+            dialog.showOpenDialog(OriginalBrowserWindow.fromWebContents(event.ipcEvent.sender), options, filenames => {
                 event.reply(filenames);
             });
         });
@@ -205,7 +205,7 @@ export class BetterDiscord {
     async waitForWindow() {
         return new Promise(resolve => {
             const defer = setInterval(() => {
-                const windows = BrowserWindow.getAllWindows();
+                const windows = OriginalBrowserWindow.getAllWindows();
 
                 if (windows.length === 1 && windows[0].webContents.getURL().includes('discordapp.com')) {
                     resolve(windows[0]);
@@ -259,7 +259,7 @@ export class BetterDiscord {
         const browser_window_path = require.resolve(path.resolve(electron_path, '..', '..', 'browser-window.js'));
         const browser_window_module = require.cache[browser_window_path];
 
-        browser_window_module.exports = PatchedBrowserWindow;
+        browser_window_module.exports = BrowserWindow;
     }
 
     /**

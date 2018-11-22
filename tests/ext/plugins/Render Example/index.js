@@ -30,7 +30,7 @@ module.exports = (Plugin, Api, Vendor) => {
             // Force update elements to remove our changes
             const GuildTextChannel = await ReactComponents.getComponent('GuildTextChannel');
             GuildTextChannel.forceUpdateAll();
-            const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
+            const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector }, m => m.defaultProps && m.defaultProps.hasOwnProperty('disableButtons'));
             MessageContent.forceUpdateAll();
             return true;
         }

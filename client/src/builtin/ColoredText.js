@@ -50,7 +50,7 @@ export default new class ColoredText extends BuiltinModule {
     /* Patches */
     async applyPatches() {
         if (this.patches.length) return;
-        this.MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector });
+        this.MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector }, m => m.defaultProps && m.defaultProps.hasOwnProperty('disableButtons'));
         this.patch(this.MessageContent.component.prototype, 'render', this.injectColoredText);
         this.MessageContent.forceUpdateAll();
     }
@@ -58,10 +58,12 @@ export default new class ColoredText extends BuiltinModule {
     /**
      * Set markup text colour to match role colour
      */
-    injectColoredText(thisObject, args, returnValue) {
-        const { TinyColor } = Reflection.modules;
-        const markup = Utils.findInReactTree(returnValue, m => m && m.props && m.props.className && m.props.className.includes('da-markup'));
-        const roleColor = thisObject.props.message.colorString;
-        if (markup && roleColor) markup.props.style = {color: TinyColor.mix(roleColor, this.defaultColor, this.intensity)};
+    injectColoredText(thisObject, args, originalReturn) {
+        this.patch(originalReturn.props, 'children', function(obj, args, returnValue) {
+            const { TinyColor } = Reflection.modules;
+            const markup = Utils.findInReactTree(returnValue, m => m && m.props && m.props.className && m.props.className.includes('da-markup'));
+            const roleColor = thisObject.props.message.colorString;
+            if (markup && roleColor) markup.props.style = {color: TinyColor.mix(roleColor, this.defaultColor, this.intensity)};
+        });
     }
 }

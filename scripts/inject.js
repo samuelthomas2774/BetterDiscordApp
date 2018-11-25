@@ -4,12 +4,12 @@ const path = require('path');
 
 const useBdRelease = args[2] && args[2].toLowerCase() === 'release';
 const releaseInput = useBdRelease ? args[3] && args[3].toLowerCase() : args[2] && args[2].toLowerCase();
-const release = releaseInput === 'canary' ? 'DiscordCanary' : releaseInput === 'ptb' ? 'DiscordPTB' : 'Discord';
+const release = releaseInput === 'canary' ? 'Discord Canary' : releaseInput === 'ptb' ? 'Discord PTB' : 'Discord';
 console.log(`Injecting into version ${release}`);
 
 const discordPath = (function() {
     if (process.platform === 'win32') {
-        const basedir = path.join(process.env.LOCALAPPDATA, release);
+        const basedir = path.join(process.env.LOCALAPPDATA, release.replace(/ /g, ''));
         if (!fs.existsSync(basedir)) throw new Error(`Cannot find directory for ${release}`);
         const version = fs.readdirSync(basedir).filter(f => fs.lstatSync(path.join(basedir, f)).isDirectory() && f.split('.').length > 1).sort().reverse()[0];
         return path.join(basedir, version, 'resources');
@@ -21,7 +21,7 @@ const discordPath = (function() {
 
         return path.join(appPath, 'Contents', 'Resources');
     } else if (process.platform === 'linux') {
-        return path.join('/usr', 'share', release.toLowerCase(), 'resources');
+        return path.join('/usr', 'share', release.toLowerCase().replace(/ /g, '-'), 'resources');
     }
 })();
 

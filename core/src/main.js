@@ -255,11 +255,11 @@ export class BetterDiscord {
      * Basically BetterDiscord needs to load before discord_desktop_core.
      */
     static patchBrowserWindow() {
-		const electron = require('electron');
-		const electron_path = require.resolve('electron');
-		Object.assign(BrowserWindow, electron.BrowserWindow); // Assigns the new chrome-specific ones
-		const newElectron = Object.assign({}, electron, {BrowserWindow});
-		require.cache[electron_path].exports = newElectron;
+        const electron = require('electron');
+        const electron_path = require.resolve('electron');
+        Object.assign(BrowserWindow, electron.BrowserWindow); // Assigns the new chrome-specific ones
+        const newElectron = Object.assign({}, electron, {BrowserWindow});
+        require.cache[electron_path].exports = newElectron;
     }
 
     /**

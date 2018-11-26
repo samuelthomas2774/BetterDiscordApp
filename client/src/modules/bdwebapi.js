@@ -34,6 +34,7 @@ const dummyFiles = {
     }]
 };
 const dummyAuthor = 'DummyAuthor';
+const dummyTimestamp = () => `2018-${Math.floor((Math.random() * 12) + 1).toString().padStart(2, '0')}-${Math.floor((Math.random() * 30) + 1).toString().padStart(2, '0')}T14:51:32.057Z`;
 
 async function dummyThemes() {
     // Simulate get
@@ -45,7 +46,7 @@ async function dummyThemes() {
             name: `Dummy ${i}`,
             tags: dummyTags,
             installs: Math.floor(Math.random() * 10000),
-            updated: '2018-07-21T14:51:32.057Z',
+            updated: dummyTimestamp(),
             rating: Math.floor(Math.random() * 1000),
             activeUsers: Math.floor(Math.random() * 1000),
             rated: Math.random() > .5,

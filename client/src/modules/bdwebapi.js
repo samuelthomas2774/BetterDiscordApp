@@ -42,7 +42,7 @@ async function dummyThemes() {
     const dummies = [];
     for (let i = 0; i < 10; i++) {
         dummies.push({
-            id: `theme${i}`,
+            id: `theme${i}${btoa(Math.random()).substring(3, 9)}`,
             name: `Dummy ${i}`,
             tags: dummyTags,
             installs: Math.floor(Math.random() * 10000),

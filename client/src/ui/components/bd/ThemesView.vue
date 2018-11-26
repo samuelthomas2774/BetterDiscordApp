@@ -84,7 +84,7 @@
                 await this.ThemeManager.refreshThemes();
             },
             async refreshOnline() {
-                if (this.loadingOnline) return;
+                if (this.loadingOnline || this.loadingMore) return;
                 this.loadingOnline = true;
                 try {
                     const getThemes = await BdWebApi.themes.get();
@@ -123,11 +123,20 @@
                 });
             },
             searchInput(e) {
-                if (this.loadingOnline) return;
+                if (this.loadingOnline || this.loadingMore) return;
                 this.refreshOnline();
             },
-            scrollend(e) {
-                console.log('scrollend');
+            async scrollend(e) {
+                if (this.loadingOnline || this.loadingMore) return;
+                this.loadingMore = true;
+                try {
+                    const getThemes = await BdWebApi.themes.get();
+                    this.onlineThemes.docs = [...this.onlineThemes.docs, ...getThemes.docs];
+                } catch (err) {
+                    Logger.err('ThemesView', err);
+                } finally {
+                    this.loadingMore = false;
+                }
             }
         }
     }

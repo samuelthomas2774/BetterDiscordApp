@@ -29,7 +29,9 @@
                 <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
                     <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop/>
                 </div>
-                <h2 v-if="loadingOnline">Loading</h2>
+                <div v-if="loadingOnline" class="bd-spinnerContainer">
+                    <div class="bd-spinner7"></div>
+                </div>
                 <RemoteCard v-else-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme"/>
             </div>
         </div>

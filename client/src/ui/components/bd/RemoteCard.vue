@@ -20,7 +20,7 @@
                 <div class="bd-remoteCardInfoBox bd-flex bd-flexGrow bd-flexCol">
                     <div class="bd-remoteCardInfo">{{item.installs}} Installs</div>
                     <div class="bd-remoteCardInfo">{{item.activeUsers}} Active Users</div>
-                    <div class="bd-remoteCardInfo">Updated: Some time ago</div>
+                    <div class="bd-remoteCardInfo">Updated {{fromNow()}}</div>
                 </div>
             </div>
         </div>
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+    import { Reflection } from 'modules';
     export default {
         props: ['item'],
         data() {
@@ -44,6 +45,10 @@
         methods: {
             resolveThumb() {
                 return `${this.item.repository.rawUri}/${this.item.files.previews[0].thumb}`;
+            },
+            fromNow() {
+                const { Moment } = Reflection.modules;
+                return Moment(this.item.updated).fromNow();
             }
         }
     }

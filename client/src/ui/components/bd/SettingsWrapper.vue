@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-settingswrap">
-        <ScrollerWrap>
+        <ScrollerWrap :scrollend="scrollend">
             <div class="bd-settingswrapHeader">
                 <span class="bd-settingswrapHeaderText">{{ headertext }}</span>
                 <slot name="header" />
@@ -27,7 +27,7 @@
     import { ScrollerWrap } from '../common';
 
     export default {
-        props: ['headertext'],
+        props: ['headertext', 'scrollend'],
         components: {
             ScrollerWrap
         }

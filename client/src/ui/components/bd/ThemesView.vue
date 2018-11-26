@@ -9,7 +9,7 @@
 */
 
 <template>
-    <SettingsWrapper headertext="Themes">
+    <SettingsWrapper headertext="Themes" :scrollend="scrollend">
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Installed</h3>
@@ -26,13 +26,17 @@
                 <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :data-theme-id="theme.id" @toggle-theme="toggleTheme(theme)" @reload-theme="reload => reloadTheme(theme, reload)" @show-settings="dont_clone => showSettings(theme, dont_clone)" @delete-theme="unload => deleteTheme(theme, unload)" />
             </div>
             <div v-if="!local" class="bd-onlinePh">
-                <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
-                    <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop/>
+                <div class="bd-onlinePhHeader">
+                    <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
+                        <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
+                    </div>
+                    <div v-if="loadingOnline" class="bd-spinnerContainer">
+                        <div class="bd-spinner7"></div>
+                    </div>
                 </div>
-                <div v-if="loadingOnline" class="bd-spinnerContainer">
-                    <div class="bd-spinner7"></div>
+                <div class="bd-onlinePhBody" v-if="!loadingOnline && onlineThemes">
+                    <RemoteCard v-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme" />
                 </div>
-                <RemoteCard v-else-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme"/>
             </div>
         </div>
     </SettingsWrapper>
@@ -117,6 +121,9 @@
             searchInput(e) {
                 if (this.loadingOnline) return;
                 this.refreshOnline();
+            },
+            scrollend(e) {
+                console.log('scrollend');
             }
         }
     }

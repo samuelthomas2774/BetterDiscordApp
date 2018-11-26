@@ -78,6 +78,12 @@ export default class BuiltinModule {
         Patch(`BD:${this.moduleName}`, module)[when](fnName, cb.bind(this));
     }
 
+    childPatch(module, fnName, child, cb, when = 'after') {
+        this.patch(module, fnName, (component, args, retVal) => {
+            this.patch(retVal[child[0]], child[1], cb, when);
+        });
+    }
+
     /**
      * Logger wraps
      */

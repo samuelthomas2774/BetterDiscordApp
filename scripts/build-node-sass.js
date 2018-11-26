@@ -9,7 +9,7 @@ switch (process.platform) {
         });
         break;
     case 'win32':
-        child_process.execSync(`scripts/rebuild-node-sass.bat`, {
+        child_process.execSync(`scripts/build-node-sass-win32.bat`, {
             stdio: 'inherit'
         });
         break;

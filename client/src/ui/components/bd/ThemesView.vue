@@ -31,11 +31,14 @@
                         <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
                     </div>
                     <div v-if="loadingOnline" class="bd-spinnerContainer">
-                        <div class="bd-spinner7"></div>
+                        <div class="bd-spinner7"/>
                     </div>
                 </div>
                 <div class="bd-onlinePhBody" v-if="!loadingOnline && onlineThemes">
                     <RemoteCard v-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme" />
+                    <div v-if="loadingMore" class="bd-spinnerContainer">
+                        <div class="bd-spinner7"/>
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,7 +63,8 @@
                 local: true,
                 localThemes: ThemeManager.localThemes,
                 onlineThemes: null,
-                loadingOnline: false
+                loadingOnline: false,
+                loadingMore: false
             };
         },
         components: {

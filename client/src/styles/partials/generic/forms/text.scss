@@ -164,11 +164,11 @@
 .bd-fancySearch {
     display: flex;
     justify-content: flex-end;
-    transform: translateY(80px) translateX(-140px);
-    transition: all .5s ease-in-out;
+    // transform: translateY(80px) translateX(-140px);
+    // transition: all .5s ease-in-out;
 
     &::before {
-        content: 'Search by name, description or tag...';
+        // content: 'Search by name, description or tag...';
         color: #f6f6f7;
         position: relative;
         top: -20px;
@@ -181,6 +181,12 @@
 
         &::before {
             opacity: 0;
+        }
+    }
+
+    &.bd-disabled {
+        .bd-textInput {
+            opacity: .8;
         }
     }
 

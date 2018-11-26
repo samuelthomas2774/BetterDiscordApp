@@ -76,36 +76,8 @@
             async refreshOnline() {
                 this.loadingOnline = true;
                 try {
-                    // const getThemes = await BdWebApi.themes.get();
-                    // this.onlineThemes = JSON.parse(getThemes);
-                    const dummies = [];
-                    for (let i = 0; i < 10; i++) {
-                        dummies.push({
-                            id: `theme${i}`,
-                            name: `Dummy ${i}`,
-                            tags: ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'],
-                            installs: Math.floor(Math.random() * 10000),
-                            updated: '2018-07-21T14:51:32.057Z',
-                            rating: Math.floor(Math.random() * 1000),
-                            activeUsers: Math.floor(Math.random() * 1000),
-                            rated: Math.random() > .5,
-                            version: '1.0.0',
-                            repository: {
-                                name: 'ExampleRepository',
-                                baseUri: 'https://github.com/Jiiks/ExampleRepository',
-                                rawUri: 'https://github.com/Jiiks/ExampleRepository/raw/master'
-                            },
-                            files: {
-                                readme: 'Example/readme.md',
-                                previews: [{
-                                    large: 'Example/preview1-big.png',
-                                    thumb: 'Example/preview1-small.png'
-                                }]
-                            },
-                            author: 'Jiiks'
-                        });
-                    }
-                    this.onlineThemes = { docs: dummies };
+                    const getThemes = await BdWebApi.themes.get();
+                    this.onlineThemes = getThemes;
                 } catch (err) {
                     Logger.err('ThemesView', err);
                 } finally {

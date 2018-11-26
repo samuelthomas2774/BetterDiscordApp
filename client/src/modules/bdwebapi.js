@@ -19,6 +19,45 @@ const ENDPOINTS = {
     'statistics': `${APIBASE}/statistics`
 };
 
+const dummyTags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'];
+const dummyRepo = {
+    name: 'ExampleRepository',
+    baseUri: 'https://github.com/Jiiks/ExampleRepository',
+    rawUri: 'https://github.com/Jiiks/ExampleRepository/raw/master'
+};
+const dummyVersion = () => `${Math.round(Math.random() * 3)}.${Math.round(Math.random() * 10)}.${Math.round(Math.random() * 10)}`;
+const dummyFiles = {
+    readme: 'Example/readme.md',
+    previews: [{
+        large: 'Example/preview1-big.png',
+        thumb: 'Example/preview1-small.png'
+    }]
+};
+const dummyAuthor = 'DummyAuthor';
+
+async function dummyThemes() {
+    // Simulate get
+    await new Promise(r => setTimeout(r, Math.random() * 3000));
+    const dummies = [];
+    for (let i = 0; i < 10; i++) {
+        dummies.push({
+            id: `theme${i}`,
+            name: `Dummy ${i}`,
+            tags: dummyTags,
+            installs: Math.floor(Math.random() * 10000),
+            updated: '2018-07-21T14:51:32.057Z',
+            rating: Math.floor(Math.random() * 1000),
+            activeUsers: Math.floor(Math.random() * 1000),
+            rated: Math.random() > .5,
+            version: dummyVersion(),
+            repository: dummyRepo,
+            files: dummyFiles,
+            author: dummyAuthor
+        });
+    }
+    return { docs: dummies };
+}
+
 export default class BdWebApi {
 
     static get themes() {
@@ -41,6 +80,7 @@ export default class BdWebApi {
     }
 
     static getThemes(args) {
+        return dummyThemes();
         if (!args) return request.get(ENDPOINTS.themes);
         const { id } = args;
         if (id) return request.get(ENDPOINTS.theme(id));

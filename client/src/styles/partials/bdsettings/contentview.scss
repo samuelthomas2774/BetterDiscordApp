@@ -1,6 +1,13 @@
 .bd-pluginsview,
 .bd-themesview {
-    .bd-onlinePh {
+    .bd-localPh {
+        .bd-scroller {
+            padding: 0 20px 0 0;
+        }
+    }
+
+    .bd-onlinePh,
+    .bd-localPh {
         display: flex;
         flex-direction: column;
         margin: 10px 0;
@@ -25,7 +32,6 @@
             .bd-scroller {
                 padding: 0 20px 0 0;
             }
-
         }
 
         h3 {

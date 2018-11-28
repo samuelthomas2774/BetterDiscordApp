@@ -22,10 +22,12 @@
         </div>
 
         <div class="bd-flex bd-flexCol bd-themesview">
-            <div v-if="local" class="bd-flex bd-flexGrow bd-flexCol bd-themesContainer bd-localThemes">
-                <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :data-theme-id="theme.id" @toggle-theme="toggleTheme(theme)" @reload-theme="reload => reloadTheme(theme, reload)" @show-settings="dont_clone => showSettings(theme, dont_clone)" @delete-theme="unload => deleteTheme(theme, unload)" />
+            <div v-if="local" class="bd-flex bd-flexGrow bd-flexCol bd-themesContainer bd-localPh">
+                <ScrollerWrap>
+                    <ThemeCard v-for="theme in localThemes" :theme="theme" :key="theme.id" :data-theme-id="theme.id" @toggle-theme="toggleTheme(theme)" @reload-theme="reload => reloadTheme(theme, reload)" @show-settings="dont_clone => showSettings(theme, dont_clone)" @delete-theme="unload => deleteTheme(theme, unload)" />
+                </ScrollerWrap>
             </div>
-            <div v-if="!local" class="bd-onlinePh">
+            <div v-else class="bd-onlinePh">
                 <div class="bd-onlinePhHeader">
                     <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
                         <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />

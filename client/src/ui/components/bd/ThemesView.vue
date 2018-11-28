@@ -9,7 +9,7 @@
 */
 
 <template>
-    <SettingsWrapper headertext="Themes" :scrollend="scrollend">
+    <SettingsWrapper headertext="Themes" :noscroller="true">
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Installed</h3>
@@ -34,12 +34,12 @@
                         <div class="bd-spinner7"/>
                     </div>
                 </div>
-                <div class="bd-onlinePhBody" v-if="!loadingOnline && onlineThemes">
+                <ScrollerWrap class="bd-onlinePhBody" v-if="!loadingOnline && onlineThemes" :scrollend="scrollend">
                     <RemoteCard v-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme" />
                     <div v-if="loadingMore" class="bd-spinnerContainer">
                         <div class="bd-spinner7"/>
                     </div>
-                </div>
+                </ScrollerWrap>
             </div>
         </div>
     </SettingsWrapper>
@@ -50,7 +50,7 @@
     import { ThemeManager, BdWebApi } from 'modules';
     import { Modals } from 'ui';
     import { ClientLogger as Logger } from 'common';
-    import { MiRefresh } from '../common';
+    import { MiRefresh, ScrollerWrap } from '../common';
     import SettingsWrapper from './SettingsWrapper.vue';
     import ThemeCard from './ThemeCard.vue';
     import RemoteCard from './RemoteCard.vue';
@@ -69,7 +69,7 @@
         },
         components: {
             SettingsWrapper, ThemeCard, RemoteCard,
-            MiRefresh,
+            MiRefresh, ScrollerWrap,
             RefreshBtn
         },
         methods: {

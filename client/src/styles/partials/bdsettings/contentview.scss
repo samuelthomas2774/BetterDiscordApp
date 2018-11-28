@@ -11,10 +11,21 @@
             padding: 50px 0;
         }
 
+        .bd-onlinePhHeader {
+            padding: 0 20px 0 0;
+        }
+
         .bd-onlinePhBody {
+            margin-top: 10px;
+
             .bd-spinnerContainer {
                 padding: 0;
             }
+
+            .bd-scroller {
+                padding: 0 20px 0 0;
+            }
+
         }
 
         h3 {

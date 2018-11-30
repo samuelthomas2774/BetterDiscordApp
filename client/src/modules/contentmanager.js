@@ -12,6 +12,7 @@ import asar from 'asar';
 import path, { dirname } from 'path';
 import rimraf from 'rimraf';
 
+import { remote } from 'electron';
 import Content from './content';
 import Globals from './globals';
 import Database from './database';
@@ -69,6 +70,28 @@ export default class {
      */
     static get contentPath() {
         return Globals.getPath(this.pathId);
+    }
+
+    static async packContent(path, contentPath) {
+        return new Promise((resolve, reject) => {
+            remote.dialog.showSaveDialog({
+                title: 'Save Package',
+                defaultPath: path,
+                filters: [
+                    {
+                        name: 'BetterDiscord Package',
+                        extensions: ['bd']
+                    }
+                ]
+            }, filepath => {
+                if (!filepath) return;
+
+                asar.uncache(filepath);
+                asar.createPackage(contentPath, filepath, () => {
+                    resolve(filepath);
+                });
+            });
+        });
     }
 
     /**

@@ -29,7 +29,7 @@
             <div class="bd-buttonGroup">
                 <div class="bd-button">Install</div>
                 <div class="bd-button">Preview</div>
-                <div class="bd-button">Source</div>
+                <div class="bd-button" @click="openSourceUrl">Source</div>
             </div>
         </div>
     </div>
@@ -37,6 +37,8 @@
 
 <script>
     import { Reflection } from 'modules';
+    import { shell } from 'electron';
+
     export default {
         props: ['item'],
         data() {
@@ -49,6 +51,11 @@
             fromNow() {
                 const { Moment } = Reflection.modules;
                 return Moment(this.item.updated).fromNow();
+            },
+            openSourceUrl() {
+                if (!this.item.repository || !this.item.repository.baseUri) return;
+                if (Object.assign(document.createElement('a'), { href: this.item.repository.baseUri }).hostname !== 'github.com') return;
+                shell.openExternal(this.item.repository.baseUri);
             }
         }
     }

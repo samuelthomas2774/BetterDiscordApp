@@ -19,7 +19,15 @@
         }
 
         .bd-onlinePhHeader {
-            padding: 0 20px 0 0;
+            display: flex;
+            padding: 0 20px 0 10px;
+            min-height: 40px;
+
+            .bd-searchHint {
+                flex-grow: 1;
+                line-height: 40px;
+                color: #fff;
+            }
         }
 
         .bd-onlinePhBody {

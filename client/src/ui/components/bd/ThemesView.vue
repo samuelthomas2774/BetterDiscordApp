@@ -29,6 +29,7 @@
             </div>
             <div v-else class="bd-onlinePh">
                 <div class="bd-onlinePhHeader">
+                    <div class="bd-searchHint">{{searchHint}}</div>
                     <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
                         <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
                     </div>
@@ -66,7 +67,8 @@
                 localThemes: ThemeManager.localThemes,
                 onlineThemes: null,
                 loadingOnline: false,
-                loadingMore: false
+                loadingMore: false,
+                searchHint: ''
             };
         },
         components: {
@@ -86,11 +88,14 @@
                 await this.ThemeManager.refreshThemes();
             },
             async refreshOnline() {
+                this.searchHint = '';
                 if (this.loadingOnline || this.loadingMore) return;
                 this.loadingOnline = true;
                 try {
                     const getThemes = await BdWebApi.themes.get();
                     this.onlineThemes = getThemes;
+                    if (!this.onlineThemes.docs) return;
+                    this.searchHint = `${this.onlineThemes.total} Results`;
                 } catch (err) {
                     Logger.err('ThemesView', err);
                 } finally {

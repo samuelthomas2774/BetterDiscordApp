@@ -56,7 +56,7 @@ async function dummyThemes() {
             author: dummyAuthor
         });
     }
-    return { docs: dummies };
+    return { docs: dummies, total: 25 };
 }
 
 export default class BdWebApi {

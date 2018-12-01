@@ -13,6 +13,7 @@ import Security from './security';
 import { ReactComponents } from './reactcomponents';
 import Reflection from './reflection';
 import DiscordApi from './discordapi';
+import ThemeManager from './thememanager';
 
 export default class PackageInstaller {
 
@@ -64,47 +65,39 @@ export default class PackageInstaller {
     /**
      * Installs or updates defined package
      * @param {Byte[]|String} bytesOrPath byte array of binary or path to local file
-     * @param {String} name Package name
+     * @param {String} nameOrId Package name
      * @param {Boolean} update Does an older version already exist
      */
-    static async installPackage(bytesOrPath, id, update = false) {
+    static async installPackage(bytesOrPath, nameOrId, contentType, update = false) {
         let outputPath = null;
         try {
-            const bytes = typeof bytesOrPath === 'string' ? fs.readFileSync(bytesOrPath) : bytesOrPath;
 
-            const outputName = `${id}.bd`;
-            outputPath = path.join(Globals.getPath('plugins'), outputName);
+            const bytes = typeof bytesOrPath === 'string' ? fs.readFileSync(bytesOrPath) : bytesOrPath;
+            const outputName = `${nameOrId}.bd`;
+
+            outputPath = path.join(Globals.getPath(contentType + 's'), outputName);
             fs.writeFileSync(outputPath, bytes);
 
-            if (!update) return PluginManager.preloadPackedContent(outputName);
+            const manager = contentType === 'plugin' ? PluginManager : ThemeManager;
 
-            const oldContent = PluginManager.getPluginById(id);
+            if (!update) return manager.preloadPackedContent(outputName);
 
-            if (update && oldContent.packed && oldContent.packed.packageName !== id) {
-                await oldContent.unload(true);
+            const oldContent = manager.findContent(nameOrId);
+
+            await oldContent.unload(true);
+
+            if (oldContent.packed && oldContent.packed.packageName !== nameOrId) {
                 rimraf(oldContent.packed.packagePath, err => {
-                    if(err) console.log(err);
+                    if (err) throw err;
                 });
-
-                return PluginManager.preloadPackedContent(outputName);
-            }
-
-            if (update && !oldContent.packed) {
-                await oldContent.unload(true);
+            } else {
                 rimraf(oldContent.contentPath, err => {
-                    if (err) console.log(err);
+                    if (err) throw err;
                 });
-
-                return PluginManager.preloadPackedContent(outputName);
             }
 
-            return PluginManager.reloadContent(oldContent);
+            return manager.preloadPackedContent(outputName);
         } catch (err) {
-            if (outputPath) {
-                rimraf(outputPath, err => {
-                    if (err) console.log(err);
-                });
-            }
             throw err;
         }
     }

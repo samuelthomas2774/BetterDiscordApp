@@ -109,7 +109,7 @@
             },
             async install() {
                 try {
-                    const installed = await PackageInstaller.installPackage(this.modal.filePath, this.modal.config.info.id, this.alreadyInstalled);
+                    const installed = await PackageInstaller.installPackage(this.modal.filePath, this.modal.config.info.id || this.modal.config.info.name, this.modal.contentType, this.alreadyInstalled);
                     this.installed = installed;
                 } catch (err) {
                     console.log(err);

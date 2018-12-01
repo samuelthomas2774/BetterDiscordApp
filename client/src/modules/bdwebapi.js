@@ -56,7 +56,15 @@ async function dummyThemes() {
             author: dummyAuthor
         });
     }
-    return { docs: dummies, total: 25 };
+    return {
+        docs: dummies,
+        pagination: {
+            total: 25,
+            pages: 3,
+            limit: 9,
+            page: 1
+        }
+    };
 }
 
 export default class BdWebApi {

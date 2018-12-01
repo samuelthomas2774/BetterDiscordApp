@@ -33,6 +33,9 @@
                     <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
                         <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
                     </div>
+                    <div class="bd-searchSort">
+                        <span>Sort by:</span>
+                    </div>
                     <div v-if="loadingOnline" class="bd-spinnerContainer">
                         <div class="bd-spinner7"/>
                     </div>
@@ -95,7 +98,7 @@
                     const getThemes = await BdWebApi.themes.get();
                     this.onlineThemes = getThemes;
                     if (!this.onlineThemes.docs) return;
-                    this.searchHint = `${this.onlineThemes.total} Results`;
+                    this.searchHint = `${this.onlineThemes.pagination.total} Results`;
                 } catch (err) {
                     Logger.err('ThemesView', err);
                 } finally {

@@ -39,8 +39,12 @@
                         </div>
                     </div>
                     <div class="bd-flex bd-flexRow" v-if="onlineThemes && onlineThemes.docs && onlineThemes.docs.length">
-                        <div class="bd-searchSort">
-                            <span>Sort by:</span>
+                        <div class="bd-searchSort bd-flex bd-flexGrow">
+                            <span class="bd-flexGrow">Sort by:</span>
+                            <div class="bd-sort">Name</div>
+                            <div class="bd-sort">Updated</div>
+                            <div class="bd-sort">Installs</div>
+                            <div class="bd-sort">Users</div>
                         </div>
                     </div>
                 </div>

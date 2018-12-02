@@ -75,7 +75,7 @@ export default class PackageInstaller {
             const bytes = typeof bytesOrPath === 'string' ? fs.readFileSync(bytesOrPath) : bytesOrPath;
             const outputName = `${nameOrId}.bd`;
 
-            outputPath = path.join(Globals.getPath(contentType + 's'), outputName);
+            outputPath = path.join(Globals.getPath(`${contentType}s`), outputName);
             fs.writeFileSync(outputPath, bytes);
 
             const manager = contentType === 'plugin' ? PluginManager : ThemeManager;

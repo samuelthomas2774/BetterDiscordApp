@@ -90,11 +90,13 @@ export default class BdWebApi {
 
     static getThemes(args) {
         return dummyThemes();
+        /*
         if (!args) return request.get(ENDPOINTS.themes);
         const { id } = args;
         if (id) return request.get(ENDPOINTS.theme(id));
 
         return request.get(ENDPOINTS.themes);
+        */
     }
 
     static getUsers(args) {

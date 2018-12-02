@@ -28,16 +28,20 @@
                 </ScrollerWrap>
             </div>
             <div v-else class="bd-onlinePh">
-                <div class="bd-onlinePhHeader">
-                    <div class="bd-searchHint">{{searchHint}}</div>
-                    <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
-                        <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
+                <div class="bd-onlinePhHeader bd-flexCol">
+                    <div class="bd-flex bd-flexRow">
+                        <div v-if="loadingOnline" class="bd-spinnerContainer">
+                            <div class="bd-spinner7" />
+                        </div>
+                        <div class="bd-searchHint">{{searchHint}}</div>
+                        <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
+                            <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
+                        </div>
                     </div>
-                    <div class="bd-searchSort">
-                        <span>Sort by:</span>
-                    </div>
-                    <div v-if="loadingOnline" class="bd-spinnerContainer">
-                        <div class="bd-spinner7"/>
+                    <div class="bd-flex bd-flexRow" v-if="onlineThemes && onlineThemes.docs && onlineThemes.docs.length">
+                        <div class="bd-searchSort">
+                            <span>Sort by:</span>
+                        </div>
                     </div>
                 </div>
                 <ScrollerWrap class="bd-onlinePhBody" v-if="!loadingOnline && onlineThemes" :scrollend="scrollend">

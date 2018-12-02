@@ -10,7 +10,16 @@
 
 <template>
     <div class="bd-settingswrap">
-        <ScrollerWrap>
+        <div v-if="noscroller" class="bd-flex bd-flexCol">
+            <div class="bd-settingswrapHeader">
+                <span class="bd-settingswrapHeaderText">{{ headertext }}</span>
+                <slot name="header" />
+            </div>
+            <div class="bd-settingswrapContents bd-flex bd-flexGrow bd-flexCol">
+                <slot />
+            </div>
+        </div>
+        <ScrollerWrap v-else :scrollend="scrollend">
             <div class="bd-settingswrapHeader">
                 <span class="bd-settingswrapHeaderText">{{ headertext }}</span>
                 <slot name="header" />
@@ -27,7 +36,7 @@
     import { ScrollerWrap } from '../common';
 
     export default {
-        props: ['headertext'],
+        props: ['headertext', 'scrollend', 'noscroller'],
         components: {
             ScrollerWrap
         }

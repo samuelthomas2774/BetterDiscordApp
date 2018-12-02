@@ -1,9 +1,56 @@
 .bd-pluginsview,
 .bd-themesview {
-    .bd-onlinePh {
+    .bd-localPh {
+        .bd-scroller {
+            padding: 0 20px 0 0;
+        }
+    }
+
+    .bd-onlinePh,
+    .bd-localPh {
         display: flex;
         flex-direction: column;
-        margin: 10% 0;
+        margin: 10px 0;
+
+        .bd-spinnerContainer {
+            display: flex;
+            justify-content: center;
+        }
+
+        .bd-onlinePhHeader {
+            display: flex;
+            padding: 0 20px 0 10px;
+            min-height: 80px;
+
+            .bd-flexRow {
+                min-height: 40px;
+            }
+
+            .bd-searchHint {
+                flex-grow: 1;
+                line-height: 40px;
+                color: #fff;
+            }
+
+            .bd-searchSort {
+                span {
+                    color: #fff;
+                    line-height: 40px;
+                }
+            }
+        }
+
+        .bd-onlinePhBody {
+            margin-top: 10px;
+
+            .bd-spinnerContainer {
+                padding: 0;
+            }
+
+            .bd-scroller {
+                padding: 0 20px 0 0;
+            }
+        }
 
         h3 {
             color: #fff;

@@ -20,7 +20,7 @@
                 <div class="bd-remoteCardInfoBox bd-flex bd-flexGrow bd-flexCol">
                     <div class="bd-remoteCardInfo">{{item.installs}} Installs</div>
                     <div class="bd-remoteCardInfo">{{item.activeUsers}} Active Users</div>
-                    <div class="bd-remoteCardInfo">Updated: Some time ago</div>
+                    <div class="bd-remoteCardInfo">Updated {{fromNow()}}</div>
                 </div>
             </div>
         </div>
@@ -29,13 +29,16 @@
             <div class="bd-buttonGroup">
                 <div class="bd-button">Install</div>
                 <div class="bd-button">Preview</div>
-                <div class="bd-button">Source</div>
+                <div class="bd-button" @click="openSourceUrl">Source</div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+    import { Reflection } from 'modules';
+    import { shell } from 'electron';
+
     export default {
         props: ['item'],
         data() {
@@ -44,6 +47,15 @@
         methods: {
             resolveThumb() {
                 return `${this.item.repository.rawUri}/${this.item.files.previews[0].thumb}`;
+            },
+            fromNow() {
+                const { Moment } = Reflection.modules;
+                return Moment(this.item.updated).fromNow();
+            },
+            openSourceUrl() {
+                if (!this.item.repository || !this.item.repository.baseUri) return;
+                if (Object.assign(document.createElement('a'), { href: this.item.repository.baseUri }).hostname !== 'github.com') return;
+                shell.openExternal(this.item.repository.baseUri);
             }
         }
     }

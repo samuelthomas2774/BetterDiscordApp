@@ -9,7 +9,7 @@
 */
 
 <template>
-    <SettingsWrapper headertext="Plugins">
+    <SettingsWrapper headertext="Plugins" :noscroller="true">
         <div class="bd-tabbar" slot="header">
             <div class="bd-button" :class="{'bd-active': local}" @click="showLocal">
                 <h3>Installed</h3>
@@ -22,12 +22,26 @@
         </div>
 
         <div class="bd-flex bd-flexCol bd-pluginsview">
-            <div v-if="local" class="bd-flex bd-flexGrow bd-flexCol bd-pluginsContainer bd-localPlugins">
-                <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :data-plugin-id="plugin.id" @toggle-plugin="togglePlugin(plugin)" @reload-plugin="reloadPlugin(plugin)" @delete-plugin="unload => deletePlugin(plugin, unload)" @show-settings="dont_clone => showSettings(plugin, dont_clone)" />
+            <div v-if="local" class="bd-flex bd-flexGrow bd-flexCol bd-pluginsContainer bd-localPlugins bd-localPh">
+                <ScrollerWrap>
+                    <PluginCard v-for="plugin in localPlugins" :plugin="plugin" :key="plugin.id" :data-plugin-id="plugin.id" @toggle-plugin="togglePlugin(plugin)" @reload-plugin="reloadPlugin(plugin)" @delete-plugin="unload => deletePlugin(plugin, unload)" @show-settings="dont_clone => showSettings(plugin, dont_clone)" />
+                </ScrollerWrap>
             </div>
-            <div v-if="!local" class="bd-onlinePh">
-                <h3>Coming Soon</h3>
-                <a href="https://v2.betterdiscord.net/plugins" target="_new">Website Browser</a>
+            <div v-else class="bd-onlinePh">
+                <div class="bd-onlinePhHeader">
+                    <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlinePlugins && onlinePlugins.docs)}">
+                        <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
+                    </div>
+                    <div v-if="loadingOnline" class="bd-spinnerContainer">
+                        <div class="bd-spinner7" />
+                    </div>
+                </div>
+                <ScrollerWrap class="bd-onlinePhBody" v-if="!loadingOnline && onlinePlugins" :scrollend="scrollend">
+                    <RemoteCard v-if="onlinePlugins && onlinePlugins.docs" v-for="plugin in onlinePlugins.docs" :key="plugin.id" :item="plugin" />
+                    <div v-if="loadingMore" class="bd-spinnerContainer">
+                        <div class="bd-spinner7" />
+                    </div>
+                </ScrollerWrap>
             </div>
         </div>
     </SettingsWrapper>
@@ -38,7 +52,7 @@
     import { PluginManager } from 'modules';
     import { Modals } from 'ui';
     import { ClientLogger as Logger } from 'common';
-    import { MiRefresh } from '../common';
+    import { MiRefresh, ScrollerWrap } from '../common';
     import SettingsWrapper from './SettingsWrapper.vue';
     import PluginCard from './PluginCard.vue';
     import RefreshBtn from '../common/RefreshBtn.vue';
@@ -48,12 +62,15 @@
             return {
                 PluginManager,
                 local: true,
-                localPlugins: PluginManager.localPlugins
+                localPlugins: PluginManager.localPlugins,
+                onlinePlugins: null,
+                loadingOnline: false,
+                loadingMore: false
             };
         },
         components: {
             SettingsWrapper, PluginCard,
-            MiRefresh,
+            MiRefresh, ScrollerWrap,
             RefreshBtn
         },
         methods: {
@@ -96,6 +113,24 @@
                 return Modals.contentSettings(plugin, null, {
                     dont_clone
                 });
+            },
+            searchInput(e) {
+                if (this.loadingOnline || this.loadingMore) return;
+                this.refreshOnline();
+            },
+            async scrollend(e) {
+                // TODO
+                return;
+                if (this.loadingOnline || this.loadingMore) return;
+                this.loadingMore = true;
+                try {
+                    const getPlugins = await BdWebApi.plugins.get();
+                    this.onlinePlugins.docs = [...this.onlinePlugins.docs, ...getPlugins.docs];
+                } catch (err) {
+                    Logger.err('PluginsView', err);
+                } finally {
+                    this.loadingMore = false;
+                }
             }
         }
     }

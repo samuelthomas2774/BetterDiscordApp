@@ -23,11 +23,8 @@
 
 <script>
     // Imports
-    import asar from 'asar';
-    import electron from 'electron';
-    import fs from 'fs';
     import { Toasts } from 'ui';
-    import { Settings } from 'modules';
+    import { Settings, PluginManager } from 'modules';
     import { ClientLogger as Logger } from 'common';
     import { shell } from 'electron';
     import Card from './Card.vue';
@@ -45,24 +42,13 @@
             MiSettings, MiRefresh, MiPencil, MiDelete, MiExtension, MiBoxDownload
         },
         methods: {
-            package() {
-                electron.remote.dialog.showSaveDialog({
-                    title: 'Save Plugin Package',
-                    defaultPath: this.plugin.name,
-                    filters: [
-                        {
-                            name: 'BetterDiscord Package',
-                            extensions: ['bd']
-                        }
-                    ]
-                }, filepath => {
-                    if (!filepath) return;
-
-                    asar.uncache(filepath);
-                    asar.createPackage(this.plugin.contentPath, filepath, () => {
-                        Toasts.success('Plugin Packaged!');
-                    });
-                });
+            async package() {
+                try {
+                    const packagePath = await PluginManager.packContent(this.plugin.name, this.plugin.contentPath);
+                    Toasts.success(`Plugin Packaged: ${packagePath}`);
+                } catch (err) {
+                    Logger.log('PluginCard', err);
+                }
             },
             editPlugin() {
                 try {

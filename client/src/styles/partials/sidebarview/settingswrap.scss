@@ -120,8 +120,14 @@
         }
 
         .bd-settingswrapContents {
-            padding: 0 20px;
-            margin-bottom: 84px;
+            padding: 0 0 0 20px;
+        }
+
+        .bd-scroller {
+            .bd-settingswrapContents {
+                margin-bottom: 84px;
+                padding: 0 20px;
+            }
         }
     }
 }

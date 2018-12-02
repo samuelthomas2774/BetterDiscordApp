@@ -10,7 +10,7 @@
 
 <template>
     <div class="bd-scrollerWrap" :class="{'bd-dark': dark}">
-        <div class="bd-scroller">
+        <div class="bd-scroller" @scroll="onscroll">
             <slot/>
         </div>
     </div>
@@ -18,6 +18,13 @@
 
 <script>
     export default {
-        props: ['dark']
+        props: ['dark', 'scrollend'],
+        methods: {
+            onscroll(e) {
+                if (!this.scrollend) return;
+                const { offsetHeight, scrollTop, scrollHeight } = e.target;
+                if (offsetHeight + scrollTop >= scrollHeight) this.scrollend(e);
+            }
+        }
     }
 </script>

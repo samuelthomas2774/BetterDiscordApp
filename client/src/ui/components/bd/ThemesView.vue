@@ -41,7 +41,7 @@
                     <div class="bd-flex bd-flexRow" v-if="onlineThemes && onlineThemes.docs && onlineThemes.docs.length">
                         <div class="bd-searchSort bd-flex bd-flexGrow">
                             <span class="bd-flexGrow">Sort by:</span>
-                            <div class="bd-sort">Name</div>
+                            <div class="bd-sort bd-active">Name<MiChevronDown size="18"/></div>
                             <div class="bd-sort">Updated</div>
                             <div class="bd-sort">Installs</div>
                             <div class="bd-sort">Users</div>
@@ -64,7 +64,7 @@
     import { ThemeManager, BdWebApi } from 'modules';
     import { Modals } from 'ui';
     import { ClientLogger as Logger } from 'common';
-    import { MiRefresh, ScrollerWrap } from '../common';
+    import { MiRefresh, ScrollerWrap, MiChevronDown } from '../common';
     import SettingsWrapper from './SettingsWrapper.vue';
     import ThemeCard from './ThemeCard.vue';
     import RemoteCard from './RemoteCard.vue';
@@ -89,7 +89,8 @@
         },
         components: {
             SettingsWrapper, ThemeCard, RemoteCard,
-            MiRefresh, ScrollerWrap,
+            MiRefresh, MiChevronDown,
+            ScrollerWrap,
             RefreshBtn
         },
         methods: {

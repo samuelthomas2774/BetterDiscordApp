@@ -33,7 +33,9 @@
             }
 
             .bd-searchSort {
-                span {
+                margin-top: 10px;
+
+                > span {
                     color: #fff;
                     display: flex;
                     justify-content: flex-end;
@@ -43,6 +45,7 @@
                 }
 
                 .bd-sort {
+                    display: flex;
                     color: $coldimwhite;
                     font-size: 12px;
                     padding: 3px;
@@ -56,6 +59,14 @@
 
                     &.bd-active {
                         color: $colbdgreen;
+                    }
+
+                    .bd-materialDesignIcon {
+                        fill: $colbdgreen;
+                    }
+
+                    svg {
+                        height: 14px;
                     }
                 }
             }

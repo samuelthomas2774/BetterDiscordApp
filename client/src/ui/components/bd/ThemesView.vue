@@ -50,8 +50,8 @@
                 </div>
                 <ScrollerWrap class="bd-onlinePhBody" v-if="!loadingOnline && onlineThemes" :scrollend="scrollend">
                     <RemoteCard v-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme" />
-                    <div v-if="loadingMore" class="bd-spinnerContainer">
-                        <div class="bd-spinner7"/>
+                    <div class="bd-spinnerContainer">
+                        <div v-if="loadingMore" class="bd-spinner7"/>
                     </div>
                 </ScrollerWrap>
             </div>

@@ -40,10 +40,11 @@
                     </div>
                     <div class="bd-flex bd-flexRow" v-if="onlineThemes && onlineThemes.docs && onlineThemes.docs.length">
                         <div class="bd-searchSort bd-flex bd-flexGrow">
-                            <div class="bd-sort" @click="sortBy('name')" :class="{'bd-active': onlineThemes.filters.sort === 'name', 'bd-flipY': onlineThemes.filters.ascending}">Name<MiChevronDown v-if="onlineThemes.filters.sort === 'name'" size="18"/></div>
+                            <div class="bd-sort" @click="sortBy('name')" :class="{'bd-active': onlineThemes.filters.sort === 'name', 'bd-flipY': onlineThemes.filters.ascending}">Name<MiChevronDown v-if="onlineThemes.filters.sort === 'name'" size="18" /></div>
                             <div class="bd-sort" @click="sortBy('updated')" :class="{'bd-active': onlineThemes.filters.sort === 'updated', 'bd-flipY': onlineThemes.filters.ascending}">Updated<MiChevronDown v-if="onlineThemes.filters.sort === 'updated'" size="18" /></div>
                             <div class="bd-sort" @click="sortBy('installs')" :class="{'bd-active': onlineThemes.filters.sort === 'installs', 'bd-flipY': onlineThemes.filters.ascending}">Installs<MiChevronDown v-if="onlineThemes.filters.sort === 'installs'" size="18" /></div>
                             <div class="bd-sort" @click="sortBy('users')" :class="{'bd-active': onlineThemes.filters.sort === 'users', 'bd-flipY': onlineThemes.filters.ascending}">Users<MiChevronDown v-if="onlineThemes.filters.sort === 'users'" size="18" /></div>
+                            <div class="bd-sort" @click="sortBy('rating')" :class="{'bd-active': onlineThemes.filters.sort === 'rating', 'bd-flipY': onlineThemes.filters.ascending}">Rating<MiChevronDown v-if="onlineThemes.filters.sort === 'rating'" size="18" /></div>
                         </div>
                     </div>
                 </div>

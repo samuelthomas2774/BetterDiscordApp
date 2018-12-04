@@ -35,6 +35,10 @@ export default class ServerEmu {
                     if (args.ascending) docs = docs.sort((docA, docB) => docA.activeUsers - docB.activeUsers);
                     else docs = docs.sort((docA, docB) => docB.activeUsers - docA.activeUsers);
                     break;
+                case 'rating':
+                    if (args.ascending) docs = docs.sort((docA, docB) => docA.rating - docB.rating);
+                    else docs = docs.sort((docA, docB) => docB.rating - docA.rating);
+                    break;
             }
         }
 

@@ -40,7 +40,6 @@
                     </div>
                     <div class="bd-flex bd-flexRow" v-if="onlineThemes && onlineThemes.docs && onlineThemes.docs.length">
                         <div class="bd-searchSort bd-flex bd-flexGrow">
-                            <span class="bd-flexGrow">Sort by:</span>
                             <div class="bd-sort bd-active">Name<MiChevronDown size="18"/></div>
                             <div class="bd-sort">Updated</div>
                             <div class="bd-sort">Installs</div>

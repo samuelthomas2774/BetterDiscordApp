@@ -98,12 +98,12 @@
             async refreshLocal() {
                 await this.ThemeManager.refreshThemes();
             },
-            async refreshOnline() {
+            async refreshOnline(sterm) {
                 this.searchHint = '';
                 if (this.loadingOnline || this.loadingMore) return;
                 this.loadingOnline = true;
                 try {
-                    const getThemes = await BdWebApi.themes.get();
+                    const getThemes = await BdWebApi.themes.get({ sterm });
                     this.onlineThemes = getThemes;
                     if (!this.onlineThemes.docs) return;
                     this.searchHint = `${this.onlineThemes.pagination.total} Results`;
@@ -142,7 +142,7 @@
             },
             searchInput(e) {
                 if (this.loadingOnline || this.loadingMore) return;
-                this.refreshOnline();
+                this.refreshOnline(e.target.value);
             },
             async scrollend(e) {
                 if (this.loadingOnline || this.loadingMore) return;

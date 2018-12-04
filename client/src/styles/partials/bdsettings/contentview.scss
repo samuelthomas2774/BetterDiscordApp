@@ -35,7 +35,28 @@
             .bd-searchSort {
                 span {
                     color: #fff;
-                    line-height: 40px;
+                    display: flex;
+                    justify-content: flex-end;
+                    font-size: 12px;
+                    height: 14px;
+                    padding: 3px;
+                }
+
+                .bd-sort {
+                    color: $coldimwhite;
+                    font-size: 12px;
+                    padding: 3px;
+                    height: 14px;
+                    cursor: pointer;
+                    transition: color .2s ease-in-out;
+
+                    &:hover {
+                        color: #fff;
+                    }
+
+                    &.bd-active {
+                        color: $colbdgreen;
+                    }
                 }
             }
         }

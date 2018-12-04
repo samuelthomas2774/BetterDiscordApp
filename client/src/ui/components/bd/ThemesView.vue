@@ -40,10 +40,10 @@
                     </div>
                     <div class="bd-flex bd-flexRow" v-if="onlineThemes && onlineThemes.docs && onlineThemes.docs.length">
                         <div class="bd-searchSort bd-flex bd-flexGrow">
-                            <div class="bd-sort" @click="sortBy('name')" :class="{'bd-active': sort === 'name', 'bd-flipY': ascending}">Name<MiChevronDown v-if="sort === 'name'" size="18"/></div>
-                            <div class="bd-sort" @click="sortBy('updated')" :class="{'bd-active': sort === 'updated', 'bd-flipY': ascending}">Updated<MiChevronDown v-if="sort === 'updated'" size="18" /></div>
-                            <div class="bd-sort" @click="sortBy('installs')" :class="{'bd-active': sort === 'installs', 'bd-flipY': ascending}">Installs<MiChevronDown v-if="sort === 'installs'" size="18" /></div>
-                            <div class="bd-sort" @click="sortBy('users')" :class="{'bd-active': sort === 'users', 'bd-flipY': ascending}">Users<MiChevronDown v-if="sort === 'users'" size="18" /></div>
+                            <div class="bd-sort" @click="sortBy('name')" :class="{'bd-active': onlineThemes.filters.sort === 'name', 'bd-flipY': onlineThemes.filters.ascending}">Name<MiChevronDown v-if="onlineThemes.filters.sort === 'name'" size="18"/></div>
+                            <div class="bd-sort" @click="sortBy('updated')" :class="{'bd-active': onlineThemes.filters.sort === 'updated', 'bd-flipY': onlineThemes.filters.ascending}">Updated<MiChevronDown v-if="onlineThemes.filters.sort === 'updated'" size="18" /></div>
+                            <div class="bd-sort" @click="sortBy('installs')" :class="{'bd-active': onlineThemes.filters.sort === 'installs', 'bd-flipY': onlineThemes.filters.ascending}">Installs<MiChevronDown v-if="onlineThemes.filters.sort === 'installs'" size="18" /></div>
+                            <div class="bd-sort" @click="sortBy('users')" :class="{'bd-active': onlineThemes.filters.sort === 'users', 'bd-flipY': onlineThemes.filters.ascending}">Users<MiChevronDown v-if="onlineThemes.filters.sort === 'users'" size="18" /></div>
                         </div>
                     </div>
                 </div>
@@ -75,17 +75,23 @@
                 ThemeManager,
                 local: true,
                 localThemes: ThemeManager.localThemes,
-                onlineThemes: null,
+                onlineThemes: {
+                    docs: [],
+                    filters: {
+                        sterm: '',
+                        sort: 'name',
+                        ascending: false
+                    },
+                    pagination: {
+                        total: 0,
+                        pages: 0,
+                        limit: 9,
+                        page: 1
+                    }
+                },
                 loadingOnline: false,
                 loadingMore: false,
-                searchHint: '',
-                sterm: '',
-                pagination: {
-                    page: 1,
-                    pages: 1
-                },
-                sort: 'name',
-                ascending: false
+                searchHint: ''
             };
         },
         components: {
@@ -110,9 +116,8 @@
                 if (this.loadingOnline || this.loadingMore) return;
                 this.loadingOnline = true;
                 try {
-                    const getThemes = await BdWebApi.themes.get({ sterm: this.sterm });
+                    const getThemes = await BdWebApi.themes.get(this.onlineThemes.filters);
                     this.onlineThemes = getThemes;
-                    this.pagination = this.onlineThemes.pagination;
                     if (!this.onlineThemes.docs) return;
                     this.searchHint = `${this.onlineThemes.pagination.total} Results`;
                 } catch (err) {
@@ -150,17 +155,25 @@
             },
             searchInput(e) {
                 if (this.loadingOnline || this.loadingMore) return;
-                this.sterm = e.target.value;
+                this.onlineThemes.filters.sterm = e.target.value;
                 this.refreshOnline();
             },
             async scrollend(e) {
-                if (this.pagination.page >= this.pagination.pages) return;
+                if (this.onlineThemes.pagination.page >= this.onlineThemes.pagination.pages) return;
                 if (this.loadingOnline || this.loadingMore) return;
                 this.loadingMore = true;
+
                 try {
-                    this.pagination.page = this.pagination.page + 1;
-                    const getThemes = await BdWebApi.themes.get({ sterm: this.sterm, page: this.pagination.page });
+                    const getThemes = await BdWebApi.themes.get({
+                        sterm: this.onlineThemes.filters.sterm,
+                        page: this.onlineThemes.pagination.page + 1,
+                        sort: this.onlineThemes.filters.sort,
+                        ascending: this.onlineThemes.filters.ascending
+                    });
+
                     this.onlineThemes.docs = [...this.onlineThemes.docs, ...getThemes.docs];
+                    this.onlineThemes.filters = getThemes.filters;
+                    this.onlineThemes.pagination = getThemes.pagination;
                 } catch (err) {
                     Logger.err('ThemesView', err);
                 } finally {
@@ -169,12 +182,13 @@
             },
             async sortBy(by) {
                 if (this.loadingOnline || this.loadingMore) return;
-                if (this.sort === by) {
-                    this.ascending = !this.ascending;
+                if (this.onlineThemes.filters.sort === by) {
+                    this.onlineThemes.filters.ascending = !this.onlineThemes.filters.ascending;
                 } else {
-                    this.sort = by;
-                    this.ascending = false;
+                    this.onlineThemes.filters.sort = by;
+                    this.onlineThemes.filters.ascending = false;
                 }
+                this.refreshOnline();
             }
         }
     }

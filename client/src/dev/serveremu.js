@@ -17,6 +17,27 @@ export default class ServerEmu {
             docs = this._themes;
         }
 
+        if (args.sort) {
+            switch (args.sort) {
+                case 'name':
+                    if (args.ascending) docs = docs.sort((docA, docB) => docA.name.toUpperCase() < docB.name.toUpperCase());
+                    else docs = docs.sort((docA, docB) => docA.name.toUpperCase() > docB.name.toUpperCase());
+                    break;
+                case 'updated':
+                    if (args.ascending) docs = docs.sort((docA, docB) => new Date(docA.updated).getTime() - new Date(docB.updated).getTime());
+                    else docs = docs.sort((docA, docB) => new Date(docB.updated).getTime() - new Date(docA.updated).getTime());
+                    break;
+                case 'installs':
+                    if (args.ascending) docs = docs.sort((docA, docB) => docA.installs - docB.installs);
+                    else docs = docs.sort((docA, docB) => docB.installs - docA.installs);
+                    break;
+                case 'users':
+                    if (args.ascending) docs = docs.sort((docA, docB) => docA.activeUsers - docB.activeUsers);
+                    else docs = docs.sort((docA, docB) => docB.activeUsers - docA.activeUsers);
+                    break;
+            }
+        }
+
         const total = docs.length;
         const pages = Math.ceil(total / 9);
 
@@ -30,6 +51,11 @@ export default class ServerEmu {
 
         return {
             docs,
+            filters: {
+                sterm: args.sterm || '',
+                ascending: args.ascending || false,
+                sort: args.sort || 'name'
+            },
             pagination: {
                 total,
                 pages,

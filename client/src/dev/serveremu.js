@@ -7,21 +7,34 @@ export default class ServerEmu {
 
         await new Promise(r => setTimeout(r, Math.random() * 3000));
 
-        let docs = this._themes;
-
+        let docs = [];
+        
         if (args && args.sterm) {
             const { sterm } = args;
             const reg = new RegExp(sterm, 'gi');
-            docs = docs.filter(doc => doc.tags.includes(sterm) || reg.exec(doc.name) || reg.exec(doc.description));
+            docs = this._themes.filter(doc => doc.tags.includes(sterm) || reg.exec(doc.name) || reg.exec(doc.description));
+        } else {
+            docs = this._themes;
+        }
+
+        const total = docs.length;
+        const pages = Math.ceil(total / 9);
+
+        let page = 1;
+        if (args && args.page) {
+            page = args.page;
+            docs = docs.slice((page - 1) * 9, page * 9);
+        } else {
+            docs = docs.slice(0, 9);
         }
 
         return {
             docs,
             pagination: {
-                total: docs.length,
-                pages: docs.length / 9,
+                total,
+                pages,
                 limit: 9,
-                page: 1
+                page
             }
         }
     }

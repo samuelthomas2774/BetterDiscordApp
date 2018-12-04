@@ -79,7 +79,12 @@
                 onlineThemes: null,
                 loadingOnline: false,
                 loadingMore: false,
-                searchHint: ''
+                searchHint: '',
+                sterm: '',
+                pagination: {
+                    page: 1,
+                    pages: 1
+                }
             };
         },
         components: {
@@ -98,13 +103,14 @@
             async refreshLocal() {
                 await this.ThemeManager.refreshThemes();
             },
-            async refreshOnline(sterm) {
+            async refreshOnline() {
                 this.searchHint = '';
                 if (this.loadingOnline || this.loadingMore) return;
                 this.loadingOnline = true;
                 try {
-                    const getThemes = await BdWebApi.themes.get({ sterm });
+                    const getThemes = await BdWebApi.themes.get({ sterm: this.sterm });
                     this.onlineThemes = getThemes;
+                    this.pagination = this.onlineThemes.pagination;
                     if (!this.onlineThemes.docs) return;
                     this.searchHint = `${this.onlineThemes.pagination.total} Results`;
                 } catch (err) {
@@ -142,13 +148,16 @@
             },
             searchInput(e) {
                 if (this.loadingOnline || this.loadingMore) return;
-                this.refreshOnline(e.target.value);
+                this.sterm = e.target.value;
+                this.refreshOnline();
             },
             async scrollend(e) {
+                if (this.pagination.page >= this.pagination.pages) return;
                 if (this.loadingOnline || this.loadingMore) return;
                 this.loadingMore = true;
                 try {
-                    const getThemes = await BdWebApi.themes.get();
+                    this.pagination.page = this.pagination.page + 1;
+                    const getThemes = await BdWebApi.themes.get({ sterm: this.sterm, page: this.pagination.page });
                     this.onlineThemes.docs = [...this.onlineThemes.docs, ...getThemes.docs];
                 } catch (err) {
                     Logger.err('ThemesView', err);

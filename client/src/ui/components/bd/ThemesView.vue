@@ -40,10 +40,10 @@
                     </div>
                     <div class="bd-flex bd-flexRow" v-if="onlineThemes && onlineThemes.docs && onlineThemes.docs.length">
                         <div class="bd-searchSort bd-flex bd-flexGrow">
-                            <div class="bd-sort bd-active">Name<MiChevronDown size="18"/></div>
-                            <div class="bd-sort">Updated</div>
-                            <div class="bd-sort">Installs</div>
-                            <div class="bd-sort">Users</div>
+                            <div class="bd-sort" @click="sortBy('name')" :class="{'bd-active': sort === 'name', 'bd-flipY': ascending}">Name<MiChevronDown v-if="sort === 'name'" size="18"/></div>
+                            <div class="bd-sort" @click="sortBy('updated')" :class="{'bd-active': sort === 'updated', 'bd-flipY': ascending}">Updated<MiChevronDown v-if="sort === 'updated'" size="18" /></div>
+                            <div class="bd-sort" @click="sortBy('installs')" :class="{'bd-active': sort === 'installs', 'bd-flipY': ascending}">Installs<MiChevronDown v-if="sort === 'installs'" size="18" /></div>
+                            <div class="bd-sort" @click="sortBy('users')" :class="{'bd-active': sort === 'users', 'bd-flipY': ascending}">Users<MiChevronDown v-if="sort === 'users'" size="18" /></div>
                         </div>
                     </div>
                 </div>
@@ -83,7 +83,9 @@
                 pagination: {
                     page: 1,
                     pages: 1
-                }
+                },
+                sort: 'name',
+                ascending: false
             };
         },
         components: {
@@ -163,6 +165,15 @@
                     Logger.err('ThemesView', err);
                 } finally {
                     this.loadingMore = false;
+                }
+            },
+            async sortBy(by) {
+                if (this.loadingOnline || this.loadingMore) return;
+                if (this.sort === by) {
+                    this.ascending = !this.ascending;
+                } else {
+                    this.sort = by;
+                    this.ascending = false;
                 }
             }
         }

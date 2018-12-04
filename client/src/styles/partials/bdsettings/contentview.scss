@@ -69,6 +69,12 @@
                     svg {
                         height: 14px;
                     }
+
+                    &.bd-flipY {
+                        .bd-materialDesignIcon {
+                            transform: scaleY(-1);
+                        }
+                    }
                 }
             }
         }

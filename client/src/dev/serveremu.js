@@ -19,10 +19,6 @@ export default class ServerEmu {
 
         if (args.sort) {
             switch (args.sort) {
-                case 'name':
-                    if (args.ascending) docs = docs.sort((docA, docB) => docA.name.toUpperCase() < docB.name.toUpperCase());
-                    else docs = docs.sort((docA, docB) => docA.name.toUpperCase() > docB.name.toUpperCase());
-                    break;
                 case 'updated':
                     if (args.ascending) docs = docs.sort((docA, docB) => new Date(docA.updated).getTime() - new Date(docB.updated).getTime());
                     else docs = docs.sort((docA, docB) => new Date(docB.updated).getTime() - new Date(docA.updated).getTime());

@@ -25,7 +25,11 @@
             </div>
         </div>
         <div class="bd-flexRow bd-flex bd-flexGrow">
-            <div class="bd-flexGrow bd-remoteCardTags">{{item.tags.join(', ')}}</div>
+            <div class="bd-flexGrow bd-remoteCardTags">
+                <div v-for="(tag, index) in item.tags" class="bd-remoteCardTag">
+                    <div @click="tagClicked(tag)">{{tag}}</div><span v-if="index + 1 < item.tags.length">, </span>
+                </div>
+            </div>
             <div class="bd-buttonGroup">
                 <div class="bd-button">Install</div>
                 <div class="bd-button">Preview</div>
@@ -40,7 +44,7 @@
     import { shell } from 'electron';
 
     export default {
-        props: ['item'],
+        props: ['item', 'tagClicked'],
         data() {
             return {}
         },

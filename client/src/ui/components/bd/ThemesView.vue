@@ -35,7 +35,7 @@
                         </div>
                         <div class="bd-searchHint">{{searchHint}}</div>
                         <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
-                            <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
+                            <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop :value="onlineThemes.filters.sterm"/>
                         </div>
                     </div>
                     <div class="bd-flex bd-flexRow" v-if="onlineThemes && onlineThemes.docs && onlineThemes.docs.length">
@@ -49,7 +49,7 @@
                     </div>
                 </div>
                 <ScrollerWrap class="bd-onlinePhBody" v-if="!loadingOnline && onlineThemes" :scrollend="scrollend">
-                    <RemoteCard v-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme" />
+                    <RemoteCard v-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme" :tagClicked="searchByTag"/>
                     <div class="bd-spinnerContainer">
                         <div v-if="loadingMore" class="bd-spinner7"/>
                     </div>
@@ -190,6 +190,11 @@
                     this.onlineThemes.filters.sort = by;
                     this.onlineThemes.filters.ascending = false;
                 }
+                this.refreshOnline();
+            },
+            async searchByTag(tag) {
+                if (this.loadingOnline || this.loadingMore) return;
+                this.onlineThemes.filters.sterm = tag;
                 this.refreshOnline();
             }
         }

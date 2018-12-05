@@ -48,8 +48,19 @@
         color: #828a97;
         font-size: 10px;
         display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
+        align-items: flex-end;
+
+        .bd-remoteCardTag {
+            > div {
+                display: inline;
+                cursor: pointer;
+                margin-left: 2px;
+
+                &:hover {
+                    color: #fff;
+                }
+            }
+        }
     }
 
     .bd-buttonGroup {

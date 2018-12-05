@@ -50,7 +50,9 @@
         },
         methods: {
             resolveThumb() {
-                return `${this.item.repository.rawUri}/${this.item.files.previews[0].thumb}`;
+                // TODO
+                return '';
+                // return `${this.item.repository.rawUri}/${this.item.files.previews[0].thumb}`;
             },
             fromNow() {
                 const { Moment } = Reflection.modules;

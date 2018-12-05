@@ -29,6 +29,12 @@ export default class BdWebApi {
         };
     }
 
+    static get plugins() {
+        return {
+            get: this.getPlugins
+        };
+    }
+
     static get users() {
         return {
             get: this.getUsers
@@ -52,6 +58,10 @@ export default class BdWebApi {
 
         return request.get(ENDPOINTS.themes);
         */
+    }
+
+    static getPlugins(args) {
+        return ServerEmu.plugins(args);
     }
 
     static getUsers(args) {

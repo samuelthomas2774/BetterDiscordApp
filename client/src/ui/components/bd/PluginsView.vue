@@ -28,18 +28,31 @@
                 </ScrollerWrap>
             </div>
             <div v-else class="bd-onlinePh">
-                <div class="bd-onlinePhHeader">
-                    <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlinePlugins && onlinePlugins.docs)}">
-                        <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
+                <div class="bd-onlinePhHeader bd-flexCol">
+                    <div class="bd-flex bd-flexRow">
+                        <div v-if="loadingOnline" class="bd-spinnerContainer">
+                            <div class="bd-spinner7" />
+                        </div>
+                        <div class="bd-searchHint">{{searchHint}}</div>
+                        <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlinePlugins && onlinePlugins.docs)}">
+                            <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop :value="onlinePlugins.filters.sterm" />
+                        </div>
                     </div>
-                    <div v-if="loadingOnline" class="bd-spinnerContainer">
-                        <div class="bd-spinner7" />
+                    <div class="bd-flex bd-flexRow" v-if="onlinePlugins && onlinePlugins.docs && onlinePlugins.docs.length">
+                        <div class="bd-searchSort bd-flex bd-flexGrow">
+                            <div v-for="btn in sortBtns"
+                                 class="bd-sort"
+                                 :class="{'bd-active': onlinePlugins.filters.sort === btn.toLowerCase(), 'bd-flipY': onlinePlugins.filters.ascending}"
+                                 @click="sortBy(btn.toLowerCase())">
+                                {{btn}}<MiChevronDown v-if="onlinePlugins.filters.sort === btn.toLowerCase()" size="18" />
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <ScrollerWrap class="bd-onlinePhBody" v-if="!loadingOnline && onlinePlugins" :scrollend="scrollend">
-                    <RemoteCard v-if="onlinePlugins && onlinePlugins.docs" v-for="plugin in onlinePlugins.docs" :key="plugin.id" :item="plugin" />
-                    <div v-if="loadingMore" class="bd-spinnerContainer">
-                        <div class="bd-spinner7" />
+                    <RemoteCard v-if="onlinePlugins && onlinePlugins.docs" v-for="plugin in onlinePlugins.docs" :key="onlinePlugins.id" :item="plugin" :tagClicked="searchByTag" />
+                    <div class="bd-spinnerContainer">
+                        <div v-if="loadingMore" class="bd-spinner7" />
                     </div>
                 </ScrollerWrap>
             </div>
@@ -49,28 +62,45 @@
 
 <script>
     // Imports
-    import { PluginManager } from 'modules';
+    import { PluginManager, BdWebApi } from 'modules';
     import { Modals } from 'ui';
     import { ClientLogger as Logger } from 'common';
-    import { MiRefresh, ScrollerWrap } from '../common';
+    import { MiRefresh, ScrollerWrap, MiChevronDown } from '../common';
     import SettingsWrapper from './SettingsWrapper.vue';
     import PluginCard from './PluginCard.vue';
+    import RemoteCard from './RemoteCard.vue';
     import RefreshBtn from '../common/RefreshBtn.vue';
 
     export default {
         data() {
             return {
                 PluginManager,
+                sortBtns: ['Updated', 'Installs', 'Users', 'Rating'],
                 local: true,
                 localPlugins: PluginManager.localPlugins,
-                onlinePlugins: null,
+                onlinePlugins: {
+                    docs: [],
+                    filters: {
+                        sterm: '',
+                        sort: 'installs',
+                        ascending: false
+                    },
+                    pagination: {
+                        total: 0,
+                        pages: 0,
+                        limit: 9,
+                        page: 1
+                    }
+                },
                 loadingOnline: false,
-                loadingMore: false
+                loadingMore: false,
+                searchHint: ''
             };
         },
         components: {
-            SettingsWrapper, PluginCard,
-            MiRefresh, ScrollerWrap,
+            SettingsWrapper, PluginCard, RemoteCard,
+            MiRefresh, MiChevronDown,
+            ScrollerWrap,
             RefreshBtn
         },
         methods: {
@@ -84,7 +114,19 @@
                 await this.PluginManager.refreshPlugins();
             },
             async refreshOnline() {
-                // TODO
+                this.searchHint = '';
+                if (this.loadingOnline || this.loadingMore) return;
+                this.loadingOnline = true;
+                try {
+                    const getPlugins = await BdWebApi.plugins.get(this.onlinePlugins.filters);
+                    this.onlinePlugins = getPlugins;
+                    if (!this.onlinePlugins.docs) return;
+                    this.searchHint = `${this.onlinePlugins.pagination.total} Results`;
+                } catch (err) {
+                    Logger.err('PluginsView', err);
+                } finally {
+                    this.loadingOnline = false;
+                }
             },
             async togglePlugin(plugin) {
                 // TODO: display error if plugin fails to start/stop
@@ -116,21 +158,45 @@
             },
             searchInput(e) {
                 if (this.loadingOnline || this.loadingMore) return;
+                this.onlinePlugins.filters.sterm = e.target.value;
                 this.refreshOnline();
             },
             async scrollend(e) {
-                // TODO
-                return;
+                if (this.onlinePlugins.pagination.page >= this.onlinePlugins.pagination.pages) return;
                 if (this.loadingOnline || this.loadingMore) return;
                 this.loadingMore = true;
+
                 try {
-                    const getPlugins = await BdWebApi.plugins.get();
+                    const getPlugins = await BdWebApi.plugins.get({
+                        sterm: this.onlinePlugins.filters.sterm,
+                        page: this.onlinePlugins.pagination.page + 1,
+                        sort: this.onlinePlugins.filters.sort,
+                        ascending: this.onlinePlugins.filters.ascending
+                    });
+
                     this.onlinePlugins.docs = [...this.onlinePlugins.docs, ...getPlugins.docs];
+                    this.onlinePlugins.filters = getPlugins.filters;
+                    this.onlinePlugins.pagination = getPlugins.pagination;
                 } catch (err) {
                     Logger.err('PluginsView', err);
                 } finally {
                     this.loadingMore = false;
                 }
+            },
+            async sortBy(by) {
+                if (this.loadingOnline || this.loadingMore) return;
+                if (this.onlinePlugins.filters.sort === by) {
+                    this.onlinePlugins.filters.ascending = !this.onlinePlugins.filters.ascending;
+                } else {
+                    this.onlinePlugins.filters.sort = by;
+                    this.onlinePlugins.filters.ascending = false;
+                }
+                this.refreshOnline();
+            },
+            async searchByTag(tag) {
+                if (this.loadingOnline || this.loadingMore) return;
+                this.onlinePlugins.filters.sterm = tag;
+                this.refreshOnline();
             }
         }
     }

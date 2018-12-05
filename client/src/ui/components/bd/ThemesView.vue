@@ -108,7 +108,6 @@
             },
             async showOnline() {
                 this.local = false;
-                if (this.loadingOnline || this.onlineThemes) return;
             },
             async refreshLocal() {
                 await this.ThemeManager.refreshThemes();

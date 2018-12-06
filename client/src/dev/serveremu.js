@@ -8,7 +8,7 @@ export default class ServerEmu {
         await new Promise(r => setTimeout(r, Math.random() * 3000));
 
         let docs = [];
-        
+
         if (args && args.sterm) {
             const { sterm } = args;
             const reg = new RegExp(sterm, 'gi');
@@ -19,22 +19,22 @@ export default class ServerEmu {
 
         if (args.sort) {
             switch (args.sort) {
-                case 'updated':
-                    if (args.ascending) docs = docs.sort((docA, docB) => new Date(docA.updated).getTime() - new Date(docB.updated).getTime());
-                    else docs = docs.sort((docA, docB) => new Date(docB.updated).getTime() - new Date(docA.updated).getTime());
-                    break;
-                case 'installs':
-                    if (args.ascending) docs = docs.sort((docA, docB) => docA.installs - docB.installs);
-                    else docs = docs.sort((docA, docB) => docB.installs - docA.installs);
-                    break;
-                case 'users':
-                    if (args.ascending) docs = docs.sort((docA, docB) => docA.activeUsers - docB.activeUsers);
-                    else docs = docs.sort((docA, docB) => docB.activeUsers - docA.activeUsers);
-                    break;
-                case 'rating':
-                    if (args.ascending) docs = docs.sort((docA, docB) => docA.rating - docB.rating);
-                    else docs = docs.sort((docA, docB) => docB.rating - docA.rating);
-                    break;
+            case 'updated':
+                if (args.ascending) docs = docs.sort((docA, docB) => new Date(docA.updated).getTime() - new Date(docB.updated).getTime());
+                else docs = docs.sort((docA, docB) => new Date(docB.updated).getTime() - new Date(docA.updated).getTime());
+                break;
+            case 'installs':
+                if (args.ascending) docs = docs.sort((docA, docB) => docA.installs - docB.installs);
+                else docs = docs.sort((docA, docB) => docB.installs - docA.installs);
+                break;
+            case 'users':
+                if (args.ascending) docs = docs.sort((docA, docB) => docA.activeUsers - docB.activeUsers);
+                else docs = docs.sort((docA, docB) => docB.activeUsers - docA.activeUsers);
+                break;
+            case 'rating':
+                if (args.ascending) docs = docs.sort((docA, docB) => docA.rating - docB.rating);
+                else docs = docs.sort((docA, docB) => docB.rating - docA.rating);
+                break;
             }
         }
 
@@ -82,22 +82,22 @@ export default class ServerEmu {
 
         if (args.sort) {
             switch (args.sort) {
-                case 'updated':
-                    if (args.ascending) docs = docs.sort((docA, docB) => new Date(docA.updated).getTime() - new Date(docB.updated).getTime());
-                    else docs = docs.sort((docA, docB) => new Date(docB.updated).getTime() - new Date(docA.updated).getTime());
-                    break;
-                case 'installs':
-                    if (args.ascending) docs = docs.sort((docA, docB) => docA.installs - docB.installs);
-                    else docs = docs.sort((docA, docB) => docB.installs - docA.installs);
-                    break;
-                case 'users':
-                    if (args.ascending) docs = docs.sort((docA, docB) => docA.activeUsers - docB.activeUsers);
-                    else docs = docs.sort((docA, docB) => docB.activeUsers - docA.activeUsers);
-                    break;
-                case 'rating':
-                    if (args.ascending) docs = docs.sort((docA, docB) => docA.rating - docB.rating);
-                    else docs = docs.sort((docA, docB) => docB.rating - docA.rating);
-                    break;
+            case 'updated':
+                if (args.ascending) docs = docs.sort((docA, docB) => new Date(docA.updated).getTime() - new Date(docB.updated).getTime());
+                else docs = docs.sort((docA, docB) => new Date(docB.updated).getTime() - new Date(docA.updated).getTime());
+                break;
+            case 'installs':
+                if (args.ascending) docs = docs.sort((docA, docB) => docA.installs - docB.installs);
+                else docs = docs.sort((docA, docB) => docB.installs - docA.installs);
+                break;
+            case 'users':
+                if (args.ascending) docs = docs.sort((docA, docB) => docA.activeUsers - docB.activeUsers);
+                else docs = docs.sort((docA, docB) => docB.activeUsers - docA.activeUsers);
+                break;
+            case 'rating':
+                if (args.ascending) docs = docs.sort((docA, docB) => docA.rating - docB.rating);
+                else docs = docs.sort((docA, docB) => docB.rating - docA.rating);
+                break;
             }
         }
 

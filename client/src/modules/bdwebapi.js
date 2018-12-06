@@ -50,7 +50,7 @@ export default class BdWebApi {
 
     static getThemes(args) {
         return ServerEmu.themes(args);
-       //  return dummyThemes();
+        //  return dummyThemes();
         /*
         if (!args) return request.get(ENDPOINTS.themes);
         const { id } = args;

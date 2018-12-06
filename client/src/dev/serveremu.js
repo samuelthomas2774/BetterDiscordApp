@@ -147,7 +147,7 @@ export default class ServerEmu {
                 activeUsers: Math.floor(Math.random() * 1000) + 1000,
                 rated: Math.random() > .5,
                 version: this.randomVersion(),
-                repository: this.dummyRepo,
+                repository: this.dummyThemeRepo,
                 files: this.dummyFiles,
                 author: this.dummyAuthor,
                 description: ''
@@ -176,7 +176,7 @@ export default class ServerEmu {
                 activeUsers: Math.floor(Math.random() * 1000) + 1000,
                 rated: Math.random() > .5,
                 version: this.randomVersion(),
-                repository: this.dummyRepo,
+                repository: this.dummyPluginRepo,
                 files: this.dummyFiles,
                 author: this.dummyAuthor,
                 description: ''
@@ -186,11 +186,21 @@ export default class ServerEmu {
         return docs;
     }
 
-    static get dummyRepo() {
+    static get dummyThemeRepo() {
         return {
             name: 'ExampleRepository',
             baseUri: 'https://github.com/Jiiks/ExampleRepository',
-            rawUri: 'https://github.com/Jiiks/ExampleRepository/raw/master'
+            rawUri: 'https://github.com/Jiiks/ExampleRepository/raw/master',
+            assetUri: 'https://api.github.com/repos/Jiiks/ExampleRepository/releases/assets/10023264'
+        }
+    }
+
+    static get dummyPluginRepo() {
+        return {
+            name: 'ExampleRepository',
+            baseUri: 'https://github.com/Jiiks/ExampleRepository',
+            rawUri: 'https://github.com/Jiiks/ExampleRepository/raw/master',
+            assetUri: 'https://api.github.com/repos/Jiiks/ExampleRepository/releases/assets/10023265'
         }
     }
 

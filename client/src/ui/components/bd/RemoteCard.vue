@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div class="bd-buttonGroup">
-                <div class="bd-button">Install</div>
+                <div class="bd-button" @click="install">Install</div>
                 <div class="bd-button">Preview</div>
                 <div class="bd-button" @click="openSourceUrl">Source</div>
             </div>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-    import { Reflection } from 'modules';
+    import { Reflection, PackageInstaller } from 'modules';
     import { shell } from 'electron';
 
     export default {
@@ -62,6 +62,9 @@
                 if (!this.item.repository || !this.item.repository.baseUri) return;
                 if (Object.assign(document.createElement('a'), { href: this.item.repository.baseUri }).hostname !== 'github.com') return;
                 shell.openExternal(this.item.repository.baseUri);
+            },
+            async install() {
+                await PackageInstaller.installRemotePackage(this.item.repository.assetUri);
             }
         }
     }

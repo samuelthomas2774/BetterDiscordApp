@@ -5,17 +5,13 @@
     border-radius: 0;
     border-bottom: 1px solid rgba(114, 118, 126, .3);
 
-    &:hover {
-        transform: scale(1.005);
-    }
-
     .bd-remoteCardTitle {
         color: #b9bbbe;
         font-weight: 700;
     }
 
     .bd-remoteCardLikes {
-        color: #f00;
+        color: $colerr;
         font-size: 12px;
         font-weight: 600;
     }
@@ -52,8 +48,19 @@
         color: #828a97;
         font-size: 10px;
         display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
+        align-items: flex-end;
+
+        .bd-remoteCardTag {
+            > div {
+                display: inline;
+                cursor: pointer;
+                margin-left: 2px;
+
+                &:hover {
+                    color: #fff;
+                }
+            }
+        }
     }
 
     .bd-buttonGroup {

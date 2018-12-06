@@ -35,23 +35,23 @@
                         </div>
                         <div class="bd-searchHint">{{searchHint}}</div>
                         <div class="bd-fancySearch" :class="{'bd-disabled': loadingOnline, 'bd-active': loadingOnline || (onlineThemes && onlineThemes.docs)}">
-                            <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop />
+                            <input type="text" class="bd-textInput" placeholder="Search" @keydown.enter="searchInput" @keyup.stop :value="onlineThemes.filters.sterm"/>
                         </div>
                     </div>
                     <div class="bd-flex bd-flexRow" v-if="onlineThemes && onlineThemes.docs && onlineThemes.docs.length">
                         <div class="bd-searchSort bd-flex bd-flexGrow">
-                            <span class="bd-flexGrow">Sort by:</span>
-                            <div class="bd-sort">Name</div>
-                            <div class="bd-sort">Updated</div>
-                            <div class="bd-sort">Installs</div>
-                            <div class="bd-sort">Users</div>
+                            <div v-for="btn in sortBtns"
+                                 class="bd-sort"
+                                 :class="{'bd-active': onlineThemes.filters.sort === btn.toLowerCase(), 'bd-flipY': onlineThemes.filters.ascending}"
+                                 @click="sortBy(btn.toLowerCase())">{{btn}}<MiChevronDown v-if="onlineThemes.filters.sort === btn.toLowerCase()" size="18" />
+                            </div>
                         </div>
                     </div>
                 </div>
                 <ScrollerWrap class="bd-onlinePhBody" v-if="!loadingOnline && onlineThemes" :scrollend="scrollend">
-                    <RemoteCard v-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme" />
-                    <div v-if="loadingMore" class="bd-spinnerContainer">
-                        <div class="bd-spinner7"/>
+                    <RemoteCard v-if="onlineThemes && onlineThemes.docs" v-for="theme in onlineThemes.docs" :key="theme.id" :item="theme" :tagClicked="searchByTag"/>
+                    <div class="bd-spinnerContainer">
+                        <div v-if="loadingMore" class="bd-spinner7"/>
                     </div>
                 </ScrollerWrap>
             </div>
@@ -64,7 +64,7 @@
     import { ThemeManager, BdWebApi } from 'modules';
     import { Modals } from 'ui';
     import { ClientLogger as Logger } from 'common';
-    import { MiRefresh, ScrollerWrap } from '../common';
+    import { MiRefresh, ScrollerWrap, MiChevronDown } from '../common';
     import SettingsWrapper from './SettingsWrapper.vue';
     import ThemeCard from './ThemeCard.vue';
     import RemoteCard from './RemoteCard.vue';
@@ -74,9 +74,23 @@
         data() {
             return {
                 ThemeManager,
+                sortBtns: ['Updated', 'Installs', 'Users', 'Rating'],
                 local: true,
                 localThemes: ThemeManager.localThemes,
-                onlineThemes: null,
+                onlineThemes: {
+                    docs: [],
+                    filters: {
+                        sterm: '',
+                        sort: 'installs',
+                        ascending: false
+                    },
+                    pagination: {
+                        total: 0,
+                        pages: 0,
+                        limit: 9,
+                        page: 1
+                    }
+                },
                 loadingOnline: false,
                 loadingMore: false,
                 searchHint: ''
@@ -84,7 +98,8 @@
         },
         components: {
             SettingsWrapper, ThemeCard, RemoteCard,
-            MiRefresh, ScrollerWrap,
+            MiRefresh, MiChevronDown,
+            ScrollerWrap,
             RefreshBtn
         },
         methods: {
@@ -93,7 +108,6 @@
             },
             async showOnline() {
                 this.local = false;
-                if (this.loadingOnline || this.onlineThemes) return;
             },
             async refreshLocal() {
                 await this.ThemeManager.refreshThemes();
@@ -103,7 +117,7 @@
                 if (this.loadingOnline || this.loadingMore) return;
                 this.loadingOnline = true;
                 try {
-                    const getThemes = await BdWebApi.themes.get();
+                    const getThemes = await BdWebApi.themes.get(this.onlineThemes.filters);
                     this.onlineThemes = getThemes;
                     if (!this.onlineThemes.docs) return;
                     this.searchHint = `${this.onlineThemes.pagination.total} Results`;
@@ -142,19 +156,45 @@
             },
             searchInput(e) {
                 if (this.loadingOnline || this.loadingMore) return;
+                this.onlineThemes.filters.sterm = e.target.value;
                 this.refreshOnline();
             },
             async scrollend(e) {
+                if (this.onlineThemes.pagination.page >= this.onlineThemes.pagination.pages) return;
                 if (this.loadingOnline || this.loadingMore) return;
                 this.loadingMore = true;
+
                 try {
-                    const getThemes = await BdWebApi.themes.get();
+                    const getThemes = await BdWebApi.themes.get({
+                        sterm: this.onlineThemes.filters.sterm,
+                        page: this.onlineThemes.pagination.page + 1,
+                        sort: this.onlineThemes.filters.sort,
+                        ascending: this.onlineThemes.filters.ascending
+                    });
+
                     this.onlineThemes.docs = [...this.onlineThemes.docs, ...getThemes.docs];
+                    this.onlineThemes.filters = getThemes.filters;
+                    this.onlineThemes.pagination = getThemes.pagination;
                 } catch (err) {
                     Logger.err('ThemesView', err);
                 } finally {
                     this.loadingMore = false;
                 }
+            },
+            async sortBy(by) {
+                if (this.loadingOnline || this.loadingMore) return;
+                if (this.onlineThemes.filters.sort === by) {
+                    this.onlineThemes.filters.ascending = !this.onlineThemes.filters.ascending;
+                } else {
+                    this.onlineThemes.filters.sort = by;
+                    this.onlineThemes.filters.ascending = false;
+                }
+                this.refreshOnline();
+            },
+            async searchByTag(tag) {
+                if (this.loadingOnline || this.loadingMore) return;
+                this.onlineThemes.filters.sterm = tag;
+                this.refreshOnline();
             }
         }
     }

@@ -33,9 +33,49 @@
             }
 
             .bd-searchSort {
-                span {
+                margin-top: 10px;
+                justify-content: flex-end;
+
+                > span {
                     color: #fff;
-                    line-height: 40px;
+                    display: flex;
+                    justify-content: flex-end;
+                    font-size: 12px;
+                    height: 14px;
+                    padding: 3px;
+                }
+
+                .bd-sort {
+                    display: flex;
+                    color: $coldimwhite;
+                    font-size: 12px;
+                    padding: 3px;
+                    height: 14px;
+                    cursor: pointer;
+                    transition: color .2s ease-in-out;
+                    font-weight: 700;
+
+                    &:hover {
+                        color: #fff;
+                    }
+
+                    &.bd-active {
+                        color: $colbdgreen;
+                    }
+
+                    .bd-materialDesignIcon {
+                        fill: $colbdgreen;
+                    }
+
+                    svg {
+                        height: 14px;
+                    }
+
+                    &.bd-flipY {
+                        .bd-materialDesignIcon {
+                            transform: scaleY(-1);
+                        }
+                    }
                 }
             }
         }
@@ -44,6 +84,7 @@
             margin-top: 10px;
 
             .bd-spinnerContainer {
+                min-height: 40px;
                 padding: 0;
             }
 

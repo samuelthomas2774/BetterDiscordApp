@@ -103,7 +103,7 @@ export default class PackageInstaller {
     }
 
     /**
-     * Install package from remote location. Only github/bdapi is supoorted.
+     * Install package from remote location. Only github/bdapi is supported.
      * @param {String} remoteLocation Remote resource location
      */
     static async installRemotePackage(remoteLocation) {
@@ -113,6 +113,7 @@ export default class PackageInstaller {
 
             const options = {
                 uri: remoteLocation,
+                encoding: null,
                 headers: {
                     'User-Agent': 'BetterDiscordClient',
                     'Accept': 'application/octet-stream'
@@ -122,9 +123,10 @@ export default class PackageInstaller {
             const response = await request.get(options);
             const outputPath = path.join(Globals.getPath('tmp'), Security.hash('sha256', response, 'hex'));
             fs.writeFileSync(outputPath, response);
+            console.log('response', response);
+            console.log('output', outputPath);
 
             await this.dragAndDropHandler(outputPath);
-
             rimraf(outputPath, err => {
                 if (err) console.log(err);
             });

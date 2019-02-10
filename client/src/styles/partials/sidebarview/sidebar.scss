@@ -1,50 +1,50 @@
 .bd-sidebar {
-    width: 100%;
-    padding-right: 20px;
-    padding: 0;
+	width: 100%;
+	padding-right: 20px;
+	padding: 0;
 
-    .bd-header {
-        padding: 6px 0;
-        margin-left: 10px;
-        margin-top: 15px;
-        color: rgba(255, 255, 255, .15);
-        font-size: 14px;
-        line-height: 16px;
-        text-transform: uppercase;
-        font-weight: 600;
-        flex-shrink: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
-    }
+	.bd-header {
+		padding: 6px 0;
+		margin-left: 10px;
+		margin-top: 15px;
+		color: rgba(255, 255, 255, .15);
+		font-size: 14px;
+		line-height: 16px;
+		text-transform: uppercase;
+		font-weight: 600;
+		flex-shrink: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
+	}
 
-    .bd-item {
-        border-radius: 3px;
-        margin-bottom: 2px;
-        padding-bottom: 6px;
-        padding-top: 6px;
-        padding: 6px 10px;
-        color: $coldimwhite;
-        cursor: pointer;
-        font-size: 17px;
-        line-height: 20px;
-        position: relative;
-        flex-shrink: 0;
-        font-weight: 500;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
+	.bd-item {
+		border-radius: 3px;
+		margin-bottom: 2px;
+		padding-bottom: 6px;
+		padding-top: 6px;
+		padding: 6px 10px;
+		color: $coldimwhite;
+		cursor: pointer;
+		font-size: 17px;
+		line-height: 20px;
+		position: relative;
+		flex-shrink: 0;
+		font-weight: 500;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
 
-        &:hover,
-        &.bd-active {
-            background: $colbdgreen;
-            color: #fff;
-        }
-
-        &.bd-active {
-            cursor: default;
-        }
-    }
+		&:hover {
+			background-color: rgba(185,185,185,.1);
+			color: #f6f6f6;
+		}
+		&.bd-active {
+			background: $colbdgreen;
+			color: #fff;
+			cursor: default;
+		}
+	}
 }

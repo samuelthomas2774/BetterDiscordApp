@@ -4,27 +4,27 @@
     "files": [
         {
             "id": "client",
-            "name": "client.zip",
+            "name": "client.tar.gz",
             "version": "2.0.0",
-            "size": "436228",
-            "remote": "/releases/download/InstallerTest/client.zip",
-            "hash": "B0543B1D458021BC8F73CCEFB66185738582FD5B27B6F803F3ACB4989C9D1EBA"
+            "size": "441020",
+            "remote": "/releases/download/InstallerTest/client.tar.gz",
+            "hash": "18A88720B1DE93351BDD0B158EAB58BF182EEA4EB1554A0B7C412E2F535B2D46"
         },
         {
             "id": "core",
-            "name": "core.zip",
+            "name": "core.tar.gz",
             "version": "2.0.0",
-            "size": "6983826",
-            "remote": "/releases/download/InstallerTest/core.zip",
-            "hash": "CF2AB488FB4FFF0EF2F5EC41930A62753D7DA5062954CDE1C27DD931F4560DC9"
+            "size": "5813974",
+            "remote": "/releases/download/InstallerTest/core.tar.gz",
+            "hash": "7D4C0DC9EC4FBDFE12E3936001884A885961DCEF01FD353BE26FE03068AA65EA"
         },
         {
             "id": "csseditor",
-            "name": "csseditor.zip",
+            "name": "csseditor.tar.gz",
             "version": "0.0.1",
-            "size": "209435",
-            "remote": "/releases/download/InstallerTest/csseditor.zip",
-            "hash": "5AD55F136AB515F17D163F017122E6690F01441F004967F53A50C218801A474E"
+            "size": "210481",
+            "remote": "/releases/download/InstallerTest/csseditor.tar.gz",
+            "hash": "DE99D8EE447A8F444D6C044A743BF2AB42C35B9A77C42A29ACEF0CE2B4548CBC"
         }
     ]
 }

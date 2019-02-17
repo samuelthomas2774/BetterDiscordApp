@@ -16,6 +16,14 @@ export default class Config extends Module {
         return this.args.version;
     }
 
+    get clientVersion() {
+        return this.args.clientVersion;
+    }
+
+    setClientVersion(clientVersion) {
+        this.args.clientVersion = clientVersion;
+    }
+
     get paths() {
         return this.args.paths;
     }
@@ -24,6 +32,10 @@ export default class Config extends Module {
         return this.paths[id];
         // const path = this.paths.find(path => path.id === id);
         // return full ? path : path.path;
+    }
+
+    addPath(id, path) {
+        this.paths[id] = path;
     }
 
     get config() {

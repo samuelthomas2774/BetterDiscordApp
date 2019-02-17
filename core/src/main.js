@@ -151,6 +151,7 @@ export class BetterDiscord {
         this.database.init();
 
         configProxy = () => this.config;
+        const autoInitComms = this.comms;
         this.init();
     }
 

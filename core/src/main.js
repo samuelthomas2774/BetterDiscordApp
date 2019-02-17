@@ -231,6 +231,7 @@ export class BetterDiscord {
         const themePath = path.resolve(extPath, 'themes');
         const modulePath = path.resolve(extPath, 'modules');
 
+        this.config.addPath('base', baseDataPath);
         this.config.addPath('ext', extPath);
         this.config.addPath('plugins', pluginPath);
         this.config.addPath('themes', themePath);

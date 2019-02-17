@@ -29,13 +29,12 @@ export default class Config extends Module {
     }
 
     getPath(id, full) {
-        return this.paths[id];
-        // const path = this.paths.find(path => path.id === id);
-        // return full ? path : path.path;
+        const path = this.paths.find(p => p.id === id);
+        return full ? path : path.path;
     }
 
     addPath(id, path) {
-        this.paths[id] = path;
+        this.paths.push({ id, path });
     }
 
     get config() {
@@ -45,4 +44,8 @@ export default class Config extends Module {
         };
     }
 
+    // Compatibility with old client code and new installer args
+    compatibility() {
+        this.args.paths = Object.entries(this.args.paths).map(([id, path]) => ({ id, path }));
+    }
 }

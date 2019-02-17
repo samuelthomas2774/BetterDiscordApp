@@ -143,6 +143,7 @@ export class BetterDiscord {
 
         BetterDiscord.loaded = true;
         this._args = args;
+        this.config.compatibility();
 
         this.bindings();
         this.parseClientPackage();

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const tests = false;
+const tests = typeof PRODUCTION === 'undefined';
 
 import path from 'path';
 import sass from 'node-sass';

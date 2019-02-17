@@ -46,7 +46,7 @@ class Comms {
 
         BDIpc.on('bd-sendToDiscord', (event, m) => this.sendToDiscord(m.channel, m.message), true);
 
-        BDIpc.on('bd-openCssEditor', (event, options) => this.bd.csseditor.openEditor(options), true);
+        // BDIpc.on('bd-openCssEditor', (event, options) => this.bd.csseditor.openEditor(options), true);
         BDIpc.on('bd-sendToCssEditor', (event, m) => this.sendToCssEditor(m.channel, m.message), true);
 
         BDIpc.on('bd-native-open', (event, options) => {
@@ -67,7 +67,7 @@ class Comms {
             });
         });
 
-        BDIpc.on('bd-dba', (event, options) => this.bd.dbInstance.exec(options), true);
+        BDIpc.on('bd-dba', (event, options) => this.bd.database.exec(options), true);
 
         BDIpc.on('bd-keytar-get', (event, { service, account }) => keytar.getPassword(service, account), true);
         BDIpc.on('bd-keytar-set', (event, { service, account, password }) => keytar.setPassword(service, account, password), true);

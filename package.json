@@ -79,8 +79,6 @@
     "watch_core": "npm run watch --prefix core",
     "build_csseditor": "npm run build --prefix csseditor",
     "watch_csseditor": "npm run watch --prefix csseditor",
-    "build_installer": "npm run build --prefix installer",
-    "watch_installer": "npm run watch --prefix installer",
     "lint": "eslint -f unix client/src core/src csseditor/src common && npm run sasslint",
     "lint_fix": "eslint -f unix client/src core/src csseditor/src common --fix",
     "sasslint": "sass-lint client/src/styles/**/*.scss -v",

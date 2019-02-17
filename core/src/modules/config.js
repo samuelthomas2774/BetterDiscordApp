@@ -21,8 +21,9 @@ export default class Config extends Module {
     }
 
     getPath(id, full) {
-        const path = this.paths.find(path => path.id === id);
-        return full ? path : path.path;
+        return this.paths[id];
+        // const path = this.paths.find(path => path.id === id);
+        // return full ? path : path.path;
     }
 
     get config() {

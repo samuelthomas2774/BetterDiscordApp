@@ -42,7 +42,7 @@ async function archiveCore(out = './release/core.tar.gz') {
     return new Promise((resolve, reject) => {
         console.log('packaging core');
         const mainFn = `core.${corepkg.version}.js`;
-        const coreArchive = createArchiver();
+        const coreArchive = createArchiver(6);
         coreArchive.file('./release/core/package.json', { name: 'core/package.json' });
         coreArchive.file('./release/core/index.js', { name: 'core/index.js' });
         coreArchive.file(`./release/core/${mainFn}`, { name: `core/${mainFn}` });

@@ -126,4 +126,4 @@ gulp.task('del-release', function() {
 
 gulp.task('dependencies', gulp.series('node-modules', gulp.parallel('node-sass-bindings', 'keytar-bindings')));
 gulp.task('build-release', gulp.parallel('core-release', 'client-release', 'dependencies'));
-gulp.task('tt', gulp.series('del-release', gulp.parallel('build-release')));
+gulp.task('release', gulp.series('del-release', 'build-release'));

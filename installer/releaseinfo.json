@@ -1,22 +1,29 @@
 {
     "mver": "2.0.0a",
-    "stub": "/master/installer/stub.js",
     "files": [
+        {
+            "id": "stub",
+            "name": "stub.js",
+            "version": "1.0.0",
+            "size": 0,
+            "remote": "/master/installer/stub.js",
+            "hash": ""
+        },
         {
             "id": "core",
             "name": "core.tar.gz",
             "version": "2.0.0a",
-            "size": 15425941,
+            "size": 13282162,
             "remote": "/releases/download/it2/core.tar.gz",
-            "hash": "c537eac4e5c3ac33f857d13aee4c59b4e02b9eb1f579273f88c4c10a40d7e461"
+            "hash": "afc0ec69418cfc680d3451066a863e08a32bcfb4a936e901a0f697c267827544"
         },
         {
             "id": "client",
             "name": "client.tar.gz",
             "version": "2.0.0b",
-            "size": 498262,
+            "size": 498214,
             "remote": "/releases/download/it2/client.tar.gz",
-            "hash": "a0d8c25f138f3c0ed1b4f6cc8aafbeb9da9cc0a7cd6940fa5d1c0a177a6a3a60"
+            "hash": "7d3fa34b459f0700b8de4a7c1778793f56c1e1cd270e75c9b87bc0066e8c9051"
         }
     ]
 }

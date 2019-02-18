@@ -1,7 +1,14 @@
 {
     "mver": "",
-    "stub": "/master/installer/stub.js",
     "files": [
+        {
+            "id": "stub",
+            "name": "stub.js",
+            "version": "1.0.0",
+            "size": 0,
+            "remote": "/master/installer/stub.js",
+            "hash": ""
+        },
         {
             "id": "client",
             "name": "",

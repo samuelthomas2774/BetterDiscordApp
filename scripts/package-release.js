@@ -105,6 +105,7 @@ async function pack() {
 
     releaseStub.mver = mainpkg.version;
     releaseStub.files = [
+        releaseStub.files.find(f => f.id === 'stub'),
         coreStub,
         clientStub
     ];

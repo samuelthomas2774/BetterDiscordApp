@@ -1,0 +1,30 @@
+{
+    "mver": "",
+    "stub": "/master/installer/stub.js",
+    "files": [
+        {
+            "id": "client",
+            "name": "",
+            "version": "",
+            "size": "",
+            "remote": "/releases/download/:rel/:fn",
+            "hash": ""
+        },
+        {
+            "id": "core",
+            "name": "",
+            "version": "",
+            "size": "",
+            "remote": "/releases/download/:rel/:fn",
+            "hash": ""
+        },
+        {
+            "id": "editor",
+            "name": "",
+            "version": "",
+            "size": "210481",
+            "remote": "/releases/download/:rel/:fn",
+            "hash": ""
+        }
+    ]
+}

@@ -1,65 +1,117 @@
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
+const hashfiles = require('hash-files');
 
-const releasepkg = require('../release/package.json');
+const releaseStub = require('./releasestub.json');
+
 const mainpkg = require('../package.json');
-const corepkg = require('../core/package.json');
-const clientpkg = require('../client/package.json');
-const editorpkg = require('../csseditor/package.json');
+const corepkg = require('../release/core/package.json');
+const clientpkg = require('../release/client/package.json');
+// const editorpkg = require('../release/editor/package.json');
 
-// core.zip
-const core = new Promise((resolve, reject) => {
-    const core_zip = archiver('zip');
-    core_zip.file('./release/package.json', {name: 'package.json'});
-    core_zip.file('./release/index.js', {name: 'index.js'});
-    core_zip.file(`./release/core.${corepkg.version}.js`, {name: `core.${corepkg.version}.js`});
-    core_zip.file('./release/sparkplug.js', {name: 'sparkplug.js'});
-    core_zip.directory('./release/modules', 'modules');
-    core_zip.directory('./release/node_modules', 'node_modules');
+const createArchiver = (level = 1) => {
+    return archiver('tar', {
+        gzip: true,
+        gzipOptions: {
+            level
+        }
+    });
+};
 
-    const core_zip_stream = fs.createWriteStream('./release/core.zip');
-    core_zip.pipe(core_zip_stream);
+async function hashFile(fn) {
+    return new Promise((resolve, reject) => {
+        hashfiles({ files: [fn], algorithm: 'sha256' }, (error, hash) => {
+            if (error) return reject();
+            resolve(hash);
+        });
+    });
+}
 
-    core_zip.on('end', resolve);
-    core_zip.on('error', reject);
-    core_zip.finalize();
-});
+async function fileSize(fn) {
+    return new Promise((resolve, reject) => {
+        fs.stat(fn, (err, stats) => {
+            if (err) return reject();
+            resolve(stats['size']);
+        });
+    });
+}
 
-// client.zip
-const client = new Promise((resolve, reject) => {
-    const client_zip = archiver('zip');
-    client_zip.file(`./release/client.${clientpkg.version}.js`, {name: `client.${clientpkg.version}.js`});
+// Core
+async function archiveCore(out = './release/core.tar.gz') {
+    return new Promise((resolve, reject) => {
+        console.log('packaging core');
+        const mainFn = `core.${corepkg.version}.js`;
+        const coreArchive = createArchiver();
+        coreArchive.file('./release/core/package.json', { name: 'package.json' });
+        coreArchive.file('./release/core/index.js', { name: 'index.js' });
+        coreArchive.file(`./release/core/${mainFn}`, { name: `${mainFn}` });
+        coreArchive.file('./release/core/sparkplug.js', { name: 'sparkplug.js' });
+        coreArchive.directory('./release/core/modules', 'modules');
+        coreArchive.directory('./release/core/node_modules', 'node_modules');
 
-    const client_zip_stream = fs.createWriteStream('./release/client.zip');
-    client_zip.pipe(client_zip_stream);
+        const coreZipStream = fs.createWriteStream(out);
+        coreArchive.pipe(coreZipStream);
 
-    client_zip.on('end', resolve);
-    client_zip.on('error', reject);
-    client_zip.finalize();
-});
+        coreArchive.on('end', () => resolve(out));
+        coreArchive.on('error', reject);
+        coreArchive.finalize();
+    });
+}
 
-// csseditor.zip
-const csseditor = new Promise((resolve, reject) => {
-    const csseditor_zip = archiver('zip');
-    csseditor_zip.directory('./release/csseditor', 'csseditor');
+// Client
+async function archiveClient(out = './release/client.tar.gz') {
+    return new Promise((resolve, reject) => {
+        console.log('packaging client');
+        const mainFn = `client.${clientpkg.version}.js`;
+        const clientArchive = createArchiver();
+        clientArchive.file('./release/client/package.json', { name: 'package.json' });
+        clientArchive.file('./release/core/sparkplug.js', { name: 'sparkplug.js' });
+        clientArchive.file(`./release/client/${mainFn}`, { name: `${mainFn}` });
 
-    const csseditor_zip_stream = fs.createWriteStream('./release/csseditor.zip');
-    csseditor_zip.pipe(csseditor_zip_stream);
+        const clientZipStream = fs.createWriteStream(out);
+        clientArchive.pipe(clientZipStream);
 
-    csseditor_zip.on('end', resolve);
-    csseditor_zip.on('error', reject);
-    csseditor_zip.finalize();
-});
+        clientArchive.on('end', () => resolve(out));
+        clientArchive.on('error', reject);
+        clientArchive.finalize();
+    });
+}
 
-// full.zip
-Promise.all([core, client, csseditor]).then(() => {
-    const full_zip = archiver('zip');
-    full_zip.file('./release/core.zip', {name: 'core.zip'});
-    full_zip.file('./release/client.zip', {name: 'client.zip'});
-    full_zip.file('./release/csseditor.zip', {name: 'csseditor.zip'});
+async function pack() {
+    const coreArchive = await archiveCore();
+    const coreHash = await hashFile(coreArchive);
+    const coreSize = await fileSize(coreArchive);
+    console.log(`${coreArchive} ${coreSize} | ${coreHash}`);
 
-    const full_zip_stream = fs.createWriteStream('./release/full.zip');
-    full_zip.pipe(full_zip_stream);
-    full_zip.finalize();
-});
+    const coreStub = releaseStub.files.find(f => f.id === 'core');
+    coreStub.name = 'core.tar.gz';
+    coreStub.version = corepkg.version;
+    coreStub.hash = coreHash;
+    coreStub.size = coreSize;
+    coreStub.remote = coreStub.remote.replace(':fn', 'core.tar.gz');
+
+    const clientArchive = await archiveClient();
+    const clientHash = await hashFile(clientArchive);
+    const clientSize = await fileSize(clientArchive);
+    console.log(`${clientArchive} ${clientSize} | ${clientHash}`);
+
+    const clientStub = releaseStub.files.find(f => f.id === 'client');
+    clientStub.name = 'client.tar.gz';
+    clientStub.version = clientpkg.version;
+    clientStub.hash = clientHash;
+    clientStub.size = clientSize;
+    clientStub.remote = clientStub.remote.replace(':fn', 'client.tar.gz');
+
+    releaseStub.mver = mainpkg.version;
+    releaseStub.files = [
+        coreStub,
+        clientStub
+    ];
+
+    fs.writeFile('./release/releaseinfo.json', JSON.stringify(releaseStub, null, 4), (err) => {
+        console.log(`all done! Don't forget to update :rel`);
+    });
+}
+
+pack();

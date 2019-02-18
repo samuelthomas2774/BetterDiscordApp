@@ -11,56 +11,80 @@ import editjson from 'gulp-json-editor';
 import corepkg from './core/package';
 import clientpkg from './client/package';
 
-gulp.task('release-package', function () {
-    return pump([
-        gulp.src('package.json'),
-        editjson(function (mainpkg) {
-            delete mainpkg.main;
-            delete mainpkg.devDependencies;
-            delete mainpkg.scripts;
-            return mainpkg;
-        }),
-        gulp.dest('release')
-    ]);
-});
+// core-release >
 
-gulp.task('client', function () {
-    return pump([
-        gulp.src('client/dist/*.client-release.js'),
-        rename(`client.${clientpkg.version}.js`),
-        gulp.dest('release')
-    ]);
-});
-
-gulp.task('core', function () {
+gulp.task('core-main', function () {
     return pump([
         gulp.src('core/dist/main.js'),
-        inject.after("'use strict';\n", 'const PRODUCTION = true;\n'),
+        inject.after(`'use strict';\n`, 'const PRODUCTION = true;\n'),
         rename(`core.${corepkg.version}.js`),
-        gulp.dest('release')
+        gulp.dest('release/core')
     ]);
 });
 
-gulp.task('sparkplug', function () {
+gulp.task('core-pkg', function() {
     return pump([
-        gulp.src('core/dist/sparkplug.js'),
-        gulp.dest('release')
+        gulp.src('package.json'),
+        editjson(function(pkg) {
+            pkg.main = `core.${corepkg.version}.js`;
+            delete pkg.devDependencies;
+            delete pkg.scripts;
+            return pkg;
+        }),
+        gulp.dest('release/core')
     ]);
 });
 
 gulp.task('core-modules', function () {
     return pump([
         gulp.src('core/dist/modules/**/*'),
-        copy('release', { prefix: 2 })
+        copy('release/core', { prefix: 2 })
     ]);
 });
 
-gulp.task('index', function () {
+gulp.task('core-sparkplug', function () {
     return pump([
-        file('index.js', `module.exports = require('./core.${corepkg.version}.js');`, {src: true}),
-        gulp.dest('release')
+        gulp.src('core/dist/sparkplug.js'),
+        gulp.dest('release/core')
     ]);
 });
+
+gulp.task('core-release', gulp.parallel('core-main', 'core-pkg', 'core-sparkplug', 'core-modules'));
+
+// < core-release
+
+// client
+
+gulp.task('client-main', function () {
+    return pump([
+        gulp.src('client/dist/*.client-release.js'),
+        rename(`client.${clientpkg.version}.js`),
+        gulp.dest('release/client')
+    ]);
+});
+
+gulp.task('client-pkg', function() {
+    return pump([
+        gulp.src('client/package.json'),
+        editjson(function (pkg) {
+            pkg.main = `client.${clientpkg.version}.js`;
+            delete pkg.scripts;
+            return pkg;
+        }),
+        gulp.dest('release/client')
+    ]);
+});
+
+gulp.task('client-sparkplug', function () {
+    return pump([
+        gulp.src('core/dist/sparkplug.js'),
+        gulp.dest('release/client')
+    ]);
+});
+
+gulp.task('client-release', gulp.parallel('client-main', 'client-pkg', 'client-sparkplug'));
+
+// CSS Editor
 
 gulp.task('css-editor', function () {
     return pump([
@@ -70,8 +94,10 @@ gulp.task('css-editor', function () {
     ]);
 });
 
+// Deps
+
 gulp.task('node-modules', function () {
-    return copydeps('.', 'release');
+    return copydeps('.', 'release/core');
 });
 
 gulp.task('node-sass-bindings', gulp.series(function () {
@@ -79,7 +105,7 @@ gulp.task('node-sass-bindings', gulp.series(function () {
 }, function () {
     return pump([
         gulp.src('other/node_sass_bindings/**/*'),
-        copy('release/node_modules/node-sass/vendor', { prefix: 2 })
+        copy('release/core/node_modules/node-sass/vendor', { prefix: 2 })
     ]);
 }));
 
@@ -88,14 +114,16 @@ gulp.task('keytar-bindings', gulp.series(function () {
 }, function () {
     return pump([
         gulp.src('other/keytar/**/*'),
-        copy('release/node_modules/keytar/build/Release', {prefix: 2})
+        copy('release/core/node_modules/keytar/build/Release', { prefix: 2 })
     ]);
 }));
 
-gulp.task('dependencies', gulp.series('node-modules', gulp.parallel('node-sass-bindings', 'keytar-bindings')));
+// Other
 
-gulp.task('build-release', gulp.parallel('release-package', 'client', 'core', 'sparkplug', 'core-modules', 'index', 'css-editor', 'dependencies'));
-
-gulp.task('release', gulp.series(function () {
+gulp.task('del-release', function() {
     return del(['release/**/*']);
-}, 'build-release'));
+});
+
+gulp.task('dependencies', gulp.series('node-modules', gulp.parallel('node-sass-bindings', 'keytar-bindings')));
+gulp.task('build-release', gulp.parallel('core-release', 'client-release', 'dependencies'));
+gulp.task('tt', gulp.series('del-release', gulp.parallel('build-release')));

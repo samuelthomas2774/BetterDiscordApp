@@ -68,7 +68,9 @@
     "vue-loader": "^13.7.2",
     "vue-material-design-icons": "^1.6.0",
     "vue-template-compiler": "^2.5.17",
-    "webpack": "^3.12.0"
+    "webpack": "^3.12.0",
+    "archiver": "^3.0.0",
+    "hash-files": "^1.1.1"  
   },
   "scripts": {
     "install": "node scripts/install.js",
@@ -88,6 +90,7 @@
     "package_release": "node scripts/package-release.js",
     "release": "npm run lint && npm run build_release && gulp release && npm run package_release",
     "update_release": "npm run build_release && gulp build-release",
+    "tt": "gulp tt",
     "inject": "node scripts/inject.js"
   }
 }

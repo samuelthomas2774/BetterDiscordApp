@@ -12,18 +12,18 @@
         {
             "id": "core",
             "name": "core.tar.gz",
-            "version": "2.0.0a",
-            "size": 13282162,
+            "version": "2.0.0b",
+            "size": 13287169,
             "remote": "/releases/download/it2/core.tar.gz",
-            "hash": "afc0ec69418cfc680d3451066a863e08a32bcfb4a936e901a0f697c267827544"
+            "hash": "2d3e48641fd38b2b8ba7ff4d607d7aab61daad08f2f48c49e4c1901686d50702"
         },
         {
             "id": "client",
             "name": "client.tar.gz",
             "version": "2.0.0b",
-            "size": 498214,
+            "size": 498211,
             "remote": "/releases/download/it2/client.tar.gz",
-            "hash": "7d3fa34b459f0700b8de4a7c1778793f56c1e1cd270e75c9b87bc0066e8c9051"
+            "hash": "2a6a33b1136a3e2e05289e8ce623fffc4e7a623fda55f0d0d4e34791b0d8dad7"
         }
     ]
 }

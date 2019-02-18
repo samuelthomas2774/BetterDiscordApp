@@ -22,7 +22,7 @@
             "id": "editor",
             "name": "",
             "version": "",
-            "size": "210481",
+            "size": "",
             "remote": "/releases/download/:rel/:fn",
             "hash": ""
         }

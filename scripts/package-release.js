@@ -43,12 +43,12 @@ async function archiveCore(out = './release/core.tar.gz') {
         console.log('packaging core');
         const mainFn = `core.${corepkg.version}.js`;
         const coreArchive = createArchiver();
-        coreArchive.file('./release/core/package.json', { name: 'package.json' });
-        coreArchive.file('./release/core/index.js', { name: 'index.js' });
-        coreArchive.file(`./release/core/${mainFn}`, { name: `${mainFn}` });
-        coreArchive.file('./release/core/sparkplug.js', { name: 'sparkplug.js' });
-        coreArchive.directory('./release/core/modules', 'modules');
-        coreArchive.directory('./release/core/node_modules', 'node_modules');
+        coreArchive.file('./release/core/package.json', { name: 'core/package.json' });
+        coreArchive.file('./release/core/index.js', { name: 'core/index.js' });
+        coreArchive.file(`./release/core/${mainFn}`, { name: `core/${mainFn}` });
+        coreArchive.file('./release/core/sparkplug.js', { name: 'core/sparkplug.js' });
+        coreArchive.directory('./release/core/modules', 'core/modules');
+        coreArchive.directory('./release/core/node_modules', 'core/node_modules');
 
         const coreZipStream = fs.createWriteStream(out);
         coreArchive.pipe(coreZipStream);
@@ -65,9 +65,9 @@ async function archiveClient(out = './release/client.tar.gz') {
         console.log('packaging client');
         const mainFn = `client.${clientpkg.version}.js`;
         const clientArchive = createArchiver();
-        clientArchive.file('./release/client/package.json', { name: 'package.json' });
-        clientArchive.file('./release/core/sparkplug.js', { name: 'sparkplug.js' });
-        clientArchive.file(`./release/client/${mainFn}`, { name: `${mainFn}` });
+        clientArchive.file('./release/client/package.json', { name: 'client/package.json' });
+        clientArchive.file('./release/core/sparkplug.js', { name: 'client/sparkplug.js' });
+        clientArchive.file(`./release/client/${mainFn}`, { name: `client/${mainFn}` });
 
         const clientZipStream = fs.createWriteStream(out);
         clientArchive.pipe(clientZipStream);

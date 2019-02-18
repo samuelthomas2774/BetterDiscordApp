@@ -24,7 +24,7 @@ gulp.task('core-main', function () {
 
 gulp.task('core-pkg', function() {
     return pump([
-        gulp.src('package.json'),
+        gulp.src('core/package.json'),
         editjson(function(pkg) {
             pkg.main = `core.${corepkg.version}.js`;
             delete pkg.devDependencies;

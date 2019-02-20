@@ -8,7 +8,23 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-const tests = typeof PRODUCTION === 'undefined';
+const TESTS = typeof PRODUCTION === 'undefined';
+const TEST_ARGS = () => {
+    const _basePath = path.resolve(__dirname, '..', '..');
+    const _baseDataPath =  path.resolve(_basePath, 'tests');
+    return {
+        'options': {
+            'autoInject': true,
+            'commonCore': true,
+            'commonData': true
+        },
+        'paths': {
+            'client': path.resolve(_basePath, 'client', 'dist'),
+            'core': path.resolve(_basePath, 'core', 'dist'),
+            'data': path.resolve(_baseDataPath, 'data')
+        }
+    }
+}
 
 import path from 'path';
 import sass from 'node-sass';
@@ -135,6 +151,7 @@ export class BetterDiscord {
     get window() {  return this.windowUtils ? this.windowUtils.window : undefined; }
 
     constructor(args) {
+        if (TESTS) args = TEST_ARGS();
         console.log('[BetterDiscord|args] ', JSON.stringify(args, null, 4));
         if (BetterDiscord.loaded) {
             console.log('[BetterDiscord] Creating two BetterDiscord objects???');
@@ -216,7 +233,9 @@ export class BetterDiscord {
      */
     parseClientPackage() {
         const clientPath = this.config.getPath('client');
-        const { version, main } = require(`${clientPath}/package.json`);
+        const clientPkg = TESTS ? require(`${path.resolve(clientPath, '..')}/package.json`) :require(`${clientPath}/package.json`);
+        const { version } = clientPkg;
+        const main = TESTS ? 'betterdiscord.client.js' : clientPkg.main;
         this.config.addPath('client_script', `${clientPath}/${main}`);
         this.config.setClientVersion(version);
         console.log(`[BetterDiscord] Client v${this.config.clientVersion} - ${this.config.getPath('client_script')}`);

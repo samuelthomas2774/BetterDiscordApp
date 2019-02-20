@@ -39,7 +39,7 @@ module.exports = {
         process: 'require("process")',
         net: 'require("net")',
         request: 'require(require("path").join(require("electron").remote.app.getAppPath(), "node_modules", "request"))',
-        sparkplug: 'require("../core/sparkplug")',
+        sparkplug: 'require("../../core/dist/sparkplug")',
         'node-crypto': 'require("crypto")'
     },
     resolve: {

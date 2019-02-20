@@ -118,7 +118,7 @@ async function pack() {
     ];
 
     fs.writeFile('./release/releaseinfo.json', JSON.stringify(releaseStub, null, 4), (err) => {
-        console.log(`all done! Don't forget to update :rel`);
+        console.log(`all done! ${tag === ':rel' ? `Don't forget to update :rel` : ''}`);
     });
 }
 

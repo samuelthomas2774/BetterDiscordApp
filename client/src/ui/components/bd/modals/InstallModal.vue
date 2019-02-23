@@ -33,16 +33,16 @@
             </div>
             <div v-else-if="!verified" slot="footer" class="bd-installModalFooter">
                 <span class="bd-installModalStatus bd-err">Not verified!</span>
-                <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
+                <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();" v-if="modal.canUpload">Upload</div>
                 <div class="bd-button bd-err" @click="install" v-if="allowUnsafe">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
             </div>
             <div v-else-if="alreadyInstalled && upToDate" slot="footer" class="bd-installModalFooter">
                 <span class="bd-installModalStatus">Up to date version already installed!</span>
-                <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
+                <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();" v-if="modal.canUpload">Upload</div>
             </div>
             <div v-else slot="footer" class="bd-installModalFooter">
                 <span class="bd-installModalStatus bd-ok">Verified!</span>
-                <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();">Upload</div>
+                <div class="bd-button bd-installModalUpload" @click="modal.confirm(0); modal.close();" v-if="modal.canUpload">Upload</div>
                 <div class="bd-button bd-ok" @click="install">{{ !alreadyInstalled ? 'Install' : 'Update' }}</div>
             </div>
         </template>

@@ -14,15 +14,17 @@ import { ReactComponents } from './reactcomponents';
 import Reflection from './reflection';
 import DiscordApi from './discordapi';
 import ThemeManager from './thememanager';
+import { DOM } from 'ui';
 
 export default class PackageInstaller {
 
     /**
      * Handler for drag and drop package install
      * @param {String} filePath Path to local file
-     * @param {String} channelId Current channel id
+     * @param {Boolean} canUpload If the user can upload files in current window
+     * @returns {Number} returns action code from modal
      */
-    static async dragAndDropHandler(filePath, channelId) {
+    static async dragAndDropHandler(filePath, canUpload) {
         try {
             const config = JSON.parse(asar.extractFile(filePath, 'config.json').toString());
             const { info, main } = config;
@@ -36,12 +38,8 @@ export default class PackageInstaller {
             const isPlugin = info.type && info.type === 'plugin' || main.endsWith('.js');
 
             // Show install modal
-            const modalResult = await Modals.installModal(isPlugin ? 'plugin' : 'theme', config, filePath, icon).promise;
-
-            if (modalResult === 0) {
-                // Upload it instead
-            }
-
+            const modalResult = await Modals.installModal(isPlugin ? 'plugin' : 'theme', config, filePath, icon, canUpload).promise;
+            return modalResult;
         } catch (err) {
             console.log(err);
         }
@@ -144,15 +142,22 @@ export default class PackageInstaller {
 
         const reflect = Reflection.DOM(selector);
         const stateNode = reflect.getComponentStateNode(this.UploadArea);
-        const callback = function (e) {
+        const callback = async function (e) {
             if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return;
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
             stateNode.clearDragging();
-
-            PackageInstaller.dragAndDropHandler(e.dataTransfer.files[0].path, DiscordApi.currentChannel.id);
+            const currentChannel = DiscordApi.currentChannel;
+            const canUpload = currentChannel ? currentChannel.checkPermissions(Reflection.modules.DiscordConstants.Permissions.ATTACH_FILES) : false;
+            const files = Array.from(e.dataTransfer.files).slice(0);
+            const actionCode = await PackageInstaller.dragAndDropHandler(e.dataTransfer.files[0].path, canUpload);
+            if (actionCode === 0) stateNode.promptToUpload(files, currentChannel.id, true, !e.shiftKey);
         };
+
+        // Add a listener to root for when not in a channel
+        const root = DOM.getElement('#app-mount');
+        root.addEventListener('drop', callback);
 
         // Remove their handler, add ours, then read theirs to give ours priority to stop theirs when we get a .bd file.
         reflect.element.removeEventListener('drop', stateNode.handleDrop);
@@ -161,6 +166,7 @@ export default class PackageInstaller {
 
         this.unpatchUploadArea = function () {
             reflect.element.removeEventListener('drop', callback);
+            root.removeEventListener('drop', callback);
         };
     }
 

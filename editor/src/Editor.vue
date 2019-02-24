@@ -17,6 +17,10 @@
             :snippets="snippets"
             :updateContent="updateContent"
             :runScript="runScript"
+            :newFile="newFile"
+            :saveFile="saveFile"
+            :newSnippet="newSnippet"
+            :saveSnippet="saveSnippet"
         />
     </div>
 </template>
@@ -28,6 +32,21 @@
 
     import { BDEdit } from 'bdedit';
     ace.acequire = ace.require;
+
+    const modes = {
+        'css': 'css',
+        'scss': 'scss',
+        'js': 'js',
+        'txt': 'text',
+        'json': 'json'
+    };
+
+    function resolveMode(fileName) {
+        if (!fileName.includes('.')) return 'text';
+        const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
+        if (modes.hasOwnProperty(ext)) return modes[ext];
+        return 'text';
+    }
 
     export default {
         data() {
@@ -57,6 +76,48 @@
 
             async runScript(script) {
                 return ClientIPC.send('editor-runScript', script);
+            },
+
+            newFile(fileName) {
+                const prefix = fileName;
+                const mode = resolveMode(fileName);
+
+                let newName = prefix;
+                let iter = 0;
+
+                while (this.files.find(file => file.name === newName)) {
+                    newName = `${prefix}_${iter}`;
+                    iter++;
+                }
+
+                const newItem = { type: 'file', name: newName, content: '', mode, saved: false };
+                this.files.push(newItem);
+                return newItem;
+            },
+
+            newSnippet(snippetName) {
+                const prefix = snippetName;
+                const mode = resolveMode(snippetName);
+
+                let newName = prefix;
+                let iter = 0;
+
+                while (this.snippets.find(snippet => snippet.name === newName)) {
+                    newName = `${prefix}_${iter}`;
+                    iter++;
+                }
+
+                const newItem = { type: 'snippet', name: newName, content: '', mode, saved: false };
+                this.snippets.push(newItem);
+                return newItem;
+            },
+
+            saveFile(file) {
+                
+            },
+
+            saveSnippet(snippet) {
+
             },
 
             toggleaot() {

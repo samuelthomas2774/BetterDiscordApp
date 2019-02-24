@@ -1,180 +1,180 @@
 .bd-settings {
-	position: absolute;
-	backface-visibility: hidden;
-	-webkit-backface-visibility: hidden;
-	top: 22px;
-	left: 0;
-	bottom: 0;
-	z-index: 1001;
-	width: 310px;
-	transform: translateX(-310px);
-	opacity: 0;
-	transition: transform .3s cubic-bezier(.4,0,0,1), opacity .25s ease;
-	pointer-events: none;
+    position: absolute;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    top: 22px;
+    left: 0;
+    bottom: 0;
+    z-index: 1001;
+    width: 310px;
+    transform: translateX(-310px);
+    opacity: 0;
+    transition: transform .3s cubic-bezier(.4, 0, 0, 1), opacity .25s ease;
+    pointer-events: none;
 
-	&.bd-active {
-		width: 900px;
-		transform: none;
-		opacity: 1;
-	}
+    &.bd-active {
+        width: 900px;
+        transform: none;
+        opacity: 1;
+    }
 
-	.bd-settingsX {
-		position: absolute;
-		top: 18px;
-		left: 255px;
-		border: 2px solid #6e6e6e;
-		border-radius: 50%;
-		width: 25px;
-		height: 25px;
-		justify-content: center;
-		display: flex;
-		align-items: center;
-		cursor: pointer;
+    .bd-settingsX {
+        position: absolute;
+        top: 18px;
+        left: 255px;
+        border: 2px solid #6e6e6e;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
 
-		.platform-darwin & { // sass-lint:disable-line class-name-format
-			top: 43px;
-		}
+        .platform-darwin & { // sass-lint:disable-line class-name-format
+            top: 43px;
+        }
 
-		.bd-xText {
-			color: #72767d;
-			position: absolute;
-			top: 32px;
-			font-weight: 600;
-			font-size: 13px;
-		}
+        .bd-xText {
+            color: #72767d;
+            position: absolute;
+            top: 32px;
+            font-weight: 600;
+            font-size: 13px;
+        }
 
-		.bd-materialDesignIcon {
-			justify-content: center;
-			display: flex;
-			fill: #72767d;
-		}
+        .bd-materialDesignIcon {
+            justify-content: center;
+            display: flex;
+            fill: #72767d;
+        }
 
-		&:hover {
-			background-color: hsla(218, 5%, 47%, .3);
+        &:hover {
+            background-color: hsla(218, 5%, 47%, .3);
 
-			.bd-materialDesignIcon {
-				fill: #fff;
-			}
-		}
-	}
+            .bd-materialDesignIcon {
+                fill: #fff;
+            }
+        }
+    }
 
-	.bd-info {
-		display: flex;
-		align-items: flex-end;
-		overflow: hidden;
-		padding: 0 25px;
-		margin: 10px 0;
+    .bd-info {
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+        padding: 0 25px;
+        margin: 10px 0;
 
-		.bd-vtext {
-			color: #414245;
-			font-weight: 700;
-			font-size: 12px;
-			flex-grow: 1;
-			height: 20px;
-			cursor: default;
-			user-select: none;
-		}
+        .bd-vtext {
+            color: #414245;
+            font-weight: 700;
+            font-size: 12px;
+            flex-grow: 1;
+            height: 20px;
+            cursor: default;
+            user-select: none;
+        }
 
-		.bd-materialButton {
-			cursor: pointer;
+        .bd-materialButton {
+            cursor: pointer;
 
-			&:hover {
-				.bd-materialDesignIcon {
-					fill: #fff;
-				}
-			}
-		}
+            &:hover {
+                .bd-materialDesignIcon {
+                    fill: #fff;
+                }
+            }
+        }
 
-		.bd-materialDesignIcon {
-			fill: #414245;
+        .bd-materialDesignIcon {
+            fill: #414245;
 
-			&:hover {
-				fill: #fff;
-			}
-		}
-	}
+            &:hover {
+                fill: #fff;
+            }
+        }
+    }
 
-	.bd-sidebarView {
-		&::after {
-			content: '';
-			height: 100%;
-			width: 310px;
-			background-color: #202225;
-			top: 100%;
-			display: block;
-			position: absolute;
-		}
+    .bd-sidebarView {
+        &::after {
+            content: '';
+            height: 100%;
+            width: 310px;
+            background-color: #202225;
+            top: 100%;
+            display: block;
+            position: absolute;
+        }
 
-		.bd-sidebarRegion {
-			.bd-scroller {
-				padding-top: 0;
-			}
-		}
+        .bd-sidebarRegion {
+            .bd-scroller {
+                padding-top: 0;
+            }
+        }
 
-		.bd-contentRegion {
-			width: 590px;
-		}
+        .bd-contentRegion {
+            width: 590px;
+        }
 
-		&.bd-active {
-			.bd-contentRegion {
-				transition: all .3s cubic-bezier(.4,0,0,1);
-				transform: none;
-				opacity: 1;
-			}
-		}
+        &.bd-active {
+            .bd-contentRegion {
+                transition: all .3s cubic-bezier(.4, 0, 0, 1);
+                transform: none;
+                opacity: 1;
+            }
+        }
 
-		&.bd-stop {
-			.bd-sidebarRegion {
-				z-index: 1003;
-			}
+        &.bd-stop {
+            .bd-sidebarRegion {
+                z-index: 1003;
+            }
 
-			.bd-contentRegion {
-				z-index: 1002;
-			}
-		}
-	}
+            .bd-contentRegion {
+                z-index: 1002;
+            }
+        }
+    }
 
-	.platform-darwin & { // sass-lint:disable-line class-name-format
-		top: 0;
+    .platform-darwin & { // sass-lint:disable-line class-name-format
+        top: 0;
 
-		.bd-sidebarView {
-			.bd-sidebarRegion {
-				padding-top: 22px;
-			}
-		}
-	}
+        .bd-sidebarView {
+            .bd-sidebarRegion {
+                padding-top: 22px;
+            }
+        }
+    }
 
-	.platform-linux & { // sass-lint:disable-line class-name-format
-		top: 0;
-	}
+    .platform-linux & { // sass-lint:disable-line class-name-format
+        top: 0;
+    }
 
-	&:not(.bd-active) > .bd-sidebarView.bd-active, // sass-lint:disable-line force-element-nesting
-	&.bd-settingsOut .bd-sidebarView.bd-active { // sass-lint:disable-line force-element-nesting
-		.bd-contentRegion {
-			transform: translate(-600px, 0%);
-			opacity: 0;
-			width: 590px;
-		}
-	}
+    &:not(.bd-active) > .bd-sidebarView.bd-active, // sass-lint:disable-line force-element-nesting
+    &.bd-settingsOut .bd-sidebarView.bd-active { // sass-lint:disable-line force-element-nesting
+        .bd-contentRegion {
+            transform: translate(-600px, 0%);
+            opacity: 0;
+            width: 590px;
+        }
+    }
 
-	&:not(.bd-active) {
-		.bd-sidebarView {
-			&.bd-active {
-				.bd-contentRegion {
-					transform: translate(-600px, 100%);
-				}
-			}
-		}
-	}
+    &:not(.bd-active) {
+        .bd-sidebarView {
+            &.bd-active {
+                .bd-contentRegion {
+                    transform: translate(-600px, 100%);
+                }
+            }
+        }
+    }
 }
 
 .bd-sidebar {
-	.bd-settingsButton {
-		position: absolute;
-		top: 0;
+    .bd-settingsButton {
+        position: absolute;
+        top: 0;
 
-		.platform-darwin & { // sass-lint:disable-line class-name-format
-			top: 22px;
-		}
-	}
+        .platform-darwin & { // sass-lint:disable-line class-name-format
+            top: 22px;
+        }
+    }
 }

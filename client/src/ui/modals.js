@@ -191,12 +191,12 @@ export default class Modals {
         return new Modal(modal, InputModal);
     }
 
-    static installModal(contentType, config, filePath, icon) {
-        return this.add(this.createInstallModal(contentType, config, filePath, icon));
+    static installModal(contentType, config, filePath, icon, canUpload = false) {
+        return this.add(this.createInstallModal(contentType, config, filePath, icon, canUpload));
     }
 
-    static createInstallModal(contentType, config, filePath, icon) {
-        const modal = { contentType, config, filePath, icon };
+    static createInstallModal(contentType, config, filePath, icon, canUpload = false) {
+        const modal = { contentType, config, filePath, icon, canUpload };
         modal.promise = new Promise((resolve, reject) => {
             modal.confirm = value => resolve(value);
             modal.beforeClose = () => reject();

@@ -188,9 +188,6 @@ export class BetterDiscord {
         await this.waitForWindowUtils();
         await this.ensureDirectories();
 
-        // TODO
-        // this.csseditor = new CSSEditor(this, this.config.getPath('csseditor'));
-
         this.windowUtils.on('did-finish-load', () => this.injectScripts(true));
 
         this.windowUtils.on('did-navigate-in-page', (event, url, isMainFrame) => {

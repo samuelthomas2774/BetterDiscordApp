@@ -26,6 +26,7 @@ const TEST_ARGS = () => {
         }
     }
 }
+const TEST_EDITOR = true;
 
 import path from 'path';
 import sass from 'node-sass';
@@ -53,7 +54,6 @@ const CSP = {
 class Comms {
     constructor(bd) {
         this.bd = bd;
-        this.editorListeners = this.editorListeners.bind(this);
         this.initListeners();
     }
 
@@ -199,6 +199,7 @@ export class BetterDiscord {
 
         setTimeout(() => {
             this.injectScripts();
+            if (TEST_EDITOR) this.editor.openEditor({});
         }, 500);
     }
 

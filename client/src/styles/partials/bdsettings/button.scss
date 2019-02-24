@@ -52,7 +52,7 @@
             height: 43px;
             background-image: $logoBigBw;
             background-size: 100% 100%;
-            transform: translate(-7px, 2px) scale(0. 5);
+            transform: translate(-7px, 2px) scale(.5);
             opacity: 0;
             transition: all .3s cubic-bezier(.4, 0, 0, 1);
         }

@@ -34,9 +34,18 @@ export default class Editor extends Module {
         });
 
         BDIpc.on('editor-getFiles', async (event) => {
-            event.reply([
-                { type: 'file', name: 'custom.scss', content: '', savedContent: '', mode: 'scss', saved: true }
-            ]);
+            const exclude = ['db.json', 'emotes.json', 'storage', 'user.settings.json', 'window.json'];
+            const listFiles = await FileUtils.listDirectory(this.bd.config.getPath('data'));
+            const files = listFiles.filter(file => !exclude.includes(file));
+
+            const constructFiles = files.map(async file => {
+                const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('data'), file));
+                return { name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content };
+            });
+
+            const awaitFiles = await Promise.all(constructFiles);
+
+            event.reply(awaitFiles);
         });
 
         BDIpc.on('editor-getSnippets', async (event) => {
@@ -59,6 +68,23 @@ export default class Editor extends Module {
             console.log(snippet);
             event.reply('ok');
         });
+    }
+
+    resolveMode(fileName) {
+        if (!fileName.includes('.')) return 'text';
+        const ext = fileName.substr(fileName.lastIndexOf('.') + 1);
+        if (this.modes.hasOwnProperty(ext)) return this.modes[ext];
+        return 'text';
+    }
+
+    get modes() {
+        return {
+            'css': 'css',
+            'scss': 'scss',
+            'js': 'js',
+            'txt': 'text',
+            'json': 'json'
+        };
     }
 
     /**

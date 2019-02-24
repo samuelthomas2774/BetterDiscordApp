@@ -12,16 +12,17 @@
                 <button title="Close CSS Editor" @click="close">X</button>
             </div>
         </div>
-        <BDEdit
-            :files="files"
-            :snippets="snippets"
-            :updateContent="updateContent"
-            :runScript="runScript"
-            :newFile="newFile"
-            :saveFile="saveFile"
-            :newSnippet="newSnippet"
-            :saveSnippet="saveSnippet"
-        />
+        <div id="spinner" v-if="loading">
+            <div class="valign">Loading Please Wait...</div>
+        </div>
+        <BDEdit v-else :files="files"
+                :snippets="snippets"
+                :updateContent="updateContent"
+                :runScript="runScript"
+                :newFile="newFile"
+                :saveFile="saveFile"
+                :newSnippet="newSnippet"
+                :saveSnippet="saveSnippet" />
     </div>
 </template>
 
@@ -51,7 +52,7 @@
     export default {
         data() {
             return {
-                files: [{ type: 'file', name: 'custom.scss', content: 'asd', savedContent: 'asd', mode: 'scss', saved: true }],
+                files: [],
                 snippets: [],
                 loading: true,
                 alwaysOnTop: false,
@@ -64,9 +65,17 @@
             ClientIPC.on('bd-editor-addSnippet', (_, snippet) => this.addSnippet(snippet));
         },
         mounted() {
+            (async () => {
+                this.files = await ClientIPC.send('bd-editor-getFiles');
+                this.snippets = await ClientIPC.send('bd-editor-getSnippets');
+
+                this.loading = false;
+            })();
         },
         methods: {
-            addFile(file) { this.files.push(file) },
+            addFile(file) {
+                this.files.push(file);
+            },
             addSnippet(snippet) { this.snippets.push(file) },
 
             updateContent(item, content) {
@@ -124,6 +133,7 @@
                 this.alwaysOnTop = !this.alwaysOnTop;
                 remote.getCurrentWindow().setAlwaysOnTop(this.alwaysOnTop);
             },
+
             close() {
                 window.close();
             }

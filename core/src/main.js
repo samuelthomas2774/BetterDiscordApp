@@ -101,6 +101,18 @@ class Comms {
             const result = await this.sendToDiscord('bd-runEditorScript', script);
             event.reply(result);
         });
+
+        BDIpc.on('bd-editor-getFiles', async (event) => {
+            event.reply([
+                { type: 'file', name: 'custom.scss', content: '', savedContent: '', mode: 'scss', saved: true }
+            ]);
+        });
+
+        BDIpc.on('bd-editor-getSnippets', async (event) => {
+            event.reply([
+                { type: 'snippet', name: 'test.js', content: '', savedContent: '', mode: 'javascript', saved: true }
+            ]);
+        });
     }
 
     async send(channel, message) {

@@ -25,32 +25,32 @@ export default class Editor extends Module {
     }
 
     initListeners() {
-        BDIpc.on('bd-openCssEditor', (event, options) => this.openEditor(options), true);
-        BDIpc.on('bd-editor-open', (event, options) => this.openEditor(options), true);
+        BDIpc.on('openCssEditor', (event, options) => this.openEditor(options), true);
+        BDIpc.on('editor-open', (event, options) => this.openEditor(options), true);
 
-        BDIpc.on('bd-editor-runScript', async (event, script) => {
-            const result = await this.sendToDiscord('bd-editor-runScript', script);
+        BDIpc.on('editor-runScript', async (event, script) => {
+            const result = await this.sendToDiscord('editor-runScript', script);
             event.reply(result);
         });
 
-        BDIpc.on('bd-editor-getFiles', async (event) => {
+        BDIpc.on('editor-getFiles', async (event) => {
             event.reply([
                 { type: 'file', name: 'custom.scss', content: '', savedContent: '', mode: 'scss', saved: true }
             ]);
         });
 
-        BDIpc.on('bd-editor-getSnippets', async (event) => {
+        BDIpc.on('editor-getSnippets', async (event) => {
             event.reply([
                 { type: 'snippet', name: 'test.js', content: '', savedContent: '', mode: 'javascript', saved: true }
             ]);
         });
 
-        BDIpc.on('bd-editor-saveFile', async (event, file) => {
+        BDIpc.on('editor-saveFile', async (event, file) => {
             console.log(file);
             event.reply('ok');
         });
 
-        BDIpc.on('bd-editor-saveSnippet', async (event, snippet) => {
+        BDIpc.on('editor-saveSnippet', async (event, snippet) => {
             console.log(snippet);
             event.reply('ok');
         });

@@ -53,10 +53,13 @@ const CSP = {
 class Comms {
     constructor(bd) {
         this.bd = bd;
+        this.editorListeners = this.editorListeners.bind(this);
         this.initListeners();
     }
 
     initListeners() {
+        this.editorListeners();
+
         BDIpc.on('ping', () => 'pong', true);
 
         BDIpc.on('bd-getConfig', () => this.bd.config.config, true);
@@ -91,6 +94,13 @@ class Comms {
         BDIpc.on('bd-keytar-set', (event, { service, account, password }) => keytar.setPassword(service, account, password), true);
         BDIpc.on('bd-keytar-delete', (event, { service, account }) => keytar.deletePassword(service, account), true);
         BDIpc.on('bd-keytar-find-credentials', (event, { service }) => keytar.findCredentials(service), true);
+    }
+
+    editorListeners() {
+        BDIpc.on('bd-editor-runScript', async (event, script) => {
+            const result = await this.sendToDiscord('bd-runEditorScript', script);
+            event.reply(result);
+        });
     }
 
     async send(channel, message) {

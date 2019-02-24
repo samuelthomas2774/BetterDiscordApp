@@ -38,6 +38,14 @@ export default new class {
         ClientIPC.on('bd-get-scss', () => this.scss, true);
         ClientIPC.on('bd-update-scss', (e, scss) => this.updateScss(scss));
         ClientIPC.on('bd-save-csseditor-bounds', (e, bounds) => this.saveEditorBounds(bounds));
+        ClientIPC.on('bd-runEditorScript', (e, script) => {
+            try {
+                new Function(script)();
+                e.reply('ok');
+            } catch (err) {
+                e.reply({ err: err.stack || err });
+            }
+        });
 
         ClientIPC.on('bd-save-scss', async (e, scss) => {
             await this.updateScss(scss);

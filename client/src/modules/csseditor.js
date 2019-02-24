@@ -38,7 +38,7 @@ export default new class {
         ClientIPC.on('bd-get-scss', () => this.scss, true);
         ClientIPC.on('bd-update-scss', (e, scss) => this.updateScss(scss));
         ClientIPC.on('bd-save-csseditor-bounds', (e, bounds) => this.saveEditorBounds(bounds));
-        ClientIPC.on('bd-runEditorScript', (e, script) => {
+        ClientIPC.on('bd-editor-runScript', (e, script) => {
             try {
                 new Function(script)();
                 e.reply('ok');

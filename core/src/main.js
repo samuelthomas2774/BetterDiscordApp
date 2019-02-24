@@ -68,7 +68,7 @@ class Comms {
 
         // BDIpc.on('bd-openCssEditor', (event, options) => this.bd.csseditor.openEditor(options), true);
         // BDIpc.on('bd-sendToCssEditor', (event, m) => this.sendToCssEditor(m.channel, m.message), true);
-        BDIpc.on('bd-openCssEditor', (event, options) => this.bd.editor.openEditor(options), true);
+        // BDIpc.on('bd-openCssEditor', (event, options) => this.bd.editor.openEditor(options), true);
 
         BDIpc.on('bd-native-open', (event, options) => {
             dialog.showOpenDialog(OriginalBrowserWindow.fromWebContents(event.ipcEvent.sender), options, filenames => {
@@ -97,8 +97,11 @@ class Comms {
     }
 
     editorListeners() {
+        BDIpc.on('bd-openCssEditor', (event, options) => this.bd.editor.openEditor(options), true);
+        BDIpc.on('bd-editor-open', (event, options) => this.bd.editor.openEditor(options), true);
+
         BDIpc.on('bd-editor-runScript', async (event, script) => {
-            const result = await this.sendToDiscord('bd-runEditorScript', script);
+            const result = await this.sendToDiscord('bd-editor-runScript', script);
             event.reply(result);
         });
 

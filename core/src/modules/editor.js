@@ -12,7 +12,7 @@ import path from 'path';
 import { BrowserWindow } from 'electron';
 
 import Module from './modulebase';
-import { WindowUtils } from './utils';
+import { WindowUtils, FileUtils } from './utils';
 import BDIpc from './bdipc';
 
 export default class Editor extends Module {
@@ -46,11 +46,16 @@ export default class Editor extends Module {
         });
 
         BDIpc.on('editor-saveFile', async (event, file) => {
-            console.log(file);
-            event.reply('ok');
+            try {
+                await FileUtils.writeFile(path.resolve(this.bd.config.getPath('data'), file.name), file.content);
+                event.reply('ok');
+            } catch (err) {
+                event.reply({ err });
+            }
         });
 
         BDIpc.on('editor-saveSnippet', async (event, snippet) => {
+            // TODO not sure how to store snippets yet
             console.log(snippet);
             event.reply('ok');
         });

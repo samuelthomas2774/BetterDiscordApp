@@ -113,6 +113,16 @@ class Comms {
                 { type: 'snippet', name: 'test.js', content: '', savedContent: '', mode: 'javascript', saved: true }
             ]);
         });
+
+        BDIpc.on('bd-editor-saveFile', async (event, file) => {
+            console.log(file);
+            event.reply('ok');
+        });
+
+        BDIpc.on('bd-editor-saveSnippet', async (event, snippet) => {
+            console.log(snippet);
+            event.reply('ok');
+        });
     }
 
     async send(channel, message) {

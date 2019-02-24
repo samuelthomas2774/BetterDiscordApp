@@ -121,12 +121,14 @@
                 return newItem;
             },
 
-            saveFile(file) {
-                
+            async saveFile(file) {
+                const result = await ClientIPC.send('bd-editor-saveFile', file);
+                console.log(result);
             },
 
-            saveSnippet(snippet) {
-
+            async saveSnippet(snippet) {
+                const result = await ClientIPC.send('bd-editor-saveSnippet', snippet);
+                console.log(result);
             },
 
             toggleaot() {

@@ -21,6 +21,39 @@ export default class Editor extends Module {
         super();
         this.editorPath = path;
         this.bd = bd;
+        this.initListeners();
+    }
+
+    initListeners() {
+        BDIpc.on('bd-openCssEditor', (event, options) => this.openEditor(options), true);
+        BDIpc.on('bd-editor-open', (event, options) => this.openEditor(options), true);
+
+        BDIpc.on('bd-editor-runScript', async (event, script) => {
+            const result = await this.sendToDiscord('bd-editor-runScript', script);
+            event.reply(result);
+        });
+
+        BDIpc.on('bd-editor-getFiles', async (event) => {
+            event.reply([
+                { type: 'file', name: 'custom.scss', content: '', savedContent: '', mode: 'scss', saved: true }
+            ]);
+        });
+
+        BDIpc.on('bd-editor-getSnippets', async (event) => {
+            event.reply([
+                { type: 'snippet', name: 'test.js', content: '', savedContent: '', mode: 'javascript', saved: true }
+            ]);
+        });
+
+        BDIpc.on('bd-editor-saveFile', async (event, file) => {
+            console.log(file);
+            event.reply('ok');
+        });
+
+        BDIpc.on('bd-editor-saveSnippet', async (event, snippet) => {
+            console.log(snippet);
+            event.reply('ok');
+        });
     }
 
     /**
@@ -68,6 +101,10 @@ export default class Editor extends Module {
     send(channel, data) {
         if (!this.editor) throw { message: 'The CSS editor is not open.' };
         return BDIpc.send(this.editor, channel, data);
+    }
+
+    async sendToDiscord(channel, message) {
+        return this.bd.windowUtils.send(channel, message);
     }
 
     /**

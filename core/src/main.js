@@ -58,8 +58,6 @@ class Comms {
     }
 
     initListeners() {
-        this.editorListeners();
-
         BDIpc.on('ping', () => 'pong', true);
 
         BDIpc.on('bd-getConfig', () => this.bd.config.config, true);
@@ -94,38 +92,6 @@ class Comms {
         BDIpc.on('bd-keytar-set', (event, { service, account, password }) => keytar.setPassword(service, account, password), true);
         BDIpc.on('bd-keytar-delete', (event, { service, account }) => keytar.deletePassword(service, account), true);
         BDIpc.on('bd-keytar-find-credentials', (event, { service }) => keytar.findCredentials(service), true);
-    }
-
-    editorListeners() {
-        BDIpc.on('bd-openCssEditor', (event, options) => this.bd.editor.openEditor(options), true);
-        BDIpc.on('bd-editor-open', (event, options) => this.bd.editor.openEditor(options), true);
-
-        BDIpc.on('bd-editor-runScript', async (event, script) => {
-            const result = await this.sendToDiscord('bd-editor-runScript', script);
-            event.reply(result);
-        });
-
-        BDIpc.on('bd-editor-getFiles', async (event) => {
-            event.reply([
-                { type: 'file', name: 'custom.scss', content: '', savedContent: '', mode: 'scss', saved: true }
-            ]);
-        });
-
-        BDIpc.on('bd-editor-getSnippets', async (event) => {
-            event.reply([
-                { type: 'snippet', name: 'test.js', content: '', savedContent: '', mode: 'javascript', saved: true }
-            ]);
-        });
-
-        BDIpc.on('bd-editor-saveFile', async (event, file) => {
-            console.log(file);
-            event.reply('ok');
-        });
-
-        BDIpc.on('bd-editor-saveSnippet', async (event, snippet) => {
-            console.log(snippet);
-            event.reply('ok');
-        });
     }
 
     async send(channel, message) {
@@ -207,6 +173,7 @@ export class BetterDiscord {
 
         configProxy = () => this.config;
         const autoInitComms = this.comms;
+        const autoInitEditor = this.editor;
         this.init();
     }
 

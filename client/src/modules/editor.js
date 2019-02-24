@@ -8,10 +8,12 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { FileUtils, ClientLogger as Logger, ClientIPC } from 'common';
 import Module from './imodule';
 
 export default new class extends Module {
+
+    get name() { return 'Editor' }
+    get delay() { return false; }
 
     setInitialState(state) {
         return {
@@ -19,8 +21,8 @@ export default new class extends Module {
         };
     }
 
-    events() {
-        ClientIPC.on('editor-runScript', (e, script) => {
+    events(ipc) {
+        ipc.on('editor-runScript', (e, script) => {
             try {
                 new Function(script)();
                 e.reply('ok');
@@ -34,7 +36,7 @@ export default new class extends Module {
      * Show editor, flashes if already visible.
      */
     async show() {
-        await ClientIPC.send('editor-open', this.state.editorBounds);
+        await this.send('editor-open', this.state.editorBounds);
     }
 
 }

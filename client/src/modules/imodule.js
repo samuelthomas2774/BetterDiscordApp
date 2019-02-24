@@ -11,6 +11,9 @@
 /**
  * Base Module that every non-static module should extend
  */
+
+import { ClientLogger as Logger, ClientIPC } from 'common';
+
 export default class Module {
 
     constructor(args) {
@@ -19,14 +22,20 @@ export default class Module {
             args
         };
         this.setState = this.setState.bind(this);
-        this.initialize();
+        
+        if (this.delay) { // If delay is set then module is set to load delayed from modulemanager
+            this.initialize = this.initialize.bind(this);
+            this.init = this.initialize;
+        } else {
+            this.initialize();
+            this.init = () => { };
+        }
     }
 
     initialize() {
         if (this.bindings) this.bindings();
         if (this.setInitialState) this.setState(this.setInitialState(this.state));
-        if (this.events) this.events();
-        if (this.init) this.init();
+        if (this.events) this.events(ClientIPC);
     }
 
     setState(newState) {
@@ -40,5 +49,25 @@ export default class Module {
 
     set state(state) { return this.__.state = state; }
     get state() { return this.__.state; }
+
+    async send(channel, message) {
+        return ClientIPC.send(channel, message);
+    }
+
+    log(msg) {
+        Logger.log(this.name, msg);
+    }
+
+    warn(msg) {
+        Logger.log(this.name, msg);
+    }
+
+    err(msg) {
+        Logger.log(this.name, msg);
+    }
+
+    info(msg) {
+        Logger.log(this.name, msg);
+    }
 
 }

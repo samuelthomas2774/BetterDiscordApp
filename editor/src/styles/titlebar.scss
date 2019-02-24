@@ -1,0 +1,71 @@
+.titlebar {
+    display: flex;
+    height: 25px;
+    padding: 4px 5px;
+    background: #292b2f;
+    border-bottom: 1px solid hsla(218,5%,47%,.3);
+    user-select: none;
+    cursor: default;
+
+    .icon {
+        width: 31px;
+        height: 25px;
+
+        .inner {
+            width: 25px;
+            height: 25px;
+            background-image: $bdicon;
+            background-size: 22px 22px;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    }
+
+    .title {
+        color: #bac9d2;
+        font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+        line-height: 25px;
+        font-size: 15px;
+    }
+
+    .controls {
+        margin: 0 0 0 2px;
+        font-size: 0;
+
+        button {
+            -webkit-app-region: no-drag;
+            border-radius: 3px;
+            width: 25px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #36393f;
+            color: #bac9d2;
+            font-family: Whitney,Helvetica Neue,Helvetica,Arial,sans-serif;
+            transition: background-color .2s ease, color .2s ease;
+            cursor: default;
+            border: 0;
+            height: 25px;
+            z-index: 900062;
+            padding: 0;
+            margin: 0 0 0 4px;
+
+            &:hover {
+                background: #44474e;
+                color: #FFF;
+            }
+
+            &.active {
+                background: #3a71c1;
+            }
+        }
+    }
+
+    .draggable {
+        top: 0;
+        left: 0;
+        right: 63px;
+        position: absolute;
+        height: 33px;
+        -webkit-app-region: drag;
+    }
+}

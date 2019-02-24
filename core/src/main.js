@@ -21,7 +21,8 @@ const TEST_ARGS = () => {
         'paths': {
             'client': path.resolve(_basePath, 'client', 'dist'),
             'core': path.resolve(_basePath, 'core', 'dist'),
-            'data': path.resolve(_baseDataPath, 'data')
+            'data': path.resolve(_baseDataPath, 'data'),
+            'editor': path.resolve(_basePath, 'editor', 'dist')
         }
     }
 }
@@ -33,7 +34,7 @@ import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
 import keytar from 'keytar';
 
-import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } from './modules';
+import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Editor, Database } from './modules';
 
 const packageJson = require(path.resolve(__dirname, 'package.json'));
 const sparkplug = path.resolve(__dirname, 'sparkplug.js');
@@ -63,7 +64,8 @@ class Comms {
         BDIpc.on('bd-sendToDiscord', (event, m) => this.sendToDiscord(m.channel, m.message), true);
 
         // BDIpc.on('bd-openCssEditor', (event, options) => this.bd.csseditor.openEditor(options), true);
-        BDIpc.on('bd-sendToCssEditor', (event, m) => this.sendToCssEditor(m.channel, m.message), true);
+        // BDIpc.on('bd-sendToCssEditor', (event, m) => this.sendToCssEditor(m.channel, m.message), true);
+        BDIpc.on('bd-openCssEditor', (event, options) => this.bd.editor.openEditor(options), true);
 
         BDIpc.on('bd-native-open', (event, options) => {
             dialog.showOpenDialog(OriginalBrowserWindow.fromWebContents(event.ipcEvent.sender), options, filenames => {
@@ -148,7 +150,8 @@ export class BetterDiscord {
     get comms() { return this._comms ? this._comms : (this._commas = new Comms(this)); }
     get database() { return this._db ? this._db : (this._db = new Database(this.config.getPath('data'))); }
     get config() { return this._config ? this._config : (this._config = new Config(this._args)); }
-    get window() {  return this.windowUtils ? this.windowUtils.window : undefined; }
+    get window() { return this.windowUtils ? this.windowUtils.window : undefined; }
+    get editor() { return this._editor ? this._editor : (this._editor = new Editor(this, this.config.getPath('editor'))); }
 
     constructor(args) {
         if (TESTS) args = TEST_ARGS();

@@ -99,6 +99,15 @@ export class FileUtils {
         }
     }
 
+    static async writeFile(path, data, options = {}) {
+        return new Promise((resolve, reject) => {
+            fs.writeFile(path, data, options, err => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
+    }
+
     static async listDirectory(path) {
         try {
             await this.directoryExists(path);

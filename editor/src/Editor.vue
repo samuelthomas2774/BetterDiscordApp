@@ -22,7 +22,8 @@
                 :newFile="newFile"
                 :saveFile="saveFile"
                 :newSnippet="newSnippet"
-                :saveSnippet="saveSnippet" />
+                :saveSnippet="saveSnippet"
+                :injectStyle="injectStyle"/>
     </div>
 </template>
 
@@ -129,6 +130,11 @@
             async saveSnippet(snippet) {
                 const result = await ClientIPC.send('bd-editor-saveSnippet', snippet);
                 console.log(result);
+            },
+
+            async injectStyle(item) {
+                const result = await ClientIPC.send('bd-editor-injectStyle', { id: item.name.split('.')[0], style: item.content });
+                return result;
             },
 
             toggleaot() {

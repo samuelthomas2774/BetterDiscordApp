@@ -9,6 +9,7 @@
 */
 
 import Module from './imodule';
+import { DOM } from 'ui';
 
 export default new class extends Module {
 
@@ -29,6 +30,11 @@ export default new class extends Module {
             } catch (err) {
                 e.reply({ err: err.stack || err });
             }
+        });
+
+        ipc.on('editor-injectStyle', (e, { id, style }) => {
+            DOM.injectStyle(style, `userstyle-${id}`);
+            e.reply('ok');
         });
     }
 

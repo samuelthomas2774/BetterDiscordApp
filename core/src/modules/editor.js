@@ -14,6 +14,7 @@ import { BrowserWindow } from 'electron';
 import Module from './modulebase';
 import { WindowUtils, FileUtils } from './utils';
 import BDIpc from './bdipc';
+import sass from 'node-sass';
 
 export default class Editor extends Module {
 
@@ -67,6 +68,21 @@ export default class Editor extends Module {
             // TODO not sure how to store snippets yet
             console.log(snippet);
             event.reply('ok');
+        });
+
+        BDIpc.on('editor-injectStyle', async (event, { id, style }) => {
+            sass.render({ data: style }, (err, result) => {
+                if (err) {
+                    console.log(err);
+                    event.reply({ err });
+                    return;
+                }
+                const { css } = result;
+                (async () => {
+                    await this.sendToDiscord('editor-injectStyle', { id, style: css.toString() });
+                    event.reply('ok');
+                })();
+            });
         });
     }
 

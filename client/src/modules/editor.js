@@ -22,6 +22,20 @@ export default new class extends Module {
         };
     }
 
+    initialize() {
+        super.initialize();
+        (async () => {
+            try {
+                // TODO this is temporary
+                const userScss = await this.send('readDataFile', 'user.scss');
+                const compiled = await this.send('compileSass', { data: userScss });
+                this.injectStyle('customcss', compiled.css.toString());
+            } catch (err) {
+                console.warn('SCSS Compilation error', err);
+            }
+        })();
+    }
+
     events(ipc) {
         ipc.on('editor-runScript', (e, script) => {
             try {
@@ -33,9 +47,13 @@ export default new class extends Module {
         });
 
         ipc.on('editor-injectStyle', (e, { id, style }) => {
-            DOM.injectStyle(style, `userstyle-${id}`);
+            this.injectStyle(id, style);
             e.reply('ok');
         });
+    }
+
+    injectStyle(id, style) {
+        return DOM.injectStyle(style, `userstyle-${id}`);
     }
 
     /**

@@ -123,8 +123,13 @@
             },
 
             async saveFile(file) {
-                const result = await ClientIPC.send('bd-editor-saveFile', file);
-                console.log(result);
+                try {
+                    const result = await ClientIPC.send('bd-editor-saveFile', file);
+                    file.savedContent = file.content;
+                    file.saved = true;
+                } catch (err) {
+                    console.log(err);
+                }
             },
 
             async saveSnippet(snippet) {

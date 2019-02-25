@@ -92,6 +92,11 @@ class Comms {
         BDIpc.on('bd-keytar-set', (event, { service, account, password }) => keytar.setPassword(service, account, password), true);
         BDIpc.on('bd-keytar-delete', (event, { service, account }) => keytar.deletePassword(service, account), true);
         BDIpc.on('bd-keytar-find-credentials', (event, { service }) => keytar.findCredentials(service), true);
+
+        BDIpc.on('bd-readDataFile', async (event, fileName) => {
+            const rf = await FileUtils.readFile(path.resolve(configProxy().getPath('data'), fileName));
+            event.reply(rf);
+        });
     }
 
     async send(channel, message) {

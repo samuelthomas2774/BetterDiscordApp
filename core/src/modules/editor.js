@@ -40,7 +40,7 @@ export default class Editor extends Module {
 
             const constructFiles = files.map(async file => {
                 const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('data'), file));
-                return { name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content };
+                return { type: 'file', name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content };
             });
 
             const awaitFiles = await Promise.all(constructFiles);

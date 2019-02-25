@@ -70,7 +70,13 @@ export default class Editor extends Module {
             event.reply('ok');
         });
 
-        BDIpc.on('editor-injectStyle', async (event, { id, style }) => {
+        BDIpc.on('editor-injectStyle', async (event, { id, style, mode }) => {
+            if (mode !== 'scss') {
+                await this.sendToDiscord('editor-injectStyle', { id, style });
+                event.reply('ok');
+                return;
+            }
+
             sass.render({ data: style }, (err, result) => {
                 if (err) {
                     console.log(err);

@@ -35,39 +35,59 @@ export default class Editor extends Module {
         });
 
         BDIpc.on('editor-getFiles', async (event) => {
-            const exclude = ['db.json', 'emotes.json', 'storage', 'user.settings.json', 'window.json'];
-            const listFiles = await FileUtils.listDirectory(this.bd.config.getPath('data'));
-            const files = listFiles.filter(file => !exclude.includes(file));
+            try {
+                const files = await FileUtils.listDirectory(this.bd.config.getPath('userfiles'));
 
-            const constructFiles = files.map(async file => {
-                const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('data'), file));
-                return { type: 'file', name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content, hoisted: file === 'user.scss' };
-            });
+                const constructFiles = files.map(async file => {
+                    const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('userfiles'), file));
+                    return { type: 'file', name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content, hoisted: file === 'user.scss' };
+                });
 
-            const awaitFiles = await Promise.all(constructFiles);
+                const awaitFiles = await Promise.all(constructFiles);
 
-            event.reply(awaitFiles);
+                event.reply(awaitFiles);
+            } catch (err) {
+                console.log(err);
+                event.reject({ err });
+            }
         });
 
         BDIpc.on('editor-getSnippets', async (event) => {
-            event.reply([
-                { type: 'snippet', name: 'test.js', content: '', savedContent: '', mode: 'javascript', saved: true }
-            ]);
+            try {
+                const files = await FileUtils.listDirectory(this.bd.config.getPath('snippets'));
+
+                const constructFiles = files.map(async file => {
+                    const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('snippets'), file));
+                    return { type: 'snippet', name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content };
+                });
+
+                const awaitFiles = await Promise.all(constructFiles);
+
+                event.reply(awaitFiles);
+            } catch (err) {
+                console.log(err);
+                event.reject({ err });
+            }
         });
 
         BDIpc.on('editor-saveFile', async (event, file) => {
             try {
-                await FileUtils.writeFile(path.resolve(this.bd.config.getPath('data'), file.name), file.content);
+                await FileUtils.writeFile(path.resolve(this.bd.config.getPath('userfiles'), file.name), file.content);
                 event.reply('ok');
             } catch (err) {
-                event.reply({ err });
+                console.log(err);
+                event.reject({ err });
             }
         });
 
         BDIpc.on('editor-saveSnippet', async (event, snippet) => {
-            // TODO not sure how to store snippets yet
-            console.log(snippet);
-            event.reply('ok');
+            try {
+                await FileUtils.writeFile(path.resolve(this.bd.config.getPath('snippets'), snippet.name), snippet.content);
+                event.reply('ok');
+            } catch (err) {
+                console.log(err);
+                event.reject({ err });
+            }
         });
 
         BDIpc.on('editor-injectStyle', async (event, { id, style, mode }) => {
@@ -77,11 +97,27 @@ export default class Editor extends Module {
                 return;
             }
 
-            style = style.split('\n').map(line => {
+            style = await Promise.all(style.split('\n').map(async(line) => {
                 if (!line.startsWith('@import')) return line;
                 const filename = line.split(' ')[1].replace(/'|"|;/g, '');
-                return `@import '${path.resolve(this.bd.config.getPath('data'), filename).replace(/\\/g, '/')}';`;
-            }).join('\n');
+                let filePath = path.resolve(this.bd.config.getPath('userfiles'), filename).replace(/\\/g, '/');
+
+                try {
+                    await FileUtils.fileExists(filePath);
+                } catch (err) {
+                    filePath = path.resolve(this.bd.config.getPath('snippets'), filename).replace(/\\/g, '/');
+                }
+
+                try {
+                    await FileUtils.fileExists(filePath);
+                } catch (err) {
+                    return `/*${filename}*/`;
+                }
+
+                return `@import '${filePath}';`;
+            }));
+
+            style = style.join('\n');
 
             sass.render({ data: style }, (err, result) => {
                 if (err) {

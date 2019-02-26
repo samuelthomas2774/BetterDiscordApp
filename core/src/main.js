@@ -207,10 +207,13 @@ export class BetterDiscord {
 
     async ensureDirectories() {
         await FileUtils.ensureDirectory(this.config.getPath('ext'));
+        await FileUtils.ensureDirectory(this.config.getPath('user'));
         await Promise.all([
             FileUtils.ensureDirectory(this.config.getPath('plugins')),
             FileUtils.ensureDirectory(this.config.getPath('themes')),
-            FileUtils.ensureDirectory(this.config.getPath('modules'))
+            FileUtils.ensureDirectory(this.config.getPath('modules')),
+            FileUtils.ensureDirectory(this.config.getPath('userfiles')),
+            FileUtils.ensureDirectory(this.config.getPath('snippets'))
         ]);
     }
 
@@ -253,17 +256,23 @@ export class BetterDiscord {
      * Add extra paths to config
      */
     extraPaths() {
-        const baseDataPath = path.resolve(this.config.getPath('data'), '..');
-        const extPath = path.resolve(baseDataPath, 'ext');
-        const pluginPath = path.resolve(extPath, 'plugins');
-        const themePath = path.resolve(extPath, 'themes');
-        const modulePath = path.resolve(extPath, 'modules');
+        const base = path.resolve(this.config.getPath('data'), '..');
+        const ext = path.resolve(base, 'ext');
+        const plugins = path.resolve(ext, 'plugins');
+        const themes = path.resolve(ext, 'themes');
+        const modules = path.resolve(ext, 'modules');
+        const user = path.resolve(this.config.getPath('data'), 'user');
+        const userfiles = path.resolve(user, 'files');
+        const snippets = path.resolve(user, 'snippets');
 
-        this.config.addPath('base', baseDataPath);
-        this.config.addPath('ext', extPath);
-        this.config.addPath('plugins', pluginPath);
-        this.config.addPath('themes', themePath);
-        this.config.addPath('modules', modulePath);
+        this.config.addPath('base', base);
+        this.config.addPath('ext', ext);
+        this.config.addPath('plugins', plugins);
+        this.config.addPath('themes', themes);
+        this.config.addPath('modules', modules);
+        this.config.addPath('user', user);
+        this.config.addPath('userfiles', userfiles);
+        this.config.addPath('snippets', snippets);
     }
 
     /**

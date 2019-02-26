@@ -63,8 +63,23 @@
         },
         components: { BDEdit },
         created() {
-            ClientIPC.on('bd-editor-addFile', (_, file) => this.addFile(file));
-            ClientIPC.on('bd-editor-addSnippet', (_, snippet) => this.addSnippet(snippet));
+            ClientIPC.on('bd-editor-addFile', (_, file) => {
+                if (this.files.find(f => f.name === file.name)) return;
+                this.addFile(file);
+            });
+
+            ClientIPC.on('bd-editor-remFile', (_, file) => {
+                this.files = this.files.filter(f => f.name !== file.name);
+            });
+
+            ClientIPC.on('bd-editor-addSnippet', (_, snippet) => {
+                if (this.snippets.find(s => s.name === snippet.name)) return;
+                this.addSnippet(snippet);
+            });
+
+            ClientIPC.on('bd-editor-remSnippet', (_, snippet) => {
+                this.snippets = this.snippets.filter(s => s.name !== snippet.name);
+            });
         },
         mounted() {
             (async () => {

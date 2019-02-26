@@ -15,6 +15,7 @@ import Module from './modulebase';
 import { WindowUtils, FileUtils } from './utils';
 import BDIpc from './bdipc';
 import sass from 'node-sass';
+import chokidar from 'chokidar';
 
 export default class Editor extends Module {
 
@@ -23,6 +24,7 @@ export default class Editor extends Module {
         this.editorPath = path;
         this.bd = bd;
         this.initListeners();
+        this.initWatchers();
     }
 
     initListeners() {
@@ -145,6 +147,53 @@ export default class Editor extends Module {
                     event.reply('ok');
                 })();
             });
+        });
+    }
+
+    initWatchers() {
+        this.fileWatcher = chokidar.watch(this.bd.config.getPath('userfiles'));
+        this.snippetWatcher = chokidar.watch(this.bd.config.getPath('snippets'));
+
+        this.fileWatcher.on('add', file => {
+            const fileName = path.basename(file);
+            try {
+                this.send('editor-addFile', {
+                    type: 'file',
+                    name: fileName,
+                    saved: true,
+                    mode: this.resolveMode(fileName),
+                    content: '',
+                    savedContent: ''
+                });
+            } catch (err) {}
+        });
+
+        this.fileWatcher.on('unlink', file => {
+            const fileName = path.basename(file);
+            try {
+                this.send('editor-remFile', { name: fileName });
+            } catch (err) {}
+        });
+
+        this.snippetWatcher.on('add', file => {
+            const fileName = path.basename(file);
+            try {
+                this.send('editor-addSnippet', {
+                    type: 'snippet',
+                    name: fileName,
+                    saved: true,
+                    mode: this.resolveMode(fileName),
+                    content: '',
+                    savedContent: ''
+                });
+            } catch (err) { }
+        });
+
+        this.snippetWatcher.on('unlink', file => {
+            const fileName = path.basename(file);
+            try {
+                this.send('editor-remSnippet', { name: fileName });
+            } catch (err) { }
         });
     }
 

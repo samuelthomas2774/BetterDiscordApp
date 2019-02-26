@@ -38,14 +38,25 @@ export default class Editor extends Module {
             try {
                 const files = await FileUtils.listDirectory(this.bd.config.getPath('userfiles'));
 
-                const constructFiles = files.map(async file => {
+                const constructFiles = await Promise.all(files.map(async file => {
                     const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('userfiles'), file));
-                    return { type: 'file', name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content, hoisted: file === 'user.scss' };
+                    return { type: 'file', name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content };
+                }));
+
+                const userscssPath = path.resolve(this.bd.config.getPath('data'), 'user.scss');
+                const userscss = await FileUtils.readFile(userscssPath);
+                constructFiles.push({
+                    caption: 'user',
+                    type: 'file',
+                    name: 'user.scss',
+                    saved: true,
+                    mode: 'scss',
+                    content: userscss,
+                    savedContent: userscss,
+                    hoisted: true
                 });
 
-                const awaitFiles = await Promise.all(constructFiles);
-
-                event.reply(awaitFiles);
+                event.reply(constructFiles);
             } catch (err) {
                 console.log(err);
                 event.reject({ err });
@@ -56,14 +67,12 @@ export default class Editor extends Module {
             try {
                 const files = await FileUtils.listDirectory(this.bd.config.getPath('snippets'));
 
-                const constructFiles = files.map(async file => {
+                const constructFiles = await Promise.all(files.map(async file => {
                     const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('snippets'), file));
                     return { type: 'snippet', name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content };
-                });
+                }));
 
-                const awaitFiles = await Promise.all(constructFiles);
-
-                event.reply(awaitFiles);
+                event.reply(constructFiles);
             } catch (err) {
                 console.log(err);
                 event.reject({ err });
@@ -71,8 +80,12 @@ export default class Editor extends Module {
         });
 
         BDIpc.on('editor-saveFile', async (event, file) => {
+            const filePath = (file.hoisted && file.name === 'user.scss') ?
+                path.resolve(this.bd.config.getPath('data'), 'user.scss') :
+                path.resolve(this.bd.config.getPath('userfiles'), file.name);
+
             try {
-                await FileUtils.writeFile(path.resolve(this.bd.config.getPath('userfiles'), file.name), file.content);
+                await FileUtils.writeFile(filePath, file.content);
                 event.reply('ok');
             } catch (err) {
                 console.log(err);

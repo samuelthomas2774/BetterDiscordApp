@@ -207,7 +207,7 @@ export class BetterDiscord {
 
     async ensureDirectories() {
         await FileUtils.ensureDirectory(this.config.getPath('ext'));
-        await FileUtils.ensureDirectory(this.config.getPath('user'));
+        await FileUtils.ensureDirectory(this.config.getPath('userdata'));
         await Promise.all([
             FileUtils.ensureDirectory(this.config.getPath('plugins')),
             FileUtils.ensureDirectory(this.config.getPath('themes')),
@@ -257,20 +257,20 @@ export class BetterDiscord {
      */
     extraPaths() {
         const base = path.resolve(this.config.getPath('data'), '..');
+        const userdata = path.resolve(base, 'userdata');
         const ext = path.resolve(base, 'ext');
         const plugins = path.resolve(ext, 'plugins');
         const themes = path.resolve(ext, 'themes');
         const modules = path.resolve(ext, 'modules');
-        const user = path.resolve(this.config.getPath('data'), 'user');
-        const userfiles = path.resolve(user, 'files');
-        const snippets = path.resolve(user, 'snippets');
+        const userfiles = path.resolve(userdata, 'files');
+        const snippets = path.resolve(userdata, 'snippets');
 
         this.config.addPath('base', base);
         this.config.addPath('ext', ext);
         this.config.addPath('plugins', plugins);
         this.config.addPath('themes', themes);
         this.config.addPath('modules', modules);
-        this.config.addPath('user', user);
+        this.config.addPath('userdata', userdata);
         this.config.addPath('userfiles', userfiles);
         this.config.addPath('snippets', snippets);
     }

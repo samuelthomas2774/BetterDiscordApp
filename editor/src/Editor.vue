@@ -23,7 +23,8 @@
                 :saveFile="saveFile"
                 :newSnippet="newSnippet"
                 :saveSnippet="saveSnippet"
-                :injectStyle="injectStyle"/>
+                :injectStyle="injectStyle"
+                :toggleLiveUpdate="toggleLiveUpdate"/>
     </div>
 </template>
 
@@ -71,6 +72,7 @@
                 this.snippets = await ClientIPC.send('bd-editor-getSnippets');
 
                 this.loading = false;
+                this.liveUpdateInternal = setInterval(this.liveUpdate, 1000);
             })();
         },
         methods: {
@@ -82,6 +84,13 @@
             updateContent(item, content) {
                 item.content = content;
                 item.saved = item.content === item.savedContent;
+
+                if (this.liveUpdateTimeout) clearTimeout(this.liveUpdateTimeout);
+                if (item.liveUpdateEnabled) {
+                    this.liveUpdateTimeout = setTimeout(() => {
+                        this.injectStyle(item);
+                    }, 5000);
+                }
             },
 
             async runScript(script) {
@@ -138,8 +147,14 @@
             },
 
             async injectStyle(item) {
+                if (item.content === '') return;
                 const result = await ClientIPC.send('bd-editor-injectStyle', { id: item.name.split('.')[0], style: item.content, mode: item.mode });
                 return result;
+            },
+
+            toggleLiveUpdate(item) {
+                item.liveUpdateEnabled = !item.liveUpdateEnabled;
+                return item;
             },
 
             toggleaot() {

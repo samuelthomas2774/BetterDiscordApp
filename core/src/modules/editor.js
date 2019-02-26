@@ -53,7 +53,8 @@ export default class Editor extends Module {
                     mode: 'scss',
                     content: userscss,
                     savedContent: userscss,
-                    hoisted: true
+                    hoisted: true,
+                    liveUpdate: true
                 });
 
                 event.reply(constructFiles);

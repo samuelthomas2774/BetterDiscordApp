@@ -77,6 +77,12 @@ export default class Editor extends Module {
                 return;
             }
 
+            style = style.split('\n').map(line => {
+                if (!line.startsWith('@import')) return line;
+                const filename = line.split(' ')[1].replace(/'|"|;/g, '');
+                return `@import '${path.resolve(this.bd.config.getPath('data'), filename).replace(/\\/g, '/')}';`;
+            }).join('\n');
+
             sass.render({ data: style }, (err, result) => {
                 if (err) {
                     console.log(err);
@@ -103,7 +109,7 @@ export default class Editor extends Module {
         return {
             'css': 'css',
             'scss': 'scss',
-            'js': 'js',
+            'js': 'javascript',
             'txt': 'text',
             'json': 'json'
         };

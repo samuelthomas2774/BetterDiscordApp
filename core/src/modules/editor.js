@@ -46,7 +46,7 @@ export default class Editor extends Module {
                 const userscssPath = path.resolve(this.bd.config.getPath('data'), 'user.scss');
                 const userscss = await FileUtils.readFile(userscssPath);
                 constructFiles.push({
-                    caption: 'user',
+                    caption: 'userstyle',
                     type: 'file',
                     name: 'user.scss',
                     saved: true,

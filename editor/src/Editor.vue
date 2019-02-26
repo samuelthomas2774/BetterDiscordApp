@@ -38,7 +38,7 @@
     const modes = {
         'css': 'css',
         'scss': 'scss',
-        'js': 'js',
+        'js': 'javascript',
         'txt': 'text',
         'json': 'json'
     };

@@ -173,7 +173,14 @@ import { FileUtils } from '../../core/src/modules/utils';
             async saveSnippet(snippet) {
                 // TODO only saved snippets should save not all when one is saved.
                 snippet.saved = true;
-                const result = await ClientIPC.send('bd-editor-saveSnippet', this.snippets);
+                snippet.savedContent = snippet.content;
+                const result = await ClientIPC.send('bd-editor-saveSnippet', this.snippets.map(snippet => {
+                    return {
+                        name: snippet.name,
+                        content: snippet.savedContent
+                    }
+                }));
+                console.log(result);
             },
 
             async readFile(file) {

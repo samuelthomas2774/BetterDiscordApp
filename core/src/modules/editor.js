@@ -71,7 +71,17 @@ export default class Editor extends Module {
         BDIpc.on('editor-getSnippets', async (event) => {
             try {
                 const snippets = await FileUtils.readJsonFromFile(this.bd.config.getPath('snippets'));
-                event.reply(snippets);
+                event.reply(snippets.map(snippet => {
+                    return {
+                        type: 'snippet',
+                        name: snippet.name,
+                        mode: this.resolveMode(snippet.name),
+                        content: snippet.content,
+                        savedContent: snippet.content,
+                        read: true,
+                        saved: true
+                    }
+                }));
             } catch (err) {
                 console.log(err);
                 event.reply([]);
@@ -113,18 +123,12 @@ export default class Editor extends Module {
             style = await Promise.all(style.split('\n').map(async(line) => {
                 if (!line.startsWith('@import')) return line;
                 const filename = line.split(' ')[1].replace(/'|"|;/g, '');
-                let filePath = path.resolve(this.bd.config.getPath('userfiles'), filename).replace(/\\/g, '/');
+                const filePath = path.resolve(this.bd.config.getPath('userfiles'), filename).replace(/\\/g, '/');
 
                 try {
                     await FileUtils.fileExists(filePath);
                 } catch (err) {
-                    filePath = path.resolve(this.bd.config.getPath('snippets'), filename).replace(/\\/g, '/');
-                }
-
-                try {
-                    await FileUtils.fileExists(filePath);
-                } catch (err) {
-                    return `/*${filename}*/`;
+                    `/*${filename}*/`;
                 }
 
                 return `@import '${filePath}';`;

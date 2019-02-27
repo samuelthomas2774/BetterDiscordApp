@@ -23,6 +23,8 @@
                 :saveFile="saveFile"
                 :newSnippet="newSnippet"
                 :saveSnippet="saveSnippet"
+                :readFile="readFile"
+                :readSnippet="readSnippet"
                 :injectStyle="injectStyle"
                 :toggleLiveUpdate="toggleLiveUpdate"/>
     </div>
@@ -34,6 +36,7 @@
     import { remote } from 'electron';
 
     import { BDEdit } from 'bdedit';
+import { FileUtils } from '../../core/src/modules/utils';
     ace.acequire = ace.require;
 
     const modes = {
@@ -58,7 +61,8 @@
                 snippets: [],
                 loading: true,
                 alwaysOnTop: false,
-                error: undefined
+                error: undefined,
+                lastSaved: undefined
             }
         },
         components: { BDEdit },
@@ -80,20 +84,29 @@
             ClientIPC.on('bd-editor-remSnippet', (_, snippet) => {
                 this.snippets = this.snippets.filter(s => s.name !== snippet.name);
             });
+
+            ClientIPC.on('bd-editor-fileChange', (_, file) => {
+                if (this.lastSaved && this.lastSaved.name === file.name) { // If we saved in our editor then don't trigger
+                    this.lastSaved = undefined;
+                    return;
+                }
+
+                const f = this.files.find(f => f.name === file.name);
+                if (f) f.changed = true;
+            });
         },
         mounted() {
             (async () => {
                 this.files = await ClientIPC.send('bd-editor-getFiles');
                 this.snippets = await ClientIPC.send('bd-editor-getSnippets');
-
                 this.loading = false;
-                this.liveUpdateInternal = setInterval(this.liveUpdate, 1000);
             })();
         },
         methods: {
             addFile(file) {
                 this.files.push(file);
             },
+
             addSnippet(snippet) { this.snippets.push(file) },
 
             updateContent(item, content) {
@@ -120,11 +133,11 @@
                 let iter = 0;
 
                 while (this.files.find(file => file.name === newName)) {
-                    newName = `${prefix}_${iter}`;
+                    newName = `${prefix.split('.')[0]}_${iter}.${prefix.split('.')[1]}`;
                     iter++;
                 }
 
-                const newItem = { type: 'file', name: newName, content: '', mode, saved: false };
+                const newItem = { type: 'file', name: newName, content: '', mode, saved: false, read: true };
                 this.files.push(newItem);
                 return newItem;
             },
@@ -141,13 +154,14 @@
                     iter++;
                 }
 
-                const newItem = { type: 'snippet', name: newName, content: '', mode, saved: false };
+                const newItem = { type: 'snippet', name: newName, content: '', savedContent: '', mode, saved: false, read: true };
                 this.snippets.push(newItem);
                 return newItem;
             },
 
             async saveFile(file) {
                 try {
+                    this.lastSaved = file;
                     const result = await ClientIPC.send('bd-editor-saveFile', file);
                     file.savedContent = file.content;
                     file.saved = true;
@@ -157,8 +171,23 @@
             },
 
             async saveSnippet(snippet) {
-                const result = await ClientIPC.send('bd-editor-saveSnippet', snippet);
-                console.log(result);
+                // TODO only saved snippets should save not all when one is saved.
+                snippet.saved = true;
+                const result = await ClientIPC.send('bd-editor-saveSnippet', this.snippets);
+            },
+
+            async readFile(file) {
+                const content = await ClientIPC.send('editor-readFile', file);
+                file.read = true;
+                file.changed = false;
+                file.content = file.savedContent = content;
+                return content;
+            },
+
+            async readSnippet(snippet) {
+                const content = await ClientIPC.send('editor-readSnippet', snippet);
+                snippet.read = true;
+                return content;
             },
 
             async injectStyle(item) {

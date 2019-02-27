@@ -41,8 +41,8 @@ export default class Editor extends Module {
                 const files = await FileUtils.listDirectory(this.bd.config.getPath('userfiles'));
 
                 const constructFiles = await Promise.all(files.map(async file => {
-                    const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('userfiles'), file));
-                    return { type: 'file', name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content };
+                    // const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('userfiles'), file));
+                    return { type: 'file', name: file, saved: true, mode: this.resolveMode(file), content: '', savedContent: '', read: false, changed: false };
                 }));
 
                 const userscssPath = path.resolve(this.bd.config.getPath('data'), 'user.scss');
@@ -56,7 +56,9 @@ export default class Editor extends Module {
                     content: userscss,
                     savedContent: userscss,
                     hoisted: true,
-                    liveUpdate: true
+                    liveUpdate: true,
+                    read: true,
+                    changed: false
                 });
 
                 event.reply(constructFiles);
@@ -68,17 +70,12 @@ export default class Editor extends Module {
 
         BDIpc.on('editor-getSnippets', async (event) => {
             try {
-                const files = await FileUtils.listDirectory(this.bd.config.getPath('snippets'));
-
-                const constructFiles = await Promise.all(files.map(async file => {
-                    const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('snippets'), file));
-                    return { type: 'snippet', name: file, saved: true, mode: this.resolveMode(file), content, savedContent: content };
-                }));
-
-                event.reply(constructFiles);
+                const snippets = await FileUtils.readJsonFromFile(this.bd.config.getPath('snippets'));
+                event.reply(snippets);
             } catch (err) {
                 console.log(err);
-                event.reject({ err });
+                event.reply([]);
+                return;
             }
         });
 
@@ -98,7 +95,7 @@ export default class Editor extends Module {
 
         BDIpc.on('editor-saveSnippet', async (event, snippet) => {
             try {
-                await FileUtils.writeFile(path.resolve(this.bd.config.getPath('snippets'), snippet.name), snippet.content);
+                await FileUtils.writeFile(this.bd.config.getPath('snippets'), JSON.stringify(snippet));
                 event.reply('ok');
             } catch (err) {
                 console.log(err);
@@ -148,11 +145,15 @@ export default class Editor extends Module {
                 })();
             });
         });
+
+        BDIpc.on('editor-readFile', async (event, file) => {
+            const content = await FileUtils.readFile(path.resolve(this.bd.config.getPath('userfiles'), file.name));
+            event.reply(content);
+        });
     }
 
     initWatchers() {
         this.fileWatcher = chokidar.watch(this.bd.config.getPath('userfiles'));
-        this.snippetWatcher = chokidar.watch(this.bd.config.getPath('snippets'));
 
         this.fileWatcher.on('add', file => {
             const fileName = path.basename(file);
@@ -175,25 +176,8 @@ export default class Editor extends Module {
             } catch (err) {}
         });
 
-        this.snippetWatcher.on('add', file => {
-            const fileName = path.basename(file);
-            try {
-                this.send('editor-addSnippet', {
-                    type: 'snippet',
-                    name: fileName,
-                    saved: true,
-                    mode: this.resolveMode(fileName),
-                    content: '',
-                    savedContent: ''
-                });
-            } catch (err) { }
-        });
-
-        this.snippetWatcher.on('unlink', file => {
-            const fileName = path.basename(file);
-            try {
-                this.send('editor-remSnippet', { name: fileName });
-            } catch (err) { }
+        this.fileWatcher.on('change', file => {
+            this.send('editor-fileChange', { name: path.basename(file) });
         });
     }
 

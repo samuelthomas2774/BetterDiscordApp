@@ -263,7 +263,7 @@ export class BetterDiscord {
         const themes = path.resolve(ext, 'themes');
         const modules = path.resolve(ext, 'modules');
         const userfiles = path.resolve(userdata, 'files');
-        const snippets = path.resolve(userdata, 'snippets');
+        const snippets = path.resolve(userdata, 'snippets.json');
 
         this.config.addPath('base', base);
         this.config.addPath('ext', ext);

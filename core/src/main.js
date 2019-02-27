@@ -212,8 +212,7 @@ export class BetterDiscord {
             FileUtils.ensureDirectory(this.config.getPath('plugins')),
             FileUtils.ensureDirectory(this.config.getPath('themes')),
             FileUtils.ensureDirectory(this.config.getPath('modules')),
-            FileUtils.ensureDirectory(this.config.getPath('userfiles')),
-            FileUtils.ensureDirectory(this.config.getPath('snippets'))
+            FileUtils.ensureDirectory(this.config.getPath('userfiles'))
         ]);
     }
 

@@ -25,7 +25,8 @@
                 :readSnippet="readSnippet"
                 :injectStyle="injectStyle"
                 :toggleLiveUpdate="toggleLiveUpdate"
-                :ctxAction="ctxAction"/>
+                :ctxAction="ctxAction"
+                :toast="toast"/>
     </div>
 </template>
 
@@ -60,7 +61,8 @@
                 loading: true,
                 alwaysOnTop: false,
                 error: undefined,
-                lastSaved: undefined
+                lastSaved: undefined,
+                toast: { active: false, msg: '' }
             }
         },
         components: { BDEdit },
@@ -218,15 +220,23 @@
                     this.loading = true;
                     const { oldName, newName } = item;
 
+                    if (this.files.find(f => f.name === newName)) {
+                        this.loading = false;
+                        this.showToast('err', `File ${newName} already exists`);
+                        return {
+                            err: `File ${newName} already exists`
+                        };
+                    }
+
                     try {
                         await ClientIPC.send('rnFile', { oldName: ['userfiles', oldName], newName: ['userfiles', newName] });
+                        return item;
                     } catch (err) {
                         console.log(err);
+                        return { err };
                     } finally {
                         this.loading = false;
                     }
-
-                    return;
                 }
 
                 if (action === 'delete') {
@@ -240,6 +250,11 @@
                     }
                     return;
                 }
+            },
+
+            showToast(type, msg, timeout = 3000) {
+                this.toast = { active: true, type, msg };
+                setTimeout(() => { this.toast.active = false }, timeout);
             },
 
             toggleLiveUpdate(item) {

@@ -10,6 +10,7 @@ import editjson from 'gulp-json-editor';
 
 import corepkg from './core/package';
 import clientpkg from './client/package';
+import editorpkg from './editor/package';
 
 // core-release >
 
@@ -84,15 +85,29 @@ gulp.task('client-sparkplug', function () {
 
 gulp.task('client-release', gulp.parallel('client-main', 'client-pkg', 'client-sparkplug'));
 
-// CSS Editor
+// Editor
 
-gulp.task('css-editor', function () {
+gulp.task('editor-main', function () {
     return pump([
-        gulp.src('csseditor/dist/csseditor-release.js'),
-        rename('csseditor.js'),
-        gulp.dest('release/csseditor')
+        gulp.src('editor/dist/editor.release.js'),
+        rename(`editor.${editorpkg.version}.js`),
+        gulp.dest('release/editor')
     ]);
 });
+
+gulp.task('editor-pkg', function () {
+    return pump([
+        gulp.src('editor/package.json'),
+        editjson(function (pkg) {
+            pkg.main = `editor.${editorpkg.version}.js`;
+            delete pkg.scripts;
+            return pkg;
+        }),
+        gulp.dest('release/editor')
+    ]);
+});
+
+gulp.task('editor-release', gulp.parallel('editor-main', 'editor-pkg'));
 
 // Deps
 
@@ -125,5 +140,5 @@ gulp.task('del-release', function() {
 });
 
 gulp.task('dependencies', gulp.series('node-modules', gulp.parallel('node-sass-bindings', 'keytar-bindings')));
-gulp.task('build-release', gulp.parallel('core-release', 'client-release', 'dependencies'));
+gulp.task('build-release', gulp.parallel('core-release', 'client-release', 'editor-release', 'dependencies'));
 gulp.task('release', gulp.series('del-release', 'build-release'));

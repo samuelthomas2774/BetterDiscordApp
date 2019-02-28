@@ -15,7 +15,7 @@ releaseStub.files = releaseStub.files.map(file => {
 const mainpkg = require('../package.json');
 const corepkg = require('../release/core/package.json');
 const clientpkg = require('../release/client/package.json');
-// const editorpkg = require('../release/editor/package.json');
+const editorpkg = require('../release/editor/package.json');
 
 const createArchiver = (level = 1) => {
     return archiver('tar', {
@@ -85,6 +85,23 @@ async function archiveClient(out = './release/client.tar.gz') {
     });
 }
 
+// Editor
+async function archiveEditor(out = './release/editor.tar.gz') {
+    return new Promise((resolve, reject) => {
+        console.log('packaging editor');
+        const mainFn = `editor.${editorpkg.version}.js`;
+        const editorArchive = createArchiver();
+        editorArchive.directory('./release/editor', 'editor');
+
+        const editorZipStream = fs.createWriteStream(out);
+        editorArchive.pipe(editorZipStream);
+
+        editorArchive.on('end', () => resolve(out));
+        editorArchive.on('error', reject);
+        editorArchive.finalize();
+    });
+}
+
 async function pack() {
     const coreArchive = await archiveCore();
     const coreHash = await hashFile(coreArchive);
@@ -110,11 +127,24 @@ async function pack() {
     clientStub.size = clientSize;
     clientStub.remote = clientStub.remote.replace(':fn', 'client.tar.gz');
 
+    const editorArchive = await archiveEditor();
+    const editorHash = await hashFile(editorArchive);
+    const editorSize = await fileSize(editorArchive);
+    console.log(`${editorArchive} ${editorSize} | ${editorHash}`);
+
+    const editorStub = releaseStub.files.find(f => f.id === 'editor');
+    editorStub.name = 'editor.tar.gz';
+    editorStub.version = editorpkg.version;
+    editorStub.hash = editorHash;
+    editorStub.size = editorSize;
+    editorStub.remote = editorStub.remote.replace(':fn', 'editor.tar.gz');
+
     releaseStub.mver = mainpkg.version;
     releaseStub.files = [
         releaseStub.files.find(f => f.id === 'stub'),
         coreStub,
-        clientStub
+        clientStub,
+        editorStub
     ];
 
     fs.writeFile('./release/releaseinfo.json', JSON.stringify(releaseStub, null, 4), (err) => {

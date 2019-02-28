@@ -12,3 +12,4 @@ user.config.json
 /.vs
 /npm-debug.log
 /tests/ext/extensions
+/tests/userdata

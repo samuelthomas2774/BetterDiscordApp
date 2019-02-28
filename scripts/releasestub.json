@@ -1,0 +1,37 @@
+{
+    "mver": "",
+    "files": [
+        {
+            "id": "stub",
+            "name": "stub.js",
+            "version": "1.0.0",
+            "size": 0,
+            "remote": "/master/installer/stub.js",
+            "hash": ""
+        },
+        {
+            "id": "client",
+            "name": "",
+            "version": "",
+            "size": "",
+            "remote": "/releases/download/:rel/:fn",
+            "hash": ""
+        },
+        {
+            "id": "core",
+            "name": "",
+            "version": "",
+            "size": "",
+            "remote": "/releases/download/:rel/:fn",
+            "hash": ""
+        },
+        {
+            "id": "editor",
+            "name": "",
+            "version": "",
+            "size": "",
+            "remote": "/releases/download/:rel/:fn",
+            "hash": ""
+        }
+    ]
+}

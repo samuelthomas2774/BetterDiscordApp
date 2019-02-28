@@ -40,7 +40,8 @@ module.exports = {
         net: 'require("net")',
         request: 'require(require("path").join(require("electron").remote.app.getAppPath(), "node_modules", "request"))',
         sparkplug: 'require("./sparkplug")',
-        'node-crypto': 'require("crypto")'
+        'node-crypto': 'require("crypto")',
+        'child_process': 'require("child_process")'
     },
     resolve: {
         alias: {

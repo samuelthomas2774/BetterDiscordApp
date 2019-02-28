@@ -16,13 +16,26 @@ export default class Config extends Module {
         return this.args.version;
     }
 
+    get clientVersion() {
+        return this.args.clientVersion;
+    }
+
+    setClientVersion(clientVersion) {
+        this.args.clientVersion = clientVersion;
+    }
+
     get paths() {
         return this.args.paths;
     }
 
     getPath(id, full) {
-        const path = this.paths.find(path => path.id === id);
+        const path = this.paths.find(p => p.id === id);
+        if (!path) return null;
         return full ? path : path.path;
+    }
+
+    addPath(id, path) {
+        this.paths.push({ id, path });
     }
 
     get config() {
@@ -32,4 +45,8 @@ export default class Config extends Module {
         };
     }
 
+    // Compatibility with old client code and new installer args
+    compatibility() {
+        this.args.paths = Object.entries(this.args.paths).map(([id, path]) => ({ id, path }));
+    }
 }

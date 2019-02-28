@@ -11,6 +11,7 @@
 // TODO Use common
 
 import fs from 'fs';
+import rimraf from 'rimraf';
 
 import Module from './modulebase';
 import BDIpc from './bdipc';
@@ -84,6 +85,20 @@ export class FileUtils {
         });
     }
 
+    static async ensureFile(path) {
+        try {
+            await this.fileExists(path);
+            return true;
+        } catch (err) {
+            try {
+                await this.writeFile(path, '');
+                return true;
+            } catch (err) {
+                throw err;
+            }
+        }
+    }
+
     static async readJsonFromFile(path) {
         let readFile;
         try {
@@ -97,6 +112,15 @@ export class FileUtils {
         } catch (err) {
             throw Object.assign(err, { path });
         }
+    }
+
+    static async writeFile(path, data, options = {}) {
+        return new Promise((resolve, reject) => {
+            fs.writeFile(path, data, options, err => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
     }
 
     static async listDirectory(path) {
@@ -154,6 +178,27 @@ export class FileUtils {
                 throw err;
             }
         }
+    }
+
+    static async rm(path) {
+        return new Promise((resolve, reject) => {
+            rimraf(path, err => {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
+                resolve();
+            });
+        });
+    }
+
+    static async rn(oldPath, newPath) {
+        return new Promise((resolve, reject) => {
+            fs.rename(oldPath, newPath, err => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
     }
 }
 

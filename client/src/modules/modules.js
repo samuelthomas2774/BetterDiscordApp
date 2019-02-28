@@ -1,5 +1,6 @@
 export { default as Events } from './events';
 export { default as CssEditor } from './csseditor';
+export { default as Editor } from './editor';
 export { default as Globals } from './globals';
 export { default as Settings } from './settings';
 export { default as Database } from './database';

@@ -28,21 +28,23 @@
 
         .bd-chevron1 {
             position: absolute;
-            svg{
+
+            svg {
                 transform: scale(1) translateY(0);
             }
         }
 
-        .bd-chevron2{
+        .bd-chevron2 {
             position: absolute;
-            svg{
+
+            svg {
                 visibility: hidden;
-                transform: scale(1.4,.5) translateY(6px) rotate(180deg);
+                transform: scale(1.4, .5) translateY(6px) rotate(180deg);
             }
         }
 
         svg {
-            transition: transform .2s cubic-bezier(.2,0,0,1);
+            transition: transform .2s cubic-bezier(.2, 0, 0, 1);
         }
     }
 
@@ -79,7 +81,7 @@
             .bd-drawerOpenButton {
                 .bd-chevron1 {
                     svg {
-                        transform: scale(1.4,.5) translateY(-6px);
+                        transform: scale(1.4, .5) translateY(-6px);
                         visibility: hidden;
                     }
                 }

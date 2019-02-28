@@ -85,6 +85,20 @@ export class FileUtils {
         });
     }
 
+    static async ensureFile(path) {
+        try {
+            await this.fileExists(path);
+            return true;
+        } catch (err) {
+            try {
+                await this.writeFile(path, '');
+                return true;
+            } catch (err) {
+                throw err;
+            }
+        }
+    }
+
     static async readJsonFromFile(path) {
         let readFile;
         try {

@@ -309,6 +309,7 @@ export class BetterDiscord {
         this.config.addPath('userdata', userdata);
         this.config.addPath('userfiles', userfiles);
         this.config.addPath('snippets', snippets);
+        if (!this.config.getPath('editor')) this.config.addPath('editor', path.resolve(base, 'editor'));
     }
 
     /**

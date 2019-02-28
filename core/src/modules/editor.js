@@ -209,7 +209,13 @@ export default class Editor extends Module {
      * Opens an editor.
      * @return {Promise}
      */
-    openEditor(options) {
+    async openEditor(options) {
+        if (!this.editorPkg) {
+            this.editorPkg = await FileUtils.readJsonFromFile(path.join(this.editorPath, 'package.json'));
+        }
+
+        console.log(this.editorPkg);
+
         return new Promise((resolve, reject) => {
             if (this.editor) {
                 if (this.editor.isFocused()) return;
@@ -236,7 +242,7 @@ export default class Editor extends Module {
             });
 
             this.editor.webContents.on('did-finish-load', () => {
-                this.editorUtils.injectScript(path.join(this.editorPath, 'editor.js'));
+                this.editorUtils.injectScript(path.join(this.editorPath, this.editorPkg.main));
                 resolve(true);
             });
         })

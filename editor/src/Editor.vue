@@ -193,8 +193,8 @@
             },
 
             async injectStyle(item) {
-                if (item.content === '') return;
-                const result = await ClientIPC.send('bd-editor-injectStyle', { id: item.name.split('.')[0], style: item.content, mode: item.mode });
+                const style = item.content.length <= 0 ? ' ' : item.content;
+                const result = await ClientIPC.send('bd-editor-injectStyle', { id: item.name.split('.')[0], style, mode: item.mode });
                 return result;
             },
 

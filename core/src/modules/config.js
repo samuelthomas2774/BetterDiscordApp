@@ -30,6 +30,7 @@ export default class Config extends Module {
 
     getPath(id, full) {
         const path = this.paths.find(p => p.id === id);
+        if (!path) return null;
         return full ? path : path.path;
     }
 

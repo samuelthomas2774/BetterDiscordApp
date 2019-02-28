@@ -90,7 +90,7 @@
     "sasslint": "sass-lint client/src/styles/**/*.scss -v",
     "test": "npm run build && npm run lint",
     "build_node-sass": "node scripts/build-node-sass.js",
-    "build_release": "npm run release --prefix client && npm run build --prefix core && npm run release --prefix csseditor",
+    "build_release": "npm run release --prefix client && npm run build --prefix core && npm run release --prefix editor",
     "package_release": "node scripts/package-release.js",
     "gulp_release": "gulp release",
     "release": "npm run lint && npm run build_release && gulp release && npm run package_release",

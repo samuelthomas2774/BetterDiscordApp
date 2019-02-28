@@ -11,6 +11,7 @@
 // TODO Use common
 
 import fs from 'fs';
+import rimraf from 'rimraf';
 
 import Module from './modulebase';
 import BDIpc from './bdipc';
@@ -163,6 +164,27 @@ export class FileUtils {
                 throw err;
             }
         }
+    }
+
+    static async rm(path) {
+        return new Promise((resolve, reject) => {
+            rimraf(path, err => {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
+                resolve();
+            });
+        });
+    }
+
+    static async rn(oldPath, newPath) {
+        return new Promise((resolve, reject) => {
+            fs.rename(oldPath, newPath, err => {
+                if (err) return reject(err);
+                resolve();
+            });
+        });
     }
 }
 

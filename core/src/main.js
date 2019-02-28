@@ -112,6 +112,28 @@ class Comms {
         BDIpc.on('bd-getPath', (event, paths) => {
             event.reply(path.resolve(this.bd.config.getPath(paths[0]), ...paths.splice(1)));
         });
+
+        BDIpc.on('bd-rmFile', async (event, paths) => {
+            const fullPath = path.resolve(this.bd.config.getPath(paths[0]), ...paths.splice(1));
+            try {
+                await FileUtils.rm(fullPath);
+                event.reply('ok');
+            } catch (err) {
+                event.reject(err);
+            }
+        });
+
+        BDIpc.on('bd-rnFile', async (event, paths) => {
+            const oldPath = path.resolve(this.bd.config.getPath(paths.oldName[0]), ...paths.oldName.splice(1));
+            const newPath = path.resolve(this.bd.config.getPath(paths.newName[0]), ...paths.newName.splice(1));
+
+            try {
+                await FileUtils.rn(oldPath, newPath);
+                event.reply('ok');
+            } catch (err) {
+                event.reject(err);
+            }
+        });
     }
 
     async send(channel, message) {

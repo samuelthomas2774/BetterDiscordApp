@@ -214,6 +214,33 @@
                     remote.clipboard.writeText(fullPath);
                     return;
                 }
+
+                if (action === 'rename') { // TODO select correct file after
+                    this.loading = true;
+                    const { oldName, newName } = item;
+
+                    try {
+                        await ClientIPC.send('rnFile', { oldName: ['userfiles', oldName], newName: ['userfiles', newName] });
+                    } catch (err) {
+                        console.log(err);
+                    } finally {
+                        this.loading = false;
+                    }
+
+                    return;
+                }
+
+                if (action === 'delete') {
+                    this.loading = true;
+                    try {
+                        await ClientIPC.send('rmFile', ['userfiles', item.name]);
+                    } catch (err) {
+                        console.log(err);
+                    } finally {
+                        this.loading = false;
+                    }
+                    return;
+                }
             },
 
             toggleLiveUpdate(item) {

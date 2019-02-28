@@ -1,0 +1,23 @@
+{
+  "name": "bdeditorwindow",
+  "description": "BetterDiscord editor window",
+  "author": "JsSucks",
+  "version": "0.4.0",
+  "homepage": "https://betterdiscord.net",
+  "license": "MIT",
+  "main": "dist/csseditor.js",
+  "contributors": [
+    "Jiiks",
+    "Pohky"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JsSucks/BetterDiscordApp.git"
+  },
+  "private": false,
+  "scripts": {
+    "build": "webpack --progress --colors",
+    "watch": "webpack --progress --colors --watch",
+    "release": "webpack --progress --colors --config=webpack.production.config.js"
+  }
+}

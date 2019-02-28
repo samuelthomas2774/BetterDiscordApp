@@ -21,19 +21,21 @@ const TEST_ARGS = () => {
         'paths': {
             'client': path.resolve(_basePath, 'client', 'dist'),
             'core': path.resolve(_basePath, 'core', 'dist'),
-            'data': path.resolve(_baseDataPath, 'data')
+            'data': path.resolve(_baseDataPath, 'data'),
+            'editor': path.resolve(_basePath, 'editor', 'dist')
         }
     }
 }
+const TEST_EDITOR = true;
 
 import path from 'path';
 import sass from 'node-sass';
-import { BrowserWindow as OriginalBrowserWindow, dialog, session } from 'electron';
+import { BrowserWindow as OriginalBrowserWindow, dialog, session, shell } from 'electron';
 import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
 import keytar from 'keytar';
 
-import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Database } from './modules';
+import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Editor, Database } from './modules';
 
 const packageJson = require(path.resolve(__dirname, 'package.json'));
 const sparkplug = path.resolve(__dirname, 'sparkplug.js');
@@ -63,7 +65,8 @@ class Comms {
         BDIpc.on('bd-sendToDiscord', (event, m) => this.sendToDiscord(m.channel, m.message), true);
 
         // BDIpc.on('bd-openCssEditor', (event, options) => this.bd.csseditor.openEditor(options), true);
-        BDIpc.on('bd-sendToCssEditor', (event, m) => this.sendToCssEditor(m.channel, m.message), true);
+        // BDIpc.on('bd-sendToCssEditor', (event, m) => this.sendToCssEditor(m.channel, m.message), true);
+        // BDIpc.on('bd-openCssEditor', (event, options) => this.bd.editor.openEditor(options), true);
 
         BDIpc.on('bd-native-open', (event, options) => {
             dialog.showOpenDialog(OriginalBrowserWindow.fromWebContents(event.ipcEvent.sender), options, filenames => {
@@ -89,6 +92,48 @@ class Comms {
         BDIpc.on('bd-keytar-set', (event, { service, account, password }) => keytar.setPassword(service, account, password), true);
         BDIpc.on('bd-keytar-delete', (event, { service, account }) => keytar.deletePassword(service, account), true);
         BDIpc.on('bd-keytar-find-credentials', (event, { service }) => keytar.findCredentials(service), true);
+
+        BDIpc.on('bd-readDataFile', async (event, fileName) => {
+            const rf = await FileUtils.readFile(path.resolve(configProxy().getPath('data'), fileName));
+            event.reply(rf);
+        });
+
+        BDIpc.on('bd-explorer', (_, _path) => {
+            if (_path.static) _path = this.bd.config.getPath(_path.static);
+            else if (_path.full) _path = _path.full;
+            else if (_path.sub) _path = path.resolve(this.bd.config.getPath(_path.sub.base), [..._path.sub.subs]);
+            try {
+                shell.openItem(_path);
+            } catch (err) {
+                console.log(err);
+            }
+        });
+
+        BDIpc.on('bd-getPath', (event, paths) => {
+            event.reply(path.resolve(this.bd.config.getPath(paths[0]), ...paths.splice(1)));
+        });
+
+        BDIpc.on('bd-rmFile', async (event, paths) => {
+            const fullPath = path.resolve(this.bd.config.getPath(paths[0]), ...paths.splice(1));
+            try {
+                await FileUtils.rm(fullPath);
+                event.reply('ok');
+            } catch (err) {
+                event.reject(err);
+            }
+        });
+
+        BDIpc.on('bd-rnFile', async (event, paths) => {
+            const oldPath = path.resolve(this.bd.config.getPath(paths.oldName[0]), ...paths.oldName.splice(1));
+            const newPath = path.resolve(this.bd.config.getPath(paths.newName[0]), ...paths.newName.splice(1));
+
+            try {
+                await FileUtils.rn(oldPath, newPath);
+                event.reply('ok');
+            } catch (err) {
+                event.reject(err);
+            }
+        });
     }
 
     async send(channel, message) {
@@ -148,7 +193,8 @@ export class BetterDiscord {
     get comms() { return this._comms ? this._comms : (this._commas = new Comms(this)); }
     get database() { return this._db ? this._db : (this._db = new Database(this.config.getPath('data'))); }
     get config() { return this._config ? this._config : (this._config = new Config(this._args)); }
-    get window() {  return this.windowUtils ? this.windowUtils.window : undefined; }
+    get window() { return this.windowUtils ? this.windowUtils.window : undefined; }
+    get editor() { return this._editor ? this._editor : (this._editor = new Editor(this, this.config.getPath('editor'))); }
 
     constructor(args) {
         if (TESTS) args = TEST_ARGS();
@@ -169,6 +215,7 @@ export class BetterDiscord {
 
         configProxy = () => this.config;
         const autoInitComms = this.comms;
+        const autoInitEditor = this.editor;
         this.init();
     }
 
@@ -183,9 +230,6 @@ export class BetterDiscord {
         await this.waitForWindowUtils();
         await this.ensureDirectories();
 
-        // TODO
-        // this.csseditor = new CSSEditor(this, this.config.getPath('csseditor'));
-
         this.windowUtils.on('did-finish-load', () => this.injectScripts(true));
 
         this.windowUtils.on('did-navigate-in-page', (event, url, isMainFrame) => {
@@ -194,15 +238,18 @@ export class BetterDiscord {
 
         setTimeout(() => {
             this.injectScripts();
+            if (TEST_EDITOR) this.editor.openEditor({});
         }, 500);
     }
 
     async ensureDirectories() {
         await FileUtils.ensureDirectory(this.config.getPath('ext'));
+        await FileUtils.ensureDirectory(this.config.getPath('userdata'));
         await Promise.all([
             FileUtils.ensureDirectory(this.config.getPath('plugins')),
             FileUtils.ensureDirectory(this.config.getPath('themes')),
-            FileUtils.ensureDirectory(this.config.getPath('modules'))
+            FileUtils.ensureDirectory(this.config.getPath('modules')),
+            FileUtils.ensureDirectory(this.config.getPath('userfiles'))
         ]);
     }
 
@@ -245,17 +292,23 @@ export class BetterDiscord {
      * Add extra paths to config
      */
     extraPaths() {
-        const baseDataPath = path.resolve(this.config.getPath('data'), '..');
-        const extPath = path.resolve(baseDataPath, 'ext');
-        const pluginPath = path.resolve(extPath, 'plugins');
-        const themePath = path.resolve(extPath, 'themes');
-        const modulePath = path.resolve(extPath, 'modules');
+        const base = path.resolve(this.config.getPath('data'), '..');
+        const userdata = path.resolve(base, 'userdata');
+        const ext = path.resolve(base, 'ext');
+        const plugins = path.resolve(ext, 'plugins');
+        const themes = path.resolve(ext, 'themes');
+        const modules = path.resolve(ext, 'modules');
+        const userfiles = path.resolve(userdata, 'files');
+        const snippets = path.resolve(userdata, 'snippets.json');
 
-        this.config.addPath('base', baseDataPath);
-        this.config.addPath('ext', extPath);
-        this.config.addPath('plugins', pluginPath);
-        this.config.addPath('themes', themePath);
-        this.config.addPath('modules', modulePath);
+        this.config.addPath('base', base);
+        this.config.addPath('ext', ext);
+        this.config.addPath('plugins', plugins);
+        this.config.addPath('themes', themes);
+        this.config.addPath('modules', modules);
+        this.config.addPath('userdata', userdata);
+        this.config.addPath('userfiles', userfiles);
+        this.config.addPath('snippets', snippets);
     }
 
     /**

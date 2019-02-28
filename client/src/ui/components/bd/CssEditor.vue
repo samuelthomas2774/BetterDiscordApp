@@ -8,6 +8,8 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+// TODO this should be remade as editor instead of css editor
+
 <template>
     <SettingsWrapper headertext="CSS Editor">
         <div class="bd-cssEditor">
@@ -49,7 +51,7 @@
 
 <script>
     // Imports
-    import { Settings, CssEditor } from 'modules';
+    import { Settings, Editor } from 'modules';
     import { SettingsWrapper } from './';
     import { FormButton } from '../common';
     import SettingsPanel from './SettingsPanel.vue';
@@ -64,18 +66,18 @@
         },
         data() {
             return {
-                CssEditor
+                Editor
             };
         },
         computed: {
             error() {
-                return this.CssEditor.error;
+                return this.Editor.error;
             },
             compiling() {
-                return this.CssEditor.compiling;
+                return this.Editor.compiling;
             },
             systemEditorPath() {
-                return this.CssEditor.filePath;
+                return this.Editor.filePath;
             },
             liveUpdateSetting() {
                 return Settings.getSetting('css', 'default', 'live-update');
@@ -92,13 +94,13 @@
         },
         methods: {
             openInternalEditor() {
-                this.CssEditor.show();
+                this.Editor.show();
             },
             openSystemEditor() {
-                this.CssEditor.openSystemEditor();
+                // this.Editor.openSystemEditor();
             },
             recompile() {
-                this.CssEditor.recompile();
+                // this.Editor.recompile();
             }
         }
     }

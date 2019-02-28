@@ -30,7 +30,7 @@ const TEST_EDITOR = true;
 
 import path from 'path';
 import sass from 'node-sass';
-import { BrowserWindow as OriginalBrowserWindow, dialog, session } from 'electron';
+import { BrowserWindow as OriginalBrowserWindow, dialog, session, shell } from 'electron';
 import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
 import keytar from 'keytar';
@@ -96,6 +96,21 @@ class Comms {
         BDIpc.on('bd-readDataFile', async (event, fileName) => {
             const rf = await FileUtils.readFile(path.resolve(configProxy().getPath('data'), fileName));
             event.reply(rf);
+        });
+
+        BDIpc.on('bd-explorer', (_, _path) => {
+            if (_path.static) _path = this.bd.config.getPath(_path.static);
+            else if (_path.full) _path = _path.full;
+            else if (_path.sub) _path = path.resolve(this.bd.config.getPath(_path.sub.base), [..._path.sub.subs]);
+            try {
+                shell.openItem(_path);
+            } catch (err) {
+                console.log(err);
+            }
+        });
+
+        BDIpc.on('bd-getPath', (event, paths) => {
+            event.reply(path.resolve(this.bd.config.getPath(paths[0]), ...paths.splice(1)));
         });
     }
 

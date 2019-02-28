@@ -12,10 +12,8 @@
                 <button title="Close CSS Editor" @click="close">X</button>
             </div>
         </div>
-        <div id="spinner" v-if="loading">
-            <div class="valign">Loading Please Wait...</div>
-        </div>
-        <BDEdit v-else :files="files"
+        <BDEdit :files="files"
+                :parentLoading="loading"
                 :snippets="snippets"
                 :updateContent="updateContent"
                 :runScript="runScript"
@@ -26,17 +24,18 @@
                 :readFile="readFile"
                 :readSnippet="readSnippet"
                 :injectStyle="injectStyle"
-                :toggleLiveUpdate="toggleLiveUpdate"/>
+                :toggleLiveUpdate="toggleLiveUpdate"
+                :ctxAction="ctxAction"/>
     </div>
 </template>
 
 <script>
-
     import { ClientIPC } from 'common';
     import { remote } from 'electron';
 
     import { BDEdit } from 'bdedit';
-import { FileUtils } from '../../core/src/modules/utils';
+    import { FileUtils } from '../../core/src/modules/utils';
+    import { setTimeout } from 'timers';
     ace.acequire = ace.require;
 
     const modes = {
@@ -95,12 +94,10 @@ import { FileUtils } from '../../core/src/modules/utils';
                 if (f) f.changed = true;
             });
         },
-        mounted() {
-            (async () => {
-                this.files = await ClientIPC.send('bd-editor-getFiles');
-                this.snippets = await ClientIPC.send('bd-editor-getSnippets');
-                this.loading = false;
-            })();
+        async mounted() {
+            this.files = await ClientIPC.send('bd-editor-getFiles');
+            this.snippets = await ClientIPC.send('bd-editor-getSnippets');
+            this.loading = false;
         },
         methods: {
             addFile(file) {
@@ -199,6 +196,24 @@ import { FileUtils } from '../../core/src/modules/utils';
                 if (item.content === '') return;
                 const result = await ClientIPC.send('bd-editor-injectStyle', { id: item.name.split('.')[0], style: item.content, mode: item.mode });
                 return result;
+            },
+
+            async ctxAction(action, item) {
+                if (action === 'reveal') {
+                    ClientIPC.send('explorer', { 'static': 'userfiles' });
+                    return;
+                }
+
+                if (action === 'copy') {
+                    remote.clipboard.writeText(item.content);
+                    return;
+                }
+
+                if (action === 'copyPath') {
+                    const fullPath = await ClientIPC.send('getPath', ['userfiles', item.name]);
+                    remote.clipboard.writeText(fullPath);
+                    return;
+                }
             },
 
             toggleLiveUpdate(item) {

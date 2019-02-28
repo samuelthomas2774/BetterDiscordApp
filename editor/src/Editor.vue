@@ -34,8 +34,7 @@
     import { remote } from 'electron';
 
     import { BDEdit } from 'bdedit';
-    import { FileUtils } from '../../core/src/modules/utils';
-    import { setTimeout } from 'timers';
+
     ace.acequire = ace.require;
 
     const modes = {

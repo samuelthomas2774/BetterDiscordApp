@@ -22,7 +22,7 @@ export default class Module {
             args
         };
         this.setState = this.setState.bind(this);
-        
+
         if (this.delay) { // If delay is set then module is set to load delayed from modulemanager
             this.initialize = this.initialize.bind(this);
             this.init = this.initialize;

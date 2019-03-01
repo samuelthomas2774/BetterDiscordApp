@@ -24,7 +24,7 @@
     "nedb": "^1.8.0",
     "node-sass": "^4.10.0",
     "original-fs": "^1.0.0",
-    "chokidar": "^2.1.2"  
+    "chokidar": "^2.1.2"
   },
   "devDependencies": {
     "aes256": "^1.0.4",
@@ -69,7 +69,7 @@
     "vue-context-menu": "^2.0.6",
     "vue-loader": "^13.7.2",
     "vue-material-design-icons": "^1.6.0",
-    "vue-template-compiler": "^2.5.17",
+    "vue-template-compiler": "^2.6.8",
     "webpack": "^3.12.0",
     "bdedit": "github:JsSucks/bdedit"
   },

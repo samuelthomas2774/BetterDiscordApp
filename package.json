@@ -75,7 +75,7 @@
   },
   "scripts": {
     "install": "node scripts/install.js",
-    "build": "npm run build --prefix client && npm run build --prefix core && npm run build --prefix editor && npm run build --prefix installer",
+    "build": "npm run build --prefix client && npm run build --prefix core && npm run build --prefix editor",
     "build_client": "npm run build --prefix client",
     "watch_client": "npm run watch --prefix client",
     "build_core": "npm run build --prefix core",

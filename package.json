@@ -23,7 +23,8 @@
     "keytar": "^4.3.0",
     "nedb": "^1.8.0",
     "node-sass": "^4.10.0",
-    "original-fs": "^1.0.0"
+    "original-fs": "^1.0.0",
+    "chokidar": "^2.1.2"  
   },
   "devDependencies": {
     "aes256": "^1.0.4",

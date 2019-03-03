@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const vueLoader = {
@@ -16,6 +15,7 @@ const scssLoader = {
 
 module.exports = {
     entry: './src/index.js',
+    mode: 'production',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'csseditor-release.js'
@@ -42,7 +42,6 @@ module.exports = {
         new webpack.DefinePlugin({
             PRODUCTION: JSON.stringify(true)
         }),
-        new UglifyJsPlugin(),
         new VueLoaderPlugin()
     ]
 };

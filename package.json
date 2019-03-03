@@ -63,7 +63,6 @@
     "request-promise-native": "1.0.5",
     "sass-lint": "^1.12.1",
     "sass-loader": "^7.1.0",
-    "uglifyjs-webpack-plugin": "^2.1.2",
     "v-tooltip": "^2.0.0-rc.33",
     "vue": "^2.6.8",
     "vue-color": "^2.7.0",

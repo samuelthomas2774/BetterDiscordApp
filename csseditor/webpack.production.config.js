@@ -1,16 +1,17 @@
 const path = require('path');
 const webpack = require('webpack');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const vueLoader = {
     test: /\.(vue)$/,
     exclude: /node_modules/,
-    loader: 'vue-loader'
+    use: 'vue-loader'
 };
 
 const scssLoader = {
     test: /\.(css|scss)$/,
-    loader: ['css-loader', 'sass-loader']
+    use: ['css-loader', 'sass-loader']
 };
 
 module.exports = {
@@ -20,7 +21,7 @@ module.exports = {
         filename: 'csseditor-release.js'
     },
     module: {
-        loaders: [vueLoader, scssLoader]
+        rules: [vueLoader, scssLoader]
     },
     externals: {
         electron: 'window.require("electron")',
@@ -41,6 +42,7 @@ module.exports = {
         new webpack.DefinePlugin({
             PRODUCTION: JSON.stringify(true)
         }),
-        new UglifyJsPlugin()
+        new UglifyJsPlugin(),
+        new VueLoaderPlugin()
     ]
 };

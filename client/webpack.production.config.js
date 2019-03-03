@@ -1,25 +1,28 @@
 const path = require('path');
 const webpack = require('webpack');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 const jsLoader = {
     test: /\.(js|jsx)$/,
     exclude: /node_modules/,
-    loader: 'babel-loader',
-    query: {
-        presets: ['react']
+    use: {
+        loader: 'babel-loader',
+        options: {
+            presets: ['@babel/env', '@babel/react']
+        }
     }
 };
 
 const vueLoader = {
     test: /\.(vue)$/,
-    loader: 'vue-loader'
+    use: 'vue-loader'
 };
 
 const scssLoader = {
     test: /\.scss$/,
     exclude: /node_modules/,
-    loader: ['css-loader', 'sass-loader']
+    use: ['css-loader', 'sass-loader']
 };
 
 module.exports = {
@@ -29,7 +32,7 @@ module.exports = {
         filename: 'betterdiscord.client-release.js'
     },
     module: {
-        loaders: [jsLoader, vueLoader, scssLoader]
+        rules: [jsLoader, vueLoader, scssLoader]
     },
     externals: {
         electron: 'require("electron")',
@@ -66,6 +69,7 @@ module.exports = {
         new webpack.DefinePlugin({
             PRODUCTION: JSON.stringify(true)
         }),
-        new UglifyJsPlugin()
+        new UglifyJsPlugin(),
+        new VueLoaderPlugin()
     ]
 };

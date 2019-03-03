@@ -1,25 +1,26 @@
 const path = require('path');
-const webpack = require('webpack');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const vueLoader = {
     test: /\.(vue)$/,
     exclude: /node_modules/,
-    loader: 'vue-loader'
+    use: 'vue-loader'
 };
 
 const scssLoader = {
     test: /\.(css|scss)$/,
-    loader: ['css-loader', 'sass-loader']
+    use: ['css-loader', 'sass-loader']
 };
 
 module.exports = {
     entry: './src/index.js',
+    mode: 'development',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'editor.js'
     },
     module: {
-        loaders: [vueLoader, scssLoader]
+        rules: [vueLoader, scssLoader]
     },
     externals: {
         electron: 'window.require("electron")',
@@ -35,5 +36,8 @@ module.exports = {
             path.resolve('..', 'node_modules'),
             path.resolve('..', 'common', 'modules')
         ]
-    }
+    },
+    plugins: [
+        new VueLoaderPlugin()
+    ]
 };

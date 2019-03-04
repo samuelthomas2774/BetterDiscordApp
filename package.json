@@ -71,7 +71,8 @@
     "vue-material-design-icons": "^3.0.0",
     "vue-template-compiler": "^2.6.8",
     "webpack": "^4.29.6",
-    "webpack-cli": "^3.2.3"
+    "webpack-cli": "^3.2.3",
+    "webpack-merge": "^4.2.1"
   },
   "scripts": {
     "install": "node scripts/install.js",

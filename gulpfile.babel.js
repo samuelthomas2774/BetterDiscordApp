@@ -4,7 +4,7 @@ import del from 'del';
 import copy from 'gulp-copy';
 import rename from 'gulp-rename';
 import inject from 'gulp-inject-string';
-import copydeps from 'gulp-npm-copy-deps';
+import copydeps from './scripts/copydeps';
 import file from 'gulp-file';
 import editjson from 'gulp-json-editor';
 
@@ -111,8 +111,11 @@ gulp.task('editor-release', gulp.parallel('editor-main', 'editor-pkg'));
 
 // Deps
 
-gulp.task('node-modules', function () {
-    return copydeps('.', 'release/core');
+gulp.task('node-modules', function() {
+    return pump([
+        gulp.src(copydeps({ignore: ['fsevents']}), { base: '.' }),
+        gulp.dest('./release/core')
+    ]);
 });
 
 gulp.task('node-sass-bindings', gulp.series(function () {

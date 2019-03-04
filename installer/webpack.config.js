@@ -1,17 +1,18 @@
 const
     path = require('path'),
     webpack = require('webpack'),
-    HtmlWebpackPlugin = require('html-webpack-plugin');
+    HtmlWebpackPlugin = require('html-webpack-plugin'),
+    VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const vueLoader = {
     test: /\.(vue)$/,
     exclude: /node_modules/,
-    loader: 'vue-loader'
+    use: 'vue-loader'
 };
 
 const scssLoader = {
     test: /\.(css|scss)$/,
-    loader: ['css-loader', 'sass-loader']
+    use: ['css-loader', 'sass-loader']
 };
 
 module.exports = {
@@ -21,7 +22,7 @@ module.exports = {
         filename: 'installer.js'
     },
     module: {
-        loaders: [vueLoader, scssLoader]
+        rules: [vueLoader, scssLoader]
     },
     resolve: {
         alias: {
@@ -31,6 +32,7 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html'
-        })
+        }),
+        new VueLoaderPlugin()
     ]
 };

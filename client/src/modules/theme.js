@@ -69,10 +69,11 @@ export default class Theme extends Content {
                 path: this.paths.mainPath.replace(/\\/g, '/')
             });
 
+            // Why are these getters?
             Logger.log(this.name, ['Finished compiling theme', new class Info {
-                get SCSS_variables() { console.log(config); }
-                get Compiled_SCSS() { console.log(result.css.toString()); }
-                get Result() { console.log(result); }
+                get SCSS_variables() { console.log(config); return ''; }
+                get Compiled_SCSS() { console.log(result.css.toString()); return ''; }
+                get Result() { console.log(result); return ''; }
             }]);
 
             return {

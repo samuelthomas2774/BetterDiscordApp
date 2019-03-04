@@ -288,7 +288,7 @@ class Module {
         if (this._require) return this._require;
 
         const __webpack_require__ = this.getWebpackRequire();
-        if (!__webpack_require__) return;
+        if (!__webpack_require__) return null;
 
         this.hookWebpackRequireCache(__webpack_require__);
         return this._require = __webpack_require__;

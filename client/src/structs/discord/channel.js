@@ -179,7 +179,7 @@ export class PermissionOverwrite {
     }
 
     get guild() {
-        if (this.channel) return this.channel.guild;
+        return this.channel ? this.channel.guild : null;
     }
 }
 
@@ -187,7 +187,7 @@ export class RolePermissionOverwrite extends PermissionOverwrite {
     get roleId() { return this.discordObject.id }
 
     get role() {
-        if (this.guild) return this.guild.roles.find(r => r.id === this.roleId);
+        return this.guild ? this.guild.roles.find(r => r.id === this.roleId) : null;
     }
 }
 

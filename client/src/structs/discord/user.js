@@ -77,7 +77,7 @@ export class User {
 
     get note() {
         const note = Modules.UserNoteStore.getNote(this.id);
-        if (note) return note;
+        return note ? note : null;
     }
 
     /**

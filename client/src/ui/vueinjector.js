@@ -71,7 +71,7 @@ export default class {
 
             get vueMount() {
                 const element = ReactDOM.findDOMNode(this);
-                if (!element) return;
+                if (!element) return null;
                 if (this.props.mountAtTop) return element;
                 if (element.firstChild) return element.firstChild;
                 const newElement = document.createElement('span');

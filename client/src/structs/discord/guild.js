@@ -166,14 +166,14 @@ export class Guild {
      * The guild's AFK channel.
      */
     get afkChannel() {
-        if (this.afkChannelId) return Channel.fromId(this.afkChannelId);
+        return this.afkChannelId ? Channel.fromId(this.afkChannelId) : null;
     }
 
     /**
      * The channel system messages are sent to.
      */
     get systemChannel() {
-        if (this.systemChannelId) return Channel.fromId(this.systemChannelId);
+        return this.systemChannelId ? Channel.fromId(this.systemChannelId) : null;
     }
 
     /**

@@ -126,6 +126,7 @@ export default class DiscordApi {
     static get currentGuild() {
         const guild = Modules.GuildStore.getGuild(Modules.SelectedGuildStore.getGuildId());
         if (guild) return Guild.from(guild);
+        return null;
     }
 
     /**
@@ -135,6 +136,7 @@ export default class DiscordApi {
     static get currentChannel() {
         const channel = Modules.ChannelStore.getChannel(Modules.SelectedChannelStore.getChannelId());
         if (channel) return Channel.from(channel);
+        return null;
     }
 
     /**
@@ -144,6 +146,7 @@ export default class DiscordApi {
     static get currentUser() {
         const user = Modules.UserStore.getCurrentUser();
         if (user) return User.from(user);
+        return null;
     }
 
     /**

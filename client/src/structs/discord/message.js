@@ -42,11 +42,11 @@ export class Reaction {
     }
 
     get message() {
-        if (this.channel) return this.channel.messages.find(m => m.id === this.messageId);
+        return this.channel ? this.channel.messages.find(m => m.id === this.messageId) : null;
     }
 
     get guild() {
-        if (this.channel) return this.channel.guild;
+        return this.channel ? this.channel.guild : null;
     }
 }
 
@@ -84,11 +84,11 @@ export class Embed {
     }
 
     get message() {
-        if (this.channel) return this.channel.messages.find(m => m.id === this.messageId);
+        return this.channel ? this.channel.messages.find(m => m.id === this.messageId) : null;
     }
 
     get guild() {
-        if (this.channel) return this.channel.guild;
+        return this.channel ? this.channel.guild : null;
     }
 }
 
@@ -143,6 +143,7 @@ export class Message {
 
     get author() {
         if (this.discordObject.author && !this.webhookId) return User.from(this.discordObject.author);
+        return null;
     }
 
     get channel() {
@@ -150,7 +151,7 @@ export class Message {
     }
 
     get guild() {
-        if (this.channel) return this.channel.guild;
+        return this.channel ? this.channel.guild : null;
     }
 
     /**
@@ -202,7 +203,7 @@ export class DefaultMessage extends Message {
     get application() { return this.discordObject.application }
 
     get webhook() {
-        if (this.webhookId) return this.discordObject.author;
+        return this.webhookId ? this.discordObject.author : null;
     }
 
     get mentions() {

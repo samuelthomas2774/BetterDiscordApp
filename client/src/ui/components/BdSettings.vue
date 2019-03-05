@@ -23,7 +23,7 @@
             </Sidebar>
 
             <div slot="sidebarfooter" class="bd-info">
-                <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
+                <span class="bd-vtext">{{versionString}}</span>
                 <div @click="openGithub" v-tooltip="'GitHub'" class="bd-materialButton">
                     <MiGithubCircle size="16" />
                 </div>
@@ -63,7 +63,7 @@
 
 <script>
     // Imports
-    import { Events, Settings } from 'modules';
+    import { Events, Settings, Globals } from 'modules';
     import { BdMenuItems } from 'ui';
     import { shell } from 'electron';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
@@ -96,6 +96,9 @@
                     category.push(item);
                 }
                 return categories;
+            },
+            versionString() {
+                return Globals.version;
             }
         },
         methods: {

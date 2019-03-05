@@ -35,7 +35,7 @@ import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
 import keytar from 'keytar';
 
-import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Editor, Database } from './modules';
+import { FileUtils, BDIpc, Config, WindowUtils, Updater, Editor, Database } from './modules';
 
 const packageJson = require(path.resolve(__dirname, 'package.json'));
 const sparkplug = path.resolve(__dirname, 'sparkplug.js');
@@ -195,6 +195,8 @@ export class BetterDiscord {
     get config() { return this._config ? this._config : (this._config = new Config(this._args)); }
     get window() { return this.windowUtils ? this.windowUtils.window : undefined; }
     get editor() { return this._editor ? this._editor : (this._editor = new Editor(this, this.config.getPath('editor'))); }
+    get updater() { return this._updater ? this._updater : (this._updater = new Updater(this)); }
+    get sendToDiscord() { return this.windowUtils.send; }
 
     constructor(args) {
         if (TESTS) args = TEST_ARGS();
@@ -229,6 +231,8 @@ export class BetterDiscord {
         console.log('[BetterDiscord] init');
         await this.waitForWindowUtils();
         await this.ensureDirectories();
+
+        await this.updater.checkForUpdates();
 
         this.windowUtils.on('did-finish-load', () => this.injectScripts(true));
 

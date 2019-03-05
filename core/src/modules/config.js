@@ -16,6 +16,14 @@ export default class Config extends Module {
         return this.args.version;
     }
 
+    get versions() {
+        return {
+            core: this.coreVersion,
+            client: this.clientVersion,
+            editor: this.editorVersion
+        };
+    }
+
     get coreVersion() {
         return this.state.coreVersion;
     }
@@ -49,6 +57,7 @@ export default class Config extends Module {
     get config() {
         return {
             version: this.version,
+            versions: this.versions,
             paths: this.paths
         };
     }

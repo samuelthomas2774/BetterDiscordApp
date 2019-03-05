@@ -39,6 +39,7 @@ const TEST_ARGS = () => {
     }
 }
 const TEST_EDITOR = TESTS && true;
+const TEST_UPDATER = TESTS && true;
 
 import path from 'path';
 import sass from 'node-sass';
@@ -237,8 +238,6 @@ export class BetterDiscord {
         await this.waitForWindowUtils();
         await this.ensureDirectories();
 
-        await this.updater.checkForUpdates();
-
         this.windowUtils.on('did-finish-load', () => this.injectScripts(true));
 
         this.windowUtils.on('did-navigate-in-page', (event, url, isMainFrame) => {
@@ -342,6 +341,7 @@ export class BetterDiscord {
      */
     async injectScripts(reload = false) {
         console.log(`[BetterDiscord] injecting ${this.config.getPath('client_script')}. Reload: ${reload}`);
+        if (TEST_UPDATER) setTimeout(this.updater.checkForUpdates, 5000);
         return this.windowUtils.injectScript(this.config.getPath('client_script'));
     }
 

@@ -8,10 +8,26 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-export default new class {
+import Events from './events';
+import Module from './imodule';
+
+export default new class extends Module {
+
+    get updates() { return this.state.updates }
+    get bdUpdates() { return this.state.updates.bd }
 
     constructor() {
+        super({
+            updatesAvailable: false,
+            error: null,
+            updates: { bd: [] }
+        });
+    }
 
+    events(ipc) {
+        ipc.on('updater-checkForUpdates', () => {
+            Events.emit('update-check-start');
+        });
     }
 
 }

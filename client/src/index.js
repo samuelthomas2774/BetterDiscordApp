@@ -18,7 +18,7 @@ import path from 'path';
 import { setTimeout } from 'timers';
 
 const tests = typeof PRODUCTION === 'undefined';
-const ignoreExternal = true;
+const ignoreExternal = tests && true;
 
 class BetterDiscord {
 

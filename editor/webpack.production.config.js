@@ -9,7 +9,7 @@ const config = {
     mode: 'production',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'editor.js'
+        filename: 'editor.release.js'
     }
 };
 

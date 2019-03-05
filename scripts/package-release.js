@@ -1,21 +1,21 @@
 const args = process.argv;
-const tag = args.length > 2 ? args[2] : ':rel';
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
 const hashfiles = require('hash-files');
 
 const releaseStub = require('./releasestub.json');
+const mainpkg = require('../package.json');
+const corepkg = require('../release/core/package.json');
+const clientpkg = require('../release/client/package.json');
+const editorpkg = require('../release/editor/package.json');
+
+const tag = args.length > 2 ? args[2] : mainpkg.version;
 
 releaseStub.files = releaseStub.files.map(file => {
     file.remote = file.remote.replace(':rel', tag);
     return file;
 });
-
-const mainpkg = require('../package.json');
-const corepkg = require('../release/core/package.json');
-const clientpkg = require('../release/client/package.json');
-const editorpkg = require('../release/editor/package.json');
 
 const createArchiver = (level = 1) => {
     return archiver('tar', {

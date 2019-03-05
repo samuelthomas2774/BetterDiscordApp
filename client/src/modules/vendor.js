@@ -11,6 +11,7 @@
 import jQuery from 'jquery';
 import lodash from 'lodash';
 import Vue from 'vue';
+import { Axi } from 'common';
 
 import request from 'request-promise-native';
 
@@ -39,6 +40,8 @@ export default class {
      * Vue
      */
     static get Vue() { return Vue }
+
+    static get axios() { return Axi.axios }
 
     static get request() { return request }
 

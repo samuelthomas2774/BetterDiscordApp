@@ -11,8 +11,20 @@
 const TESTS = typeof PRODUCTION === 'undefined';
 const TEST_ARGS = () => {
     const _basePath = path.resolve(__dirname, '..', '..');
-    const _baseDataPath =  path.resolve(_basePath, 'tests');
+    const _baseDataPath = path.resolve(_basePath, 'tests');
+
+    const _corePkg = require(path.resolve(_basePath, 'core', 'package.json'));
+    const _clientPkg = require(path.resolve(_basePath, 'client', 'package.json'));
+    const _editorPkg = require(path.resolve(_basePath, 'editor', 'package.json'));
+
+    const coreVersion = _corePkg.version;
+    const clientVersion = _clientPkg.version;
+    const editorVersion = _editorPkg.version;
+
     return {
+        coreVersion,
+        clientVersion,
+        editorVersion,
         'options': {
             'autoInject': true,
             'commonCore': true,

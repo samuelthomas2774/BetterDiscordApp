@@ -16,8 +16,16 @@ export default class Config extends Module {
         return this.args.version;
     }
 
+    get coreVersion() {
+        return this.state.coreVersion;
+    }
+
     get clientVersion() {
-        return this.args.clientVersion;
+        return this.state.clientVersion;
+    }
+
+    get editorVersion() {
+        return this.state.editorVersion;
     }
 
     setClientVersion(clientVersion) {

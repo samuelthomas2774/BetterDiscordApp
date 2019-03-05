@@ -54,14 +54,7 @@ const sparkplug = path.resolve(__dirname, 'sparkplug.js');
 
 let configProxy;
 
-const CSP = {
-    'img-src': ['https://cdn.betterttv.net', 'https://cdn.frankerfacez.com'],
-    'script-src': [
-        `'sha256-fSHKdpQGCHaIqWP3SpJOuUHrLp49jy4dWHzZ/RBJ/p4='`, // React Devtools
-        `'sha256-VFJcfKY5B3EBkFDgQnv3CozPwBlZcxwssfLVWlPFfZU='`, // Vue Devtools
-        `'sha256-VzDmLZ4PxPkOS/KY7ITzLQsSWhfCnvUrNculcj8UNgE=' 'sha256-l6K+77Z1cmldR9gIvaVWlboF/zr5MXCQHcsEHfnr5TU='` // Vue Detector
-    ]
-};
+const CSP = TESTS ? require('../src/csp.json') : require('./csp.json');
 
 class Comms {
     constructor(bd) {

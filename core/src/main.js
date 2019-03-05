@@ -38,7 +38,7 @@ const TEST_ARGS = () => {
         }
     }
 }
-const TEST_EDITOR = true;
+const TEST_EDITOR = TESTS && true;
 
 import path from 'path';
 import sass from 'node-sass';

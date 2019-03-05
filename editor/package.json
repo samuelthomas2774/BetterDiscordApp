@@ -5,7 +5,7 @@
   "version": "0.4.0",
   "homepage": "https://betterdiscord.net",
   "license": "MIT",
-  "main": "dist/csseditor.js",
+  "main": "dist/editor.js",
   "contributors": [
     "Jiiks",
     "Pohky"

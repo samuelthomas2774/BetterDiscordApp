@@ -9,24 +9,64 @@
 */
 
 import Module from './modulebase';
+import semver from 'semver';
 
 const TEST_UPDATE = [
     {
         'id': 'core',
-        'currentVersion': '2.0.0-beta.4',
         'version': '2.0.0-beta.5'
     },
     {
         'id': 'client',
-        'currentVersion': '2.0.0-beta.4',
         'version': '2.0.0-beta.5'
     },
     {
         'id': 'editor',
-        'currentVersion': '0.4.0',
         'version': '0.4.1'
     }
 ];
+
+class ReleaseInfo {
+
+    constructor(versions) {
+        this.versions = versions;
+    }
+
+    get core() {
+        const f = this.files.find(f => f.id === 'core');
+        return {
+            id: 'core',
+            currentVersion: this.versions.core,
+            version: f.version,
+            upToDate: semver.satisfies(this.versions.core, `>=${f.version}`, { includePrerelease: true })
+        }
+    }
+
+    get client() {
+        const f = this.files.find(f => f.id === 'client');
+        return {
+            id: 'client',
+            currentVersion: this.versions.core,
+            version: f.version,
+            upToDate: semver.satisfies(this.versions.client, `>=${f.version}`, { includePrerelease: true })
+        }
+    }
+
+    get editor() {
+        const f = this.files.find(f => f.id === 'editor');
+        return {
+            id: 'editor',
+            currentVersion: this.versions.editor,
+            version: f.version,
+            upToDate: semver.satisfies(this.versions.editor, `>=${f.version}`, { includePrerelease: true })
+        }
+    }
+
+    test() {
+        this.files = TEST_UPDATE;
+    }
+
+}
 
 export default class Updater extends Module {
 
@@ -50,11 +90,37 @@ export default class Updater extends Module {
 
         try {
             const { coreVersion, clientVersion, editorVersion } = this.bd.config;
-            console.log('[BetterDiscord:Updater]', coreVersion, clientVersion, editorVersion);
+            const releaseInfo = new ReleaseInfo({ core: coreVersion, client: clientVersion, editor: editorVersion });
+
+            releaseInfo.test();
+            this.debug(releaseInfo);
+
+
             return true;
         } catch (err) {
             console.log('[BetterDiscord:Updater]', err);
             this.bd.sendToDiscord('updater-error', err);
+        }
+    }
+
+    debug(releaseInfo) {
+        const { core, client, editor } = releaseInfo;
+        if (!core.upToDate) {
+            console.log(`[BetterDiscord:Updater] Core update available: ${core.currentVersion} > ${core.version}`);
+        } else {
+            console.log(`[BetterDiscord:Updater] Core up to date: ${core.currentVersion} = ${core.version}`);
+        }
+
+        if (!client.upToDate) {
+            console.log(`[BetterDiscord:Updater] Client update available: ${client.currentVersion} > ${client.version}`);
+        } else {
+            console.log(`[BetterDiscord:Updater] Client up to date: ${client.currentVersion} = ${client.version}`);
+        }
+
+        if (!editor.upToDate) {
+            console.log(`[BetterDiscord:Updater] Editor update available: ${editor.currentVersion} > ${editor.version}`);
+        } else {
+            console.log(`[BetterDiscord:Updater] Editor up to date: ${editor.currentVersion} = ${editor.version}`);
         }
     }
 

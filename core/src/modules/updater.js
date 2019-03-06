@@ -122,14 +122,20 @@ export default class Updater extends Module {
             const latestRelease = await this.latestRelease();
             console.log(latestRelease);
 
-            releaseInfo.test();
-            this.debug(releaseInfo);
+            releaseInfo.files = latestRelease.files;
 
+            if (!releaseInfo.core.upToDate || !releaseInfo.client.upToDate || !ReleaseInfo.editor.upToDate) {
+                this.bd.sendToDiscord('updater-updatesAvailable', releaseInfo);
+                return true;
+            }
+
+            this.bd.sendToDiscord('updater-noUpdates', '');
 
             return true;
         } catch (err) {
             console.log('[BetterDiscord:Updater]', err);
             this.bd.sendToDiscord('updater-error', err);
+            return 'err';
         }
     }
 

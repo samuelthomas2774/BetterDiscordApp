@@ -11,7 +11,18 @@
 <template>
     <SettingsWrapper headertext="Updates">
         <div class="bd-flex bd-flexCol bd-updaterview">
-            
+            <div class="bd-settingsCategories">
+                <div class="bd-settingsCategory" v-if="bdUpdates && bdUpdates.length">
+                    <div class="bd-formItem">
+                        <h5>BetterDiscord</h5>
+                    </div>
+                    <div class="bd-formDivider"></div>
+                    <div v-for="update in bdUpdates">
+                        {{update.id}} - {{update.currentVersion}} - {{update.version}}
+                        <div class="bd-formDivider"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </SettingsWrapper>
 </template>
@@ -36,13 +47,19 @@
         },
         computed: {
             updatesAvailable() {
-                return false;
+                return this.updater.updatesAvailable;
             },
             newVersion() {
                 return '2.0.0-beta.4';
             },
             error() {
-                return null;
+                return this.updater.error;
+            },
+            updates() {
+                return this.updater.updates;
+            },
+            bdUpdates() {
+                return this.updater.bdUpdates;
             }
         },
         methods: {

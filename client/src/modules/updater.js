@@ -15,27 +15,44 @@ export default new class extends Module {
 
     get updates() { return this.state.updates }
     get bdUpdates() { return this.state.updates.bd }
+    get error() { return null; }
+    get updatesAvailable() { return this.state.updatesAvailable; }
 
     constructor() {
         super({
             updatesAvailable: false,
             error: null,
-            updates: { bd: [] }
+            updates: { bd: [] },
+            updating: false
         });
     }
 
     events(ipc) {
         ipc.on('updater-checkForUpdates', () => {
+            if (this.state.updating) return; // We're already updating. Updater should be paused anyways at this point.
             Events.emit('update-check-start');
         });
 
         ipc.on('updater-noUpdates', () => {
-            Events.emit('update-check-end');
+            if (this.state.updatesAvailable) return; // If for some reason we get this even though we have updates already.
+            this.setState({
+                updatesAvailable: false,
+                updates: {}
+            });
         });
 
         ipc.on('updater-updatesAvailable', (_, updates) => {
-            console.log('UPDATES', updates);
+            if (this.state.updating) return; // If for some reason we get more updates when we're already updating
+            this.setState({
+                updates,
+                updatesAvailable: true
+            });
         });
+    }
+
+    stateChanged(oldState, newState) {
+        if (!newState.updatesAvailable) return Events.emit('update-check-end');
+        if (!oldState.updatesAvailable && newState.updatesAvailable) return Events.emit('updates-available');
     }
 
 }

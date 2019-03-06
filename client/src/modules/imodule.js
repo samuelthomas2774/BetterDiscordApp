@@ -39,7 +39,7 @@ export default class Module {
     }
 
     setState(newState) {
-        const oldState = this.state;
+        const oldState = Object.assign({}, this.state);
         Object.assign(this.state, newState);
         if (this.stateChanged) this.stateChanged(oldState, newState);
     }

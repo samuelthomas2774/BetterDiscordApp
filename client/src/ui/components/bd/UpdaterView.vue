@@ -18,10 +18,14 @@
                     </div>
                     <div class="bd-formDivider"></div>
                     <div v-for="update in bdUpdates">
-                        {{update.id}} - {{update.currentVersion}} - {{update.version}}
+                        <UpdaterStatus :item="update" v-if="update.status.updating" />
+                        <UpdaterToggle :item="update" :toggle="() => updater.toggleUpdate(update)" v-else />
                         <div class="bd-formDivider"></div>
                     </div>
                 </div>
+            </div>
+            <div class="bd-formButton bd-button" @click="update">
+                Update
             </div>
         </div>
     </SettingsWrapper>
@@ -31,7 +35,8 @@
     import { Globals, Updater } from 'modules';
     import { ClientLogger as Logger } from 'common';
     import SettingsWrapper from './SettingsWrapper.vue';
-    import { FormButton } from '../common';
+    import UpdaterToggle from './UpdaterToggle.vue';
+    import UpdaterStatus from './UpdaterStatus.vue';
 
     export default {
         data() {
@@ -43,7 +48,8 @@
         },
         components: {
             SettingsWrapper,
-            FormButton
+            UpdaterToggle,
+            UpdaterStatus
         },
         computed: {
             updatesAvailable() {
@@ -63,8 +69,9 @@
             }
         },
         methods: {
-            async install() {
-
+            async update() {
+                // TODO
+                console.log('update');
             }
         }
     }

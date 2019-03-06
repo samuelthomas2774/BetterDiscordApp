@@ -43,6 +43,18 @@ export default new class extends Module {
 
         ipc.on('updater-updatesAvailable', (_, updates) => {
             if (this.state.updating) return; // If for some reason we get more updates when we're already updating
+            updates.bd = updates.bd.map(update => {
+                update.text = `${update.id.charAt(0).toUpperCase()}${update.id.slice(1)}`;
+                update.hint = `Current: ${update.currentVersion} | Latest: ${update.version}`;
+                update.status = {
+                    update: true,
+                    updating: false,
+                    updated: false,
+                    error: null
+                };
+
+                return update;
+            });
             this.setState({
                 updates,
                 updatesAvailable: true
@@ -53,6 +65,10 @@ export default new class extends Module {
     stateChanged(oldState, newState) {
         if (!newState.updatesAvailable) return Events.emit('update-check-end');
         if (!oldState.updatesAvailable && newState.updatesAvailable) return Events.emit('updates-available');
+    }
+
+    toggleUpdate(update) {
+        update.status.update = !update.status.update;
     }
 
 }

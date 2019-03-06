@@ -4,5 +4,7 @@ export { default as CssEditorView } from './CssEditor.vue';
 export { default as PluginsView } from './PluginsView.vue';
 export { default as ThemesView } from './ThemesView.vue';
 export { default as UpdaterView } from './UpdaterView.vue';
+export { default as UpdaterStatus } from './UpdaterStatus.vue';
+export { default as UpdaterToggle } from './UpdaterToggle.vue';
 export { default as BdBadge } from './BdBadge.vue';
 export { default as ConnectivityView } from './ConnectivityView.vue';

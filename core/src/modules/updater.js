@@ -10,6 +10,24 @@
 
 import Module from './modulebase';
 
+const TEST_UPDATE = [
+    {
+        'id': 'core',
+        'currentVersion': '2.0.0-beta.4',
+        'version': '2.0.0-beta.5'
+    },
+    {
+        'id': 'client',
+        'currentVersion': '2.0.0-beta.4',
+        'version': '2.0.0-beta.5'
+    },
+    {
+        'id': 'editor',
+        'currentVersion': '0.4.0',
+        'version': '0.4.1'
+    }
+];
+
 export default class Updater extends Module {
 
     constructor(bd) {

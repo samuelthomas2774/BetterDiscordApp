@@ -28,6 +28,14 @@ export default new class extends Module {
         ipc.on('updater-checkForUpdates', () => {
             Events.emit('update-check-start');
         });
+
+        ipc.on('updater-noUpdates', () => {
+            Events.emit('update-check-end');
+        });
+
+        ipc.on('updater-updatesAvailable', (_, updates) => {
+            console.log('UPDATES', updates);
+        });
     }
 
 }

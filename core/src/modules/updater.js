@@ -35,32 +35,23 @@ class ReleaseInfo {
 
     get core() {
         const f = this.files.find(f => f.id === 'core');
-        return {
-            id: 'core',
-            currentVersion: this.versions.core,
-            version: f.version,
-            upToDate: semver.satisfies(this.versions.core, `>=${f.version}`, { includePrerelease: true })
-        }
+        f.upToDate = semver.satisfies(this.versions.core, `>=${f.version}`, { includePrerelease: true });
+        f.currentVersion = this.versions.core;
+        return f;
     }
 
     get client() {
         const f = this.files.find(f => f.id === 'client');
-        return {
-            id: 'client',
-            currentVersion: this.versions.core,
-            version: f.version,
-            upToDate: semver.satisfies(this.versions.client, `>=${f.version}`, { includePrerelease: true })
-        }
+        f.upToDate = semver.satisfies(this.versions.client, `>=${f.version}`, { includePrerelease: true });
+        f.currentVersion = this.versions.client;
+        return f;
     }
 
     get editor() {
         const f = this.files.find(f => f.id === 'editor');
-        return {
-            id: 'editor',
-            currentVersion: this.versions.editor,
-            version: f.version,
-            upToDate: semver.satisfies(this.versions.editor, `>=${f.version}`, { includePrerelease: true })
-        }
+        f.upToDate = semver.satisfies(this.versions.editor, `>=${f.version}`, { includePrerelease: true });
+        f.currentVersion = this.versions.editor;
+        return f;
     }
 
     test() {
@@ -78,6 +69,7 @@ export default class Updater extends Module {
 
     bindings() {
         this.checkForUpdates = this.checkForUpdates.bind(this);
+        this.checkForBdUpdates = this.checkForBdUpdates.bind(this);
         this.start = this.start.bind(this);
     }
 
@@ -111,27 +103,49 @@ export default class Updater extends Module {
         console.log('fallback');
     }
 
-    async checkForUpdates() {
-        console.log('[BetterDiscord:Updater] Checking for updates');
-        this.bd.sendToDiscord('updater-checkForUpdates', '');
-
+    async checkForBdUpdates() {
         try {
             const { coreVersion, clientVersion, editorVersion } = this.bd.config;
             const releaseInfo = new ReleaseInfo({ core: coreVersion, client: clientVersion, editor: editorVersion });
 
             const latestRelease = await this.latestRelease();
-            console.log(latestRelease);
 
             releaseInfo.files = latestRelease.files;
 
-            if (!releaseInfo.core.upToDate || !releaseInfo.client.upToDate || !ReleaseInfo.editor.upToDate) {
-                this.bd.sendToDiscord('updater-updatesAvailable', releaseInfo);
+            const updates = [];
+
+            const { core, client, editor } = releaseInfo;
+            if (!core.upToDate) updates.push(core);
+            if (!client.upToDate) updates.push(client);
+            if (!editor.upToDate) updates.push(editor);
+
+            return updates;
+
+        } catch (err) {
+            console.log('[BetterDiscord:Updater]', err);
+            return [];
+        }
+    }
+
+    async checkForUpdates() {
+        console.log('[BetterDiscord:Updater] Checking for updates');
+        this.bd.sendToDiscord('updater-checkForUpdates', '');
+
+        try {
+            const bd = await this.checkForBdUpdates();
+            const updates = { bd, haveUpdates: false };
+
+            if (bd.length) updates.haveUpdates = true;
+
+            if (!updates.haveUpdates) {
+                this.bd.sendToDiscord('updater-noUpdates', '');
                 return true;
             }
 
-            this.bd.sendToDiscord('updater-noUpdates', '');
+            this.bd.sendToDiscord('updater-updatesAvailable', updates);
 
             return true;
+
         } catch (err) {
             console.log('[BetterDiscord:Updater]', err);
             this.bd.sendToDiscord('updater-error', err);

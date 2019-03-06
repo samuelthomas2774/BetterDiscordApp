@@ -8,6 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+import { Notifications } from 'ui';
+import { Reflection, Globals } from 'modules';
+
 import Events from './events';
 import Module from './imodule';
 
@@ -25,6 +28,50 @@ export default new class extends Module {
             updates: { bd: [] },
             updating: false
         });
+    }
+
+    bindings() {
+        this.restartNotif = this.restartNotif.bind(this);
+        this.reloadNotif = this.reloadNotif.bind(this);
+    }
+
+    restartNotif() {
+        Notifications.add('Updates Finished!', 'Restart required.', [
+            {
+                text: 'Restart Later',
+                onClick: () => { setTimeout(this.restartNotif, 5 * 60000); return true; }
+            },
+            {
+                text: 'Restart Now',
+                onClick: () => {
+                    try {
+                        const { remote } = Globals.require('electron');
+                        window.close();
+                        Reflection.module.byProps('showToken', 'hideToken').showToken();
+                        remote.app.relaunch();
+                        remote.app.exit(0);
+                    } catch (err) {
+                        console.err(err);
+                        return true;
+                    }
+                }
+            }
+        ]);
+    }
+
+    reloadNotif() {
+        Notifications.add('Updates Finished!', 'Reload required.', [
+            {
+                text: 'Reload Later',
+                onClick: () => { setTimeout(this.reloadNotif, 5 * 60000); return true; }
+            },
+            {
+                text: 'Reload Now',
+                onClick: () => {
+                    document.location.reload();
+                }
+            }
+        ]);
     }
 
     events(ipc) {
@@ -59,6 +106,19 @@ export default new class extends Module {
                 updates,
                 updatesAvailable: true
             });
+        });
+
+        ipc.on('updater-updated', (_, info) => {
+            const { reloadRequired, restartRequired } = info;
+            if (restartRequired) {
+                this.restartNotif();
+                return;
+            }
+
+            if (reloadRequired) {
+                this.reloadNotif();
+                return;
+            }
         });
     }
 

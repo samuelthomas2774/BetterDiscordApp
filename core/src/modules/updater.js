@@ -11,6 +11,8 @@
 import Module from './modulebase';
 import semver from 'semver';
 import Axi from './axi';
+import zlib from 'zlib';
+import tarfs from 'tar-fs';
 
 const TEST_UPDATE = [
     {
@@ -150,6 +152,27 @@ export default class Updater extends Module {
             console.log('[BetterDiscord:Updater]', err);
             this.bd.sendToDiscord('updater-error', err);
             return 'err';
+        }
+    }
+
+    async downloadTarGz(url, dest, responseType = 'stream', headers = null) {
+        try {
+            const stream = await Axi.axios({
+                url,
+                type: 'GET',
+                responseType,
+                headers: headers ||
+                {
+                    'Content-Type': 'application/octet-stream',
+                    'Accept': 'application/octet-stream'
+                }
+            });
+
+            return new Promise((resolve, reject) => {
+                stream.data.pipe(zlib.createGunzip()).pipe(tarfs.extract(dest)).on('finish', resolve).on('error', reject);
+            });
+        } catch (err) {
+            throw err;
         }
     }
 

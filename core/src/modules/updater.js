@@ -10,6 +10,7 @@
 
 import Module from './modulebase';
 import semver from 'semver';
+import Axi from './axi';
 
 const TEST_UPDATE = [
     {
@@ -84,6 +85,32 @@ export default class Updater extends Module {
         this.updaterThread = setInterval(this.checkForUpdates, interval * 60 * 1000);
     }
 
+    validate(releaseInfo) {
+        return releaseInfo &&
+            typeof releaseInfo === 'object' &&
+            releaseInfo.files &&
+            Array.isArray(releaseInfo.files) &&
+            releaseInfo.files.length >= 4;
+    }
+
+    async latestRelease() {
+        try {
+            const release = await Axi.github.api.get('repos/JsSucks/BetterDiscordApp/releases/latest'); // TODO replace with config
+            const releaseInfoAsset = release.data.assets.find(asset => asset.name === 'releaseinfo.json');
+            const releaseInfo = await Axi.get(releaseInfoAsset['browser_download_url']);
+
+            if (this.validate(releaseInfo.data)) return releaseInfo.data;
+            return this.latestReleaseFallback();
+        } catch (err) {
+            console.log(err);
+            return this.latestReleaseFallback();
+        }
+    }
+
+    async latestReleaseFallback() {
+        console.log('fallback');
+    }
+
     async checkForUpdates() {
         console.log('[BetterDiscord:Updater] Checking for updates');
         this.bd.sendToDiscord('updater-checkForUpdates', '');
@@ -91,6 +118,9 @@ export default class Updater extends Module {
         try {
             const { coreVersion, clientVersion, editorVersion } = this.bd.config;
             const releaseInfo = new ReleaseInfo({ core: coreVersion, client: clientVersion, editor: editorVersion });
+
+            const latestRelease = await this.latestRelease();
+            console.log(latestRelease);
 
             releaseInfo.test();
             this.debug(releaseInfo);

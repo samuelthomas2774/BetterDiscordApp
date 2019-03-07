@@ -11,6 +11,9 @@
 /**
  * Base Module that every non-static module should extend.
  */
+
+import { default as BDIpc } from './bdipc';
+
 export default class Module {
 
     constructor(args) {
@@ -24,6 +27,7 @@ export default class Module {
     init() {
         if (this.bindings) this.bindings();
         if (this.setInitialState) this.setInitialState(this.state);
+        if (this.events) this.events(BDIpc);
     }
 
     set args(t) {}

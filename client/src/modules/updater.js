@@ -33,6 +33,8 @@ export default new class extends Module {
     bindings() {
         this.restartNotif = this.restartNotif.bind(this);
         this.reloadNotif = this.reloadNotif.bind(this);
+        this.startUpdate = this.startUpdate.bind(this);
+        this.setUpdateStatus = this.setUpdateStatus.bind(this);
     }
 
     restartNotif() {
@@ -120,6 +122,14 @@ export default new class extends Module {
                 return;
             }
         });
+
+        ipc.on('updater-updateFinished', (_, update) => {
+            this.setUpdateStatus(update.id, 'updated', true);
+        });
+
+        ipc.on('updater-updateError', (_, update) => {
+            this.setUpdateStatus(update.id, 'error', update.error);
+        });
     }
 
     stateChanged(oldState, newState) {
@@ -127,8 +137,30 @@ export default new class extends Module {
         if (!oldState.updatesAvailable && newState.updatesAvailable) return Events.emit('updates-available');
     }
 
+    setUpdateStatus(updateId, statusChild, statusValue) {
+        for (const u of this.bdUpdates) {
+            if (u.id === updateId) {
+                u.status[statusChild] = statusValue;
+                return;
+            }
+        }
+    }
+
     toggleUpdate(update) {
         update.status.update = !update.status.update;
+    }
+
+    async startUpdate() {
+        console.log('start update');
+        const updates = { bd: [] };
+        for (const update of this.bdUpdates) {
+            if (update.status.update) {
+                update.status.updating = true;
+                updates.bd.push(update);
+            }
+        }
+        console.log(updates);
+        this.send('updater-startUpdate', updates);
     }
 
 }

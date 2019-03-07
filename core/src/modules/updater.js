@@ -72,7 +72,54 @@ export default class Updater extends Module {
     bindings() {
         this.checkForUpdates = this.checkForUpdates.bind(this);
         this.checkForBdUpdates = this.checkForBdUpdates.bind(this);
+        this.updateAll = this.updateAll.bind(this);
+        this.updateFinished = this.updateFinished.bind(this);
         this.start = this.start.bind(this);
+    }
+
+    events(ipc) {
+        ipc.on('updater-startUpdate', (_, updates) => this.updateAll(updates));
+    }
+
+    async updateBd(update) {
+        try {
+            console.log('[BetterDiscord:Updater] Updating', update.id);
+            await this.downloadTarGz(`https://github.com/JsSucks/BetterDiscordApp${update.remote}`, this.bd.config.getPath(update.id));
+            console.log('[BetterDiscord:Updater] Finished updating', update.id);
+            this.bd.sendToDiscord('updater-updateFinished', update);
+            this.updateFinished(update);
+        } catch (err) {
+            console.log('[BetterDiscord:Updater] Failed to update', update.id);
+            console.log(err);
+        }
+    }
+
+    updateAll(updates) {
+        const bd = updates.bd || [];
+        const plugins = updates.plugins || [];
+        const themes = updates.themes || [];
+        const modules = updates.modules || [];
+
+        this.restartRequired = this.reloadRequired = false;
+        this.finishedUpdates = 0;
+        this.totalUpdates = bd.length + plugins.length + themes.length + modules.length;
+
+        if (bd.length) {
+            for (const update of bd) {
+                this.updateBd(update);
+            }
+        }
+
+    }
+
+    updateFinished(update) {
+        if (update.id === 'core') this.restartRequired = true;
+        if (update.id === 'client') this.reloadRequired = true;
+
+        this.finishedUpdates++;
+        if (this.finishedUpdates >= this.totalUpdates) {
+            this.bd.sendToDiscord('updater-updated', { restartRequired: this.restartRequired, reloadRequired: this.reloadRequired });
+        }
     }
 
     start(interval = 15) {

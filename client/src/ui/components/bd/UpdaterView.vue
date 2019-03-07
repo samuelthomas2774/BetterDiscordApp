@@ -69,9 +69,8 @@
             }
         },
         methods: {
-            async update() {
-                // TODO
-                console.log('update');
+            update() {
+                this.updater.startUpdate();
             }
         }
     }

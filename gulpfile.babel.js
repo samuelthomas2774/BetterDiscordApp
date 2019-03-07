@@ -15,7 +15,7 @@ import editorpkg from './editor/package';
 
 // core-release >
 
-gulp.task('core-main', function () {
+gulp.task('core-main', function() {
     return pump([
         gulp.src('core/dist/main.js'),
         replace('/*PRODUCTION*/', 'const PRODUCTION = true;'),
@@ -37,27 +37,34 @@ gulp.task('core-pkg', function() {
     ]);
 });
 
-gulp.task('core-modules', function () {
+gulp.task('core-modules', function() {
     return pump([
         gulp.src('core/dist/modules/**/*'),
         copy('release/core', { prefix: 2 })
     ]);
 });
 
-gulp.task('core-sparkplug', function () {
+gulp.task('core-sparkplug', function() {
     return pump([
         gulp.src('core/dist/sparkplug.js'),
         gulp.dest('release/core')
     ]);
 });
 
-gulp.task('core-release', gulp.parallel('core-main', 'core-pkg', 'core-sparkplug', 'core-modules'));
+gulp.task('core-extras', function() {
+    return pump([
+        gulp.src(['core/src/csp.json']),
+        gulp.dest('release/core')
+    ]);
+});
+
+gulp.task('core-release', gulp.parallel('core-main', 'core-pkg', 'core-sparkplug', 'core-modules', 'core-extras'));
 
 // < core-release
 
 // client
 
-gulp.task('client-main', function () {
+gulp.task('client-main', function() {
     return pump([
         gulp.src('client/dist/*.client-release.js'),
         rename(`client.${clientpkg.version}.js`),
@@ -77,7 +84,7 @@ gulp.task('client-pkg', function() {
     ]);
 });
 
-gulp.task('client-sparkplug', function () {
+gulp.task('client-sparkplug', function() {
     return pump([
         gulp.src('core/dist/sparkplug.js'),
         gulp.dest('release/client')
@@ -88,7 +95,7 @@ gulp.task('client-release', gulp.parallel('client-main', 'client-pkg', 'client-s
 
 // Editor
 
-gulp.task('editor-main', function () {
+gulp.task('editor-main', function() {
     return pump([
         gulp.src('editor/dist/editor.release.js'),
         rename(`editor.${editorpkg.version}.js`),
@@ -96,10 +103,10 @@ gulp.task('editor-main', function () {
     ]);
 });
 
-gulp.task('editor-pkg', function () {
+gulp.task('editor-pkg', function() {
     return pump([
         gulp.src('editor/package.json'),
-        editjson(function (pkg) {
+        editjson(function(pkg) {
             pkg.main = `editor.${editorpkg.version}.js`;
             delete pkg.scripts;
             return pkg;
@@ -119,18 +126,18 @@ gulp.task('node-modules', function() {
     ]);
 });
 
-gulp.task('node-sass-bindings', gulp.series(function () {
+gulp.task('node-sass-bindings', gulp.series(function() {
     return del(['release/node_modules/node-sass/vendor']);
-}, function () {
+}, function() {
     return pump([
         gulp.src('other/node_sass_bindings/**/*'),
         copy('release/core/node_modules/node-sass/vendor', { prefix: 2 })
     ]);
 }));
 
-gulp.task('keytar-bindings', gulp.series(function () {
+gulp.task('keytar-bindings', gulp.series(function() {
     return del(['release/node_modules/keytar/build']);
-}, function () {
+}, function() {
     return pump([
         gulp.src('other/keytar/**/*'),
         copy('release/core/node_modules/keytar/build/Release', { prefix: 2 })

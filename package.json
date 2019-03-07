@@ -98,7 +98,8 @@
     "package_release": "node scripts/package-release.js",
     "gulp_release": "gulp release",
     "release": "npm run lint && npm run build_release && gulp release && npm run package_release",
-    "update_release": "npm run build_release && gulp build-release",
+    "release_test": "npm run build_release && gulp release",
+    "update_release": "npm run build_release && gulp release",
     "inject": "node scripts/inject.js"
   }
 }

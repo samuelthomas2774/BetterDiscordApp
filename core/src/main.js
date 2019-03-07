@@ -8,6 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+/*PRODUCTION*/
 const TESTS = typeof PRODUCTION === 'undefined';
 const TEST_ARGS = () => {
     const _basePath = path.resolve(__dirname, '..', '..');

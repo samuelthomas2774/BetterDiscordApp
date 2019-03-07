@@ -4,6 +4,7 @@ import del from 'del';
 import copy from 'gulp-copy';
 import rename from 'gulp-rename';
 import inject from 'gulp-inject-string';
+import replace from 'gulp-replace';
 import copydeps from './scripts/copydeps';
 import file from 'gulp-file';
 import editjson from 'gulp-json-editor';
@@ -17,7 +18,7 @@ import editorpkg from './editor/package';
 gulp.task('core-main', function () {
     return pump([
         gulp.src('core/dist/main.js'),
-        inject.after(`'use strict';\n`, 'const PRODUCTION = true;\n'),
+        replace('/*PRODUCTION*/', 'const PRODUCTION = true;'),
         rename(`core.${corepkg.version}.js`),
         gulp.dest('release/core')
     ]);

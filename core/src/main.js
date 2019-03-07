@@ -40,7 +40,6 @@ const TEST_ARGS = () => {
     }
 }
 const TEST_EDITOR = TESTS && true;
-const TEST_UPDATER = TESTS && true;
 
 import path from 'path';
 import sass from 'node-sass';
@@ -227,6 +226,7 @@ export class BetterDiscord {
         configProxy = () => this.config;
         const autoInitComms = this.comms;
         const autoInitEditor = this.editor;
+        const autoInitUpdater = this.updater;
         this.init();
     }
 
@@ -358,7 +358,6 @@ export class BetterDiscord {
      */
     async injectScripts(reload = false) {
         console.log(`[BetterDiscord] injecting ${this.config.getPath('client_script')}. Reload: ${reload}`);
-        if (TEST_UPDATER) setTimeout(this.updater.checkForUpdates, 5000);
         return this.windowUtils.injectScript(this.config.getPath('client_script'));
     }
 

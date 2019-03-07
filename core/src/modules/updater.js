@@ -81,6 +81,9 @@ export default class Updater extends Module {
 
     events(ipc) {
         ipc.on('updater-startUpdate', (_, updates) => this.updateAll(updates));
+        ipc.on('debug-updater-forceUpdate', () => {
+            this.checkForUpdates(true);
+        });
     }
 
     async updateBd(update) {
@@ -179,12 +182,19 @@ export default class Updater extends Module {
         console.log('fallback');
     }
 
-    async checkForBdUpdates() {
+    async checkForBdUpdates(forced = false) {
         try {
             const { coreVersion, clientVersion, editorVersion } = this.bd.config;
             const releaseInfo = new ReleaseInfo({ core: coreVersion, client: clientVersion, editor: editorVersion });
 
             const latestRelease = await this.latestRelease();
+
+            if (forced) {
+                latestRelease.files = latestRelease.files.map(file => {
+                    file.version = '10.0.0';
+                    return file;
+                });
+            }
 
             releaseInfo.files = latestRelease.files;
 
@@ -203,12 +213,12 @@ export default class Updater extends Module {
         }
     }
 
-    async checkForUpdates() {
+    async checkForUpdates(forced = false) {
         console.log('[BetterDiscord:Updater] Checking for updates');
         this.bd.sendToDiscord('updater-checkForUpdates', '');
 
         try {
-            const bd = await this.checkForBdUpdates();
+            const bd = await this.checkForBdUpdates(forced);
             const updates = { bd, haveUpdates: false };
 
             if (bd.length) updates.haveUpdates = true;

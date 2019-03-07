@@ -96,6 +96,10 @@ class BetterDiscord {
             Events.emit('ready');
             Events.emit('discord-ready');
 
+            window.__superSecretBdMenu = function() {
+                Events.emit('enabledSuperSecretBdMenu');
+            }
+
             if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
                 Modals.showContentManagerErrors();
         } catch (err) {

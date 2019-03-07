@@ -8,3 +8,4 @@ export { default as UpdaterStatus } from './UpdaterStatus.vue';
 export { default as UpdaterToggle } from './UpdaterToggle.vue';
 export { default as BdBadge } from './BdBadge.vue';
 export { default as ConnectivityView } from './ConnectivityView.vue';
+export { default as SuperSecretView } from './SuperSecretView.vue';

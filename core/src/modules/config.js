@@ -37,7 +37,15 @@ export default class Config extends Module {
     }
 
     setClientVersion(clientVersion) {
-        this.args.clientVersion = clientVersion;
+        this.state.clientVersion = clientVersion;
+    }
+
+    setCoreVersion(coreVersion) {
+        this.state.coreVersion = coreVersion;
+    }
+
+    setEditorVersion(editorVersion) {
+        this.state.editorVersion = editorVersion;
     }
 
     get paths() {

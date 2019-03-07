@@ -218,8 +218,10 @@ export class BetterDiscord {
         this.config.compatibility();
 
         this.bindings();
-        this.parseClientPackage();
         this.extraPaths();
+        this.parseClientPackage();
+        this.parseEditorPackage();
+        this.parseCorePackage();
         this.database.init();
 
         configProxy = () => this.config;
@@ -289,12 +291,26 @@ export class BetterDiscord {
      */
     parseClientPackage() {
         const clientPath = this.config.getPath('client');
-        const clientPkg = TESTS ? require(`${path.resolve(clientPath, '..')}/package.json`) :require(`${clientPath}/package.json`);
+        const clientPkg = TESTS ? require(`${path.resolve(clientPath, '..')}/package.json`) : require(`${clientPath}/package.json`);
         const { version } = clientPkg;
         const main = TESTS ? 'betterdiscord.client.js' : clientPkg.main;
         this.config.addPath('client_script', `${clientPath}/${main}`);
         this.config.setClientVersion(version);
         console.log(`[BetterDiscord] Client v${this.config.clientVersion} - ${this.config.getPath('client_script')}`);
+    }
+
+    parseCorePackage() {
+        const corePath = this.config.getPath('core');
+        const corePkg = TESTS ? require(`${path.resolve(corePath, '..')}/package.json`) : require(`${corePath}/package.json`);
+        const { version } = corePkg;
+        this.config.setCoreVersion(version);
+    }
+
+    parseEditorPackage() {
+        const editorPath = this.config.getPath('editor');
+        const editorPkg = TESTS ? require(`${path.resolve(editorPath, '..')}/package.json`) : require(`${editorPath}/package.json`);
+        const { version } = editorPkg;
+        this.config.setEditorVersion(version);
     }
 
     /**

@@ -134,7 +134,22 @@ export default new class extends Module {
 
     stateChanged(oldState, newState) {
         if (!newState.updatesAvailable) return Events.emit('update-check-end');
-        if (!oldState.updatesAvailable && newState.updatesAvailable) return Events.emit('updates-available');
+        if (!oldState.updatesAvailable && newState.updatesAvailable) {
+            Events.emit('updates-available');
+            Notifications.add('', 'Updates Available!', [
+                {
+                    text: 'Ignore',
+                    onClick: () => { return true; }
+                },
+                {
+                    text: 'Show Updates',
+                    onClick: () => {
+                        Events.emit('bd-open-menu', 'updater');
+                        return true;
+                    }
+                }
+            ]);
+        }
     }
 
     setUpdateStatus(updateId, statusChild, statusValue) {

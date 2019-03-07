@@ -85,12 +85,12 @@ export default class Updater extends Module {
         try {
             console.log('[BetterDiscord:Updater] Updating', update.id);
             await this.downloadTarGz(`https://github.com/JsSucks/BetterDiscordApp${update.remote}`, this.bd.config.getPath(update.id));
-            console.log('[BetterDiscord:Updater] Finished updating', update.id);
-            this.bd.sendToDiscord('updater-updateFinished', update);
             this.updateFinished(update);
         } catch (err) {
             console.log('[BetterDiscord:Updater] Failed to update', update.id);
             console.log(err);
+            update.error = err;
+            this.bd.sendToDiscord('updater-updateError', update);
         }
     }
 
@@ -115,6 +115,9 @@ export default class Updater extends Module {
     updateFinished(update) {
         if (update.id === 'core') this.restartRequired = true;
         if (update.id === 'client') this.reloadRequired = true;
+
+        console.log('[BetterDiscord:Updater] Finished updating', update.id);
+        this.bd.sendToDiscord('updater-updateFinished', update);
 
         this.finishedUpdates++;
         if (this.finishedUpdates >= this.totalUpdates) {

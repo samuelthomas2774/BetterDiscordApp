@@ -15,7 +15,6 @@ import { ClientLogger as Logger, ClientIPC, Utils, Axi } from 'common';
 import { BuiltinManager, EmoteModule, ReactDevtoolsModule, VueDevtoolsModule, TrackingProtection, E2EE } from 'builtin';
 import electron from 'electron';
 import path from 'path';
-import { setTimeout } from 'timers';
 
 const tests = typeof PRODUCTION === 'undefined';
 const ignoreExternal = tests && true;

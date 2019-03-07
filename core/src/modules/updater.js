@@ -8,7 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+
 import Module from './modulebase';
+import { FileUtils } from './utils';
 import semver from 'semver';
 import Axi from './axi';
 import zlib from 'zlib';
@@ -84,8 +86,10 @@ export default class Updater extends Module {
     async updateBd(update) {
         try {
             console.log('[BetterDiscord:Updater] Updating', update.id);
-            await this.downloadTarGz(`https://github.com/JsSucks/BetterDiscordApp${update.remote}`, this.bd.config.getPath(update.id));
+            await this.downloadTarGz(`https://github.com/JsSucks/BetterDiscordApp${update.remote}`, this.bd.config.getPath('base'));
             this.updateFinished(update);
+            // Cleanup
+            await FileUtils.rm(`${this.bd.config.getPath(update.id)}_old`);
         } catch (err) {
             console.log('[BetterDiscord:Updater] Failed to update', update.id);
             console.log(err);
@@ -94,7 +98,7 @@ export default class Updater extends Module {
         }
     }
 
-    updateAll(updates) {
+    async updateAll(updates) {
         const bd = updates.bd || [];
         const plugins = updates.plugins || [];
         const themes = updates.themes || [];
@@ -104,7 +108,27 @@ export default class Updater extends Module {
         this.finishedUpdates = 0;
         this.totalUpdates = bd.length + plugins.length + themes.length + modules.length;
 
+        const renamed = [];
+        // TODO cleaner
         if (bd.length) {
+            for (const update of bd) {
+                try {
+                    await FileUtils.rm(`${this.bd.config.getPath(update.id)}_old`);
+                    // Try to rename dirs first
+                    await FileUtils.rn(this.bd.config.getPath(update.id), `${this.bd.config.getPath(update.id)}_old`);
+                    renamed.push({ 'old': this.bd.config.getPath(update.id), 'new': `${this.bd.config.getPath(update.id)}_old`});
+                } catch (err) {
+                    if (renamed.length) {
+                        // Restore dirs
+                        for (const r of renamed) {
+                            await FileUtils.rn(r.new, r.old);
+                        }
+                    }
+
+                    throw err;
+                }
+            }
+
             for (const update of bd) {
                 this.updateBd(update);
             }

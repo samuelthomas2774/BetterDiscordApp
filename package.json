@@ -2,7 +2,7 @@
   "name": "betterdiscord",
   "description": "BetterDiscord",
   "author": "Jiiks",
-  "version": "2.0.0-beta.3",
+  "version": "2.0.0-beta.4",
   "homepage": "https://betterdiscord.net",
   "license": "MIT",
   "main": "core/dist/main.js",
@@ -17,6 +17,7 @@
   "private": false,
   "dependencies": {
     "asar": "^1.0.0",
+    "axios": "^0.18.0",
     "chokidar": "^2.1.2",
     "csp-parse": "github:macropodhq/csp-parse",
     "deepmerge": "^3.2.0",
@@ -24,7 +25,9 @@
     "keytar": "^4.4.1",
     "nedb": "^1.8.0",
     "node-sass": "^4.11.0",
-    "original-fs": "^1.0.0"
+    "original-fs": "^1.0.0",
+    "semver": "^5.6.0",
+    "tar-fs": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.3.4",
@@ -51,6 +54,7 @@
     "gulp-inject-string": "^1.1.2",
     "gulp-json-editor": "^2.5.1",
     "gulp-rename": "^1.4.0",
+    "gulp-replace": "^1.0.0",
     "gulp-watch": "^5.0.1",
     "hash-files": "^1.1.1",
     "html-webpack-plugin": "^3.2.0",
@@ -58,6 +62,7 @@
     "lodash": "^4.17.11",
     "mkdirp": "^0.5.1",
     "node-gyp": "^3.8.0",
+    "parallel-webpack": "^2.3.0",
     "pump": "^3.0.0",
     "request-promise-native": "1.0.5",
     "sass-lint": "^1.12.1",
@@ -82,6 +87,8 @@
     "watch_core": "npm run watch --prefix core",
     "build_editor": "npm run build --prefix editor",
     "watch_editor": "npm run watch --prefix editor",
+    "build_all": "parallel-webpack --progress --colors --config=webpack.all.config.js",
+    "watch_all": "parallel-webpack --progress --colors --watch --config=webpack.all.config.js",
     "lint": "eslint -f unix client/src core/src editor/src common && npm run sasslint",
     "lint_fix": "eslint -f unix client/src core/src",
     "sasslint": "sass-lint client/src/styles/**/*.scss -v",
@@ -91,7 +98,8 @@
     "package_release": "node scripts/package-release.js",
     "gulp_release": "gulp release",
     "release": "npm run lint && npm run build_release && gulp release && npm run package_release",
-    "update_release": "npm run build_release && gulp build-release",
+    "release_test": "npm run build_release && gulp release",
+    "update_release": "npm run build_release && gulp release",
     "inject": "node scripts/inject.js"
   }
 }

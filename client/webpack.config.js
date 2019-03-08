@@ -13,7 +13,10 @@ const config = {
     },
     plugins: [
         new webpack.NamedModulesPlugin()
-    ]
+    ],
+    externals: {
+        asar: 'require("asar")'
+    }
 };
 
 module.exports = merge(baseconfig, config);

@@ -8,11 +8,24 @@
  * LICENSE file in the root directory of this source tree.
 */
 
+/*PRODUCTION*/
 const TESTS = typeof PRODUCTION === 'undefined';
 const TEST_ARGS = () => {
     const _basePath = path.resolve(__dirname, '..', '..');
-    const _baseDataPath =  path.resolve(_basePath, 'tests');
+    const _baseDataPath = path.resolve(_basePath, 'tests');
+
+    const _corePkg = require(path.resolve(_basePath, 'core', 'package.json'));
+    const _clientPkg = require(path.resolve(_basePath, 'client', 'package.json'));
+    const _editorPkg = require(path.resolve(_basePath, 'editor', 'package.json'));
+
+    const coreVersion = _corePkg.version;
+    const clientVersion = _clientPkg.version;
+    const editorVersion = _editorPkg.version;
+
     return {
+        coreVersion,
+        clientVersion,
+        editorVersion,
         'options': {
             'autoInject': true,
             'commonCore': true,
@@ -26,7 +39,7 @@ const TEST_ARGS = () => {
         }
     }
 }
-const TEST_EDITOR = true;
+const TEST_EDITOR = TESTS && true;
 
 import path from 'path';
 import sass from 'node-sass';
@@ -35,21 +48,14 @@ import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
 import keytar from 'keytar';
 
-import { FileUtils, BDIpc, Config, WindowUtils, CSSEditor, Editor, Database } from './modules';
+import { FileUtils, BDIpc, Config, WindowUtils, Updater, Editor, Database } from './modules';
 
 const packageJson = require(path.resolve(__dirname, 'package.json'));
 const sparkplug = path.resolve(__dirname, 'sparkplug.js');
 
 let configProxy;
 
-const CSP = {
-    'img-src': ['https://cdn.betterttv.net', 'https://cdn.frankerfacez.com'],
-    'script-src': [
-        `'sha256-fSHKdpQGCHaIqWP3SpJOuUHrLp49jy4dWHzZ/RBJ/p4='`, // React Devtools
-        `'sha256-VFJcfKY5B3EBkFDgQnv3CozPwBlZcxwssfLVWlPFfZU='`, // Vue Devtools
-        `'sha256-VzDmLZ4PxPkOS/KY7ITzLQsSWhfCnvUrNculcj8UNgE=' 'sha256-l6K+77Z1cmldR9gIvaVWlboF/zr5MXCQHcsEHfnr5TU='` // Vue Detector
-    ]
-};
+const CSP = TESTS ? require('../src/csp.json') : require('./csp.json');
 
 class Comms {
     constructor(bd) {
@@ -195,6 +201,8 @@ export class BetterDiscord {
     get config() { return this._config ? this._config : (this._config = new Config(this._args)); }
     get window() { return this.windowUtils ? this.windowUtils.window : undefined; }
     get editor() { return this._editor ? this._editor : (this._editor = new Editor(this, this.config.getPath('editor'))); }
+    get updater() { return this._updater ? this._updater : (this._updater = new Updater(this)); }
+    get sendToDiscord() { return this.windowUtils.send; }
 
     constructor(args) {
         if (TESTS) args = TEST_ARGS();
@@ -209,13 +217,16 @@ export class BetterDiscord {
         this.config.compatibility();
 
         this.bindings();
-        this.parseClientPackage();
         this.extraPaths();
+        this.parseClientPackage();
+        this.parseEditorPackage();
+        this.parseCorePackage();
         this.database.init();
 
         configProxy = () => this.config;
         const autoInitComms = this.comms;
         const autoInitEditor = this.editor;
+        this.updater.start();
         this.init();
     }
 
@@ -280,12 +291,26 @@ export class BetterDiscord {
      */
     parseClientPackage() {
         const clientPath = this.config.getPath('client');
-        const clientPkg = TESTS ? require(`${path.resolve(clientPath, '..')}/package.json`) :require(`${clientPath}/package.json`);
+        const clientPkg = TESTS ? require(`${path.resolve(clientPath, '..')}/package.json`) : require(`${clientPath}/package.json`);
         const { version } = clientPkg;
         const main = TESTS ? 'betterdiscord.client.js' : clientPkg.main;
         this.config.addPath('client_script', `${clientPath}/${main}`);
         this.config.setClientVersion(version);
         console.log(`[BetterDiscord] Client v${this.config.clientVersion} - ${this.config.getPath('client_script')}`);
+    }
+
+    parseCorePackage() {
+        const corePath = this.config.getPath('core');
+        const corePkg = TESTS ? require(`${path.resolve(corePath, '..')}/package.json`) : require(`${corePath}/package.json`);
+        const { version } = corePkg;
+        this.config.setCoreVersion(version);
+    }
+
+    parseEditorPackage() {
+        const editorPath = this.config.getPath('editor');
+        const editorPkg = TESTS ? require(`${path.resolve(editorPath, '..')}/package.json`) : require(`${editorPath}/package.json`);
+        const { version } = editorPkg;
+        this.config.setEditorVersion(version);
     }
 
     /**

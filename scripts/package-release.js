@@ -53,6 +53,7 @@ async function archiveCore(out = './release/core.tar.gz') {
         coreArchive.file('./release/core/package.json', { name: 'core/package.json' });
         coreArchive.file('./release/core/index.js', { name: 'core/index.js' });
         coreArchive.file(`./release/core/${mainFn}`, { name: `core/${mainFn}` });
+        coreArchive.file('./release/core/csp.json', { name: 'core/csp.json' });
         coreArchive.file('./release/core/sparkplug.js', { name: 'core/sparkplug.js' });
         coreArchive.directory('./release/core/modules', 'core/modules');
         coreArchive.directory('./release/core/node_modules', 'core/node_modules');

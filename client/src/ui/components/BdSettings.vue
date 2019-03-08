@@ -20,10 +20,11 @@
                     <SidebarItem :item="{text, type: 'header'}" />
                     <SidebarItem v-for="i in category" :key="i.id" :item="i" :active="item && i.id === item.id" @click="itemOnClick(i.id)" />
                 </template>
+                <SidebarItem v-if="superSecretMenu" :item="{ _type: 'button', text: 'Super Secret' }" :active="superSecretMenuActive" @click="itemOnClick('superSecretMenu')"/>
             </Sidebar>
 
             <div slot="sidebarfooter" class="bd-info">
-                <span class="bd-vtext">v2.0.0a by Jiiks/JsSucks</span>
+                <span class="bd-vtext">{{versionString}}</span>
                 <div @click="openGithub" v-tooltip="'GitHub'" class="bd-materialButton">
                     <MiGithubCircle size="16" />
                 </div>
@@ -37,7 +38,8 @@
 
             <ContentColumn slot="content">
                 <transition name="bd-contentcolumn" @before-enter="animating++" @after-enter="animating--" @enter-cancelled="animating--" @before-leave="animating++" @after-leave="animating--" @leave-cancelled="animating--">
-                    <div v-if="item" :key="item.id">
+                    <SuperSecretView v-if="superSecretMenuActive"/>
+                    <div v-else-if="item" :key="item.id">
                         <template v-if="item.component">
                             <component :is="item.component" :SettingsWrapper="SettingsWrapper" />
                         </template>
@@ -63,11 +65,11 @@
 
 <script>
     // Imports
-    import { Events, Settings } from 'modules';
+    import { Events, Settings, Globals, Reflection } from 'modules';
     import { BdMenuItems } from 'ui';
     import { shell } from 'electron';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
-    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView } from './bd';
+    import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView, SuperSecretView } from './bd';
     import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
 
     export default {
@@ -78,13 +80,15 @@
                 items: BdMenuItems.items,
                 Settings,
                 SettingsWrapper,
-                openMenuHandler: null
+                openMenuHandler: null,
+                superSecretMenu: false,
+                superSecretMenuActive: false
             };
         },
         props: ['active'],
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView,
+            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView, SuperSecretView,
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         computed: {
@@ -96,10 +100,19 @@
                     category.push(item);
                 }
                 return categories;
+            },
+            versionString() {
+                return Globals.version;
             }
         },
         methods: {
             itemOnClick(id) {
+                if (id === 'superSecretMenu') {
+                    this.item = 'supersecretmenu';
+                    this.superSecretMenuActive = true;
+                    return;
+                }
+                this.superSecretMenuActive = false;
                 this.item = this.items.find(item => item.id === id);
             },
             closeContent() {
@@ -123,6 +136,10 @@
         },
         created() {
             Events.on('bd-open-menu', this.openMenuHandler = item => item && this.itemOnClick(this.items.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
+            try {
+                const currentUser = Reflection.module.byName('UserStore').getCurrentUser();
+                this.superSecretMenu = ['81388395867156480', '98003542823944192', '249746236008169473', '284056145272766465', '478559353516064769'].includes(currentUser.id)
+            } catch (err) {}
         },
         destroyed() {
             if (this.openMenuHandler) Events.off('bd-open-menu', this.openMenuHandler);

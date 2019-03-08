@@ -35,6 +35,7 @@ export default new class extends Module {
         this.reloadNotif = this.reloadNotif.bind(this);
         this.startUpdate = this.startUpdate.bind(this);
         this.setUpdateStatus = this.setUpdateStatus.bind(this);
+        this.testUi = this.testUi.bind(this);
     }
 
     restartNotif() {
@@ -91,6 +92,7 @@ export default new class extends Module {
         });
 
         ipc.on('updater-updatesAvailable', (_, updates) => {
+            console.log(updates);
             if (this.state.updating) return; // If for some reason we get more updates when we're already updating
             updates.bd = updates.bd.map(update => {
                 update.text = `${update.id.charAt(0).toUpperCase()}${update.id.slice(1)}`;
@@ -176,6 +178,13 @@ export default new class extends Module {
         }
         console.log(updates);
         this.send('updater-startUpdate', updates);
+    }
+
+    testUi(updates) {
+        this.setState({
+            updates,
+            updatesAvailable: true
+        });
     }
 
 }

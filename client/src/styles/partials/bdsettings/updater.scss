@@ -3,4 +3,22 @@
         margin: 0 0 10px;
         color: #fff;
     }
+
+    .bd-settingSwitch {
+        .bd-spinner7 {
+            height: 24px;
+        }
+
+        .bd-updaterStatus {
+            text-align: right;
+
+            &.bd-err {
+                color: $colerr;
+            }
+
+            &.bd-ok {
+                color: $colok;
+            }
+        }
+    }
 }

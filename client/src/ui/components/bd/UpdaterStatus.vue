@@ -12,8 +12,8 @@
     <div class="bd-settingSwitch">
         <div class="bd-title">
             <h3>{{item.text}}</h3>
-            <h3 class="bd-updaterStatus" v-if="item.status.error">Update Failed!</h3>
-            <h3 class="bd-updaterStatus" v-else-if="item.status.updated">Done</h3>
+            <h3 class="bd-updaterStatus bd-err" v-if="item.status.error">Update Failed!</h3>
+            <h3 class="bd-updaterStatus bd-ok" v-else-if="item.status.updated">Done</h3>
             <div class="bd-spinner7" v-else-if="item.status.updating" />
             <h3 class="bd-updaterStatus" v-else>Unknown</h3>
         </div>

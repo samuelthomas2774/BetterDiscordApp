@@ -22,7 +22,7 @@
 
     import SettingsWrapper from './SettingsWrapper.vue';
     import { FormButton } from '../common';
-    import { Globals, Events } from 'modules';
+    import { Globals, Events, Updater } from 'modules';
     import { ClientIPC } from 'common';
 
     export default {
@@ -42,7 +42,63 @@
                 console.log(Globals);
             },
             testUpdateUi() {
-                Events.emit('update-check-start');
+                Updater.testUi({
+                    'bd': [
+                        {
+                            'id': 'update',
+                            'version': '3.0.0',
+                            'currentVersion': '2.0.0',
+                            'text': 'Update test',
+                            'hint': 'Current: 2.0.0 | Latest: 3.0.0',
+                            'status': {
+                                'update': true,
+                                'updating': false,
+                                'updated': false,
+                                'error': null
+                            }
+                        },
+                        {
+                            'id': 'updating',
+                            'version': '3.0.0',
+                            'currentVersion': '2.0.0',
+                            'text': 'Updating test',
+                            'hint': 'Current: 2.0.0 | Latest: 3.0.0',
+                            'status': {
+                                'update': true,
+                                'updating': true,
+                                'updated': false,
+                                'error': null
+                            }
+                        },
+                        {
+                            'id': 'updated',
+                            'version': '3.0.0',
+                            'currentVersion': '2.0.0',
+                            'text': 'Updated test',
+                            'hint': 'Current: 2.0.0 | Latest: 3.0.0',
+                            'status': {
+                                'update': true,
+                                'updating': true,
+                                'updated': true,
+                                'error': null
+                            }
+                        },
+                        {
+                            'id': 'error',
+                            'version': '3.0.0',
+                            'currentVersion': '2.0.0',
+                            'text': 'Error test',
+                            'hint': 'Current: 2.0.0 | Latest: 3.0.0',
+                            'status': {
+                                'update': true,
+                                'updating': true,
+                                'updated': false,
+                                'error': 'Failed to update.'
+                            }
+                        }
+                    ],
+                    'haveUpdates': true
+                });
             }
         }
     }

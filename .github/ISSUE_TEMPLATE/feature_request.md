@@ -7,6 +7,10 @@ assignees: ''
 
 ---
 
+- [ ] Used appropriate template for the issue type
+- [ ] Searched both open and closed issues for duplicates of this issue
+- [ ] Title adequately and _concisely_ reflects the feature or the bug
+
 **Is your feature request related to a problem? Please describe.**
 <!-- A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] -->
 

@@ -152,7 +152,7 @@ export default class Updater extends Module {
         }
     }
 
-    start(interval = 15) {
+    start(interval = 30) {
         this.updaterThread = setInterval(this.checkForUpdates, interval * 60 * 1000);
     }
 

@@ -226,7 +226,7 @@ export class BetterDiscord {
         configProxy = () => this.config;
         const autoInitComms = this.comms;
         const autoInitEditor = this.editor;
-        const autoInitUpdater = this.updater;
+        this.updater.start();
         this.init();
     }
 

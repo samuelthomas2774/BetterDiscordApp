@@ -80,7 +80,10 @@ export default class Updater extends Module {
     }
 
     events(ipc) {
-        ipc.on('updater-startUpdate', (_, updates) => this.updateAll(updates));
+        ipc.on('updater-startUpdate', (_, updates) => {
+            clearInterval(this.updaterThread);
+            this.updateAll(updates);
+        });
         ipc.on('debug-updater-forceUpdate', () => {
             this.checkForUpdates(true);
         });

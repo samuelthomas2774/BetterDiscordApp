@@ -102,7 +102,7 @@ export default new class extends Module {
     }
 
     get version() {
-        return this.config.version;
+        return this.config.versions.core;
     }
 
 }

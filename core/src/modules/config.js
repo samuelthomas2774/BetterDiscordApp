@@ -16,12 +16,36 @@ export default class Config extends Module {
         return this.args.version;
     }
 
+    get versions() {
+        return {
+            core: this.coreVersion,
+            client: this.clientVersion,
+            editor: this.editorVersion
+        };
+    }
+
+    get coreVersion() {
+        return this.state.coreVersion;
+    }
+
     get clientVersion() {
-        return this.args.clientVersion;
+        return this.state.clientVersion;
+    }
+
+    get editorVersion() {
+        return this.state.editorVersion;
     }
 
     setClientVersion(clientVersion) {
-        this.args.clientVersion = clientVersion;
+        this.state.clientVersion = clientVersion;
+    }
+
+    setCoreVersion(coreVersion) {
+        this.state.coreVersion = coreVersion;
+    }
+
+    setEditorVersion(editorVersion) {
+        this.state.editorVersion = editorVersion;
     }
 
     get paths() {
@@ -41,6 +65,7 @@ export default class Config extends Module {
     get config() {
         return {
             version: this.version,
+            versions: this.versions,
             paths: this.paths
         };
     }

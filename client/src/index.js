@@ -11,14 +11,13 @@
 import { DOM, BdUI, BdMenu, Modals, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
 import BdCss from './styles/index.scss';
 import { Events, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi, BdWebApi, Connectivity, Cache, Reflection, PackageInstaller } from 'modules';
-import { ClientLogger as Logger, ClientIPC, Utils } from 'common';
+import { ClientLogger as Logger, ClientIPC, Utils, Axi } from 'common';
 import { BuiltinManager, EmoteModule, ReactDevtoolsModule, VueDevtoolsModule, TrackingProtection, E2EE } from 'builtin';
 import electron from 'electron';
 import path from 'path';
-import { setTimeout } from 'timers';
 
 const tests = typeof PRODUCTION === 'undefined';
-const ignoreExternal = true;
+const ignoreExternal = tests && true;
 
 class BetterDiscord {
 
@@ -39,7 +38,7 @@ class BetterDiscord {
             BdWebApi,
             Connectivity,
             Cache,
-            Logger, ClientIPC, Utils,
+            Logger, ClientIPC, Utils, Axi,
 
             plugins: PluginManager.localContent,
             themes: ThemeManager.localContent,

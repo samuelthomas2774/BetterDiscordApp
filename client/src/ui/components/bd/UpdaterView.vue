@@ -11,19 +11,22 @@
 <template>
     <SettingsWrapper headertext="Updates">
         <div class="bd-flex bd-flexCol bd-updaterview">
-            <div v-if="error" class="bd-formItem">
-                <h5 style="margin-bottom: 10px;">Error installing updates</h5>
-                <div class="bd-err bd-preWrap"><div class="bd-pre">{{ error.formatted }}</div></div>
-                <div class="bd-formDivider"></div>
+            <div class="bd-settingsCategories">
+                <div class="bd-settingsCategory" v-if="bdUpdates && bdUpdates.length">
+                    <div class="bd-formItem">
+                        <h5>BetterDiscord</h5>
+                    </div>
+                    <div class="bd-formDivider"></div>
+                    <div v-for="update in bdUpdates">
+                        <UpdaterStatus :item="update" v-if="update.status.updating" />
+                        <UpdaterToggle :item="update" :toggle="() => updater.toggleUpdate(update)" v-else />
+                        <div class="bd-formDivider"></div>
+                    </div>
+                </div>
             </div>
-
-            <template v-if="updatesAvailable">
-                <p>Version {{ newVersion }} is available. You are currently running version {{ currentVersion }}.</p>
-                <FormButton :onClick="install" :loading="updating">Install</FormButton>
-            </template>
-            <template v-else>
-                <p>You're all up to date!</p>
-            </template>
+            <div class="bd-formButton bd-button" @click="update">
+                Update
+            </div>
         </div>
     </SettingsWrapper>
 </template>
@@ -32,7 +35,8 @@
     import { Globals, Updater } from 'modules';
     import { ClientLogger as Logger } from 'common';
     import SettingsWrapper from './SettingsWrapper.vue';
-    import { FormButton } from '../common';
+    import UpdaterToggle from './UpdaterToggle.vue';
+    import UpdaterStatus from './UpdaterStatus.vue';
 
     export default {
         data() {
@@ -44,26 +48,29 @@
         },
         components: {
             SettingsWrapper,
-            FormButton
+            UpdaterToggle,
+            UpdaterStatus
         },
         computed: {
             updatesAvailable() {
                 return this.updater.updatesAvailable;
             },
             newVersion() {
-                return this.updater.latestVersion;
+                return '2.0.0-beta.4';
             },
             error() {
                 return this.updater.error;
+            },
+            updates() {
+                return this.updater.updates;
+            },
+            bdUpdates() {
+                return this.updater.bdUpdates;
             }
         },
         methods: {
-            async install() {
-                this.updating = true;
-                try {
-                    await this.updater.update();
-                } catch (err) {}
-                this.updating = false;
+            update() {
+                this.updater.startUpdate();
             }
         }
     }

@@ -15,7 +15,10 @@ const config = {
         new webpack.DefinePlugin({
             PRODUCTION: JSON.stringify(true)
         })
-    ]
+    ],
+    externals: {
+        sparkplug: 'require("./sparkplug")'
+    }
 };
 
 module.exports = merge(baseconfig, config);

@@ -28,7 +28,6 @@ module.exports = {
     },
     externals: {
         electron: 'require("electron")',
-        asar: 'require("asar")',
         fs: 'require("fs")',
         path: 'require("path")',
         util: 'require("util")',

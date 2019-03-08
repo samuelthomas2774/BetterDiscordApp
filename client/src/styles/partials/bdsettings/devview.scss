@@ -1,0 +1,9 @@
+.bd-contentColumn .bd-devview {
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+
+    .bd-button {
+        font-size: 10px;
+        height: 20px;
+    }
+}

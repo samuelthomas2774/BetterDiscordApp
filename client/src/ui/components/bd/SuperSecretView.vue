@@ -13,6 +13,7 @@
         <div class="bd-flex bd-flexCol bd-devview">
             <FormButton @click="forceUpdate">Force Update</FormButton>
             <FormButton @click="debugConfig">Config Debug</FormButton>
+            <FormButton @click="testUpdateUi">Update UI Test</FormButton>
         </div>
     </SettingsWrapper>
 </template>
@@ -21,7 +22,7 @@
 
     import SettingsWrapper from './SettingsWrapper.vue';
     import { FormButton } from '../common';
-    import { Globals } from 'modules';
+    import { Globals, Events } from 'modules';
     import { ClientIPC } from 'common';
 
     export default {
@@ -39,6 +40,9 @@
             },
             debugConfig() {
                 console.log(Globals);
+            },
+            testUpdateUi() {
+                Events.emit('update-check-start');
             }
         }
     }

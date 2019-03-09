@@ -50,7 +50,6 @@ import keytar from 'keytar';
 
 import { FileUtils, BDIpc, Config, WindowUtils, Updater, Editor, Database } from './modules';
 
-const packageJson = require(path.resolve(__dirname, 'package.json'));
 const sparkplug = path.resolve(__dirname, 'sparkplug.js');
 
 let configProxy;

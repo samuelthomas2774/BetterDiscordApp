@@ -220,7 +220,6 @@ export class BetterDiscord {
         this.parseClientPackage();
         this.parseEditorPackage();
         this.parseCorePackage();
-        this.database.init();
 
         configProxy = () => this.config;
         const autoInitComms = this.comms;

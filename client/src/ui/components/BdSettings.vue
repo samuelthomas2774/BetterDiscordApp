@@ -126,9 +126,10 @@
         },
         created() {
             Events.on('bd-open-menu', this.openMenuHandler = item => item && this.itemOnClick(this.items.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
+
             try {
                 const currentUser = Reflection.module.byName('UserStore').getCurrentUser();
-                if (['81388395867156480', '98003542823944192', '249746236008169473', '284056145272766465', '478559353516064769'].includes(currentUser.id) || true) {
+                if (['81388395867156480', '98003542823944192', '249746236008169473', '284056145272766465', '478559353516064769'].includes(currentUser.id)) {
                     BdMenuItems.addVueComponent('BD Devs', 'Super Secret', SuperSecretView);
                 }
             } catch (err) {}

@@ -83,7 +83,7 @@ class Comms {
 
         BDIpc.on('bd-compileSass', (event, options) => {
             if (!sass) {
-                event.reject(native_module_errors.sass);
+                event.reject(native_module_errors['node-sass']);
                 return;
             }
 

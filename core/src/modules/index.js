@@ -12,7 +12,7 @@ try {
     exports.sass = require('node-sass');
 } catch (err) {
     console.error('[BetterDiscord] Error loading node-sass', err);
-    native_module_errors.sass = err instanceof Error ? {message: err.message, stack: err.stack} : err;
+    native_module_errors['node-sass'] = err instanceof Error ? {message: err.message, stack: err.stack} : err;
 }
 
 try {

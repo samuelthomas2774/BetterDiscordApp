@@ -94,6 +94,10 @@ class BetterDiscord {
 
             if (tests) this.initTests();
 
+            if (Globals.nativeModuleErrors.keytar) {
+                Settings.getSetting('security', 'default', 'use-keytar').disabled = true;
+            }
+
             if (!ignoreExternal) {
                 await ExtModuleManager.loadAllModules(true);
                 await PluginManager.loadAllPlugins(true);
@@ -103,7 +107,7 @@ class BetterDiscord {
             Events.emit('ready');
             Events.emit('discord-ready');
 
-            if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors'))
+            if (!Settings.get('core', 'advanced', 'ignore-content-manager-errors') && !Globals.nativeModuleErrorCount)
                 Modals.showContentManagerErrors();
         } catch (err) {
             Logger.err('main', ['FAILED TO LOAD!', err]);

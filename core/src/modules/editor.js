@@ -125,7 +125,7 @@ export default class Editor extends Module {
             }
 
             if (!sass) {
-                event.reject(native_module_errors.sass);
+                event.reject(native_module_errors['node-sass']);
                 return;
             }
 

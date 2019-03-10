@@ -9,6 +9,7 @@ export * from './contextmenus';
 export { default as VueInjector } from './vueinjector';
 export { default as Reflection } from './reflection';
 
+export { default as Autocomplete } from './autocomplete';
 export { default as ProfileBadges } from './profilebadges';
 export { default as ClassNormaliser } from './classnormaliser';
 

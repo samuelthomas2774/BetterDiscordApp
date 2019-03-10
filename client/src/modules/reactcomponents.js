@@ -461,7 +461,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannelTextArea() {
-        const { selector } = Reflection.resolve('channelTextArea', 'emojiButton');
+        const { selector } = Reflection.resolve('channelTextArea', 'autocomplete');
         this.ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', {selector});
     }
 

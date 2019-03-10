@@ -49,7 +49,6 @@ import ContentSecurityPolicy from 'csp-parse';
 import { FileUtils, BDIpc, Config, WindowUtils, Updater, Editor, Database } from './modules';
 import { sass, keytar, native_module_errors } from './modules';
 
-const packageJson = require(path.resolve(__dirname, 'package.json'));
 const sparkplug = path.resolve(__dirname, 'sparkplug.js');
 
 let configProxy;
@@ -239,7 +238,6 @@ export class BetterDiscord {
         this.parseClientPackage();
         this.parseEditorPackage();
         this.parseCorePackage();
-        this.database.init();
 
         configProxy = () => this.config;
         const autoInitComms = this.comms;

@@ -373,6 +373,11 @@ export class ReactAutoPatcher {
         this.Message.forceUpdateAll();
     }
 
+    static async patchMessageContent() {
+        const { selector } = Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited');
+        this.MessageContent = await ReactComponents.getComponent('MessageContent', {selector}, c => c.defaultProps && c.defaultProps.hasOwnProperty('disableButtons'));
+    }
+
     static async patchMessageGroup() {
         const { selector } = Reflection.resolve('container', 'message', 'messageCozy');
         this.MessageGroup = await ReactComponents.getComponent('MessageGroup', {selector});
@@ -391,6 +396,11 @@ export class ReactAutoPatcher {
         this.MessageGroup.forceUpdateAll();
     }
 
+    static async patchImageWrapper() {
+        const { selector } = Reflection.resolve('imageWrapper');
+        this.ImageWrapper = await ReactComponents.getComponent('ImageWrapper', {selector});
+    }
+
     static async patchChannelMember() {
         ReactComponents.componentAliases.ChannelMember = 'MemberListItem';
 
@@ -407,6 +417,11 @@ export class ReactAutoPatcher {
         });
 
         this.ChannelMember.forceUpdateAll();
+    }
+
+    static async patchNameTag() {
+        const { selector } = Reflection.resolve('nameTag', 'username', 'discriminator', 'ownerIcon');
+        this.NameTag = await ReactComponents.getComponent('NameTag', {selector});
     }
 
     static async patchGuild() {
@@ -441,6 +456,11 @@ export class ReactAutoPatcher {
         });
 
         this.Channel.forceUpdateAll();
+    }
+
+    static async patchChannelTextArea() {
+        const { selector } = Reflection.resolve('channelTextArea', 'emojiButton');
+        this.ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', {selector});
     }
 
     /**
@@ -538,6 +558,9 @@ export class ReactAutoPatcher {
     }
 
     static async patchUploadArea() {
-        PackageInstaller.uploadAreaPatch();
+        const { selector } = Reflection.resolve('uploadArea');
+        this.UploadArea = await ReactComponents.getComponent('UploadArea', {selector});
+
+        PackageInstaller.uploadAreaPatch(this.UploadArea);
     }
 }

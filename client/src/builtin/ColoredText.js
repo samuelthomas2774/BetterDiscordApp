@@ -50,7 +50,7 @@ export default new class ColoredText extends BuiltinModule {
     /* Patches */
     async applyPatches() {
         if (this.patches.length) return;
-        this.MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector }, m => m.defaultProps && m.defaultProps.hasOwnProperty('disableButtons'));
+        this.MessageContent = await ReactComponents.getComponent('MessageContent');
         this.patch(this.MessageContent.component.prototype, 'render', this.injectColoredText);
         this.MessageContent.forceUpdateAll();
     }

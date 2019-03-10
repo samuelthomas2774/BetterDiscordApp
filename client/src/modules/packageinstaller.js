@@ -10,7 +10,6 @@ import { Utils } from 'common';
 import PluginManager from './pluginmanager';
 import Globals from './globals';
 import Security from './security';
-import { ReactComponents } from './reactcomponents';
 import Reflection from './reflection';
 import DiscordApi from './discordapi';
 import ThemeManager from './thememanager';
@@ -136,12 +135,10 @@ export default class PackageInstaller {
     /**
      * Patches Discord upload area for .bd files
      */
-    static async uploadAreaPatch() {
-        const { selector } = Reflection.resolve('uploadArea');
-        this.UploadArea = await ReactComponents.getComponent('UploadArea', { selector });
+    static async uploadAreaPatch(UploadArea) {
+        const reflect = Reflection.DOM(UploadArea.important.selector);
+        const stateNode = reflect.getComponentStateNode(UploadArea);
 
-        const reflect = Reflection.DOM(selector);
-        const stateNode = reflect.getComponentStateNode(this.UploadArea);
         const callback = async function (e) {
             if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return;
             e.preventDefault();

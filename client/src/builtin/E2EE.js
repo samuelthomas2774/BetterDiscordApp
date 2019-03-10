@@ -172,7 +172,7 @@ export default new class E2EE extends BuiltinModule {
         this.patch(Dispatcher, 'dispatch', this.dispatcherPatch, 'before');
         this.patchMessageContent();
 
-        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', { selector: Reflection.resolve('channelTextArea', 'emojiButton').selector });
+        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea');
         this.patchChannelTextArea(ChannelTextArea);
         this.patchChannelTextAreaSubmit(ChannelTextArea);
         ChannelTextArea.forceUpdateAll();
@@ -236,11 +236,11 @@ export default new class E2EE extends BuiltinModule {
     }
 
     async patchMessageContent() {
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector }, m => m.defaultProps && m.defaultProps.hasOwnProperty('disableButtons'));
+        const MessageContent = await ReactComponents.getComponent('MessageContent');
         this.patch(MessageContent.component.prototype, 'render', this.beforeRenderMessageContent, 'before');
         this.patch(MessageContent.component.prototype, 'render', this.afterRenderMessageContent);
 
-        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: Reflection.resolve('imageWrapper').selector });
+        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper');
         this.patch(ImageWrapper.component.prototype, 'render', this.beforeRenderImageWrapper, 'before');
     }
 

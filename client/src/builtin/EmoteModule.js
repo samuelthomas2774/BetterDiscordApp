@@ -218,7 +218,7 @@ export default new class EmoteModule extends BuiltinModule {
     async applyPatches() {
         this.patchMessageContent();
         this.patchSendAndEdit();
-        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: Reflection.resolve('imageWrapper').selector });
+        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper');
         this.patch(ImageWrapper.component.prototype, 'render', this.beforeRenderImageWrapper, 'before');
     }
 
@@ -226,7 +226,7 @@ export default new class EmoteModule extends BuiltinModule {
      * Patches MessageContent render method
      */
     async patchMessageContent() {
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector }, m => m.defaultProps && m.defaultProps.hasOwnProperty('disableButtons'));
+        const MessageContent = await ReactComponents.getComponent('MessageContent');
         this.childPatch(MessageContent.component.prototype, 'render', ['props', 'children'], this.afterRenderMessageContent);
         MessageContent.forceUpdateAll();
     }

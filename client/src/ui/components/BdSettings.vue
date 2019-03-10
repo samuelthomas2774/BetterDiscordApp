@@ -16,6 +16,15 @@
                     <MiClose size="17"/>
                     <span class="bd-xText">ESC</span>
                 </div>
+
+                <div v-if="nativeModuleErrorCount" class="bd-sidebarMessage bd-err" @click="showNativeModuleErrors">
+                    <MiError size="20" />
+                    <div>
+                        <strong>{{ nativeModuleErrorCount }} native module{{ nativeModuleErrorCount !== 1 ? 's' : '' }} failed to load.</strong>
+                        Some features will be unavailable.
+                    </div>
+                </div>
+
                 <template v-for="(category, text) in sidebar">
                     <SidebarItem :item="{text, type: 'header'}" />
                     <SidebarItem v-for="i in category" :key="i.id" :item="i" :active="item && i.id === item.id" @click="itemOnClick(i.id)" />
@@ -70,7 +79,7 @@
     import { shell } from 'electron';
     import { SidebarView, Sidebar, SidebarItem, ContentColumn } from './sidebar';
     import { SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView, SuperSecretView } from './bd';
-    import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle } from './common';
+    import { SvgX, MiGithubCircle, MiWeb, MiClose, MiTwitterCircle, MiError } from './common';
 
     export default {
         data() {
@@ -89,7 +98,7 @@
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
             SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView, SuperSecretView,
-            MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
+            MiGithubCircle, MiWeb, MiClose, MiTwitterCircle, MiError
         },
         computed: {
             sidebar() {
@@ -103,6 +112,9 @@
             },
             versionString() {
                 return Globals.version;
+            },
+            nativeModuleErrorCount() {
+                return Globals.nativeModuleErrorCount;
             }
         },
         methods: {
@@ -126,6 +138,9 @@
             },
             openTwitter() {
                 shell.openExternal('https://twitter.com/Jiiksi');
+            },
+            showNativeModuleErrors() {
+                Events.emit('show-native-module-errors');
             }
         },
         watch: {

@@ -186,6 +186,7 @@ export class ReactComponents {
     static get unknownComponents() { return this._unknownComponents || (this._unknownComponents = []) }
     static get listeners() { return this._listeners || (this._listeners = []) }
     static get nameSetters() { return this._nameSetters || (this._nameSetters = []) }
+    static get componentAliases() { return this._componentAliases || (this._componentAliases = []) }
 
     static get ReactComponent() { return ReactComponent }
 
@@ -222,6 +223,8 @@ export class ReactComponents {
      * @return {Promise => ReactComponent}
      */
     static async getComponent(name, important, filter) {
+        name = this.getComponentName(name);
+
         const have = this.components.find(c => c.id === name);
         if (have) return have;
 
@@ -239,7 +242,13 @@ export class ReactComponents {
                 let component, reflect;
                 for (const element of elements) {
                     reflect = Reflection.DOM(element);
-                    component = filter ? reflect.components.find(filter) : reflect.component;
+                    component = filter ? reflect.components.find(component => {
+                        try {
+                            return filter.call(undefined, component);
+                        } catch (err) {
+                            return false;
+                        }
+                    }) : reflect.component;
                     if (component) break;
                 }
 
@@ -274,6 +283,19 @@ export class ReactComponents {
         return new Promise(resolve => {
             listener.listeners.push(resolve);
         });
+    }
+
+    static getComponentName(name) {
+        const resolvedAliases = [];
+
+        while (this.componentAliases[name]) {
+            resolvedAliases.push(name);
+            name = this.componentAliases[name];
+
+            if (resolvedAliases.includes(name)) break;
+        }
+
+        return name;
     }
 
     static setName(name, filter) {
@@ -370,6 +392,8 @@ export class ReactAutoPatcher {
     }
 
     static async patchChannelMember() {
+        ReactComponents.componentAliases.ChannelMember = 'MemberListItem';
+
         const { selector } = Reflection.resolve('member', 'memberInner', 'activity');
         this.ChannelMember = await ReactComponents.getComponent('ChannelMember', {selector}, m => m.prototype.renderActivity);
 
@@ -386,7 +410,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchGuild() {
-        const selector = `div.${Reflection.resolve('guild', 'guildsWrapper').className}:not(:first-child)`;
+        const selector = `div.${Reflection.resolve('container', 'guildIcon', 'selected', 'unread').className}:not(:first-child)`;
         this.Guild = await ReactComponents.getComponent('Guild', {selector}, m => m.prototype.renderBadge);
 
         this.unpatchGuild = MonkeyPatch('BD:ReactComponents', this.Guild.component.prototype).after('render', (component, args, retVal) => {
@@ -403,7 +427,7 @@ export class ReactAutoPatcher {
      * The Channel component contains the header, message scroller, message form and member list.
      */
     static async patchChannel() {
-        const selector = '.chat';
+        const { selector } = Reflection.resolve('chat', 'title', 'channelName');
         this.Channel = await ReactComponents.getComponent('Channel', {selector});
 
         this.unpatchChannel = MonkeyPatch('BD:ReactComponents', this.Channel.component.prototype).after('render', (component, args, retVal) => {
@@ -423,6 +447,8 @@ export class ReactAutoPatcher {
      * The GuildTextChannel component represents a text channel in the guild channel list.
      */
     static async patchGuildTextChannel() {
+        ReactComponents.componentAliases.GuildTextChannel = 'TextChannel';
+
         const { selector } = Reflection.resolve('containerDefault', 'actionIcon');
         this.GuildTextChannel = await ReactComponents.getComponent('GuildTextChannel', {selector}, c => c.prototype.renderMentionBadge);
 
@@ -435,6 +461,8 @@ export class ReactAutoPatcher {
      * The GuildVoiceChannel component represents a voice channel in the guild channel list.
      */
     static async patchGuildVoiceChannel() {
+        ReactComponents.componentAliases.GuildVoiceChannel = 'VoiceChannel';
+
         const { selector } = Reflection.resolve('containerDefault', 'actionIcon');
         this.GuildVoiceChannel = await ReactComponents.getComponent('GuildVoiceChannel', {selector}, c => c.prototype.handleVoiceConnect);
 
@@ -447,7 +475,9 @@ export class ReactAutoPatcher {
      * The DirectMessage component represents a channel in the direct messages list.
      */
     static async patchDirectMessage() {
-        const selector = '.channel.private';
+        ReactComponents.componentAliases.DirectMessage = 'PrivateChannel';
+
+        const { selector } = Reflection.resolve('channel', 'avatar', 'name');
         this.DirectMessage = await ReactComponents.getComponent('DirectMessage', {selector}, c => c.prototype.renderAvatar);
 
         this.unpatchDirectMessage = MonkeyPatch('BD:ReactComponents', this.DirectMessage.component.prototype).after('render', this._afterChannelRender);
@@ -469,15 +499,18 @@ export class ReactAutoPatcher {
     }
 
     static async patchUserProfileModal() {
+        ReactComponents.componentAliases.UserProfileModal = 'UserProfileBody';
+
         const { selector } = Reflection.resolve('root', 'topSectionNormal');
-        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', {selector}, Filters.byPrototypeFields(['renderHeader', 'renderBadges']));
+        this.UserProfileModal = await ReactComponents.getComponent('UserProfileModal', {selector}, c => c.prototype.renderHeader && c.prototype.renderBadges);
 
         this.unpatchUserProfileModal = MonkeyPatch('BD:ReactComponents', this.UserProfileModal.component.prototype).after('render', (component, args, retVal) => {
+            const root = retVal.props.children[0] || retVal.props.children;
             const { user } = component.props;
             if (!user) return;
-            retVal.props['data-user-id'] = user.id;
-            if (user.bot) retVal.props.className += ' bd-isBot';
-            if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
+            root.props['data-user-id'] = user.id;
+            if (user.bot) root.props.className += ' bd-isBot';
+            if (user.id === DiscordApi.currentUser.id) root.props.className += ' bd-isCurrentUser';
         });
 
         this.UserProfileModal.forceUpdateAll();
@@ -485,18 +518,20 @@ export class ReactAutoPatcher {
 
     static async patchUserPopout() {
         const { selector } = Reflection.resolve('userPopout', 'headerNormal');
-        this.UserPopout = await ReactComponents.getComponent('UserPopout', {selector});
+        this.UserPopout = await ReactComponents.getComponent('UserPopout', {selector}, c => c.prototype.renderHeader);
 
         this.unpatchUserPopout = MonkeyPatch('BD:ReactComponents', this.UserPopout.component.prototype).after('render', (component, args, retVal) => {
+            Logger.log('ReactComponents', ['Rendering UserPopout', component, args, retVal]);
+                const root = retVal.props.children[0] || retVal.props.children;
             const { user, guild, guildMember } = component.props;
             if (!user) return;
-            retVal.props['data-user-id'] = user.id;
-            if (user.bot) retVal.props.className += ' bd-isBot';
-            if (user.id === DiscordApi.currentUser.id) retVal.props.className += ' bd-isCurrentUser';
-            if (guild) retVal.props['data-guild-id'] = guild.id;
-            if (guild && user.id === guild.ownerId) retVal.props.className += ' bd-isGuildOwner';
-            if (guild && guildMember) retVal.props.className += ' bd-isGuildMember';
-            if (guildMember && guildMember.roles.length) retVal.props.className += ' bd-hasRoles';
+            root.props['data-user-id'] = user.id;
+            if (user.bot) root.props.className += ' bd-isBot';
+            if (user.id === DiscordApi.currentUser.id) root.props.className += ' bd-isCurrentUser';
+            if (guild) root.props['data-guild-id'] = guild.id;
+            if (guild && user.id === guild.ownerId) root.props.className += ' bd-isGuildOwner';
+            if (guild && guildMember) root.props.className += ' bd-isGuildMember';
+            if (guildMember && guildMember.roles.length) root.props.className += ' bd-hasRoles';
         });
 
         this.UserPopout.forceUpdateAll();

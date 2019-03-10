@@ -220,8 +220,10 @@ export default new class EmoteModule extends BuiltinModule {
     async applyPatches() {
         this.patchMessageContent();
         this.patchSendAndEdit();
-        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper');
-        this.patch(ImageWrapper.component.prototype, 'render', this.beforeRenderImageWrapper, 'before');
+
+        const MessageAccessories = await ReactComponents.getComponent('MessageAccessories');
+        this.patch(MessageAccessories.component.prototype, 'render', this.afterRenderMessageAccessories, 'after');
+        MessageAccessories.forceUpdateAll();
     }
 
     /**
@@ -258,10 +260,12 @@ export default new class EmoteModule extends BuiltinModule {
     /**
      * Handle send message
      */
-    async handleSendMessage(component, args, orig) {
+    async handleSendMessage(MessageActions, args, orig) {
         if (!args.length) return orig(...args);
         const { content } = args[1];
         if (!content) return orig(...args);
+
+        Logger.log('EmoteModule', ['Sending message', MessageActions, args, orig]);
 
         const emoteAsImage = Settings.getSetting('emotes', 'default', 'emoteasimage').value &&
             (DiscordApi.currentChannel.type === 'DM' || DiscordApi.currentChannel.checkPermissions(DiscordApi.modules.DiscordPermissions.ATTACH_FILES));
@@ -273,7 +277,7 @@ export default new class EmoteModule extends BuiltinModule {
                     const emote = this.findByName(isEmote[1], true);
                     if (!emote) return word;
                     this.addToMostUsed(emote);
-                    return emote ? `:${isEmote[1]}:` : word;
+                    return emote ? `;${isEmote[1]};` : word;
                 }
                 return word;
             }).join(' ');
@@ -307,23 +311,29 @@ export default new class EmoteModule extends BuiltinModule {
         if (!content) return orig(...args);
         args[2].content = args[2].content.split(' ').map(word => {
             const isEmote = /;(.*?);/g.exec(word);
-            return isEmote ? `:${isEmote[1]}:` : word;
+            return isEmote ? `;${isEmote[1]};` : word;
         }).join(' ');
         return orig(...args);
     }
 
     /**
-     * Handle imagewrapper render
+     * Handle MessageAccessories render
      */
-    beforeRenderImageWrapper(component, args, retVal) {
-        if (!component.props || !component.props.src) return;
+    afterRenderMessageAccessories(component, args, retVal) {
+        Logger.log('Rendering emote MessageAccessories', [component, args, retVal]);
 
-        const src = component.props.original || component.props.src.split('?')[0];
-        if (!src || !src.includes('.bdemote.')) return;
-        const emoteName = src.split('/').pop().split('.')[0];
-        const emote = this.findByName(emoteName);
+        if (!component.props || !component.props.message) return;
+        if (!component.props.message.attachments || component.props.message.attachments.length !== 1) return;
+
+        const filename = component.props.message.attachments[0].filename;
+        const match = filename.match(/([^/]*)\.bdemote\.(gif|png)$/i);
+        if (!match) return;
+
+        const emote = this.findByName(match[1]);
         if (!emote) return;
-        retVal.props.children = emote.render();
+
+        emote.jumboable = true;
+        retVal.props.children[2] = emote.render();
     }
 
     /**
@@ -348,7 +358,7 @@ export default new class EmoteModule extends BuiltinModule {
                 continue;
             }
 
-            if (!/:(\w+):/g.test(child)) {
+            if (!/;(\w+);/g.test(child)) {
                 newMarkup.push(child);
                 continue;
             }
@@ -357,7 +367,7 @@ export default new class EmoteModule extends BuiltinModule {
 
             let s = '';
             for (const word of words) {
-                const isemote = /:(.*?):/g.exec(word);
+                const isemote = /;(.*?);/g.exec(word);
                 if (!isemote) {
                     s += word;
                     continue;

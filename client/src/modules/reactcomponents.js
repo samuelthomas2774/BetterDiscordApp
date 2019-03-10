@@ -378,6 +378,11 @@ export class ReactAutoPatcher {
         this.MessageContent = await ReactComponents.getComponent('MessageContent', {selector}, c => c.defaultProps && c.defaultProps.hasOwnProperty('disableButtons'));
     }
 
+    static async patchMessageAccessories() {
+        const { selector } = Reflection.resolve('container', 'containerCozy', 'embedWrapper');
+        this.MessageAccessories = await ReactComponents.getComponent('MessageAccessories', {selector});
+    }
+
     static async patchMessageGroup() {
         const { selector } = Reflection.resolve('container', 'message', 'messageCozy');
         this.MessageGroup = await ReactComponents.getComponent('MessageGroup', {selector});

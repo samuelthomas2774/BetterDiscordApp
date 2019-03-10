@@ -13,6 +13,7 @@ import Security from './security';
 import Reflection from './reflection';
 import DiscordApi from './discordapi';
 import ThemeManager from './thememanager';
+import { MonkeyPatch } from './patcher';
 import { DOM } from 'ui';
 
 export default class PackageInstaller {
@@ -132,39 +133,51 @@ export default class PackageInstaller {
         }
     }
 
+    static async handleDrop(stateNode, e, original) {
+        if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return original && original.call(stateNode, e);
+
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        if (stateNode) stateNode.clearDragging();
+
+        const currentChannel = DiscordApi.currentChannel;
+        const canUpload = currentChannel ?
+            currentChannel.checkPermissions(Reflection.modules.DiscordConstants.Permissions.SEND_MESSAGES) &&
+            currentChannel.checkPermissions(Reflection.modules.DiscordConstants.Permissions.ATTACH_FILES) : false;
+
+        const files = Array.from(e.dataTransfer.files).slice(0);
+        const actionCode = await this.dragAndDropHandler(e.dataTransfer.files[0].path, canUpload);
+
+        if (actionCode === 0 && stateNode) stateNode.promptToUpload(files, currentChannel.id, true, !e.shiftKey);
+    }
+
     /**
      * Patches Discord upload area for .bd files
      */
     static async uploadAreaPatch(UploadArea) {
-        const reflect = Reflection.DOM(UploadArea.important.selector);
-        const stateNode = reflect.getComponentStateNode(UploadArea);
-
-        const callback = async function (e) {
-            if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return;
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            stateNode.clearDragging();
-            const currentChannel = DiscordApi.currentChannel;
-            const canUpload = currentChannel ? currentChannel.checkPermissions(Reflection.modules.DiscordConstants.Permissions.ATTACH_FILES) : false;
-            const files = Array.from(e.dataTransfer.files).slice(0);
-            const actionCode = await PackageInstaller.dragAndDropHandler(e.dataTransfer.files[0].path, canUpload);
-            if (actionCode === 0) stateNode.promptToUpload(files, currentChannel.id, true, !e.shiftKey);
-        };
-
         // Add a listener to root for when not in a channel
         const root = DOM.getElement('#app-mount');
-        root.addEventListener('drop', callback);
+        const rootHandleDrop = this.handleDrop.bind(this, undefined);
+        root.addEventListener('drop', rootHandleDrop);
 
-        // Remove their handler, add ours, then read theirs to give ours priority to stop theirs when we get a .bd file.
-        reflect.element.removeEventListener('drop', stateNode.handleDrop);
-        reflect.element.addEventListener('drop', callback);
-        reflect.element.addEventListener('drop', stateNode.handleDrop);
+        const unpatchUploadAreaHandleDrop = MonkeyPatch('BD:ReactComponents', UploadArea.component.prototype).instead('handleDrop', (component, [e], original) => this.handleDrop(component, e, original));
 
-        this.unpatchUploadArea = function () {
-            reflect.element.removeEventListener('drop', callback);
-            root.removeEventListener('drop', callback);
+        this.unpatchUploadArea = () => {
+            unpatchUploadAreaHandleDrop();
+            root.removeEventListener('drop', rootHandleDrop);
+            this.unpatchUploadArea = undefined;
         };
+
+        for (const element of document.querySelectorAll(UploadArea.important.selector)) {
+            const stateNode = Reflection.DOM(element).getComponentStateNode(UploadArea);
+
+            element.removeEventListener('drop', stateNode.handleDrop);
+            stateNode.handleDrop = UploadArea.component.prototype.handleDrop.bind(stateNode);
+            element.addEventListener('drop', stateNode.handleDrop);
+
+            stateNode.forceUpdate();
+        }
     }
 
 }

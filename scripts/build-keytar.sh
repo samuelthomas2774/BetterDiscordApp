@@ -4,9 +4,10 @@ PLATFORM="$1"
 ARCH="$2"
 NODE_API_VERSION="$3"
 ELECTRON_VERSION="$4"
+KEYTAR_VERSION="`node -p 'require("keytar/package").version'`"
 ELECTRON_URL="https://atom.io/download/electron"
 
-DIRECTORY="release-tmp/keytar.node/keytar-4.3.0"
+DIRECTORY="release-tmp/keytar.node/keytar-$KEYTAR_VERSION"
 FILENAME="$PLATFORM-$ARCH-$NODE_API_VERSION.node"
 
 if [ `node -p 'process.platform'` != "$PLATFORM" ]; then

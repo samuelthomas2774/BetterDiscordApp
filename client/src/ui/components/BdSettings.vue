@@ -20,7 +20,6 @@
                     <SidebarItem :item="{text, type: 'header'}" />
                     <SidebarItem v-for="i in category" :key="i.id" :item="i" :active="item && i.id === item.id" @click="itemOnClick(i.id)" />
                 </template>
-                <SidebarItem v-if="superSecretMenu" :item="{ _type: 'button', text: 'Super Secret' }" :active="superSecretMenuActive" @click="itemOnClick('superSecretMenu')"/>
             </Sidebar>
 
             <div slot="sidebarfooter" class="bd-info">
@@ -38,8 +37,7 @@
 
             <ContentColumn slot="content">
                 <transition name="bd-contentcolumn" @before-enter="animating++" @after-enter="animating--" @enter-cancelled="animating--" @before-leave="animating++" @after-leave="animating--" @leave-cancelled="animating--">
-                    <SuperSecretView v-if="superSecretMenuActive"/>
-                    <div v-else-if="item" :key="item.id">
+                    <div v-if="item" :key="item.id">
                         <template v-if="item.component">
                             <component :is="item.component" :SettingsWrapper="SettingsWrapper" />
                         </template>
@@ -80,15 +78,13 @@
                 items: BdMenuItems.items,
                 Settings,
                 SettingsWrapper,
-                openMenuHandler: null,
-                superSecretMenu: false,
-                superSecretMenuActive: false
+                openMenuHandler: null
             };
         },
         props: ['active'],
         components: {
             SidebarView, Sidebar, SidebarItem, ContentColumn,
-            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView, SuperSecretView,
+            SettingsWrapper, SettingsPanel, CssEditorView, PluginsView, ThemesView, UpdaterView, ConnectivityView,
             MiGithubCircle, MiWeb, MiClose, MiTwitterCircle
         },
         computed: {
@@ -107,12 +103,6 @@
         },
         methods: {
             itemOnClick(id) {
-                if (id === 'superSecretMenu') {
-                    this.item = 'supersecretmenu';
-                    this.superSecretMenuActive = true;
-                    return;
-                }
-                this.superSecretMenuActive = false;
                 this.item = this.items.find(item => item.id === id);
             },
             closeContent() {
@@ -136,9 +126,12 @@
         },
         created() {
             Events.on('bd-open-menu', this.openMenuHandler = item => item && this.itemOnClick(this.items.find(i => i === item || i.id === item || i.contentid === item || i.set === item).id));
+
             try {
                 const currentUser = Reflection.module.byName('UserStore').getCurrentUser();
-                this.superSecretMenu = ['81388395867156480', '98003542823944192', '249746236008169473', '284056145272766465', '478559353516064769'].includes(currentUser.id)
+                if (['81388395867156480', '98003542823944192', '249746236008169473', '284056145272766465', '478559353516064769'].includes(currentUser.id)) {
+                    BdMenuItems.addVueComponent('BD Devs', 'Super Secret', SuperSecretView);
+                }
             } catch (err) {}
         },
         destroyed() {

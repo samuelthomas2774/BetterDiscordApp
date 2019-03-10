@@ -22,10 +22,10 @@ export default class BuiltinModule {
         this.patch = this.patch.bind(this);
     }
 
-    init() {
+    async init() {
         this.setting.on('setting-updated', this._settingUpdated);
         if (this.setting.value) {
-            if (this.enabled) this.enabled();
+            if (this.enabled) await this.enabled();
             if (this.applyPatches) this.applyPatches();
         }
     }
@@ -38,10 +38,10 @@ export default class BuiltinModule {
         return Patcher.getPatchesByCaller(`BD:${this.moduleName}`);
     }
 
-    _settingUpdated(e) {
+    async _settingUpdated(e) {
         const { value } = e;
         if (value === true) {
-            if (this.enabled) this.enabled(e);
+            if (this.enabled) await this.enabled(e);
             if (this.applyPatches) this.applyPatches();
             return;
         }

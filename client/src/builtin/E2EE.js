@@ -239,9 +239,11 @@ export default new class E2EE extends BuiltinModule {
         const MessageContent = await ReactComponents.getComponent('MessageContent');
         this.patch(MessageContent.component.prototype, 'render', this.beforeRenderMessageContent, 'before');
         this.patch(MessageContent.component.prototype, 'render', this.afterRenderMessageContent);
+        MessageContent.forceUpdateAll();
 
         const ImageWrapper = await ReactComponents.getComponent('ImageWrapper');
         this.patch(ImageWrapper.component.prototype, 'render', this.beforeRenderImageWrapper, 'before');
+        ImageWrapper.forceUpdateAll();
     }
 
     beforeRenderMessageContent(component) {

@@ -397,8 +397,10 @@ export class ReactAutoPatcher {
     }
 
     static async patchImageWrapper() {
+        ReactComponents.componentAliases.ImageWrapper = 'Image';
+
         const { selector } = Reflection.resolve('imageWrapper');
-        this.ImageWrapper = await ReactComponents.getComponent('ImageWrapper', {selector});
+        this.ImageWrapper = await ReactComponents.getComponent('ImageWrapper', {selector}, c => typeof c.defaultProps.children === 'function');
     }
 
     static async patchChannelMember() {
@@ -541,8 +543,7 @@ export class ReactAutoPatcher {
         this.UserPopout = await ReactComponents.getComponent('UserPopout', {selector}, c => c.prototype.renderHeader);
 
         this.unpatchUserPopout = MonkeyPatch('BD:ReactComponents', this.UserPopout.component.prototype).after('render', (component, args, retVal) => {
-            Logger.log('ReactComponents', ['Rendering UserPopout', component, args, retVal]);
-                const root = retVal.props.children[0] || retVal.props.children;
+            const root = retVal.props.children[0] || retVal.props.children;
             const { user, guild, guildMember } = component.props;
             if (!user) return;
             root.props['data-user-id'] = user.id;

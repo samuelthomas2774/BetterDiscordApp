@@ -12,7 +12,7 @@ import BuiltinModule from './BuiltinModule';
 import path from 'path';
 import { request } from 'vendor';
 
-import { Utils, FileUtils } from 'common';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { DiscordApi, Settings, Globals, Reflection, ReactComponents, Database } from 'modules';
 import { DiscordContextMenu } from 'ui';
 
@@ -131,6 +131,8 @@ export default new class EmoteModule extends BuiltinModule {
 
             this.database.set(id, { id: emote.value.id || value, type });
         }
+
+        Logger.log('EmoteModule', ['Loaded emote database']);
     }
 
     async loadUserData() {

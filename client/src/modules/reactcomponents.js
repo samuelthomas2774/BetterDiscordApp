@@ -378,6 +378,11 @@ export class ReactAutoPatcher {
         this.MessageContent = await ReactComponents.getComponent('MessageContent', {selector}, c => c.defaultProps && c.defaultProps.hasOwnProperty('disableButtons'));
     }
 
+    static async patchSpoiler() {
+        const { selector } = Reflection.resolve('spoilerText', 'spoilerContainer');
+        this.Spoiler = await ReactComponents.getComponent('Spoiler', {selector}, c => c.prototype.renderSpoilerText);
+    }
+
     static async patchMessageAccessories() {
         const { selector } = Reflection.resolve('container', 'containerCozy', 'embedWrapper');
         this.MessageAccessories = await ReactComponents.getComponent('MessageAccessories', {selector});

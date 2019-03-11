@@ -75,12 +75,14 @@ export default class BuiltinModule {
      */
     patch(module, fnName, cb, when = 'after') {
         if (!['before', 'after', 'instead'].includes(when)) when = 'after';
-        Patch(`BD:${this.moduleName}`, module)[when](fnName, cb.bind(this));
+        return Patch(`BD:${this.moduleName}`, module)[when](fnName, cb.bind(this));
     }
 
     childPatch(module, fnName, child, cb, when = 'after') {
+        const last = child.pop();
+
         this.patch(module, fnName, (component, args, retVal) => {
-            this.patch(retVal[child[0]], child[1], cb, when);
+            const unpatch = this.patch(child.reduce((obj, key) => obj[key], retVal), last, function() {unpatch(); return cb.apply(this, arguments);}, when);
         });
     }
 

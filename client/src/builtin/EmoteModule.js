@@ -220,6 +220,7 @@ export default new class EmoteModule extends BuiltinModule {
     async applyPatches() {
         this.patchMessageContent();
         this.patchSendAndEdit();
+        this.patchSpoiler();
 
         const MessageAccessories = await ReactComponents.getComponent('MessageAccessories');
         this.patch(MessageAccessories.component.prototype, 'render', this.afterRenderMessageAccessories, 'after');
@@ -242,6 +243,22 @@ export default new class EmoteModule extends BuiltinModule {
         const { MessageActions } = Reflection.modules;
         this.patch(MessageActions, 'sendMessage', this.handleSendMessage, 'instead');
         this.patch(MessageActions, 'editMessage', this.handleEditMessage, 'instead');
+    }
+
+    async patchSpoiler() {
+        const Spoiler = await ReactComponents.getComponent('Spoiler');
+        this.childPatch(Spoiler.component.prototype, 'render', ['props', 'children', 'props', 'children'], this.afterRenderSpoiler);
+        Spoiler.forceUpdateAll();
+    }
+
+    afterRenderSpoiler(component, args, retVal) {
+        const markup = Utils.findInReactTree(retVal, filter =>
+            filter &&
+            filter.className &&
+            filter.className.includes('inlineContent'));
+        if (!markup) return;
+
+        markup.children = this.processMarkup(markup.children);
     }
 
     /**

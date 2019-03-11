@@ -320,8 +320,6 @@ export default new class EmoteModule extends BuiltinModule {
      * Handle MessageAccessories render
      */
     afterRenderMessageAccessories(component, args, retVal) {
-        Logger.log('Rendering emote MessageAccessories', [component, args, retVal]);
-
         if (!component.props || !component.props.message) return;
         if (!component.props.message.attachments || component.props.message.attachments.length !== 1) return;
 

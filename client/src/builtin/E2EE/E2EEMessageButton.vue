@@ -17,7 +17,7 @@
 </template>
 
 <script>
-    import { MiLock } from '../ui/components/common/MaterialIcon';
+    import { MiLock } from 'commoncomponents';
 
     export default {
         components: {

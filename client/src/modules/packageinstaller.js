@@ -6,14 +6,14 @@ import rimraf from 'rimraf';
 
 import { request } from 'vendor';
 import { Modals } from 'ui';
-import { Utils } from 'common';
+import { Utils, FileUtils } from 'common';
 import PluginManager from './pluginmanager';
 import Globals from './globals';
 import Security from './security';
-import { ReactComponents } from './reactcomponents';
 import Reflection from './reflection';
 import DiscordApi from './discordapi';
 import ThemeManager from './thememanager';
+import { MonkeyPatch } from './patcher';
 import { DOM } from 'ui';
 
 export default class PackageInstaller {
@@ -84,15 +84,10 @@ export default class PackageInstaller {
 
             await oldContent.unload(true);
 
-            if (oldContent.packed && oldContent.packed.packageName !== nameOrId) {
-                rimraf(oldContent.packed.packagePath, err => {
-                    if (err) throw err;
-                });
-            } else {
-                rimraf(oldContent.contentPath, err => {
-                    if (err) throw err;
-                });
+            if (oldContent.packed && oldContent.packageName !== nameOrId) {
+                await FileUtils.deleteFile(oldContent.packagePath).catch(err => null);
             }
+            await FileUtils.recursiveDeleteDirectory(oldContent.contentPath).catch(err => null);
 
             return manager.preloadPackedContent(outputName);
         } catch (err) {
@@ -133,41 +128,51 @@ export default class PackageInstaller {
         }
     }
 
+    static async handleDrop(stateNode, e, original) {
+        if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return original && original.call(stateNode, e);
+
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        if (stateNode) stateNode.clearDragging();
+
+        const currentChannel = DiscordApi.currentChannel;
+        const canUpload = currentChannel ?
+            currentChannel.checkPermissions(Reflection.modules.DiscordConstants.Permissions.SEND_MESSAGES) &&
+            currentChannel.checkPermissions(Reflection.modules.DiscordConstants.Permissions.ATTACH_FILES) : false;
+
+        const files = Array.from(e.dataTransfer.files).slice(0);
+        const actionCode = await this.dragAndDropHandler(e.dataTransfer.files[0].path, canUpload);
+
+        if (actionCode === 0 && stateNode) stateNode.promptToUpload(files, currentChannel.id, true, !e.shiftKey);
+    }
+
     /**
      * Patches Discord upload area for .bd files
      */
-    static async uploadAreaPatch() {
-        const { selector } = Reflection.resolve('uploadArea');
-        this.UploadArea = await ReactComponents.getComponent('UploadArea', { selector });
-
-        const reflect = Reflection.DOM(selector);
-        const stateNode = reflect.getComponentStateNode(this.UploadArea);
-        const callback = async function (e) {
-            if (!e.dataTransfer.files.length || !e.dataTransfer.files[0].name.endsWith('.bd')) return;
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            stateNode.clearDragging();
-            const currentChannel = DiscordApi.currentChannel;
-            const canUpload = currentChannel ? currentChannel.checkPermissions(Reflection.modules.DiscordConstants.Permissions.ATTACH_FILES) : false;
-            const files = Array.from(e.dataTransfer.files).slice(0);
-            const actionCode = await PackageInstaller.dragAndDropHandler(e.dataTransfer.files[0].path, canUpload);
-            if (actionCode === 0) stateNode.promptToUpload(files, currentChannel.id, true, !e.shiftKey);
-        };
-
+    static async uploadAreaPatch(UploadArea) {
         // Add a listener to root for when not in a channel
         const root = DOM.getElement('#app-mount');
-        root.addEventListener('drop', callback);
+        const rootHandleDrop = this.handleDrop.bind(this, undefined);
+        root.addEventListener('drop', rootHandleDrop);
 
-        // Remove their handler, add ours, then read theirs to give ours priority to stop theirs when we get a .bd file.
-        reflect.element.removeEventListener('drop', stateNode.handleDrop);
-        reflect.element.addEventListener('drop', callback);
-        reflect.element.addEventListener('drop', stateNode.handleDrop);
+        const unpatchUploadAreaHandleDrop = MonkeyPatch('BD:ReactComponents', UploadArea.component.prototype).instead('handleDrop', (component, [e], original) => this.handleDrop(component, e, original));
 
-        this.unpatchUploadArea = function () {
-            reflect.element.removeEventListener('drop', callback);
-            root.removeEventListener('drop', callback);
+        this.unpatchUploadArea = () => {
+            unpatchUploadAreaHandleDrop();
+            root.removeEventListener('drop', rootHandleDrop);
+            this.unpatchUploadArea = undefined;
         };
+
+        for (const element of document.querySelectorAll(UploadArea.important.selector)) {
+            const stateNode = Reflection.DOM(element).getComponentStateNode(UploadArea);
+
+            element.removeEventListener('drop', stateNode.handleDrop);
+            stateNode.handleDrop = UploadArea.component.prototype.handleDrop.bind(stateNode);
+            element.addEventListener('drop', stateNode.handleDrop);
+
+            stateNode.forceUpdate();
+        }
     }
 
 }

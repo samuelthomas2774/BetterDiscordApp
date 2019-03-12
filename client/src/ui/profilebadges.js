@@ -87,8 +87,7 @@ export default class extends Module {
     async patchNameTag() {
         if (this.PatchedNameTag) return this.PatchedNameTag;
 
-        const selector = Reflection.resolve('nameTag', 'username', 'discriminator', 'ownerIcon').selector;
-        const NameTag = await ReactComponents.getComponent('NameTag', {selector});
+        const NameTag = await ReactComponents.getComponent('NameTag');
 
         this.PatchedNameTag = class extends NameTag.component {
             render() {

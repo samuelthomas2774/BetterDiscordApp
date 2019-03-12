@@ -10,16 +10,18 @@ span {
     opacity: $spanOpacity2 !important;
 }
 
-.chat .messages-wrapper,
-#friends .friends-table {
+.da-chat .da-messagesWrapper,
+.da-friendsTable {
     background-image: url(map-get($relative-file-test, url));
     background-size: contain;
     background-repeat: no-repeat;
 }
 
-.avatar-large {
-    background-image: url(map-get($avatar, url)) !important;
-    border-radius: $avatarRadius !important;
+@if map-has-key($avatar, url) {
+    .da-avatar > .da-image {
+        background-image: url(map-get($avatar, url)) !important;
+        border-radius: $avatarRadius !important;
+    }
 }
 
 // Can't use a for loop as then we don't get the index

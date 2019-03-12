@@ -36,10 +36,6 @@ export default new class extends Module {
 
     async first() {
         const config = await ClientIPC.send('getConfig');
-        config.paths.push({
-            id: 'tmp',
-            path: path.join(config.paths.find(p => p.id === 'base').path, 'tmp')
-        });
         this.setState({ config });
 
         const nativeModuleErrors = await ClientIPC.getNativeModuleErrors();

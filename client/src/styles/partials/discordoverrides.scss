@@ -27,3 +27,9 @@ body:not(.bd-hideButton) {
 .bd-settingsWrapper.platform-linux {
     transform: none;
 }
+
+// Remove the margin on message attachments with an emote
+.da-containerCozy + .da-containerCozy > * > .bd-emote {
+    margin-top: -8px;
+    margin-bottom: -8px;
+}

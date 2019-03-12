@@ -11,7 +11,7 @@ export default new class Autocomplete {
     }
 
     async init() {
-        this.cta = await ReactComponents.getComponent('ChannelTextArea', { selector: Reflection.resolve('channelTextArea', 'emojiButton').selector });
+        this.cta = await ReactComponents.getComponent('ChannelTextArea');
         MonkeyPatch('BD:Autocomplete', this.cta.component.prototype).after('render', this.channelTextAreaAfterRender.bind(this));
         this.initialized = true;
     }

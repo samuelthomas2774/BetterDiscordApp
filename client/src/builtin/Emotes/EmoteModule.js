@@ -8,20 +8,17 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import BuiltinModule from './BuiltinModule';
+import BuiltinModule from '../BuiltinModule';
 import path from 'path';
 import { request } from 'vendor';
 
-import { Utils, FileUtils } from 'common';
+import { Utils, FileUtils, ClientLogger as Logger } from 'common';
 import { DiscordApi, Settings, Globals, Reflection, ReactComponents, Database } from 'modules';
 import { DiscordContextMenu } from 'ui';
 
 import Emote from './EmoteComponent.js';
-import Autocomplete from '../ui/components/common/Autocomplete.vue';
 
-import GlobalAc from '../ui/autocomplete';
-
-const EMOTE_SOURCES = [
+export const EMOTE_SOURCES = [
     'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0',
     'https://cdn.frankerfacez.com/emoticon/:id/1',
     'https://cdn.betterttv.net/emote/:id/1x'
@@ -131,6 +128,8 @@ export default new class EmoteModule extends BuiltinModule {
 
             this.database.set(id, { id: emote.value.id || value, type });
         }
+
+        Logger.log('EmoteModule', ['Loaded emote database']);
     }
 
     async loadUserData() {
@@ -218,15 +217,18 @@ export default new class EmoteModule extends BuiltinModule {
     async applyPatches() {
         this.patchMessageContent();
         this.patchSendAndEdit();
-        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: Reflection.resolve('imageWrapper').selector });
-        this.patch(ImageWrapper.component.prototype, 'render', this.beforeRenderImageWrapper, 'before');
+        this.patchSpoiler();
+
+        const MessageAccessories = await ReactComponents.getComponent('MessageAccessories');
+        this.patch(MessageAccessories.component.prototype, 'render', this.afterRenderMessageAccessories, 'after');
+        MessageAccessories.forceUpdateAll();
     }
 
     /**
      * Patches MessageContent render method
      */
     async patchMessageContent() {
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector }, m => m.defaultProps && m.defaultProps.hasOwnProperty('disableButtons'));
+        const MessageContent = await ReactComponents.getComponent('MessageContent');
         this.childPatch(MessageContent.component.prototype, 'render', ['props', 'children'], this.afterRenderMessageContent);
         MessageContent.forceUpdateAll();
     }
@@ -240,10 +242,26 @@ export default new class EmoteModule extends BuiltinModule {
         this.patch(MessageActions, 'editMessage', this.handleEditMessage, 'instead');
     }
 
+    async patchSpoiler() {
+        const Spoiler = await ReactComponents.getComponent('Spoiler');
+        this.childPatch(Spoiler.component.prototype, 'render', ['props', 'children', 'props', 'children'], this.afterRenderSpoiler);
+        Spoiler.forceUpdateAll();
+    }
+
+    afterRenderSpoiler(component, _childrenObject, args, retVal) {
+        const markup = Utils.findInReactTree(retVal, filter =>
+            filter &&
+            filter.className &&
+            filter.className.includes('inlineContent'));
+        if (!markup) return;
+
+        markup.children = this.processMarkup(markup.children);
+    }
+
     /**
      * Handle message render
      */
-    afterRenderMessageContent(component, args, retVal) {
+    afterRenderMessageContent(component, _childrenObject, args, retVal) {
         const markup = Utils.findInReactTree(retVal, filter =>
             filter &&
             filter.className &&
@@ -256,10 +274,12 @@ export default new class EmoteModule extends BuiltinModule {
     /**
      * Handle send message
      */
-    async handleSendMessage(component, args, orig) {
+    async handleSendMessage(MessageActions, args, orig) {
         if (!args.length) return orig(...args);
         const { content } = args[1];
         if (!content) return orig(...args);
+
+        Logger.log('EmoteModule', ['Sending message', MessageActions, args, orig]);
 
         const emoteAsImage = Settings.getSetting('emotes', 'default', 'emoteasimage').value &&
             (DiscordApi.currentChannel.type === 'DM' || DiscordApi.currentChannel.checkPermissions(DiscordApi.modules.DiscordPermissions.ATTACH_FILES));
@@ -271,7 +291,7 @@ export default new class EmoteModule extends BuiltinModule {
                     const emote = this.findByName(isEmote[1], true);
                     if (!emote) return word;
                     this.addToMostUsed(emote);
-                    return emote ? `:${isEmote[1]}:` : word;
+                    return emote ? `;${isEmote[1]};` : word;
                 }
                 return word;
             }).join(' ');
@@ -305,23 +325,27 @@ export default new class EmoteModule extends BuiltinModule {
         if (!content) return orig(...args);
         args[2].content = args[2].content.split(' ').map(word => {
             const isEmote = /;(.*?);/g.exec(word);
-            return isEmote ? `:${isEmote[1]}:` : word;
+            return isEmote ? `;${isEmote[1]};` : word;
         }).join(' ');
         return orig(...args);
     }
 
     /**
-     * Handle imagewrapper render
+     * Handle MessageAccessories render
      */
-    beforeRenderImageWrapper(component, args, retVal) {
-        if (!component.props || !component.props.src) return;
+    afterRenderMessageAccessories(component, args, retVal) {
+        if (!component.props || !component.props.message) return;
+        if (!component.props.message.attachments || component.props.message.attachments.length !== 1) return;
 
-        const src = component.props.original || component.props.src.split('?')[0];
-        if (!src || !src.includes('.bdemote.')) return;
-        const emoteName = src.split('/').pop().split('.')[0];
-        const emote = this.findByName(emoteName);
+        const filename = component.props.message.attachments[0].filename;
+        const match = filename.match(/([^/]*)\.bdemote\.(gif|png)$/i);
+        if (!match) return;
+
+        const emote = this.findByName(match[1]);
         if (!emote) return;
-        retVal.props.children = emote.render();
+
+        emote.jumboable = true;
+        retVal.props.children[2] = emote.render();
     }
 
     /**
@@ -339,14 +363,14 @@ export default new class EmoteModule extends BuiltinModule {
         for (const child of markup) {
             if (typeof child !== 'string') {
                 if (typeof child === 'object') {
-                    const isEmoji = Utils.findInReactTree(child, 'emojiName');
-                    if (isEmoji) child.props.children.props.jumboable = jumboable;
+                    const isEmoji = Utils.findInReactTree(child, filter => filter && filter.emojiName);
+                    if (isEmoji) isEmoji.jumboable = jumboable;
                 }
                 newMarkup.push(child);
                 continue;
             }
 
-            if (!/:(\w+):/g.test(child)) {
+            if (!/;(\w+);/g.test(child)) {
                 newMarkup.push(child);
                 continue;
             }
@@ -355,7 +379,7 @@ export default new class EmoteModule extends BuiltinModule {
 
             let s = '';
             for (const word of words) {
-                const isemote = /:(.*?):/g.exec(word);
+                const isemote = /;(.*?);/g.exec(word);
                 if (!isemote) {
                     s += word;
                     continue;

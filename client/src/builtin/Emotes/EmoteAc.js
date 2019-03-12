@@ -9,17 +9,10 @@
 */
 
 import { Settings } from 'modules';
-
-import BuiltinModule from './BuiltinModule';
-import EmoteModule from './EmoteModule';
-import GlobalAc from '../ui/autocomplete';
+import BuiltinModule from '../BuiltinModule';
+import EmoteModule, { EMOTE_SOURCES } from './EmoteModule';
+import GlobalAc from 'autocomplete';
 import { BdContextMenu } from 'ui';
-
-const EMOTE_SOURCES = [
-    'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0',
-    'https://cdn.frankerfacez.com/emoticon/:id/1',
-    'https://cdn.betterttv.net/emote/:id/1x'
-]
 
 export default new class EmoteAc extends BuiltinModule {
 

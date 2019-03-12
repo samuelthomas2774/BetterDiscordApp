@@ -109,20 +109,8 @@ export default class extends ContentManager {
             throw {message: `Plugin ${info.name} did not return a class that extends Plugin.`};
 
         const instance = new plugin({
-            configs, info, main,
-            paths: {
-                contentPath: paths.contentPath,
-                dirName: packed ? packed.packageName : paths.dirName,
-                mainPath: paths.mainPath
-            }
+            configs, info, main, paths
         });
-
-        if (packed) instance.packed = {
-            pkg: packed.pkg,
-            packageName: packed.packageName,
-            packagePath: packed.packagePath,
-            packed: true
-        }; else instance.packed = false;
 
         if (instance.enabled && this.loaded) {
             instance.userConfig.enabled = false;

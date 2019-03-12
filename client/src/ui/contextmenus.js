@@ -9,7 +9,7 @@
 */
 
 import { Utils, ClientLogger as Logger } from 'common';
-import { ReactComponents, Reflection, MonkeyPatch } from 'modules';
+import { Reflection, MonkeyPatch } from 'modules';
 import { VueInjector, Toasts } from 'ui';
 import CMGroup from './components/contextmenu/Group.vue';
 

@@ -84,15 +84,10 @@ export default class PackageInstaller {
 
             await oldContent.unload(true);
 
-            if (oldContent.packed && oldContent.packed.packageName !== nameOrId) {
-                rimraf(oldContent.packed.packagePath, err => {
-                    if (err) throw err;
-                });
-            } else {
-                rimraf(oldContent.contentPath, err => {
-                    if (err) throw err;
-                });
+            if (oldContent.packed && oldContent.packageName !== nameOrId) {
+                await FileUtils.deleteFile(oldContent.packagePath).catch(err => null);
             }
+            await FileUtils.recursiveDeleteDirectory(oldContent.contentPath).catch(err => null);
 
             return manager.preloadPackedContent(outputName);
         } catch (err) {

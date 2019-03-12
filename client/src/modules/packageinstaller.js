@@ -6,7 +6,7 @@ import rimraf from 'rimraf';
 
 import { request } from 'vendor';
 import { Modals } from 'ui';
-import { Utils } from 'common';
+import { Utils, FileUtils } from 'common';
 import PluginManager from './pluginmanager';
 import Globals from './globals';
 import Security from './security';

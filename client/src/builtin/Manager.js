@@ -1,15 +1,19 @@
 import { EmoteModule, EmoteAc } from './Emotes';
-import { default as ReactDevtoolsModule } from './ReactDevtoolsModule';
-import { default as VueDevtoolsModule } from './VueDevToolsModule';
-import { default as TrackingProtection } from './TrackingProtection';
-import { default as E2EE } from './E2EE';
-import { default as ColoredText } from './ColoredText';
-import { default as TwentyFourHour } from './24Hour';
-import { default as KillClyde } from './KillClyde';
-import { default as BlockedMessages } from './BlockedMessages';
-import { default as VoiceDisconnect } from './VoiceDisconnect';
+import ReactDevtoolsModule from './ReactDevtoolsModule';
+import VueDevtoolsModule from './VueDevToolsModule';
+import TrackingProtection from './TrackingProtection';
+import E2EE from './E2EE';
+import ColoredText from './ColoredText';
+import TwentyFourHour from './24Hour';
+import KillClyde from './KillClyde';
+import BlockedMessages from './BlockedMessages';
+import VoiceDisconnect from './VoiceDisconnect';
 
 export default class {
+    static get modules() {
+        return require('./builtin');
+    }
+
     static initAll() {
         EmoteModule.init();
         ReactDevtoolsModule.init();

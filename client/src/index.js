@@ -34,7 +34,7 @@ class BetterDiscord {
             Vendor,
 
             Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi,
-            EmoteModule,
+            BuiltinManager, EmoteModule,
             BdWebApi,
             Connectivity,
             Cache,

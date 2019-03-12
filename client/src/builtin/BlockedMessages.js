@@ -21,7 +21,7 @@ export default new class BlockedMessages extends BuiltinModule {
     async enabled(e) {
         const MessageListComponents = Reflection.module.byProps('BlockedMessageGroup');
         MessageListComponents.OriginalBlockedMessageGroup = MessageListComponents.BlockedMessageGroup;
-        MessageListComponents.BlockedMessageGroup = () => { return null; };
+        MessageListComponents.BlockedMessageGroup = () => null;
         this.cancelBlockedMessages = () => {
             MessageListComponents.BlockedMessageGroup = MessageListComponents.OriginalBlockedMessageGroup;
             delete MessageListComponents.OriginalBlockedMessageGroup;

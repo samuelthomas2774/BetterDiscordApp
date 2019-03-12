@@ -173,9 +173,18 @@ class ReactComponent {
         this.important = important;
     }
 
+    get elements() {
+        if (!this.important || !this.important.selector) return [];
+
+        return document.querySelectorAll(this.important.selector);
+    }
+
+    get stateNodes() {
+        return [...this.elements].map(e => Reflection.DOM(e).getComponentStateNode(this));
+    }
+
     forceUpdateAll() {
-        if (!this.important || !this.important.selector) return;
-        for (const e of document.querySelectorAll(this.important.selector)) {
+        for (const e of this.elements) {
             Reflection.DOM(e).forceUpdate(this);
         }
     }

@@ -39,15 +39,14 @@ export default class BuiltinModule {
     }
 
     async _settingUpdated(e) {
-        const { value } = e;
-        if (value === true) {
+        if (e.value) {
             if (this.enabled) await this.enabled(e);
-            if (this.applyPatches) this.applyPatches();
-            return;
-        }
-        if (value === false) {
-            if (this.disabled) this.disabled(e);
+            if (this.applyPatches) await this.applyPatches();
+            if (this.rerenderPatchedComponents) this.rerenderPatchedComponents();
+        } else {
+            if (this.disabled) await this.disabled(e);
             this.unpatch();
+            if (this.rerenderPatchedComponents) this.rerenderPatchedComponents();
         }
     }
 

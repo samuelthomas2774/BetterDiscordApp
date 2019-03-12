@@ -363,8 +363,8 @@ export default new class EmoteModule extends BuiltinModule {
         for (const child of markup) {
             if (typeof child !== 'string') {
                 if (typeof child === 'object') {
-                    const isEmoji = Utils.findInReactTree(child, 'emojiName');
-                    if (isEmoji) child.props.children.props.jumboable = jumboable;
+                    const isEmoji = Utils.findInReactTree(child, filter => filter && filter.emojiName);
+                    if (isEmoji) isEmoji.jumboable = jumboable;
                 }
                 newMarkup.push(child);
                 continue;

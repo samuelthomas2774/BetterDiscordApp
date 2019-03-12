@@ -45,7 +45,7 @@
     import { E2EE } from 'builtin';
     import { Settings, DiscordApi, Reflection } from 'modules';
     import { Toasts } from 'ui';
-    import { MiLock, MiImagePlus, MiIcVpnKey } from '../ui/components/common/MaterialIcon';
+    import { MiLock, MiImagePlus, MiIcVpnKey } from 'commoncomponents';
 
     export default {
         components: {

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import BuiltinModule from './BuiltinModule';
+import BuiltinModule from '../BuiltinModule';
 import path from 'path';
 import { request } from 'vendor';
 
@@ -17,11 +17,8 @@ import { DiscordApi, Settings, Globals, Reflection, ReactComponents, Database } 
 import { DiscordContextMenu } from 'ui';
 
 import Emote from './EmoteComponent.js';
-import Autocomplete from '../ui/components/common/Autocomplete.vue';
 
-import GlobalAc from '../ui/autocomplete';
-
-const EMOTE_SOURCES = [
+export const EMOTE_SOURCES = [
     'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0',
     'https://cdn.frankerfacez.com/emoticon/:id/1',
     'https://cdn.betterttv.net/emote/:id/1x'

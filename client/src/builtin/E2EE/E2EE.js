@@ -9,7 +9,7 @@
 */
 
 import { Settings, Cache, Events } from 'modules';
-import BuiltinModule from './BuiltinModule';
+import BuiltinModule from '../BuiltinModule';
 import { Reflection, ReactComponents, MonkeyPatch, Patcher, DiscordApi, Security } from 'modules';
 import { VueInjector, Modals, Toasts } from 'ui';
 import { ClientLogger as Logger, ClientIPC } from 'common';

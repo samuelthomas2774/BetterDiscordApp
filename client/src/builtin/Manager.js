@@ -1,4 +1,4 @@
-import { default as EmoteModule } from './EmoteModule';
+import { EmoteModule, EmoteAc } from './Emotes';
 import { default as ReactDevtoolsModule } from './ReactDevtoolsModule';
 import { default as VueDevtoolsModule } from './VueDevToolsModule';
 import { default as TrackingProtection } from './TrackingProtection';
@@ -8,7 +8,6 @@ import { default as TwentyFourHour } from './24Hour';
 import { default as KillClyde } from './KillClyde';
 import { default as BlockedMessages } from './BlockedMessages';
 import { default as VoiceDisconnect } from './VoiceDisconnect';
-import { default as EmoteAc } from './EmoteAc';
 
 export default class {
     static initAll() {

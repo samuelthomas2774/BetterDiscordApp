@@ -1,4 +1,4 @@
-export { default as EmoteModule } from './EmoteModule';
+export { EmoteModule, EmoteAc } from './Emotes';
 export { default as ReactDevtoolsModule } from './ReactDevtoolsModule';
 export { default as VueDevtoolsModule } from './VueDevToolsModule';
 export { default as TrackingProtection } from './TrackingProtection';

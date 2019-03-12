@@ -8,14 +8,9 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import VrWrapper from '../ui/vrwrapper';
+import VrWrapper from '../../ui/vrwrapper';
+import { EMOTE_SOURCES } from '.';
 import EmoteComponent from './EmoteComponent.vue';
-
-const EMOTE_SOURCES = [
-    'https://static-cdn.jtvnw.net/emoticons/v1/:id/1.0',
-    'https://cdn.frankerfacez.com/emoticon/:id/1',
-    'https://cdn.betterttv.net/emote/:id/1x'
-]
 
 export default class Emote extends VrWrapper {
 

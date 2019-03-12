@@ -35,12 +35,16 @@ const TEST_ARGS = () => {
             'client': path.resolve(_basePath, 'client', 'dist'),
             'core': path.resolve(_basePath, 'core', 'dist'),
             'data': path.resolve(_baseDataPath, 'data'),
-            'editor': path.resolve(_basePath, 'editor', 'dist')
+            'editor': path.resolve(_basePath, 'editor', 'dist'),
+            // tmp: path.join(_basePath, 'tmp')
+            tmp: path.join(os.tmpdir(), 'betterdiscord', `${process.getuid()}`)
         }
     }
 }
 const TEST_EDITOR = TESTS && true;
 
+import process from 'process';
+import os from 'os';
 import path from 'path';
 import sass from 'node-sass';
 import { BrowserWindow as OriginalBrowserWindow, dialog, session, shell } from 'electron';

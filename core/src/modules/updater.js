@@ -8,7 +8,6 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-
 import Module from './modulebase';
 import { FileUtils } from './utils';
 import semver from 'semver';

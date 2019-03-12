@@ -22,10 +22,10 @@ export default class BuiltinModule {
         this.patch = this.patch.bind(this);
     }
 
-    init() {
+    async init() {
         this.setting.on('setting-updated', this._settingUpdated);
         if (this.setting.value) {
-            if (this.enabled) this.enabled();
+            if (this.enabled) await this.enabled();
             if (this.applyPatches) this.applyPatches();
         }
     }
@@ -38,16 +38,15 @@ export default class BuiltinModule {
         return Patcher.getPatchesByCaller(`BD:${this.moduleName}`);
     }
 
-    _settingUpdated(e) {
-        const { value } = e;
-        if (value === true) {
-            if (this.enabled) this.enabled(e);
-            if (this.applyPatches) this.applyPatches();
-            return;
-        }
-        if (value === false) {
-            if (this.disabled) this.disabled(e);
+    async _settingUpdated(e) {
+        if (e.value) {
+            if (this.enabled) await this.enabled(e);
+            if (this.applyPatches) await this.applyPatches();
+            if (this.rerenderPatchedComponents) this.rerenderPatchedComponents();
+        } else {
+            if (this.disabled) await this.disabled(e);
             this.unpatch();
+            if (this.rerenderPatchedComponents) this.rerenderPatchedComponents();
         }
     }
 
@@ -75,12 +74,14 @@ export default class BuiltinModule {
      */
     patch(module, fnName, cb, when = 'after') {
         if (!['before', 'after', 'instead'].includes(when)) when = 'after';
-        Patch(`BD:${this.moduleName}`, module)[when](fnName, cb.bind(this));
+        return Patch(`BD:${this.moduleName}`, module)[when](fnName, cb.bind(this));
     }
 
     childPatch(module, fnName, child, cb, when = 'after') {
+        const last = child.pop();
+
         this.patch(module, fnName, (component, args, retVal) => {
-            this.patch(retVal[child[0]], child[1], cb, when);
+            const unpatch = this.patch(child.reduce((obj, key) => obj[key], retVal), last, function(...args) {unpatch(); return cb.call(this, component, ...args);}, when);
         });
     }
 

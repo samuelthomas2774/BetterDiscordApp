@@ -5,7 +5,7 @@
 <script>
     import { ClientLogger as Logger } from 'common';
     import EmoteModule from './EmoteModule';
-    import { MiStar } from '../ui/components/common';
+    import { MiStar } from 'commoncomponents';
 
     export default {
         components: {

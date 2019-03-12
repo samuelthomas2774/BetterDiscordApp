@@ -12,7 +12,7 @@ import BuiltinModule from './BuiltinModule';
 
 import { Reflection } from 'modules';
 
-export default new class E2EE extends BuiltinModule {
+export default new class TrackingProtection extends BuiltinModule {
 
     /* Getters */
     get moduleName() { return 'TrackingProtection' }

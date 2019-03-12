@@ -9,8 +9,8 @@
 */
 
 import { Settings, Cache, Events } from 'modules';
-import BuiltinModule from './BuiltinModule';
-import { Reflection, ReactComponents, MonkeyPatch, Patcher, DiscordApi, Security } from 'modules';
+import BuiltinModule from '../BuiltinModule';
+import { Reflection, ReactComponents, DiscordApi, Security } from 'modules';
 import { VueInjector, Modals, Toasts } from 'ui';
 import { ClientLogger as Logger, ClientIPC } from 'common';
 import { request } from 'vendor';
@@ -172,7 +172,7 @@ export default new class E2EE extends BuiltinModule {
         this.patch(Dispatcher, 'dispatch', this.dispatcherPatch, 'before');
         this.patchMessageContent();
 
-        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea', { selector: Reflection.resolve('channelTextArea', 'emojiButton').selector });
+        const ChannelTextArea = await ReactComponents.getComponent('ChannelTextArea');
         this.patchChannelTextArea(ChannelTextArea);
         this.patchChannelTextAreaSubmit(ChannelTextArea);
         ChannelTextArea.forceUpdateAll();
@@ -236,12 +236,14 @@ export default new class E2EE extends BuiltinModule {
     }
 
     async patchMessageContent() {
-        const MessageContent = await ReactComponents.getComponent('MessageContent', { selector: Reflection.resolve('container', 'containerCozy', 'containerCompact', 'edited').selector }, m => m.defaultProps && m.defaultProps.hasOwnProperty('disableButtons'));
+        const MessageContent = await ReactComponents.getComponent('MessageContent');
         this.patch(MessageContent.component.prototype, 'render', this.beforeRenderMessageContent, 'before');
-        this.patch(MessageContent.component.prototype, 'render', this.afterRenderMessageContent);
+        this.childPatch(MessageContent.component.prototype, 'render', ['props', 'children'], this.afterRenderMessageContent);
+        MessageContent.forceUpdateAll();
 
-        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper', { selector: Reflection.resolve('imageWrapper').selector });
+        const ImageWrapper = await ReactComponents.getComponent('ImageWrapper');
         this.patch(ImageWrapper.component.prototype, 'render', this.beforeRenderImageWrapper, 'before');
+        ImageWrapper.forceUpdateAll();
     }
 
     beforeRenderMessageContent(component) {
@@ -285,10 +287,16 @@ export default new class E2EE extends BuiltinModule {
         component.props.message.contentParsed = create.contentParsed;
     }
 
-    afterRenderMessageContent(component, args, retVal) {
+    afterRenderMessageContent(component, _childrenObject, args, retVal) {
         if (!component.props.message.bd_encrypted) return;
-        const buttons = Utils.findInReactTree(retVal, m => Array.isArray(m) && m[1].props && m[1].props.currentUserId);
+
+        const { className } = Reflection.resolve('buttonContainer', 'avatar', 'username');
+        const buttonContainer = Utils.findInReactTree(retVal, m => m && m.className && m.className.indexOf(className) !== -1);
+        if (!buttonContainer) return;
+
+        const buttons = buttonContainer.children.props.children;
         if (!buttons) return;
+
         try {
             buttons.unshift(VueInjector.createReactElement(E2EEMessageButton));
         } catch (err) {

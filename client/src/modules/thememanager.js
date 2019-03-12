@@ -36,12 +36,7 @@ export default class ThemeManager extends ContentManager {
     static async loadTheme(paths, configs, info, main) {
         try {
             const instance = new Theme({
-                configs, info, main,
-                paths: {
-                    contentPath: paths.contentPath,
-                    dirName: paths.dirName,
-                    mainPath: paths.mainPath
-                }
+                configs, info, main, paths
             });
             if (instance.enabled) {
                 instance.userConfig.enabled = false;

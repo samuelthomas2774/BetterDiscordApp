@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
 */
 
-import { DOM, BdUI, BdMenu, Modals, Toasts, Notifications, BdContextMenu, DiscordContextMenu } from 'ui';
+import { DOM, BdUI, BdMenu, Modals, Toasts, Notifications, BdContextMenu, DiscordContextMenu, Autocomplete } from 'ui';
 import BdCss from './styles/index.scss';
 import { Events, Globals, Settings, Database, Updater, ModuleManager, PluginManager, ThemeManager, ExtModuleManager, Vendor, Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi, BdWebApi, Connectivity, Cache, Reflection, PackageInstaller } from 'modules';
 import { ClientLogger as Logger, ClientIPC, Utils, Axi } from 'common';
@@ -27,14 +27,14 @@ class BetterDiscord {
         Logger.log('main', 'BetterDiscord starting');
 
         this._bd = {
-            DOM, BdUI, BdMenu, Modals, Reflection, Toasts, Notifications, BdContextMenu, DiscordContextMenu,
+            DOM, BdUI, BdMenu, Modals, Reflection, Toasts, Notifications, BdContextMenu, DiscordContextMenu, Autocomplete,
 
             Events, Globals, Settings, Database, Updater,
             ModuleManager, PluginManager, ThemeManager, ExtModuleManager, PackageInstaller,
             Vendor,
 
             Patcher, MonkeyPatch, ReactComponents, ReactHelpers, ReactAutoPatcher, DiscordApi,
-            EmoteModule,
+            BuiltinManager, EmoteModule,
             BdWebApi,
             Connectivity,
             Cache,

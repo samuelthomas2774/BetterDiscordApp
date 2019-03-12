@@ -248,7 +248,7 @@ export default new class EmoteModule extends BuiltinModule {
         Spoiler.forceUpdateAll();
     }
 
-    afterRenderSpoiler(component, args, retVal) {
+    afterRenderSpoiler(component, _childrenObject, args, retVal) {
         const markup = Utils.findInReactTree(retVal, filter =>
             filter &&
             filter.className &&
@@ -261,7 +261,7 @@ export default new class EmoteModule extends BuiltinModule {
     /**
      * Handle message render
      */
-    afterRenderMessageContent(component, args, retVal) {
+    afterRenderMessageContent(component, _childrenObject, args, retVal) {
         const markup = Utils.findInReactTree(retVal, filter =>
             filter &&
             filter.className &&

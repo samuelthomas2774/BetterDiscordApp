@@ -81,7 +81,7 @@ export default class BuiltinModule {
         const last = child.pop();
 
         this.patch(module, fnName, (component, args, retVal) => {
-            const unpatch = this.patch(child.reduce((obj, key) => obj[key], retVal), last, function() {unpatch(); return cb.apply(this, arguments);}, when);
+            const unpatch = this.patch(child.reduce((obj, key) => obj[key], retVal), last, function(...args) {unpatch(); return cb.call(this, component, ...args);}, when);
         });
     }
 

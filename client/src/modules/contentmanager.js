@@ -220,6 +220,7 @@ export default class {
             const unpackedPath = path.join(Globals.getPath('tmp'), packageName);
 
             asar.extractAll(packagePath, unpackedPath);
+
             return this.preloadContent({
                 config,
                 contentPath: unpackedPath,
@@ -228,8 +229,8 @@ export default class {
                 packageName,
                 packed: true
             }, reload, index);
-
         } catch (err) {
+            Logger.log('ContentManager', ['Error extracting packed content', err]);
             throw err;
         }
     }
@@ -322,12 +323,6 @@ export default class {
             return content;
         } catch (err) {
             throw err;
-        } finally {
-            if (typeof dirName === 'object' && dirName.packed) {
-                rimraf(dirName.contentPath, err => {
-                    if (err) Logger.err(err);
-                });
-            }
         }
     }
 
@@ -353,6 +348,7 @@ export default class {
                 await unload;
 
             await FileUtils.recursiveDeleteDirectory(content.paths.contentPath);
+            if (content.packed) await FileUtils.recursiveDeleteDirectory(content.packagePath);
             return true;
         } catch (err) {
             Logger.err(this.moduleName, err);
@@ -384,7 +380,7 @@ export default class {
 
             if (this.unloadContentHook) this.unloadContentHook(content);
 
-            if (reload) return content.packed ? this.preloadPackedContent(content.packed.pkg, true, index) : this.preloadContent(content.dirName, true, index);
+            if (reload) return content.packed ? this.preloadPackedContent(content.packagePath, true, index) : this.preloadContent(content.dirName, true, index);
 
             this.localContent.splice(index, 1);
         } catch (err) {

@@ -4,6 +4,7 @@ dist
 etc
 release
 
+tests/tmp
 tests/log.txt
 
 # User data

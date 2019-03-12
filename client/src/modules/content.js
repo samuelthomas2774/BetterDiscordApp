@@ -65,6 +65,10 @@ export default class Content extends AsyncEventEmitter {
     get config() { return this.settings.categories }
     get data() { return this.userConfig.data || (this.userConfig.data = {}) }
 
+    get packed() { return this.dirName.packed }
+    get packagePath() { return this.dirName.packagePath }
+    get packageName() { return this.dirName.pkg }
+
     /**
      * Opens a settings modal for this content.
      * @return {Modal}

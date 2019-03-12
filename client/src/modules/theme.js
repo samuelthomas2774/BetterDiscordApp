@@ -147,6 +147,11 @@ export default class Theme extends Content {
      * @param {Array} files Files to watch
      */
     set watchfiles(files) {
+        if (this.packed) {
+            // Don't watch files for packed themes
+            return;
+        }
+
         if (!files) files = [];
 
         for (const file of files) {

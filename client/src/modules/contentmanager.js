@@ -148,6 +148,8 @@ export default class {
      * @param {bool} suppressErrors Suppress any errors that occur during loading of content
      */
     static async refreshContent(suppressErrors = false) {
+        this.loaded = true;
+
         if (!this.localContent.length) return this.loadAllContent();
 
         try {

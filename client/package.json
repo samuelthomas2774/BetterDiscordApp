@@ -2,7 +2,7 @@
   "name": "bdclient",
   "description": "BetterDiscord client package",
   "author": "Jiiks",
-  "version": "2.0.0-beta.4",
+  "version": "2.0.0-beta.6",
   "homepage": "https://betterdiscord.net",
   "license": "MIT",
   "main": "dist/betterdiscord.client.js",

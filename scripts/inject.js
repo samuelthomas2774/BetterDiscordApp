@@ -18,7 +18,7 @@ const discordPath = (function() {
     } else if (process.platform === 'darwin') {
         const appPath = releaseInput === 'canary' ? path.join('/Applications', 'Discord Canary.app')
             : releaseInput === 'ptb' ? path.join('/Applications', 'Discord PTB.app')
-            : useBdRelease && args[3] ? args[3] ? args[2] : args[2]
+            : useBdRelease && args[3] ? args[3] : !useBdRelease && args[2] ? args[2]
             : path.join('/Applications', 'Discord.app');
 
         return path.join(appPath, 'Contents', 'Resources');

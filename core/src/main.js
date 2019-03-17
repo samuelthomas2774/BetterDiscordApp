@@ -87,7 +87,7 @@ class Comms {
             });
         });
 
-        const sassImporter = async (context, url, prev) => {
+        const sassImporter = async (context, url, prev, inlinedFiles) => {
             let file = path.resolve(path.dirname(prev), url);
 
             const scss = await FileUtils.readFile(file).catch(err => FileUtils.readFile(file += '.scss'));
@@ -95,7 +95,10 @@ class Comms {
             const result = await postcss([postcssUrl({url: 'inline', encodeType: 'base64', optimizeSvgEncode: true})])
                 .process(scss, {from: file, syntax: postcssScss});
 
-            console.log('Processed', file, result);
+            for (const message of result.messages) {
+                if (message.type !== 'dependency') continue;
+                inlinedFiles.push(message.file);
+            }
 
             return {file, contents: result.css};
         };
@@ -106,13 +109,16 @@ class Comms {
                 options.path = undefined;
             }
 
+            const inlinedFiles = [];
+
             options.importer = function (url, prev, done) {
-                sassImporter(this, url, prev).then(done, done);
+                sassImporter(this, url, prev, inlinedFiles).then(done, done);
             };
 
             sass.render(options, (err, result) => {
-                if (err) event.reject(err);
-                else event.reply(result);
+                if (err) return event.reject(err);
+                result.stats.includedFiles = result.stats.includedFiles.concat(inlinedFiles);
+                event.reply(result);
             });
         });
 

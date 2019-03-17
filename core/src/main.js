@@ -52,6 +52,10 @@ import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
 import keytar from 'keytar';
 
+import postcss from 'postcss';
+import postcssUrl from 'postcss-url';
+import postcssScss from 'postcss-scss';
+
 import { FileUtils, BDIpc, Config, WindowUtils, Updater, Editor, Database } from './modules';
 
 const sparkplug = path.resolve(__dirname, 'sparkplug.js');
@@ -83,11 +87,30 @@ class Comms {
             });
         });
 
+        const sassImporter = async (context, url, prev) => {
+            const file = path.resolve(prev, url);
+
+            console.log('Importing', file, url, prev, context);
+
+            const scss = await FileUtils.readFile(file);
+
+            const result = await postcss([postcssUrl({url: 'inline', encodeType: 'base64', optimizeSvgEncode: true})])
+                .process(scss, {from: file, syntax: postcssScss});
+
+            console.log('Processed', file, result);
+
+            return {contents: result.css};
+        };
+
         BDIpc.on('bd-compileSass', (event, options) => {
             if (typeof options.path === 'string' && typeof options.data === 'string') {
                 options.data = `${options.data} @import '${options.path.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}';`;
                 options.path = undefined;
             }
+
+            options.importer = function (url, prev, done) {
+                sassImporter(this, url, prev).then(done, done);
+            };
 
             sass.render(options, (err, result) => {
                 if (err) event.reject(err);

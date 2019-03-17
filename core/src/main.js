@@ -37,7 +37,6 @@ const TEST_ARGS = () => {
             'data': path.resolve(_baseDataPath, 'data'),
             'editor': path.resolve(_basePath, 'editor', 'dist'),
             // tmp: path.join(_basePath, 'tmp')
-            tmp: path.join(os.tmpdir(), 'betterdiscord', `${process.getuid()}`)
         }
     }
 }
@@ -337,6 +336,7 @@ export class BetterDiscord {
         this.config.addPath('userfiles', userfiles);
         this.config.addPath('snippets', snippets);
         if (!this.config.getPath('editor')) this.config.addPath('editor', path.resolve(base, 'editor'));
+        if (!this.config.getPath('tmp')) this.config.addPath('tmp', path.join(os.tmpdir(), 'betterdiscord', `${process.getuid()}`));
     }
 
     /**

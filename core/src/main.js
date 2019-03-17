@@ -88,18 +88,16 @@ class Comms {
         });
 
         const sassImporter = async (context, url, prev) => {
-            const file = path.resolve(prev, url);
+            let file = path.resolve(path.dirname(prev), url);
 
-            console.log('Importing', file, url, prev, context);
-
-            const scss = await FileUtils.readFile(file);
+            const scss = await FileUtils.readFile(file).catch(err => FileUtils.readFile(file += '.scss'));
 
             const result = await postcss([postcssUrl({url: 'inline', encodeType: 'base64', optimizeSvgEncode: true})])
                 .process(scss, {from: file, syntax: postcssScss});
 
             console.log('Processed', file, result);
 
-            return {contents: result.css};
+            return {file, contents: result.css};
         };
 
         BDIpc.on('bd-compileSass', (event, options) => {

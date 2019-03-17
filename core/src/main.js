@@ -336,7 +336,10 @@ export class BetterDiscord {
         this.config.addPath('userfiles', userfiles);
         this.config.addPath('snippets', snippets);
         if (!this.config.getPath('editor')) this.config.addPath('editor', path.resolve(base, 'editor'));
-        if (!this.config.getPath('tmp')) this.config.addPath('tmp', path.join(os.tmpdir(), 'betterdiscord', `${process.getuid()}`));
+
+        if (!this.config.getPath('tmp')) this.config.addPath('tmp', process.platform !== 'win32' ?
+            path.join(os.tmpdir(), 'betterdiscord', `${process.getuid()}`) :
+            path.join(os.tmpdir(), 'betterdiscord'));
     }
 
     /**

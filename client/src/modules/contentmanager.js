@@ -214,7 +214,8 @@ export default class {
             await FileUtils.fileExists(packagePath);
 
             const config = JSON.parse(asar.extractFile(packagePath, 'config.json').toString());
-            const unpackedPath = path.join(Globals.getPath('tmp'), this.pathId, packageName);
+            const id = config.info.id || config.info.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-');
+            const unpackedPath = path.join(Globals.getPath('tmp'), this.pathId, id);
 
             asar.extractAll(packagePath, unpackedPath);
 
@@ -430,7 +431,7 @@ export default class {
 
     static getContentIndex(content) { return this.localContent.findIndex(c => c === content) }
     static getContentById(id) { return this.localContent.find(c => c.id === id) }
-    static getContentByDirName(dirName) { return this.localContent.find(c => c.dirName === dirName) }
+    static getContentByDirName(dirName) { return this.localContent.find(c => !c.packed ? c.dirName === dirName : c.dirName.pkg === dirName) }
     static getContentByPath(path) { return this.localContent.find(c => c.contentPath === path) }
     static getContentByName(name) { return this.localContent.find(c => c.name === name) }
 

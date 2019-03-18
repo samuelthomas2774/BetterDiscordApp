@@ -102,7 +102,7 @@ class Comms {
         BDIpc.on('bd-keytar-find-credentials', (event, { service }) => keytar.findCredentials(service), true);
 
         BDIpc.on('bd-readDataFile', async (event, fileName) => {
-            const rf = await FileUtils.readFile(path.resolve(configProxy().getPath('data'), fileName));
+            const rf = await FileUtils.readFile(path.resolve(this.bd.config.getPath('data'), fileName));
             event.reply(rf);
         });
 
@@ -206,9 +206,13 @@ export class BetterDiscord {
     get updater() { return this._updater ? this._updater : (this._updater = new Updater(this)); }
     get sendToDiscord() { return this.windowUtils.send; }
 
-    constructor(args) {
-        if (TESTS) args = TEST_ARGS();
+    constructor(...args) {
+        if (TESTS) args.unshift(TEST_ARGS());
+
+        args = deepmerge.all(args);
+
         console.log('[BetterDiscord|args] ', JSON.stringify(args, null, 4));
+
         if (BetterDiscord.loaded) {
             console.log('[BetterDiscord] Creating two BetterDiscord objects???');
             return null;

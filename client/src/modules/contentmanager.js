@@ -366,6 +366,8 @@ export default class {
         if (!content) throw {message: `Could not find a ${this.contentType} from ${content}.`};
 
         try {
+            Object.defineProperty(content, 'unloaded', {configurable: true, value: true});
+
             const disablePromise = content.disable(false);
             const unloadPromise = content.emit('unload', reload);
 
@@ -378,8 +380,14 @@ export default class {
 
             if (this.unloadContentHook) this.unloadContentHook(content);
 
-            if (reload) return content.packed ? this.preloadPackedContent(content.dirName.pkg, true, index) : this.preloadContent(content.dirName, true, index);
+            if (reload) {
+                const newcontent = content.packed ? this.preloadPackedContent(content.dirName.pkg, true, index) :
+                    this.preloadContent(content.dirName, true, index);
+                Object.defineProperty(content, 'unloaded', {value: newcontent});
+                return newcontent;
+            }
 
+            Object.defineProperty(content, 'unloaded', {value: true});
             this.localContent.splice(index, 1);
         } catch (err) {
             Logger.err(this.moduleName, err);

@@ -104,13 +104,8 @@ export default class {
             const directories = await FileUtils.listDirectory(this.contentPath);
 
             for (const dir of directories) {
-                const packed = dir.endsWith('.bd');
-
-                if (!packed) {
-                    try {
-                        await FileUtils.directoryExists(path.join(this.contentPath, dir));
-                    } catch (err) { continue; }
-                }
+                const stat = await FileUtils.stat(path.join(this.contentPath, dir));
+                const packed = stat.isFile();
 
                 try {
                     if (packed) {
@@ -157,18 +152,18 @@ export default class {
             const directories = await FileUtils.listDirectory(this.contentPath);
 
             for (const dir of directories) {
-                const packed = dir.endsWith('.bd');
-
                 // If content is already loaded this should resolve
                 if (this.getContentByDirName(dir)) continue;
 
-                try {
-                    await FileUtils.directoryExists(path.join(this.contentPath, dir));
-                } catch (err) { continue; }
+                const stat = await FileUtils.stat(path.join(this.contentPath, dir));
+                const packed = stat.isFile();
 
                 try {
-                    // Load if not
-                    await this.preloadContent(dir);
+                    if (packed) {
+                        await this.preloadPackedContent(dir);
+                    } else {
+                        await this.preloadContent(dir);
+                    }
                 } catch (err) {
                     // We don't want every plugin/theme to fail loading when one does
                     this.errors.push(new ErrorEvent({
@@ -219,7 +214,7 @@ export default class {
             await FileUtils.fileExists(packagePath);
 
             const config = JSON.parse(asar.extractFile(packagePath, 'config.json').toString());
-            const unpackedPath = path.join(Globals.getPath('tmp'), packageName);
+            const unpackedPath = path.join(Globals.getPath('tmp'), this.pathId, packageName);
 
             asar.extractAll(packagePath, unpackedPath);
 
@@ -350,7 +345,7 @@ export default class {
                 await unload;
 
             await FileUtils.recursiveDeleteDirectory(content.paths.contentPath);
-            if (content.packed) await FileUtils.recursiveDeleteDirectory(content.packagePath);
+            if (content.packed) await FileUtils.deleteFile(content.packagePath);
             return true;
         } catch (err) {
             Logger.err(this.moduleName, err);
@@ -382,7 +377,7 @@ export default class {
 
             if (this.unloadContentHook) this.unloadContentHook(content);
 
-            if (reload) return content.packed ? this.preloadPackedContent(content.packagePath, true, index) : this.preloadContent(content.dirName, true, index);
+            if (reload) return content.packed ? this.preloadPackedContent(content.dirName.pkg, true, index) : this.preloadContent(content.dirName, true, index);
 
             this.localContent.splice(index, 1);
         } catch (err) {

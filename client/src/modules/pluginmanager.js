@@ -100,12 +100,21 @@ export default class PluginManager extends ContentManager {
 
         const deps = this.pluginDependencies[paths.contentPath] = {};
         if (dependencies) {
+            let refreshedModules = false;
+
             for (const [key, value] of Object.entries(dependencies)) {
-                const extModule = ExtModuleManager.findModule(key);
+                let extModule = ExtModuleManager.findModule(key);
                 if (!extModule) {
-                    throw {message: `Dependency ${key}:${value} is not loaded.`};
+                    if (!refreshedModules) {
+                        await ExtModuleManager.refreshContent(true);
+                        refreshedModules = true;
+                    }
+
+                    extModule = ExtModuleManager.findModule(key);
+                    if (!extModule) throw {message: `Dependency ${key} is not loaded.`};
                 }
-                deps[key] = extModule.__require;
+
+                deps[key] = deps[extModule.id] = extModule.__require;
             }
         }
 

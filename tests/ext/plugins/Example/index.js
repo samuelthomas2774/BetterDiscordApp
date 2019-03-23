@@ -6,6 +6,7 @@ const Dependencies = require('betterdiscord/dependencies');
 const { Events, Logger, Utils, InternalSettings, CssUtils } = PluginApi;
 const { $, _ } = Vendor;
 
+// This will use version 1 of Example Module as that's listed in the config.json
 const ExampleModule = require('betterdiscord/dependencies/example-module');
 
 module.exports = class extends Plugin {

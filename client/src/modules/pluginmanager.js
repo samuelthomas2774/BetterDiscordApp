@@ -85,7 +85,7 @@ export default class PluginManager extends ContentManager {
     static get refreshPlugins() { return this.refreshContent }
 
     static get loadContent() { return this.loadPlugin }
-    static async loadPlugin(paths, configs, info, main, dependencies, permissions, mainExport, packed = false) {
+    static async loadPlugin(paths, configs, info, main, alternateVersions, dependencies, permissions, mainExport, packed = false) {
         if (permissions && permissions.length > 0) {
             for (const perm of permissions) {
                 Logger.log(this.moduleName, `Permission: ${Permissions.permissionText(perm).HEADER} - ${Permissions.permissionText(perm).BODY}`);
@@ -121,9 +121,7 @@ export default class PluginManager extends ContentManager {
                     if (!extModule) throw {message: `Dependency ${key} is not loaded.`};
                 }
 
-                if (!semver.satisfies(extModule.version, value)) throw {message: `This plugin requires a different version of ${key}.`};
-
-                deps[key] = deps[extModule.id] = extModule.__require;
+                deps[key] = deps[extModule.id] = extModule.getVersion(value);
             }
         }
 

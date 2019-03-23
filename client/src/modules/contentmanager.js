@@ -252,7 +252,7 @@ export default class {
                 throw 'Blocked unsafe content';
             }
 
-            const contentPath = packed ? dirName.contentPath : path.join(this.contentPath, dirName);
+            const contentPath = packed ? dirName.contentPath : await FileUtils.realpath(path.join(this.contentPath, dirName));
 
             await FileUtils.directoryExists(contentPath);
 

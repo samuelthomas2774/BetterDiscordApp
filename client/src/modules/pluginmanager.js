@@ -47,6 +47,10 @@ export default class PluginManager extends ContentManager {
         return this._pluginDependencies || (this._pluginDependencies = {});
     }
 
+    static get pluginInstanceModules() {
+        return this._pluginInstanceModules || (this._pluginInstanceModules = {});
+    }
+
     static async loadAllContent(suppressErrors) {
         this.loaded = false;
         const loadAll = await super.loadAllContent(true);
@@ -125,6 +129,12 @@ export default class PluginManager extends ContentManager {
             }
         }
 
+        this.pluginInstanceModules[paths.contentPath] = Object.freeze(Object.defineProperty({
+            __esModule: true
+        }, 'default', {
+            get: () => instance
+        }));
+
         const pluginExports = Globals.require(paths.mainPath);
 
         let plugin = mainExport ? pluginExports[mainExport]
@@ -156,6 +166,7 @@ export default class PluginManager extends ContentManager {
 
         delete this.pluginApiInstances[content.contentPath];
         delete this.pluginDependencies[content.contentPath];
+        delete this.pluginInstanceModules[content.contentPath];
 
         delete Globals.require.cache[Globals.require.resolve(content.paths.mainPath)];
         const uncache = [];
@@ -240,22 +251,22 @@ export default class PluginManager extends ContentManager {
 
     static requireApi(request, plugin, contentPath, parent) {
         if (request === 'betterdiscord/plugin') return Plugin;
-        if (request === 'betterdiscord/plugin-api') return PluginManager.pluginApiInstances[contentPath];
+        if (request === 'betterdiscord/plugin-api') return this.pluginApiInstances[contentPath];
         if (request === 'betterdiscord/vendor') return Vendor;
-        if (request === 'betterdiscord/dependencies') return PluginManager.pluginDependencies[contentPath];
+        if (request === 'betterdiscord/dependencies') return this.pluginDependencies[contentPath];
 
         if (request.startsWith('betterdiscord/vendor/')) {
             return Vendor[request.substr(21)];
         }
 
         if (request.startsWith('betterdiscord/dependencies/')) {
-            return PluginManager.pluginDependencies[contentPath][request.substr(27)];
+            return this.pluginDependencies[contentPath][request.substr(27)];
         }
 
-        if (request === 'betterdiscord/plugin-instance') return plugin;
+        if (request === 'betterdiscord/plugin-instance') return this.pluginInstanceModules[contentPath];
 
         if (request.startsWith('betterdiscord/bridge/')) {
-            const plugin = PluginManager.getPluginById(request.substr(21));
+            const plugin = this.getPluginById(request.substr(21));
             return plugin.bridge;
         }
 
@@ -265,7 +276,7 @@ export default class PluginManager extends ContentManager {
         }
 
         if (request.startsWith('betterdiscord/plugin-api/')) {
-            const api = PluginManager.pluginApiInstances[contentPath];
+            const api = this.pluginApiInstances[contentPath];
             const apirequest = request.substr(25);
 
             if (apirequest === 'async-eventemitter') return api.AsyncEventEmitter;

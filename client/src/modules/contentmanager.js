@@ -21,6 +21,7 @@ import { SettingsSet, ErrorEvent } from 'structs';
 import { Modals } from 'ui';
 import Combokeys from 'combokeys';
 import Settings from './settings';
+import semver from 'semver';
 
 /**
  * Base class for managing external content
@@ -261,6 +262,8 @@ export default class {
             const configPath = path.resolve(contentPath, 'config.json');
             const readConfig = packed ? dirName.config : await FileUtils.readJsonFromFile(configPath);
             const mainPath = path.join(contentPath, readConfig.main || 'index.js');
+
+            readConfig.info.version = semver.coerce(`${readConfig.info.version || .1}`).version;
 
             const defaultConfig = new SettingsSet({
                 settings: readConfig.defaultConfig,

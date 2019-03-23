@@ -19,6 +19,7 @@ import Plugin from './plugin';
 import PluginApi from './pluginapi';
 import Vendor from './vendor';
 import path from 'path';
+import semver from 'semver';
 
 export default class PluginManager extends ContentManager {
 
@@ -113,6 +114,8 @@ export default class PluginManager extends ContentManager {
                     extModule = ExtModuleManager.findModule(key);
                     if (!extModule) throw {message: `Dependency ${key} is not loaded.`};
                 }
+
+                if (!semver.satisfies(extModule.version, value)) throw {message: `This plugin requires a different version of ${key}.`};
 
                 deps[key] = deps[extModule.id] = extModule.__require;
             }

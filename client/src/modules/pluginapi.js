@@ -25,9 +25,7 @@ import DiscordApi from './discordapi';
 import { ReactComponents, ReactHelpers } from './reactcomponents';
 import { Patcher, MonkeyPatch } from './patcher';
 import GlobalAc from '../ui/autocomplete';
-import Vue from 'vue';
-import path from 'path';
-import Globals from './globals';
+import semver from 'semver';
 
 export default class PluginApi {
 
@@ -47,8 +45,18 @@ export default class PluginApi {
         return PluginManager.getPluginByPath(this.pluginPath);
     }
 
-    async bridge(plugin_id) {
+    async bridge(plugin_id, request_version) {
         const plugin = await PluginManager.waitForPlugin(plugin_id);
+        if (!request_version) return plugin.bridge;
+
+        if (plugin.bridges) for (const version of Object.keys(plugin.bridges)) {
+            if (semver.satisfies(version, request_version)) return plugin.bridges[version];
+        }
+
+        if (!semver.satisfies(plugin.version, request_version)) {
+            throw new Error(`Requested version ${request_version} not satisfied by plugin.`);
+        }
+
         return plugin.bridge;
     }
 

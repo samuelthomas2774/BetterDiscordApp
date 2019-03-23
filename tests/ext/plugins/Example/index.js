@@ -87,15 +87,37 @@ module.exports = class extends Plugin {
         Logger.log(e);
     }
 
-    get bridge() {
-        return {
-            test1: this.test1.bind(this),
-            test2: this.test2.bind(this)
-        };
+    /**
+     * Allows plugins to support plugins using older versions of their bridge.
+     * The bridge property will be used when plugins don't ask for a version.
+     * This uses getters to avoid creating every available versions.
+     */
+    get bridges() {
+        return Object.defineProperty(this, 'bridges', {value: Object.defineProperties({}, {
+            '2.0.0': {get: () => this.bridge},
+            '1.0.0': {get: () => this.v1bridge}
+        })}).bridges;
     }
 
-    test1() { return 'It works!'; }
-    test2() { return 'This works too!'; }
+    get bridge() {
+        return Object.defineProperty(this, 'bridge', {value: {
+            test1: this.test1.bind(this),
+            test2: this.test2.bind(this)
+        }}).bridge;
+    }
+
+    async test1() { return 'It works!'; }
+    async test2() { return 'This works too!'; }
+
+    get v1bridge() {
+        return Object.defineProperty(this, 'v1bridge', {value: {
+            test1: this.test1Sync.bind(this),
+            test2: this.test2Sync.bind(this)
+        }}).v1bridge;
+    }
+
+    test1Sync() { return 'It works!'; }
+    test2Sync() { return 'This works too!'; }
 
     settingChanged(event) {
         if (!this.enabled) return;

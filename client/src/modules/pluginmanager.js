@@ -104,6 +104,12 @@ export default class PluginManager extends ContentManager {
             let refreshedModules = false;
 
             for (const [key, value] of Object.entries(dependencies)) {
+                if (key === 'betterdiscord') {
+                    if (semver.satisfies(Globals.version, value)) continue;
+
+                    throw {message: 'This plugin requires a different version of BetterDiscord.'};
+                }
+
                 let extModule = ExtModuleManager.findModule(key);
                 if (!extModule) {
                     if (!refreshedModules) {

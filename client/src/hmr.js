@@ -6,7 +6,7 @@ const http_path = electron.ipcRenderer.sendSync('--bd-webpack-server');
 
 function _eval() {
     eval(arguments[0]);
-};
+}
 
 function loadScript(url) {
     console.log('[BetterDiscord] loading script', url);

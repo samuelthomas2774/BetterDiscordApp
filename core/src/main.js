@@ -364,10 +364,10 @@ export class BetterDiscord {
         if (TEST_HMR) {
             console.log(`[BetterDiscord] injecting webpack ${path.resolve(__dirname, '..', '..', 'client', 'src', 'hmr.js')}. Reload: ${reload}`);
             return this.windowUtils.injectScript(path.resolve(__dirname, '..', '..', 'client', 'src', 'hmr.js'));
-        } else {
-            console.log(`[BetterDiscord] injecting ${this.config.getPath('client_script')}. Reload: ${reload}`);
-            return this.windowUtils.injectScript(this.config.getPath('client_script'));
         }
+
+        console.log(`[BetterDiscord] injecting ${this.config.getPath('client_script')}. Reload: ${reload}`);
+        return this.windowUtils.injectScript(this.config.getPath('client_script'));
     }
 
     /**

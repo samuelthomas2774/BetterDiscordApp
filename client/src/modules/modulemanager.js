@@ -9,7 +9,7 @@
 */
 
 import { ClientLogger as Logger } from 'common';
-import { SocketProxy, EventHook } from 'modules';
+import { SocketProxy, EventHook, DispatchHook } from 'modules';
 import { ProfileBadges, ClassNormaliser } from 'ui';
 import Updater from './updater';
 
@@ -27,6 +27,7 @@ export default class {
             new ClassNormaliser(),
             new SocketProxy(),
             new EventHook(),
+            new DispatchHook(),
             Updater
         ]);
     }

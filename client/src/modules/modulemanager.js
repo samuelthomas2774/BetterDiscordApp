@@ -11,6 +11,7 @@
 import { ClientLogger as Logger } from 'common';
 import { SocketProxy, EventHook, DispatchHook } from 'modules';
 import { ProfileBadges, ClassNormaliser } from 'ui';
+import { UserSettings } from './discordapi';
 import Updater from './updater';
 
 /**
@@ -28,6 +29,7 @@ export default class {
             new SocketProxy(),
             new EventHook(),
             new DispatchHook(),
+            UserSettings,
             Updater
         ]);
     }

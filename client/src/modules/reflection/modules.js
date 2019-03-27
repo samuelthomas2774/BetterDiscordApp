@@ -10,6 +10,7 @@
 
 import { Utils, Filters } from 'common';
 import Events from '../events';
+import KnownModules from './knownmodules';
 
 class Module {
 

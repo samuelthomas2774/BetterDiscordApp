@@ -10,7 +10,7 @@
 
 import { Filters } from 'common';
 
-const KnownModules = {
+export default {
 
     React: Filters.byProperties(['createElement', 'cloneElement']),
     ReactDOM: Filters.byProperties(['render', 'findDOMNode']),
@@ -186,4 +186,4 @@ const KnownModules = {
     /* In-Message Links */
     ExternalLink: Filters.byCode(/\.trusted\b/)
 
-};
+}

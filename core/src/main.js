@@ -82,6 +82,12 @@ class Comms {
             });
         });
 
+        BDIpc.on('bd-native-save', (event, options) => {
+            dialog.showSaveDialog(OriginalBrowserWindow.fromWebContents(event.ipcEvent.sender), options, filename => {
+                event.reply(filename);
+            });
+        });
+
         BDIpc.on('bd-compileSass', (event, options) => {
             if (typeof options.path === 'string' && typeof options.data === 'string') {
                 options.data = `${options.data} @import '${options.path.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}';`;
@@ -195,6 +201,11 @@ class BrowserWindow extends OriginalBrowserWindow {
         return {};
     }
 }
+
+// Some Electron APIs depend on browserWindow.constructor being BrowserWindow
+Object.defineProperty(BrowserWindow.prototype, 'constructor', {
+    value: OriginalBrowserWindow
+});
 
 export class BetterDiscord {
 

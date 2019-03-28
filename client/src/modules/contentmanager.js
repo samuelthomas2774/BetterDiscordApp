@@ -16,7 +16,7 @@ import { remote } from 'electron';
 import Content from './content';
 import Globals from './globals';
 import Database from './database';
-import { Utils, FileUtils, ClientLogger as Logger } from 'common';
+import { Utils, FileUtils, ClientLogger as Logger, ClientIPC } from 'common';
 import { SettingsSet, ErrorEvent } from 'structs';
 import { Modals } from 'ui';
 import Combokeys from 'combokeys';
@@ -73,23 +73,23 @@ export default class {
     }
 
     static async packContent(path, contentPath) {
-        return new Promise((resolve, reject) => {
-            remote.dialog.showSaveDialog({
-                title: 'Save Package',
-                defaultPath: path,
-                filters: [
-                    {
-                        name: 'BetterDiscord Package',
-                        extensions: ['bd']
-                    }
-                ]
-            }, filepath => {
-                if (!filepath) return;
+        const filepath = await ClientIPC.send('bd-native-save', {
+            title: 'Save Package',
+            defaultPath: path,
+            filters: [
+                {
+                    name: 'BetterDiscord Package',
+                    extensions: ['bd']
+                }
+            ]
+        });
 
-                asar.uncache(filepath);
-                asar.createPackage(contentPath, filepath, () => {
-                    resolve(filepath);
-                });
+        if (!filepath) return;
+
+        return new Promise((resolve, reject) => {
+            asar.uncache(filepath);
+            asar.createPackage(contentPath, filepath, () => {
+                resolve(filepath);
             });
         });
     }

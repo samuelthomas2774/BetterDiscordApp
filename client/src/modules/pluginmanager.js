@@ -129,8 +129,10 @@ export default class PluginManager extends ContentManager {
             }
         }
 
+        let instance;
         this.pluginInstanceModules[paths.contentPath] = Object.freeze(Object.defineProperty({
-            __esModule: true
+            __esModule: true,
+            id: info.id || info.name.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '-').replace(/--/g, '-')
         }, 'default', {
             get: () => instance
         }));
@@ -145,7 +147,7 @@ export default class PluginManager extends ContentManager {
         if (!plugin || !(plugin.prototype instanceof Plugin))
             throw {message: `Plugin ${info.name} did not export a class that extends Plugin or a function that returns a class that extends Plugin.`};
 
-        const instance = new plugin({
+        instance = new plugin({
             configs, info, main, paths
         });
 
@@ -217,11 +219,12 @@ export default class PluginManager extends ContentManager {
         const resolveFilename = Module._resolveFilename;
 
         Module._load = function (request, parent, isMain) {
-            if (request === 'betterdiscord' || request.startsWith('betterdiscord/')) {
-                const plugin = PluginManager.getPluginByModule(parent);
-                const contentPath = plugin ? plugin.contentPath : PluginManager.getPluginPathByModule(parent);
+            const plugin = PluginManager.getPluginByModule(parent);
+            const contentPath = plugin ? plugin.contentPath : PluginManager.getPluginPathByModule(parent);
+            const plugin_id = plugin ? plugin.id : contentPath ? PluginManager.pluginInstanceModules[contentPath].id : null;
 
-                if (contentPath) {
+            if (contentPath) {
+                if (request === 'betterdiscord' || request.startsWith('betterdiscord/')) {
                     const module = PluginManager.requireApi(request, plugin, contentPath, parent);
 
                     if (module) return module;
@@ -232,12 +235,14 @@ export default class PluginManager extends ContentManager {
         };
 
         Module._resolveFilename = function (request, parent, isMain) {
-            if (request === 'betterdiscord' || request.startsWith('betterdiscord/')) {
-                const contentPath = PluginManager.getPluginPathByModule(parent);
-                if (contentPath) return request;
-            }
+            const contentPath = PluginManager.getPluginPathByModule(parent);
+            if (contentPath && (request === 'betterdiscord' || request.startsWith('betterdiscord/'))) return request;
 
-            return resolveFilename.apply(this, arguments);
+            const filename = resolveFilename.apply(this, arguments);
+
+            if (contentPath) Permissions.assertCanRequireModule(request, filename, PluginManager.pluginInstanceModules[contentPath].default, PluginManager.pluginInstanceModules[contentPath].id, contentPath, parent);
+
+            return filename;
         };
     }
 
@@ -245,10 +250,22 @@ export default class PluginManager extends ContentManager {
         return this.localContent.find(plugin => module.filename === plugin.contentPath || module.filename.startsWith(plugin.contentPath + path.sep));
     }
 
-    static getPluginPathByModule(module) {
-        return Object.keys(this.pluginApiInstances).find(contentPath => module.filename === contentPath || module.filename.startsWith(contentPath + path.sep));
+    static getPluginPathByPath(path) {
+        return Object.keys(this.pluginApiInstances).find(contentPath => path === contentPath || path.startsWith(contentPath + path.sep));
     }
 
+    static getPluginPathByModule(module) {
+        return this.getPluginPathByPath(module.filename);
+    }
+
+    /**
+     * Gets the exports of a virtual betterdiscord/* module.
+     * @param {string} request
+     * @param {?Plugin} plugin
+     * @param {string} contentPath
+     * @param {Module} parent
+     * @return {}
+     */
     static requireApi(request, plugin, contentPath, parent) {
         if (request === 'betterdiscord/plugin') return Plugin;
         if (request === 'betterdiscord/plugin-api') return this.pluginApiInstances[contentPath];

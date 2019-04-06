@@ -47,7 +47,7 @@ import process from 'process';
 import os from 'os';
 import path from 'path';
 import sass from 'node-sass';
-import { BrowserWindow as OriginalBrowserWindow, dialog, session, shell, protocol } from 'electron';
+import { BrowserWindow as OriginalBrowserWindow, dialog, session, shell } from 'electron';
 import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
 import keytar from 'keytar';

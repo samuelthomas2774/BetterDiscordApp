@@ -47,7 +47,7 @@ import process from 'process';
 import os from 'os';
 import path from 'path';
 import sass from 'node-sass';
-import { BrowserWindow as OriginalBrowserWindow, dialog, session, shell } from 'electron';
+import { BrowserWindow as OriginalBrowserWindow, dialog, session, shell, protocol } from 'electron';
 import deepmerge from 'deepmerge';
 import ContentSecurityPolicy from 'csp-parse';
 import keytar from 'keytar';
@@ -240,8 +240,15 @@ export class BetterDiscord {
 
     async init() {
         console.log('[BetterDiscord] init');
-        await this.waitForWindowUtils();
+
+        // Electron 5.0.0-beta.2 moves this - previously it was in webFrame (renderer)
+        // https://github.com/electron/electron/pull/16625
+        if (protocol.registerSchemesAsPrivileged) {
+            protocol.registerSchemesAsPrivileged([{ scheme: 'chrome-extension' }]);
+        }
+
         await this.ensureDirectories();
+        await this.waitForWindowUtils();
 
         this.windowUtils.on('did-finish-load', () => this.injectScripts(true));
 

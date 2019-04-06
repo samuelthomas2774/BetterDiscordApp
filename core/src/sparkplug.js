@@ -17,12 +17,6 @@ import electron, { ipcRenderer } from 'electron';
 
     console.log('[BetterDiscord|Sparkplug]');
 
-    // Electron 5.0.0-beta.2 moves this to protocol (main)
-    // https://github.com/electron/electron/pull/16625
-    if (electron.webFrame.registerURLSchemeAsPrivileged) {
-        electron.webFrame.registerURLSchemeAsPrivileged('chrome-extension');
-    }
-
     const currentWindow = electron.remote.getCurrentWindow();
 
     if (currentWindow.__bd_preload) {

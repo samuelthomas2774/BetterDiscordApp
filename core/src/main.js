@@ -241,12 +241,6 @@ export class BetterDiscord {
     async init() {
         console.log('[BetterDiscord] init');
 
-        // Electron 5.0.0-beta.2 moves this - previously it was in webFrame (renderer)
-        // https://github.com/electron/electron/pull/16625
-        if (protocol.registerSchemesAsPrivileged) {
-            protocol.registerSchemesAsPrivileged([{ scheme: 'chrome-extension' }]);
-        }
-
         await this.ensureDirectories();
         await this.waitForWindowUtils();
 

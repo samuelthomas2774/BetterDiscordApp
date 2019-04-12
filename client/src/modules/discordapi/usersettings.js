@@ -600,7 +600,7 @@ export default new class UserSettings extends EventEmitter {
      * Configurable in the language panel.
      * @type {string}
      */
-    get locale() { return Modules.UserSettingsStore.locale }
+    get locale() { return this._locale, Modules.UserSettingsStore.locale }
 
     set locale(locale) {
         this.updateSettings({locale: !!locale});
@@ -619,6 +619,11 @@ export default new class UserSettings extends EventEmitter {
      * This is not configurable.
      * @type {number}
      */
-    get timezoneOffset() { return Modules.UserSettingsStore.timezoneOffset }
+    get timezoneOffset() { return this._timezoneOffset, Modules.UserSettingsStore.timezoneOffset }
+
+    _update_timezoneOffset() {
+        this.emit('timezone-offset', this.timezoneOffset, this._timezoneOffset);
+        this._timezoneOffset = this.timezoneOffset;
+    }
 
 }

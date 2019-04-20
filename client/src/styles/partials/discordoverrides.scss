@@ -7,6 +7,10 @@ body:not(.bd-hideButton) {
         margin-top: 26px;
     }
 
+    .platform-osx [class*='layers-'] > [class*='layer-'] > * > [class*='wrapper-'] [class*='listItem-']:first-child {
+        margin-top: 12px;
+    }
+
     [class*='layers-'] > [class*='layer-'] > * > [class*='wrapper-'] + [class*='flex'] {
         border-radius: 0 0 0 5px;
     }

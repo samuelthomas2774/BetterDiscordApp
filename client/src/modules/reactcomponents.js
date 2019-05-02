@@ -190,15 +190,34 @@ class ReactComponent {
     }
 }
 
+ReactComponent.important = Symbol('BD.ReactComponent.important');
+
 export class ReactComponents {
+    /** @type {ReactComponent[]} */
     static get components() { return this._components || (this._components = []) }
+
+    /** @type {Reflection.modules.React.Component[]} */
     static get unknownComponents() { return this._unknownComponents || (this._unknownComponents = []) }
+
+    /** @type {{id: string, listeners: function[]}[]} */
     static get listeners() { return this._listeners || (this._listeners = []) }
+
+    /** @type {<{name: string, filter: function}[]>} */
     static get nameSetters() { return this._nameSetters || (this._nameSetters = []) }
-    static get componentAliases() { return this._componentAliases || (this._componentAliases = []) }
+
+    /** @type {Object.<string, string>} */
+    static get componentAliases() { return this._componentAliases || (this._componentAliases = {}) }
 
     static get ReactComponent() { return ReactComponent }
 
+    /**
+     * Processes a React component.
+     * @param {Reflection.modules.React.Component} component The React component class
+     * @param {object} retVal
+     * @param {object} important
+     * @param {string} important.selector A query selector the component will render elements matching (used to select all component instances to force them to rerender)
+     * @return {ReactComponent}
+     */
     static push(component, retVal, important) {
         if (!(component instanceof Function)) return null;
         const { displayName } = component;
@@ -211,6 +230,8 @@ export class ReactComponents {
             if (!have.important) have.important = important;
             return component;
         }
+
+        if (!important) important = component[ReactComponent.important];
 
         const c = new ReactComponent(displayName, component, retVal, important);
         this.components.push(c);
@@ -226,16 +247,19 @@ export class ReactComponents {
 
     /**
      * Finds a component from the components array or by waiting for it to be mounted.
-     * @param {String} name The component's name
-     * @param {Object} important An object containing a selector to look for
-     * @param {Function} filter A function to filter components if a single element is rendered by multiple components
-     * @return {Promise => ReactComponent}
+     * @param {string} name The component's name
+     * @param {object} important An object containing a selector to look for
+     * @param {function} filter A function to filter components if a single element is rendered by multiple components
+     * @return {Promise<ReactComponent>}
      */
     static async getComponent(name, important, filter) {
         name = this.getComponentName(name);
 
         const have = this.components.find(c => c.id === name);
-        if (have) return have;
+        if (have) {
+            if (!have.important) have.important = important;
+            return have;
+        }
 
         if (important) {
             const callback = () => {
@@ -321,6 +345,11 @@ export class ReactComponents {
         return this.nameSetters.push({ name, filter });
     }
 
+    /**
+     * Processes a React component that isn't known.
+     * @param {Reflection.modules.React.Component} component
+     * @param {} retVal
+     */
     static processUnknown(component, retVal) {
         for (const [fi, filter] of this.nameSetters.entries()) {
             if (filter.filter.filter(component)) {

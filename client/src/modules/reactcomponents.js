@@ -322,7 +322,6 @@ export class ReactComponents {
     }
 
     static processUnknown(component, retVal) {
-        const have = this.unknownComponents.find(c => c.component === component);
         for (const [fi, filter] of this.nameSetters.entries()) {
             if (filter.filter.filter(component)) {
                 Logger.log('ReactComponents', 'Filter match!');
@@ -331,9 +330,8 @@ export class ReactComponents {
                 return this.push(component, retVal);
             }
         }
-        if (have) return have;
-        this.unknownComponents.push(component);
-        return component;
+
+        if (!this.unknownComponents.includes(component)) this.unknownComponents.push(component);
     }
 }
 

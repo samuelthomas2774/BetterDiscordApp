@@ -10,25 +10,11 @@ addons:
 
 jobs:
   include:
-    - stage: Build
-      script:
-        - npm run build
-        - npm run update_release
-      skip_cleanup: true
-    - stage: Test
-      install: skip
-      script:
-        - npm run lint
-      skip_cleanup: true
-    - stage: Package
-      install: skip
+    - stage: test
+    - stage: release
       script:
         - npm run package_release
         - npm run build_debs
-      skip_cleanup: true
-    - stage: GitHub Release
-      install: skip
-      script: skip
       deploy:
         provider: releases
         api_key: "$GITHUB_OAUTH_TOKEN"

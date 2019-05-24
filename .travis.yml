@@ -13,6 +13,7 @@ jobs:
     - stage: test
     - stage: release
       script:
+        - npm run update_release
         - npm run package_release
         - npm run build_debs
       deploy:

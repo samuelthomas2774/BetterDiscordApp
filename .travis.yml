@@ -11,3 +11,40 @@ addons:
   apt:
     packages:
     - libsecret-1-dev
+
+jobs:
+  include:
+    - stage: Build
+      script:
+        - npm run build
+        - npm run update_release
+    - stage: Test
+      script:
+        - npm run lint
+    - stage: Package
+      script:
+        - npm run package_release
+        - npm run build_debs
+    - stage: GitHub Release
+      script: skip
+      deploy:
+        provider: releases
+        api_key: "$GITHUB_OAUTH_TOKEN"
+        file:
+          # BetterDiscord installer/updater
+          - release/releaseinfo.json
+          - release/core.tar.gz
+          - release/client.tar.gz
+          - release/core.tar.gz
+
+          # dpkg
+          - release/betterdiscord_*.deb
+          - release/betterdiscord-ptb_*.deb
+          - release/betterdiscord-canary_*.deb
+          - release/betterdiscord-core_*.deb
+          - release/betterdiscord-client_*.deb
+          - release/betterdiscord-editor_*.deb
+        file_glob: true
+        skip_cleanup: true
+        on:
+          tags: true

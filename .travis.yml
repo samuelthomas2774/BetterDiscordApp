@@ -10,7 +10,7 @@ addons:
 
 jobs:
   include:
-    # - stage: test
+    - stage: test
     - stage: release
       script:
         - npm run update_release
@@ -24,7 +24,7 @@ jobs:
           - release/releaseinfo.json
           - release/core.tar.gz
           - release/client.tar.gz
-          - release/core.tar.gz
+          - release/editor.tar.gz
 
           # dpkg
           - release/betterdiscord_*.deb

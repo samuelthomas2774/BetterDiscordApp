@@ -14,14 +14,20 @@ jobs:
       script:
         - npm run build
         - npm run update_release
+      skip_cleanup: true
     - stage: Test
+      install: skip
       script:
         - npm run lint
+      skip_cleanup: true
     - stage: Package
+      install: skip
       script:
         - npm run package_release
         - npm run build_debs
+      skip_cleanup: true
     - stage: GitHub Release
+      install: skip
       script: skip
       deploy:
         provider: releases
@@ -41,6 +47,5 @@ jobs:
           - release/betterdiscord-client_*.deb
           - release/betterdiscord-editor_*.deb
         file_glob: true
-        skip_cleanup: true
         on:
           tags: true

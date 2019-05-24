@@ -10,7 +10,7 @@ addons:
 
 jobs:
   include:
-    - stage: test
+    # - stage: test
     - stage: release
       script:
         - npm run update_release
@@ -34,5 +34,6 @@ jobs:
           - release/betterdiscord-client_*.deb
           - release/betterdiscord-editor_*.deb
         file_glob: true
+        skip_cleanup: true
         on:
           tags: true

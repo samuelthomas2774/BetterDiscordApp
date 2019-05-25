@@ -23,10 +23,10 @@ function deb(name) {
         files.push(file);
         callback(null, file);
     }, function (callback) { (async () => {
-        if (files.length !== 3) throw new Error('Must have three files');
-        if (!files[0].path.match(/\/debian-binary$/)) throw new Error('Missing debian-binary file');
-        if (!files[1].path.match(/\/control\.tar(\.gz)?$/)) throw new Error('Missing control archive');
-        if (!files[2].path.match(/\/data\.tar(\.gz)?$/)) throw new Error('Missing data archive');
+        const orderedfiles = [new Vinyl({path: '/debian-binary', contents: Buffer.from('2.0\n')})];
+        orderedfiles.push(files.find(f => f.path.match(/\/control\.tar(\.gz)?$/)));
+        orderedfiles.push(files.find(f => f.path.match(/\/data\.tar(\.gz)?$/)));
+        if (orderedfiles.length !== 3) throw new Error('Must have three files');
 
         const contents = new stream.Readable();
         contents._read = () => {};
@@ -38,14 +38,10 @@ function deb(name) {
             contents
         });
 
-        // console.log('Returning deb', debfile, files);
-
         contents.push('!<arch>' + String.fromCharCode(0x0A)); // Signature
 
-        for (const [index, file] of files.entries()) {
-            // console.log(file, index, file.stat);
-
-            const size = file.stat ? file.stat.size.toString() : file.contents && file.contents.length ? file.contents.length : 0;
+        for (const [index, file] of orderedfiles.entries()) {
+            const size = file.stat && file.stat.size ? file.stat.size : file.contents && file.contents.length ? file.contents.length : 0;
 
             contents.push(rightPaddedWithSpaces(16, path.basename(file.path)));  // Filename (ASCII, 16 bytes long)
             contents.push(rightPaddedWithSpaces(12, (Math.floor(file.stat ? file.stat.mtime / 1000 : 0)).toString())); // File modification timestamp (Decimal, 12 bytes long)
@@ -55,10 +51,8 @@ function deb(name) {
             contents.push(rightPaddedWithSpaces(10, size.toString())); // File size in bytes (Decimal, 10 bytes long)
             contents.push(String.fromCharCode(0x60) + String.fromCharCode(0x0A)); // Ending characters ("0x60 0x0A")
 
-            // stream.write(file.contents);
             if (file.isStream()) await new Promise((resolve, reject) => {
                 file.contents.on('data', data => contents.push(data));
-                // file.contents.pipe(contents);
                 file.contents.on('end', resolve);
                 file.contents.on('error', reject);
             }); else contents.push(file.contents);
@@ -86,6 +80,44 @@ function rightPaddedWithSpaces(n, string) {
     return string + (new Array(n - string.length + 1)).join(String.fromCharCode(0x20));
 }
 
+function ensuredirectories() {
+    const directories = [];
+
+    return through2.obj(function (file, enc, callback) {
+        const name = file.relative;
+        const nameparts = name.split('/');
+
+        if (file.isDirectory()) {
+            if (directories.includes(file.name)) return;
+            directories.push(file.name);
+        } else {
+            for (let [index, part] of nameparts.slice(0, nameparts.length - 1).entries()) {
+                let partpath = part;
+                while (index > 0) {
+                    index--;
+                    partpath = nameparts[index] + '/' + partpath;
+                }
+
+                if (directories.includes(partpath)) continue;
+
+                const directory = new Vinyl({
+                    cwd: file.cwd,
+                    base: file.base,
+                    path: path.join(file.base, partpath),
+                    stat: {
+                        isDirectory: () => true
+                    }
+                });
+
+                this.push(directory);
+                directories.push(partpath);
+            }
+        }
+
+        callback(null, file);
+    });
+}
+
 /**
  * Creates a Debian package.
  * @param {string} name
@@ -98,7 +130,6 @@ function rightPaddedWithSpaces(n, string) {
 function mkdeb(name, datafiles, dataprefix, controlfiles, controlvars) {
     return pump([
         merge([
-            file('debian-binary', '2.0\n', {src: true}),
             pump([
                 gulp.src(controlfiles),
                 ...Object.keys(controlvars || {}).map(k => replace(`\${${k}}`, controlvars[k])),
@@ -108,13 +139,14 @@ function mkdeb(name, datafiles, dataprefix, controlfiles, controlvars) {
             pump([
                 gulp.src(datafiles),
                 rename(p => p.dirname = dataprefix + '/' + p.dirname),
+                ensuredirectories(),
                 tar(name + '.tar'),
                 gzip(),
-                gulp.dest('release')
+                gulp.dest('release'),
+                rename(p => p.basename = 'data.tar')
             ])
         ]),
 
-        rename(p => p.basename = p.basename === name ? 'data' : p.basename === name + '.tar' ? 'data.tar' : p.basename),
         deb(name + '.deb'),
         gulp.dest('release')
     ]);

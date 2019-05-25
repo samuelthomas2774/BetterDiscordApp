@@ -88,8 +88,7 @@ function ensuredirectories() {
         const nameparts = name.split('/');
 
         if (file.isDirectory()) {
-            if (directories.includes(file.name)) return;
-            directories.push(file.name);
+            if (!directories.includes(file.name)) directories.push(file.name);
         } else {
             for (let [index, part] of nameparts.slice(0, nameparts.length - 1).entries()) {
                 let partpath = part;

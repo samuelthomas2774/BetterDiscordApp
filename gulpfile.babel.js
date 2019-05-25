@@ -183,7 +183,7 @@ gulp.task('build-inject-deb-canary', function () {
     return mkdeb(`betterdiscord-canary_${version}-${arch}`, 'other/deb/injector/**/*', '/usr/share/discord-canary/resources/app', 'other/deb/control-canary/**/*');
 });
 
-gulp.task('build-inject-debs', gulp.parallel('build-inject-deb', 'build-inject-deb-ptb', 'build-inject-deb-canary'));
+gulp.task('build-inject-debs', gulp.series('build-inject-deb', 'build-inject-deb-ptb', 'build-inject-deb-canary'));
 
 gulp.task('build-core-deb', function () {
     return mkdeb(`betterdiscord-core_${corepkg.version}-all`, 'release/core/**/*', '/usr/lib/betterdiscord/core', 'other/deb/control-core/**/*', {
@@ -198,8 +198,8 @@ gulp.task('build-client-deb', function () {
 });
 
 gulp.task('build-editor-deb', function () {
-    return mkdeb(`betterdiscord-editor_${clientpkg.version}-all`, 'release/editor/**/*', '/usr/lib/betterdiscord/editor', 'other/deb/control-editor/**/*', {
+    return mkdeb(`betterdiscord-editor_${editorpkg.version}-all`, 'release/editor/**/*', '/usr/lib/betterdiscord/editor', 'other/deb/control-editor/**/*', {
         VERSION: editorpkg.version
     });
 });
-gulp.task('build-debs', gulp.parallel('build-inject-debs', 'build-core-deb', 'build-client-deb', 'build-editor-deb'));
+gulp.task('build-debs', gulp.series('build-inject-debs', 'build-core-deb', 'build-client-deb', 'build-editor-deb'));

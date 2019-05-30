@@ -71,7 +71,8 @@ export default class extends Module {
             const c = contributors.find(c => c.id === user.id);
             if (!c) return;
 
-            const nameTag = retVal.props.children.props.children[1].props.children[0];
+            const flex = retVal.props.children.props.children[1].props.children[0];
+            const nameTag = flex.props.children[0];
             nameTag.type = this.PatchedNameTag || nameTag.type;
         });
 
@@ -91,14 +92,14 @@ export default class extends Module {
 
         this.PatchedNameTag = class extends NameTag.component {
             render() {
-                const retVal = NameTag.component.prototype.render.call(this, arguments);
+                const retVal = NameTag.component.prototype.render.apply(this, arguments);
                 try {
-                    if (!retVal.props || !retVal.props.children) return;
+                    if (!retVal.props || !retVal.props.children) return retVal;
 
                     const user = ReactHelpers.findProp(this, 'user');
-                    if (!user) return;
+                    if (!user) return retVal;
                     const contributor = contributors.find(c => c.id === user.id);
-                    if (!contributor) return;
+                    if (!contributor) return retVal;
 
                     retVal.props.children.splice(1, 0, VueInjector.createReactElement(BdBadge, {
                         contributor,

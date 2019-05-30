@@ -468,7 +468,7 @@ export class ReactAutoPatcher {
     }
 
     static async patchNameTag() {
-        const { selector } = Reflection.resolve('nameTag', 'username', 'discriminator', 'ownerIcon');
+        const { selector } = Reflection.resolve('nameTag', 'username', 'discriminator', 'discriminatorWithMobileIndicator');
         this.NameTag = await ReactComponents.getComponent('NameTag', {selector});
     }
 

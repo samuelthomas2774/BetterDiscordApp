@@ -71,8 +71,7 @@ export default class extends Module {
             const c = contributors.find(c => c.id === user.id);
             if (!c) return;
 
-            const flex = retVal.props.children.props.children[1].props.children[0];
-            const nameTag = flex.props.children[0];
+            const nameTag = retVal.props.children[1].props.children[0].props.children[0];
             nameTag.type = this.PatchedNameTag || nameTag.type;
         });
 

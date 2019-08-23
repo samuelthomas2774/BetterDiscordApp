@@ -5,7 +5,7 @@ set "ELECTRON_VERSION=4.0.8"
 
 call ./scripts/build-keytar.bat %PLATFORM% ia32 %NODE_API_VERSION% %ELECTRON_VERSION%
 
-set "NODE_API_VERSION=68"
-set "ELECTRON_VERSION=5.0.0-beta.8"
+set "NODE_API_VERSION=73"
+set "ELECTRON_VERSION=6.0.2"
 
 call ./scripts/build-keytar.bat %PLATFORM% ia32 %NODE_API_VERSION% %ELECTRON_VERSION%

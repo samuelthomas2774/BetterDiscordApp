@@ -532,7 +532,7 @@ export class ReactAutoPatcher {
         ReactComponents.componentAliases.GuildVoiceChannel = 'VoiceChannel';
 
         const { selector } = Reflection.resolve('containerDefault', 'actionIcon');
-        this.GuildVoiceChannel = await ReactComponents.getComponent('GuildVoiceChannel', {selector}, c => c.prototype.handleVoiceConnect);
+        this.GuildVoiceChannel = await ReactComponents.getComponent('GuildVoiceChannel', {selector}, c => c.prototype.renderVoiceUsers);
 
         this.unpatchGuildVoiceChannel = MonkeyPatch('BD:ReactComponents', this.GuildVoiceChannel.component.prototype).after('render', this._afterChannelRender);
 

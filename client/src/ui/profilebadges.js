@@ -89,26 +89,24 @@ export default class extends Module {
 
         const NameTag = await ReactComponents.getComponent('NameTag');
 
-        this.PatchedNameTag = class extends NameTag.component {
-            render() {
-                const retVal = NameTag.component.prototype.render.apply(this, arguments);
-                try {
-                    if (!retVal.props || !retVal.props.children) return retVal;
+        this.PatchedNameTag = function (props) {
+            const retVal = NameTag.component.apply(this, arguments);
+            try {
+                if (!retVal.props || !retVal.props.children) return retVal;
 
-                    const user = ReactHelpers.findProp(this, 'user');
-                    if (!user) return retVal;
-                    const contributor = contributors.find(c => c.id === user.id);
-                    if (!contributor) return retVal;
+                const user = ReactHelpers.findProp(props, 'user');
+                if (!user) return retVal;
+                const contributor = contributors.find(c => c.id === user.id);
+                if (!contributor) return retVal;
 
-                    retVal.props.children.splice(1, 0, VueInjector.createReactElement(BdBadge, {
-                        contributor,
-                        type: 'nametag'
-                    }));
-                } catch (err) {
-                    Logger.err('ProfileBadges', ['Error thrown while rendering a NameTag', err]);
-                }
-                return retVal;
+                retVal.props.children.splice(1, 0, VueInjector.createReactElement(BdBadge, {
+                    contributor,
+                    type: 'nametag'
+                }));
+            } catch (err) {
+                Logger.err('ProfileBadges', ['Error thrown while rendering a NameTag', err]);
             }
+            return retVal;
         };
 
         // Rerender all channel members

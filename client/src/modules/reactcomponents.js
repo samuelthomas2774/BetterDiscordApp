@@ -473,8 +473,8 @@ export class ReactAutoPatcher {
     }
 
     static async patchGuild() {
-        const selector = `div.${Reflection.resolve('container', 'guildIcon', 'selected', 'unread').className}:not(:first-child)`;
-        this.Guild = await ReactComponents.getComponent('Guild', {selector}, m => m.prototype.renderBadge);
+        const { selector } = Reflection.resolve('listItem', 'guildSeparator', 'selected', 'friendsOnline');
+        this.Guild = await ReactComponents.getComponent('Guild', {selector}, m => m.displayName === 'Guild');
 
         this.unpatchGuild = MonkeyPatch('BD:ReactComponents', this.Guild.component.prototype).after('render', (component, args, retVal) => {
             const { guild } = component.props;
